@@ -1,14 +1,839 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Progress } from '@/components/ui/progress';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import Icon from '@/components/ui/icon';
 
-const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4 color-black text-black">Добро пожаловать!</h1>
-        <p className="text-xl text-gray-600">тут будет отображаться ваш проект</p>
+type UserRole = 'guest' | 'employer' | 'employee';
+
+interface Vacancy {
+  id: number;
+  title: string;
+  department: string;
+  salary: string;
+  status: 'active' | 'closed';
+  recommendations: number;
+}
+
+interface Employee {
+  id: number;
+  name: string;
+  position: string;
+  department: string;
+  avatar: string;
+  recommendations: number;
+  hired: number;
+  earnings: number;
+  level: number;
+}
+
+interface Recommendation {
+  id: number;
+  candidateName: string;
+  vacancy: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  date: string;
+  reward: number;
+}
+
+function Index() {
+  const [userRole, setUserRole] = useState<UserRole>('guest');
+  const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
+
+  const vacancies: Vacancy[] = [
+    { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5 },
+    { id: 2, title: 'Product Manager', department: 'Продукт', salary: '200 000 ₽', status: 'active', recommendations: 3 },
+    { id: 3, title: 'UX/UI Designer', department: 'Дизайн', salary: '180 000 ₽', status: 'active', recommendations: 8 },
+    { id: 4, title: 'DevOps Engineer', department: 'Инфраструктура', salary: '220 000 ₽', status: 'active', recommendations: 2 },
+  ];
+
+  const employees: Employee[] = [
+    { id: 1, name: 'Анна Смирнова', position: 'Tech Lead', department: 'Разработка', avatar: '', recommendations: 12, hired: 4, earnings: 120000, level: 5 },
+    { id: 2, name: 'Дмитрий Иванов', position: 'Senior Developer', department: 'Разработка', avatar: '', recommendations: 8, hired: 2, earnings: 60000, level: 3 },
+    { id: 3, name: 'Мария Петрова', position: 'Product Owner', department: 'Продукт', avatar: '', recommendations: 15, hired: 5, earnings: 150000, level: 6 },
+  ];
+
+  const recommendations: Recommendation[] = [
+    { id: 1, candidateName: 'Алексей Козлов', vacancy: 'Senior Frontend Developer', status: 'pending', date: '2025-11-10', reward: 30000 },
+    { id: 2, candidateName: 'Елена Новикова', vacancy: 'UX/UI Designer', status: 'accepted', date: '2025-11-08', reward: 30000 },
+    { id: 3, candidateName: 'Сергей Волков', vacancy: 'Product Manager', status: 'pending', date: '2025-11-12', reward: 30000 },
+  ];
+
+  const renderLandingPage = () => (
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+      <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Icon name="Rocket" className="text-primary" size={32} />
+            <span className="text-2xl font-bold">RefStaff</span>
+          </div>
+          <nav className="hidden md:flex items-center gap-8">
+            <a href="#how" className="text-sm hover:text-primary transition-colors">Как работает</a>
+            <a href="#benefits" className="text-sm hover:text-primary transition-colors">Преимущества</a>
+            <a href="#pricing" className="text-sm hover:text-primary transition-colors">Тарифы</a>
+            <a href="#contact" className="text-sm hover:text-primary transition-colors">Контакты</a>
+          </nav>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" onClick={() => setUserRole('employee')}>Вход</Button>
+            <Button onClick={() => setUserRole('employer')}>Зарегистрировать компанию</Button>
+          </div>
+        </div>
+      </header>
+
+      <section className="pt-32 pb-20 px-4">
+        <div className="container mx-auto text-center max-w-4xl">
+          <Badge className="mb-6 animate-fade-in">Реферальный рекрутинг нового поколения</Badge>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-slide-up">
+            Нанимайте лучших кандидатов через своих сотрудников
+          </h1>
+          <p className="text-xl text-muted-foreground mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            Платформа для реферального найма с геймификацией и прозрачной системой вознаграждений
+          </p>
+          <Button size="lg" className="animate-scale-in" style={{ animationDelay: '0.2s' }} onClick={() => setUserRole('employer')}>
+            <Icon name="Rocket" className="mr-2" size={20} />
+            Начать бесплатно — 14 дней
+          </Button>
+        </div>
+      </section>
+
+      <section id="how" className="py-20 px-4 bg-white">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-4xl font-bold text-center mb-16">Как это работает</h2>
+          <div className="grid md:grid-cols-4 gap-8">
+            {[
+              { icon: 'Building2', title: 'Регистрация', desc: 'Зарегистрируйте компанию и добавьте вакансии' },
+              { icon: 'Users', title: 'Приглашение', desc: 'Пригласите сотрудников в систему' },
+              { icon: 'UserPlus', title: 'Рекомендации', desc: 'Сотрудники рекомендуют кандидатов' },
+              { icon: 'TrendingUp', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за успешный найм' },
+            ].map((step, i) => (
+              <Card key={i} className="text-center hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Icon name={step.icon as any} className="text-primary" size={32} />
+                  </div>
+                  <CardTitle>{step.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{step.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="benefits" className="py-20 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-4xl font-bold text-center mb-16">Преимущества платформы</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { icon: 'Wallet', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%' },
+              { icon: 'Zap', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза' },
+              { icon: 'Shield', title: 'Качество кандидатов', desc: 'Рекомендации от проверенных сотрудников' },
+              { icon: 'Trophy', title: 'Геймификация', desc: 'Вовлечение сотрудников через достижения' },
+              { icon: 'BarChart3', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса' },
+              { icon: 'Link', title: 'Интеграция', desc: 'API для подключения к вашим системам' },
+            ].map((benefit, i) => (
+              <Card key={i} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <Icon name={benefit.icon as any} className="text-secondary mb-3" size={40} />
+                  <CardTitle className="text-xl">{benefit.title}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{benefit.desc}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="pricing" className="py-20 px-4 bg-white">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-4xl font-bold text-center mb-4">Тарифы</h2>
+          <p className="text-center text-muted-foreground mb-16">14 дней бесплатно для всех новых клиентов</p>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="border-2">
+              <CardHeader>
+                <CardTitle>Пробный период</CardTitle>
+                <CardDescription>Протестируйте платформу</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold mb-4">0 ₽</div>
+                <p className="text-sm text-muted-foreground mb-6">14 дней бесплатно</p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">До 300 сотрудников</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">Все функции платформы</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">Поддержка 24/7</span>
+                  </li>
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full" variant="outline" onClick={() => setUserRole('employer')}>Попробовать</Button>
+              </CardFooter>
+            </Card>
+
+            <Card className="border-2 border-primary shadow-xl scale-105 relative">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <Badge className="bg-secondary">Популярный</Badge>
+              </div>
+              <CardHeader>
+                <CardTitle>До 300 сотрудников</CardTitle>
+                <CardDescription>Для растущих компаний</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold mb-1">19 900 ₽</div>
+                <p className="text-sm text-muted-foreground mb-2">в месяц</p>
+                <p className="text-sm text-green-600 font-medium mb-6">15 920 ₽/мес при годовой оплате</p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">До 300 сотрудников</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">Неограниченные вакансии</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">API интеграция</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">Аналитика и отчёты</span>
+                  </li>
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full" onClick={() => setUserRole('employer')}>Подключить</Button>
+              </CardFooter>
+            </Card>
+
+            <Card className="border-2">
+              <CardHeader>
+                <CardTitle>Свыше 300 сотрудников</CardTitle>
+                <CardDescription>Для крупных компаний</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-4xl font-bold mb-1">48 900 ₽</div>
+                <p className="text-sm text-muted-foreground mb-2">в месяц</p>
+                <p className="text-sm text-green-600 font-medium mb-6">39 120 ₽/мес при годовой оплате</p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">Неограниченное количество</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">Приоритетная поддержка</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">Персональный менеджер</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
+                    <span className="text-sm">Кастомизация системы</span>
+                  </li>
+                </ul>
+              </CardContent>
+              <CardFooter>
+                <Button className="w-full" variant="outline" onClick={() => setUserRole('employer')}>Подключить</Button>
+              </CardFooter>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" className="py-20 px-4">
+        <div className="container mx-auto max-w-2xl">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">Остались вопросы?</CardTitle>
+              <CardDescription>Свяжитесь с нами, и мы с радостью ответим</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form className="space-y-4">
+                <div>
+                  <Label htmlFor="name">Имя</Label>
+                  <Input id="name" placeholder="Иван Иванов" />
+                </div>
+                <div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="ivan@company.ru" />
+                </div>
+                <div>
+                  <Label htmlFor="message">Сообщение</Label>
+                  <Textarea id="message" placeholder="Расскажите о вашем проекте..." rows={4} />
+                </div>
+                <Button className="w-full">Отправить</Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+
+      <footer className="border-t bg-gray-50 py-12 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid md:grid-cols-4 gap-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Icon name="Rocket" className="text-primary" size={24} />
+                <span className="text-lg font-bold">RefStaff</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Платформа реферального рекрутинга с геймификацией
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Продукт</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary">Возможности</a></li>
+                <li><a href="#" className="hover:text-primary">Тарифы</a></li>
+                <li><a href="#" className="hover:text-primary">API документация</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Компания</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary">О нас</a></li>
+                <li><a href="#" className="hover:text-primary">Блог</a></li>
+                <li><a href="#" className="hover:text-primary">Контакты</a></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-4">Правовая информация</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary">Политика конфиденциальности</a></li>
+                <li><a href="#" className="hover:text-primary">Пользовательское соглашение</a></li>
+              </ul>
+            </div>
+          </div>
+          <div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
+            © 2025 RefStaff. Все права защищены.
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+
+  const renderEmployerDashboard = () => (
+    <div className="min-h-screen bg-gray-50">
+      <header className="border-b bg-white">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Icon name="Rocket" className="text-primary" size={28} />
+            <span className="text-xl font-bold">RefStaff</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon">
+              <Icon name="Bell" size={20} />
+            </Button>
+            <Button variant="ghost" onClick={() => setUserRole('guest')}>Выход</Button>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-3xl font-bold mb-8">Личный кабинет работодателя</h1>
+
+        <Tabs defaultValue="vacancies" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 lg:w-auto">
+            <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
+            <TabsTrigger value="employees">Сотрудники</TabsTrigger>
+            <TabsTrigger value="recommendations">Рекомендации</TabsTrigger>
+            <TabsTrigger value="stats">Статистика</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="vacancies" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold">Активные вакансии</h2>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Icon name="Plus" className="mr-2" size={18} />
+                    Добавить вакансию
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Новая вакансия</DialogTitle>
+                    <DialogDescription>Создайте новую вакансию для реферального найма</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 pt-4">
+                    <div>
+                      <Label htmlFor="vacancy-title">Название должности</Label>
+                      <Input id="vacancy-title" placeholder="Senior Frontend Developer" />
+                    </div>
+                    <div>
+                      <Label htmlFor="department">Отдел</Label>
+                      <Input id="department" placeholder="Разработка" />
+                    </div>
+                    <div>
+                      <Label htmlFor="salary">Зарплата</Label>
+                      <Input id="salary" placeholder="250 000 ₽" />
+                    </div>
+                    <div>
+                      <Label htmlFor="requirements">Требования</Label>
+                      <Textarea id="requirements" placeholder="Опыт работы от 5 лет..." rows={4} />
+                    </div>
+                    <Button className="w-full">Создать вакансию</Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            <div className="grid gap-4">
+              {vacancies.map((vacancy) => (
+                <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle>{vacancy.title}</CardTitle>
+                        <CardDescription>{vacancy.department}</CardDescription>
+                      </div>
+                      <Badge variant="secondary">{vacancy.status === 'active' ? 'Активна' : 'Закрыта'}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Icon name="Wallet" size={16} className="text-muted-foreground" />
+                          <span>{vacancy.salary}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Icon name="Users" size={16} className="text-muted-foreground" />
+                          <span>{vacancy.recommendations} рекомендаций</span>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm">Редактировать</Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="employees" className="space-y-4">
+            <h2 className="text-2xl font-semibold">Сотрудники компании</h2>
+            <div className="grid gap-4">
+              {employees.map((employee) => (
+                <Card key={employee.id}>
+                  <CardHeader>
+                    <div className="flex items-center gap-4">
+                      <Avatar className="h-12 w-12">
+                        <AvatarImage src={employee.avatar} />
+                        <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <CardTitle className="text-lg">{employee.name}</CardTitle>
+                        <CardDescription>{employee.position} • {employee.department}</CardDescription>
+                      </div>
+                      <Badge variant="outline">Уровень {employee.level}</Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-3 gap-4 text-center">
+                      <div>
+                        <div className="text-2xl font-bold text-primary">{employee.recommendations}</div>
+                        <div className="text-xs text-muted-foreground">Рекомендаций</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-green-600">{employee.hired}</div>
+                        <div className="text-xs text-muted-foreground">Нанято</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-secondary">{employee.earnings.toLocaleString()} ₽</div>
+                        <div className="text-xs text-muted-foreground">Заработано</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="recommendations" className="space-y-4">
+            <h2 className="text-2xl font-semibold">Рекомендации кандидатов</h2>
+            <div className="grid gap-4">
+              {recommendations.map((rec) => (
+                <Card key={rec.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg">{rec.candidateName}</CardTitle>
+                        <CardDescription>{rec.vacancy}</CardDescription>
+                      </div>
+                      <Badge variant={
+                        rec.status === 'accepted' ? 'default' : 
+                        rec.status === 'rejected' ? 'destructive' : 
+                        'secondary'
+                      }>
+                        {rec.status === 'accepted' ? 'Принят' : 
+                         rec.status === 'rejected' ? 'Отклонён' : 
+                         'На рассмотрении'}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Icon name="Calendar" size={16} />
+                          <span>{new Date(rec.date).toLocaleDateString('ru-RU')}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Icon name="Award" size={16} />
+                          <span>{rec.reward.toLocaleString()} ₽</span>
+                        </div>
+                      </div>
+                      {rec.status === 'pending' && (
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm">
+                            <Icon name="X" className="mr-1" size={16} />
+                            Отклонить
+                          </Button>
+                          <Button size="sm">
+                            <Icon name="Check" className="mr-1" size={16} />
+                            Принять
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="stats" className="space-y-6">
+            <h2 className="text-2xl font-semibold">Статистика по компании</h2>
+            
+            <div className="grid md:grid-cols-4 gap-4">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Всего рекомендаций</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">35</div>
+                  <p className="text-xs text-green-600 mt-1">+12% за месяц</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Принято кандидатов</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">11</div>
+                  <p className="text-xs text-green-600 mt-1">Конверсия 31%</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Выплачено бонусов</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">330К ₽</div>
+                  <p className="text-xs text-muted-foreground mt-1">За весь период</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardDescription>Средний срок найма</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold">18 дней</div>
+                  <p className="text-xs text-green-600 mt-1">-40% vs рынка</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Топ рекрутеров месяца</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {employees.sort((a, b) => b.hired - a.hired).map((emp, idx) => (
+                    <div key={emp.id} className="flex items-center gap-4">
+                      <div className="text-2xl font-bold text-muted-foreground w-8">#{idx + 1}</div>
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback>{emp.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1">
+                        <div className="font-medium">{emp.name}</div>
+                        <div className="text-sm text-muted-foreground">{emp.hired} успешных найма</div>
+                      </div>
+                      <Badge variant="secondary">
+                        <Icon name="TrendingUp" className="mr-1" size={14} />
+                        {emp.earnings.toLocaleString()} ₽
+                      </Badge>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
-};
+
+  const renderEmployeeDashboard = () => (
+    <div className="min-h-screen bg-gray-50">
+      <header className="border-b bg-white">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Icon name="Rocket" className="text-primary" size={28} />
+            <span className="text-xl font-bold">RefStaff</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon">
+              <Icon name="Bell" size={20} />
+            </Button>
+            <Button variant="ghost" onClick={() => setUserRole('guest')}>Выход</Button>
+          </div>
+        </div>
+      </header>
+
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          <Card className="md:col-span-2">
+            <CardHeader>
+              <div className="flex items-center gap-4">
+                <Avatar className="h-16 w-16">
+                  <AvatarFallback>АС</AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <CardTitle className="text-2xl">Анна Смирнова</CardTitle>
+                  <CardDescription>Tech Lead • Разработка</CardDescription>
+                </div>
+                <Button variant="outline">Редактировать</Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="font-medium">Уровень 5</span>
+                    <span className="text-muted-foreground">250 / 500 XP</span>
+                  </div>
+                  <Progress value={50} className="h-2" />
+                </div>
+                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-primary">12</div>
+                    <div className="text-xs text-muted-foreground">Рекомендаций</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">4</div>
+                    <div className="text-xs text-muted-foreground">Нанято</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-secondary">120К ₽</div>
+                    <div className="text-xs text-muted-foreground">Заработано</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="Trophy" className="text-yellow-500" size={24} />
+                Достижения
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
+                    <Icon name="Star" className="text-yellow-600" size={20} />
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">Первая рекомендация</div>
+                    <div className="text-xs text-muted-foreground">Получено</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+                    <Icon name="Target" className="text-green-600" size={20} />
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">Меткий глаз</div>
+                    <div className="text-xs text-muted-foreground">3 успешных найма</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3 opacity-50">
+                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                    <Icon name="Award" className="text-purple-600" size={20} />
+                  </div>
+                  <div>
+                    <div className="font-medium text-sm">Рекрутер месяца</div>
+                    <div className="text-xs text-muted-foreground">2/5 наймов</div>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="vacancies" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
+            <TabsTrigger value="my-recommendations">Мои рекомендации</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="vacancies" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold">Открытые вакансии</h2>
+            </div>
+
+            <div className="grid gap-4">
+              {vacancies.map((vacancy) => (
+                <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle>{vacancy.title}</CardTitle>
+                        <CardDescription>{vacancy.department}</CardDescription>
+                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button onClick={() => setActiveVacancy(vacancy)}>
+                            <Icon name="UserPlus" className="mr-2" size={18} />
+                            Рекомендовать
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Рекомендовать кандидата</DialogTitle>
+                            <DialogDescription>
+                              Вакансия: {activeVacancy?.title}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <div className="space-y-4 pt-4">
+                            <div>
+                              <Label htmlFor="candidate-name">ФИО кандидата</Label>
+                              <Input id="candidate-name" placeholder="Иван Иванов" />
+                            </div>
+                            <div>
+                              <Label htmlFor="candidate-email">Email</Label>
+                              <Input id="candidate-email" type="email" placeholder="ivan@example.com" />
+                            </div>
+                            <div>
+                              <Label htmlFor="candidate-phone">Телефон</Label>
+                              <Input id="candidate-phone" placeholder="+7 (999) 123-45-67" />
+                            </div>
+                            <div>
+                              <Label htmlFor="candidate-resume">Резюме (DOC, DOCX, PDF)</Label>
+                              <Input id="candidate-resume" type="file" accept=".doc,.docx,.pdf" />
+                            </div>
+                            <div>
+                              <Label htmlFor="comment">Комментарий</Label>
+                              <Textarea id="comment" placeholder="Почему этот кандидат подходит..." rows={3} />
+                            </div>
+                            <div className="bg-primary/10 p-4 rounded-lg">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Icon name="Award" className="text-primary" size={20} />
+                                <span className="font-medium">Вознаграждение за успешный найм</span>
+                              </div>
+                              <div className="text-2xl font-bold text-primary">30 000 ₽</div>
+                            </div>
+                            <Button className="w-full">Отправить рекомендацию</Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-2 text-sm">
+                        <Icon name="Wallet" size={16} className="text-muted-foreground" />
+                        <span>{vacancy.salary}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Icon name="Users" size={16} className="text-muted-foreground" />
+                        <span>{vacancy.recommendations} рекомендаций</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-primary">
+                        <Icon name="Award" size={16} />
+                        <span className="font-medium">30 000 ₽ за найм</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="my-recommendations" className="space-y-4">
+            <h2 className="text-2xl font-semibold">Мои рекомендации</h2>
+            <div className="grid gap-4">
+              {recommendations.slice(0, 2).map((rec) => (
+                <Card key={rec.id}>
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-lg">{rec.candidateName}</CardTitle>
+                        <CardDescription>{rec.vacancy}</CardDescription>
+                      </div>
+                      <Badge variant={
+                        rec.status === 'accepted' ? 'default' : 
+                        rec.status === 'rejected' ? 'destructive' : 
+                        'secondary'
+                      }>
+                        {rec.status === 'accepted' ? 'Принят' : 
+                         rec.status === 'rejected' ? 'Отклонён' : 
+                         'На рассмотрении'}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Icon name="Calendar" size={16} />
+                        <span>{new Date(rec.date).toLocaleDateString('ru-RU')}</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <Icon name="Award" size={16} />
+                        <span>{rec.reward.toLocaleString()} ₽</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+      {userRole === 'guest' && renderLandingPage()}
+      {userRole === 'employer' && renderEmployerDashboard()}
+      {userRole === 'employee' && renderEmployeeDashboard()}
+    </>
+  );
+}
 
 export default Index;
