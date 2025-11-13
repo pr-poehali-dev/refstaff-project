@@ -2143,7 +2143,8 @@ function Index() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+    );
+  };
 
   return (
     <>
