@@ -179,6 +179,12 @@ export const api = {
     return response.json();
   },
 
+  async getCompanyByToken(inviteToken: string): Promise<Company> {
+    const response = await fetch(`${API_URL}/?resource=company&invite_token=${inviteToken}`);
+    if (!response.ok) throw new Error('Failed to fetch company by token');
+    return response.json();
+  },
+
   async updateCompany(companyId: number, data: Partial<Company>): Promise<Company> {
     const response = await fetch(`${API_URL}/?resource=company`, {
       method: 'PUT',

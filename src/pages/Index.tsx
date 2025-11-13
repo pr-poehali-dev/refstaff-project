@@ -1287,8 +1287,8 @@ function Index() {
             <div>
               <Label>Реферальная ссылка компании</Label>
               <div className="flex gap-2 mt-2">
-                <Input value={company?.invite_token ? `https://refstaff.app/join/${company.invite_token}` : 'Загрузка...'} readOnly />
-                <Button onClick={() => company?.invite_token && navigator.clipboard.writeText(`https://refstaff.app/join/${company.invite_token}`)}>
+                <Input value={company?.invite_token ? `${window.location.origin}/invite/${company.invite_token}` : 'Загрузка...'} readOnly />
+                <Button onClick={() => company?.invite_token && navigator.clipboard.writeText(`${window.location.origin}/invite/${company.invite_token}`)}>
                   <Icon name="Copy" size={18} />
                 </Button>
               </div>
