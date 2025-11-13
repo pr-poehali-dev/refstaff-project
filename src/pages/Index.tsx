@@ -62,6 +62,15 @@ interface ChatMessage {
   isOwn: boolean;
 }
 
+interface NewsPost {
+  id: number;
+  title: string;
+  content: string;
+  author: string;
+  date: string;
+  category: 'news' | 'achievement' | 'announcement' | 'blog';
+}
+
 function Index() {
   const [userRole, setUserRole] = useState<UserRole>(() => {
     const saved = localStorage.getItem('userRole');
@@ -134,6 +143,39 @@ function Index() {
     lastName: 'Смирнова',
     position: 'Tech Lead',
     department: 'Разработка'
+  });
+
+  const [newsPosts, setNewsPosts] = useState<NewsPost[]>([
+    { 
+      id: 1, 
+      title: 'Добро пожаловать в реферальную программу!', 
+      content: 'Мы рады запустить новую систему вознаграждений за рекомендацию кандидатов. Теперь вы можете зарабатывать бонусы, помогая компании находить лучшие таланты.', 
+      author: 'HR Отдел', 
+      date: '2025-11-10',
+      category: 'announcement'
+    },
+    { 
+      id: 2, 
+      title: 'Наша команда выросла до 50 человек!', 
+      content: 'Благодаря вашим рекомендациям, наша команда достигла важной отметки. Спасибо всем за активное участие в программе!', 
+      author: 'Руководство', 
+      date: '2025-11-08',
+      category: 'achievement'
+    },
+    { 
+      id: 3, 
+      title: 'Новые вакансии в отделе разработки', 
+      content: 'Открыты 5 новых позиций для frontend и backend разработчиков. Повышенное вознаграждение - до 50 000 ₽ за успешный найм!', 
+      author: 'Отдел разработки', 
+      date: '2025-11-05',
+      category: 'news'
+    }
+  ]);
+  const [showCreateNewsDialog, setShowCreateNewsDialog] = useState(false);
+  const [newsForm, setNewsForm] = useState({
+    title: '',
+    content: '',
+    category: 'news' as 'news' | 'achievement' | 'announcement' | 'blog'
   });
 
   useEffect(() => {
@@ -383,6 +425,32 @@ function Index() {
       console.error('Ошибка обновления данных сотрудника:', error);
       alert('Не удалось обновить данные сотрудника');
     }
+  };
+
+  const handleCreateNews = () => {
+    if (!newsForm.title || !newsForm.content) {
+      alert('Заполните все поля');
+      return;
+    }
+
+    const newPost: NewsPost = {
+      id: newsPosts.length + 1,
+      title: newsForm.title,
+      content: newsForm.content,
+      author: company?.name || 'Администратор',
+      date: new Date().toISOString().split('T')[0],
+      category: newsForm.category
+    };
+
+    setNewsPosts([newPost, ...newsPosts]);
+    setNewsForm({ title: '', content: '', category: 'news' });
+    setShowCreateNewsDialog(false);
+    alert('Новость успешно опубликована!');
+  };
+
+  const handleDeleteNews = (id: number) => {
+    setNewsPosts(newsPosts.filter(post => post.id !== id));
+    alert('Новость удалена');
   };
 
   const renderLandingPage = () => (
@@ -812,10 +880,11 @@ function Index() {
           </div>
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto">
             <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
             <TabsTrigger value="employees">Сотрудники</TabsTrigger>
             <TabsTrigger value="recommendations">Рекомендации</TabsTrigger>
+            <TabsTrigger value="news">Новости</TabsTrigger>
             <TabsTrigger value="chats">Чаты</TabsTrigger>
             <TabsTrigger value="integrations">Интеграции</TabsTrigger>
             <TabsTrigger value="stats">Статистика</TabsTrigger>
@@ -1262,6 +1331,57 @@ function Index() {
             </div>
           </TabsContent>
 
+          <TabsContent value="news" className="space-y-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold">Новости компании</h2>
+              <Button onClick={() => setShowCreateNewsDialog(true)}>
+                <Icon name="Plus" className="mr-2" size={18} />
+                Создать новость
+              </Button>
+            </div>
+
+            <div className="grid gap-4">
+              {newsPosts.map((post) => (
+                <Card key={post.id} className="hover:shadow-md transition-shadow">
+                  <CardHeader>
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant={
+                            post.category === 'news' ? 'default' :
+                            post.category === 'achievement' ? 'secondary' :
+                            post.category === 'announcement' ? 'outline' :
+                            'default'
+                          }>
+                            {post.category === 'news' ? '📰 Новость' :
+                             post.category === 'achievement' ? '🏆 Достижение' :
+                             post.category === 'announcement' ? '📢 Объявление' :
+                             '✍️ Блог'}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(post.date).toLocaleDateString('ru-RU')}
+                          </span>
+                        </div>
+                        <CardTitle className="text-xl">{post.title}</CardTitle>
+                        <CardDescription className="mt-1">Автор: {post.author}</CardDescription>
+                      </div>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleDeleteNews(post.id)}
+                      >
+                        <Icon name="Trash2" size={16} className="text-destructive" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
           <TabsContent value="chats" className="space-y-4">
             <h2 className="text-2xl font-semibold mb-4">Чаты с сотрудниками</h2>
             <div className="grid gap-3">
@@ -1651,6 +1771,77 @@ function Index() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={showCreateNewsDialog} onOpenChange={setShowCreateNewsDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Создать новость</DialogTitle>
+            <DialogDescription>
+              Опубликуйте новость или объявление для сотрудников компании
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="news-category">Категория</Label>
+              <Select 
+                value={newsForm.category}
+                onValueChange={(value) => setNewsForm({...newsForm, category: value as any})}
+              >
+                <SelectTrigger id="news-category">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="news">📰 Новость</SelectItem>
+                  <SelectItem value="achievement">🏆 Достижение</SelectItem>
+                  <SelectItem value="announcement">📢 Объявление</SelectItem>
+                  <SelectItem value="blog">✍️ Блог</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="news-title">Заголовок</Label>
+              <Input 
+                id="news-title" 
+                placeholder="Введите заголовок новости"
+                value={newsForm.title}
+                onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="news-content">Содержание</Label>
+              <Textarea 
+                id="news-content" 
+                placeholder="Расскажите подробнее..."
+                rows={8}
+                value={newsForm.content}
+                onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Эта новость увидят все сотрудники компании на главной странице
+              </p>
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button 
+                className="flex-1"
+                onClick={handleCreateNews}
+              >
+                <Icon name="Send" className="mr-2" size={18} />
+                Опубликовать
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => {
+                  setShowCreateNewsDialog(false);
+                  setNewsForm({ title: '', content: '', category: 'news' });
+                }}
+              >
+                Отмена
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
@@ -1950,13 +2141,69 @@ function Index() {
           </Card>
         </div>
 
-        <Tabs defaultValue="vacancies" className="space-y-6">
+        <Tabs defaultValue="news" className="space-y-6">
           <TabsList>
+            <TabsTrigger value="news">Новости</TabsTrigger>
             <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
             <TabsTrigger value="my-recommendations">Мои рекомендации</TabsTrigger>
             <TabsTrigger value="achievements">Достижения</TabsTrigger>
             <TabsTrigger value="wallet-history">История кошелька</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="news" className="space-y-4">
+            <h2 className="text-2xl font-semibold mb-4">Новости компании</h2>
+            
+            {newsPosts.length === 0 ? (
+              <Card>
+                <CardContent className="py-12 text-center">
+                  <Icon name="Newspaper" className="mx-auto mb-4 text-muted-foreground" size={48} />
+                  <p className="text-muted-foreground">Пока нет новостей</p>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {newsPosts.map((post) => (
+                  <Card key={post.id} className="hover:shadow-md transition-shadow">
+                    <CardHeader>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge variant={
+                          post.category === 'news' ? 'default' :
+                          post.category === 'achievement' ? 'secondary' :
+                          post.category === 'announcement' ? 'outline' :
+                          'default'
+                        }>
+                          {post.category === 'news' ? '📰 Новость' :
+                           post.category === 'achievement' ? '🏆 Достижение' :
+                           post.category === 'announcement' ? '📢 Объявление' :
+                           '✍️ Блог'}
+                        </Badge>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(post.date).toLocaleDateString('ru-RU')}
+                        </span>
+                      </div>
+                      <CardTitle className="text-xl">{post.title}</CardTitle>
+                      <CardDescription>Автор: {post.author}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
+                    </CardContent>
+                    <CardFooter className="border-t pt-4">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <Button variant="ghost" size="sm">
+                          <Icon name="Heart" className="mr-1" size={16} />
+                          Нравится
+                        </Button>
+                        <Button variant="ghost" size="sm">
+                          <Icon name="MessageCircle" className="mr-1" size={16} />
+                          Комментарии
+                        </Button>
+                      </div>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
 
           <TabsContent value="vacancies" className="space-y-4">
             <div className="flex justify-between items-center">
