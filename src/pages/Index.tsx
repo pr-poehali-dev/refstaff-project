@@ -79,6 +79,7 @@ function Index() {
   const [newMessage, setNewMessage] = useState('');
   const [inviteLink, setInviteLink] = useState('https://refstaff.app/join/abc123def456');
   const [newReward, setNewReward] = useState('30000');
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(2);
 
   useEffect(() => {
     localStorage.setItem('userRole', userRole);
@@ -101,6 +102,11 @@ function Index() {
     };
     setChatMessages([...chatMessages, newMsg]);
     setNewMessage('');
+  };
+
+  const handleOpenChat = () => {
+    setShowChatDialog(true);
+    setUnreadMessagesCount(0);
   };
 
   const currentEmployeeId = 1;
@@ -998,9 +1004,14 @@ function Index() {
               <Icon name="Building2" className="mr-2" size={18} />
               О компании
             </Button>
-            <Button variant="ghost" onClick={() => setShowChatDialog(true)}>
+            <Button variant="ghost" onClick={handleOpenChat} className="relative">
               <Icon name="MessageCircle" className="mr-2" size={18} />
               Чат с HR
+              {unreadMessagesCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadMessagesCount}
+                </span>
+              )}
             </Button>
             <Button variant="ghost" onClick={handleLogout}>Выход</Button>
           </div>
