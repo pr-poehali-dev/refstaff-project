@@ -47,7 +47,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             status = query_params.get('status', 'active')
             
             query = """
-                SELECT v.*, 
+                SELECT v.id, v.title, v.department, v.salary_display, v.status, 
+                       v.reward_amount, v.payout_delay_days, v.requirements, v.description,
+                       v.referral_token, v.created_at,
                        COUNT(r.id) as recommendations_count,
                        u.first_name || ' ' || u.last_name as created_by_name
                 FROM t_p65890965_refstaff_project.vacancies v
@@ -75,9 +77,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             query = """
                 INSERT INTO t_p65890965_refstaff_project.vacancies 
-                (company_id, title, department, salary_display, requirements, description, reward_amount, created_by)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-                RETURNING id, title, department, salary_display, status, reward_amount, created_at
+                (company_id, title, department, salary_display, requirements, description, reward_amount, payout_delay_days, created_by)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id, title, department, salary_display, status, reward_amount, payout_delay_days, created_at
             """
             
             cur.execute(query, (
@@ -88,6 +90,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 body_data.get('requirements', ''),
                 body_data.get('description', ''),
                 body_data.get('reward_amount', 30000),
+                body_data.get('payout_delay_days', 30),
                 body_data.get('created_by', 1)
             ))
             
@@ -215,11 +218,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """
                 cur.execute(update_user, (rec_data['reward_amount'], rec_data['recommended_by']))
                 
-                unlock_date = "CURRENT_TIMESTAMP + INTERVAL '1 month'"
+                get_vacancy_delay = """
+                    SELECT payout_delay_days FROM t_p65890965_refstaff_project.vacancies
+                    WHERE id = (SELECT vacancy_id FROM t_p65890965_refstaff_project.recommendations WHERE id = %s)
+                """
+                cur.execute(get_vacancy_delay, (recommendation_id,))
+                vacancy_info = cur.fetchone()
+                delay_days = vacancy_info['payout_delay_days'] if vacancy_info else 30
+                
                 create_pending_payout = f"""
                     INSERT INTO t_p65890965_refstaff_project.pending_payouts 
                     (user_id, recommendation_id, amount, unlock_date, status)
-                    VALUES (%s, %s, %s, {unlock_date}, 'pending')
+                    VALUES (%s, %s, %s, CURRENT_TIMESTAMP + INTERVAL '{delay_days} days', 'pending')
                 """
                 cur.execute(create_pending_payout, (
                     rec_data['recommended_by'], 

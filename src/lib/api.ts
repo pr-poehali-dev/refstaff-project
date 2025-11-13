@@ -9,6 +9,8 @@ export interface Vacancy {
   description?: string;
   status: 'active' | 'closed';
   reward_amount: number;
+  payout_delay_days?: number;
+  referral_token?: string;
   recommendations_count?: number;
   created_at: string;
 }

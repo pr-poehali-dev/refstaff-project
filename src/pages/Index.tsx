@@ -23,6 +23,7 @@ interface Vacancy {
   status: 'active' | 'closed';
   recommendations: number;
   reward: number;
+  payoutDelayDays: number;
   referralLink?: string;
 }
 
@@ -102,10 +103,10 @@ function Index() {
   };
 
   const vacancies: Vacancy[] = [
-    { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5, reward: 30000, referralLink: 'https://refstaff.app/r/vac1' },
-    { id: 2, title: 'Product Manager', department: 'Продукт', salary: '200 000 ₽', status: 'active', recommendations: 3, reward: 25000, referralLink: 'https://refstaff.app/r/vac2' },
-    { id: 3, title: 'UX/UI Designer', department: 'Дизайн', salary: '180 000 ₽', status: 'active', recommendations: 8, reward: 30000, referralLink: 'https://refstaff.app/r/vac3' },
-    { id: 4, title: 'DevOps Engineer', department: 'Инфраструктура', salary: '220 000 ₽', status: 'active', recommendations: 2, reward: 35000, referralLink: 'https://refstaff.app/r/vac4' },
+    { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5, reward: 30000, payoutDelayDays: 30, referralLink: 'https://refstaff.app/r/vac1' },
+    { id: 2, title: 'Product Manager', department: 'Продукт', salary: '200 000 ₽', status: 'active', recommendations: 3, reward: 25000, payoutDelayDays: 45, referralLink: 'https://refstaff.app/r/vac2' },
+    { id: 3, title: 'UX/UI Designer', department: 'Дизайн', salary: '180 000 ₽', status: 'active', recommendations: 8, reward: 30000, payoutDelayDays: 60, referralLink: 'https://refstaff.app/r/vac3' },
+    { id: 4, title: 'DevOps Engineer', department: 'Инфраструктура', salary: '220 000 ₽', status: 'active', recommendations: 2, reward: 35000, payoutDelayDays: 90, referralLink: 'https://refstaff.app/r/vac4' },
   ];
 
   const employees: Employee[] = [
@@ -543,6 +544,24 @@ function Index() {
                       <p className="text-xs text-muted-foreground mt-1">Сумма в рублях, которую получит сотрудник за успешный найм</p>
                     </div>
                     <div>
+                      <Label htmlFor="payout-delay">Срок выплаты вознаграждения</Label>
+                      <Select defaultValue="30">
+                        <SelectTrigger id="payout-delay">
+                          <SelectValue placeholder="Выберите срок" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="0">Сразу после найма</SelectItem>
+                          <SelectItem value="7">Через 7 дней</SelectItem>
+                          <SelectItem value="14">Через 14 дней</SelectItem>
+                          <SelectItem value="30">Через 30 дней</SelectItem>
+                          <SelectItem value="45">Через 45 дней</SelectItem>
+                          <SelectItem value="60">Через 60 дней</SelectItem>
+                          <SelectItem value="90">Через 90 дней (испытательный срок)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground mt-1">Когда сотрудник получит деньги после принятия кандидата</p>
+                    </div>
+                    <div>
                       <Label htmlFor="requirements">Требования</Label>
                       <Textarea id="requirements" placeholder="Опыт работы от 5 лет..." rows={4} />
                     </div>
@@ -579,6 +598,10 @@ function Index() {
                           <div className="flex items-center gap-2 text-sm text-primary">
                             <Icon name="Award" size={16} />
                             <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                            <Icon name="Clock" size={16} />
+                            <span>Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'}</span>
                           </div>
                         </div>
                         <Button variant="outline" size="sm">Редактировать</Button>
@@ -1106,7 +1129,12 @@ function Index() {
                                 <span className="font-medium">Вознаграждение за успешный найм</span>
                               </div>
                               <div className="text-2xl font-bold text-primary">{activeVacancy?.reward.toLocaleString()} ₽</div>
-                              <p className="text-xs text-muted-foreground mt-1">Выплата через 30 дней после найма</p>
+                              <p className="text-xs text-muted-foreground mt-1">
+                                {activeVacancy?.payoutDelayDays === 0 
+                                  ? 'Выплата сразу после найма'
+                                  : `Выплата через ${activeVacancy?.payoutDelayDays} ${activeVacancy?.payoutDelayDays === 1 ? 'день' : (activeVacancy?.payoutDelayDays ?? 0) < 5 ? 'дня' : 'дней'} после найма`
+                                }
+                              </p>
                             </div>
                             <Button className="w-full">Отправить рекомендацию</Button>
                           </div>
