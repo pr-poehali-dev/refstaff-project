@@ -119,6 +119,14 @@ function Index() {
     phone: '',
     comment: ''
   });
+  
+  const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    firstName: 'Анна',
+    lastName: 'Смирнова',
+    position: 'Tech Lead',
+    department: 'Разработка'
+  });
 
   useEffect(() => {
     localStorage.setItem('userRole', userRole);
@@ -173,7 +181,7 @@ function Index() {
         recommendations: v.recommendations_count || 0,
         reward: v.reward_amount,
         payoutDelayDays: v.payout_delay_days || 30,
-        referralLink: v.referral_token ? `https://refstaff.app/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
+        referralLink: v.referral_token ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
 
       const mappedEmployees: Employee[] = employeesData.map((e: ApiEmployee) => ({
@@ -584,6 +592,10 @@ function Index() {
               <Input id="admin-password" type="password" placeholder="Минимум 8 символов" />
             </div>
             <div>
+              <Label htmlFor="company-inn">ИНН компании</Label>
+              <Input id="company-inn" placeholder="1234567890" maxLength={12} />
+            </div>
+            <div>
               <Label htmlFor="employee-count">Количество сотрудников</Label>
               <Input id="employee-count" type="number" placeholder="50" />
             </div>
@@ -646,7 +658,12 @@ function Index() {
     </div>
   );
 
-  const renderEmployerDashboard = () => (
+  const renderEmployerDashboard = () => {
+    const isSubscriptionExpired = company?.subscription_end_date 
+      ? new Date(company.subscription_end_date) < new Date() 
+      : false;
+    
+    return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -682,6 +699,29 @@ function Index() {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Личный кабинет работодателя</h1>
 
+        {isSubscriptionExpired && (
+          <Card className="mb-8 bg-destructive/10 border-destructive">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0">
+                  <Icon name="AlertTriangle" className="text-destructive" size={24} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-lg mb-2 text-destructive">Подписка истекла</h3>
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Ваша подписка закончилась. Данные сохранены, но доступ к функционалу ограничен. 
+                    Продлите подписку, чтобы продолжить управление вакансиями и рекомендациями.
+                  </p>
+                  <Button onClick={() => setShowSubscriptionDialog(true)}>
+                    <Icon name="CreditCard" className="mr-2" size={18} />
+                    Продлить подписку
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {isLoading ? (
           <div className="flex items-center justify-center py-20">
             <div className="text-center">
@@ -705,7 +745,7 @@ function Index() {
               <h2 className="text-2xl font-semibold">Активные вакансии</h2>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button>
+                  <Button disabled={isSubscriptionExpired}>
                     <Icon name="Plus" className="mr-2" size={18} />
                     Добавить вакансию
                   </Button>
@@ -996,11 +1036,11 @@ function Index() {
                       </div>
                       {rec.status === 'pending' && (
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleUpdateRecommendationStatus(rec.id, 'rejected')}>
+                          <Button variant="outline" size="sm" onClick={() => handleUpdateRecommendationStatus(rec.id, 'rejected')} disabled={isSubscriptionExpired}>
                             <Icon name="X" className="mr-1" size={16} />
                             Отклонить
                           </Button>
-                          <Button size="sm" onClick={() => handleUpdateRecommendationStatus(rec.id, 'accepted')}>
+                          <Button size="sm" onClick={() => handleUpdateRecommendationStatus(rec.id, 'accepted')} disabled={isSubscriptionExpired}>
                             <Icon name="Check" className="mr-1" size={16} />
                             Принять
                           </Button>
@@ -1524,9 +1564,13 @@ function Index() {
         </DialogContent>
       </Dialog>
     </div>
-  );
+    );
+  };
 
-  const renderEmployeeDashboard = () => (
+  const renderEmployeeDashboard = () => {
+    const employeeNotifications = notifications.filter(n => n.type !== 'subscription');
+    
+    return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -1537,9 +1581,9 @@ function Index() {
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
               <Icon name="Bell" size={20} />
-              {notifications.filter(n => !n.read).length > 0 && (
+              {employeeNotifications.filter(n => !n.read).length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {notifications.filter(n => !n.read).length}
+                  {employeeNotifications.filter(n => !n.read).length}
                 </span>
               )}
             </Button>
@@ -1573,7 +1617,7 @@ function Index() {
                   <CardTitle className="text-2xl">Анна Смирнова</CardTitle>
                   <CardDescription>Tech Lead • Разработка</CardDescription>
                 </div>
-                <Button variant="outline">Редактировать</Button>
+                <Button variant="outline" onClick={() => setShowEditProfileDialog(true)}>Редактировать</Button>
               </div>
             </CardHeader>
             <CardContent>
