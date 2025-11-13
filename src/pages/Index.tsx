@@ -1143,18 +1143,39 @@ function Index() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Icon name="Wallet" size={16} className="text-muted-foreground" />
-                        <span>{vacancy.salary}</span>
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-6">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Icon name="Wallet" size={16} className="text-muted-foreground" />
+                          <span>{vacancy.salary}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Icon name="Users" size={16} className="text-muted-foreground" />
+                          <span>{vacancy.recommendations} рекомендаций</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-primary">
+                          <Icon name="Award" size={16} />
+                          <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <Icon name="Users" size={16} className="text-muted-foreground" />
-                        <span>{vacancy.recommendations} рекомендаций</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm text-primary">
-                        <Icon name="Award" size={16} />
-                        <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>
+                      <Separator />
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Реферальная ссылка для рекомендаций</Label>
+                        <div className="flex gap-2">
+                          <Input value={vacancy.referralLink} readOnly className="text-xs" />
+                          <Button size="sm" variant="outline" onClick={() => {
+                            navigator.clipboard.writeText(vacancy.referralLink || '');
+                          }}>
+                            <Icon name="Copy" size={16} />
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={() => {
+                            const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}, а за успешную рекомендацию получишь ${vacancy.reward.toLocaleString()} ₽. Вот ссылка: ${vacancy.referralLink}`;
+                            navigator.clipboard.writeText(text);
+                          }}>
+                            <Icon name="Share2" size={16} />
+                          </Button>
+                        </div>
+                        <p className="text-xs text-muted-foreground">Отправьте эту ссылку знакомым, которые ищут работу</p>
                       </div>
                     </div>
                   </CardContent>
