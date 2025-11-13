@@ -1007,7 +1007,7 @@ function Index() {
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-lg">ATS системы</CardTitle>
-                      <CardDescription">BambooHR / Greenhouse</CardDescription>
+                      <CardDescription>BambooHR / Greenhouse</CardDescription>
                     </div>
                     <Badge variant="outline">Не подключена</Badge>
                   </div>
