@@ -209,11 +209,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 update_user = """
                     UPDATE t_p65890965_refstaff_project.users 
                     SET successful_hires = successful_hires + 1,
-                        total_earnings = total_earnings + %s,
+                        wallet_pending = wallet_pending + %s,
                         experience_points = experience_points + 100
                     WHERE id = %s
                 """
                 cur.execute(update_user, (rec_data['reward_amount'], rec_data['recommended_by']))
+                
+                unlock_date = "CURRENT_TIMESTAMP + INTERVAL '1 month'"
+                create_pending_payout = f"""
+                    INSERT INTO t_p65890965_refstaff_project.pending_payouts 
+                    (user_id, recommendation_id, amount, unlock_date, status)
+                    VALUES (%s, %s, %s, {unlock_date}, 'pending')
+                """
+                cur.execute(create_pending_payout, (
+                    rec_data['recommended_by'], 
+                    recommendation_id, 
+                    rec_data['reward_amount']
+                ))
             
             return {
                 'statusCode': 200,
@@ -247,6 +259,366 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Access-Control-Allow-Origin': '*'
                 },
                 'body': json.dumps([dict(row) for row in employees], default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'GET' and resource == 'company':
+            company_id = query_params.get('company_id', '1')
+            
+            query = """
+                SELECT id, name, employee_count, invite_token, logo_url, 
+                       description, website, industry, created_at
+                FROM t_p65890965_refstaff_project.companies
+                WHERE id = %s
+            """
+            
+            cur.execute(query, (company_id,))
+            company = cur.fetchone()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(dict(company) if company else {}, default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'PUT' and resource == 'company':
+            body_data = json.loads(event.get('body', '{}'))
+            company_id = body_data.get('company_id', '1')
+            
+            update_fields = []
+            params = []
+            
+            if 'name' in body_data:
+                update_fields.append('name = %s')
+                params.append(body_data['name'])
+            if 'logo_url' in body_data:
+                update_fields.append('logo_url = %s')
+                params.append(body_data['logo_url'])
+            if 'description' in body_data:
+                update_fields.append('description = %s')
+                params.append(body_data['description'])
+            if 'website' in body_data:
+                update_fields.append('website = %s')
+                params.append(body_data['website'])
+            if 'industry' in body_data:
+                update_fields.append('industry = %s')
+                params.append(body_data['industry'])
+            
+            if not update_fields:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'No fields to update'}),
+                    'isBase64Encoded': False
+                }
+            
+            params.append(company_id)
+            query = f"""
+                UPDATE t_p65890965_refstaff_project.companies 
+                SET {', '.join(update_fields)}
+                WHERE id = %s
+                RETURNING id, name, logo_url, description, website, industry
+            """
+            
+            cur.execute(query, params)
+            updated_company = cur.fetchone()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(dict(updated_company), default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'POST' and resource == 'employees' and action == 'register':
+            body_data = json.loads(event.get('body', '{}'))
+            invite_token = body_data.get('invite_token')
+            
+            get_company = """
+                SELECT id FROM t_p65890965_refstaff_project.companies
+                WHERE invite_token = %s
+            """
+            cur.execute(get_company, (invite_token,))
+            company = cur.fetchone()
+            
+            if not company:
+                return {
+                    'statusCode': 404,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'Invalid invite token'}),
+                    'isBase64Encoded': False
+                }
+            
+            insert_user = """
+                INSERT INTO t_p65890965_refstaff_project.users 
+                (company_id, email, first_name, last_name, position, department, role)
+                VALUES (%s, %s, %s, %s, %s, %s, 'employee')
+                RETURNING id, email, first_name, last_name, position, department, role
+            """
+            
+            cur.execute(insert_user, (
+                company['id'],
+                body_data.get('email'),
+                body_data.get('first_name'),
+                body_data.get('last_name'),
+                body_data.get('position', ''),
+                body_data.get('department', '')
+            ))
+            
+            new_user = cur.fetchone()
+            
+            return {
+                'statusCode': 201,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(dict(new_user), default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'PUT' and resource == 'employees' and action == 'role':
+            body_data = json.loads(event.get('body', '{}'))
+            user_id = body_data.get('user_id')
+            
+            update_fields = []
+            params = []
+            
+            if 'is_hr_manager' in body_data:
+                update_fields.append('is_hr_manager = %s')
+                params.append(body_data['is_hr_manager'])
+            if 'is_admin' in body_data:
+                update_fields.append('is_admin = %s')
+                params.append(body_data['is_admin'])
+            
+            if not update_fields:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'No role fields provided'}),
+                    'isBase64Encoded': False
+                }
+            
+            params.append(user_id)
+            query = f"""
+                UPDATE t_p65890965_refstaff_project.users 
+                SET {', '.join(update_fields)}
+                WHERE id = %s
+                RETURNING id, first_name, last_name, is_hr_manager, is_admin
+            """
+            
+            cur.execute(query, params)
+            updated_user = cur.fetchone()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(dict(updated_user), default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'GET' and resource == 'wallet':
+            user_id = query_params.get('user_id')
+            
+            wallet_query = """
+                SELECT wallet_balance, wallet_pending
+                FROM t_p65890965_refstaff_project.users
+                WHERE id = %s
+            """
+            cur.execute(wallet_query, (user_id,))
+            wallet = cur.fetchone()
+            
+            transactions_query = """
+                SELECT id, amount, type, description, created_at
+                FROM t_p65890965_refstaff_project.wallet_transactions
+                WHERE user_id = %s
+                ORDER BY created_at DESC
+                LIMIT 50
+            """
+            cur.execute(transactions_query, (user_id,))
+            transactions = cur.fetchall()
+            
+            pending_query = """
+                SELECT id, amount, unlock_date, status
+                FROM t_p65890965_refstaff_project.pending_payouts
+                WHERE user_id = %s AND status = 'pending'
+                ORDER BY unlock_date ASC
+            """
+            cur.execute(pending_query, (user_id,))
+            pending = cur.fetchall()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({
+                    'wallet': dict(wallet) if wallet else {},
+                    'transactions': [dict(t) for t in transactions],
+                    'pending_payouts': [dict(p) for p in pending]
+                }, default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'POST' and resource == 'chats':
+            body_data = json.loads(event.get('body', '{}'))
+            company_id = body_data.get('company_id')
+            employee_id = body_data.get('employee_id')
+            
+            check_chat = """
+                SELECT id FROM t_p65890965_refstaff_project.chats
+                WHERE company_id = %s AND employee_id = %s
+            """
+            cur.execute(check_chat, (company_id, employee_id))
+            existing_chat = cur.fetchone()
+            
+            if existing_chat:
+                return {
+                    'statusCode': 200,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'chat_id': existing_chat['id']}),
+                    'isBase64Encoded': False
+                }
+            
+            create_chat = """
+                INSERT INTO t_p65890965_refstaff_project.chats 
+                (company_id, employee_id)
+                VALUES (%s, %s)
+                RETURNING id, company_id, employee_id, created_at
+            """
+            cur.execute(create_chat, (company_id, employee_id))
+            new_chat = cur.fetchone()
+            
+            return {
+                'statusCode': 201,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(dict(new_chat), default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'GET' and resource == 'chats':
+            user_id = query_params.get('user_id')
+            company_id = query_params.get('company_id')
+            
+            if company_id:
+                query = """
+                    SELECT c.*, 
+                           u.first_name || ' ' || u.last_name as employee_name,
+                           u.position, u.avatar_url,
+                           (SELECT COUNT(*) FROM t_p65890965_refstaff_project.chat_messages 
+                            WHERE chat_id = c.id AND is_read = false AND sender_id != %s) as unread_count
+                    FROM t_p65890965_refstaff_project.chats c
+                    JOIN t_p65890965_refstaff_project.users u ON c.employee_id = u.id
+                    WHERE c.company_id = %s
+                    ORDER BY c.last_message_at DESC NULLS LAST
+                """
+                cur.execute(query, (user_id, company_id))
+            else:
+                query = """
+                    SELECT c.*,
+                           comp.name as company_name,
+                           (SELECT COUNT(*) FROM t_p65890965_refstaff_project.chat_messages 
+                            WHERE chat_id = c.id AND is_read = false AND sender_id != %s) as unread_count
+                    FROM t_p65890965_refstaff_project.chats c
+                    JOIN t_p65890965_refstaff_project.companies comp ON c.company_id = comp.id
+                    WHERE c.employee_id = %s
+                    ORDER BY c.last_message_at DESC NULLS LAST
+                """
+                cur.execute(query, (user_id, user_id))
+            
+            chats = cur.fetchall()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps([dict(c) for c in chats], default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'POST' and resource == 'messages':
+            body_data = json.loads(event.get('body', '{}'))
+            
+            insert_message = """
+                INSERT INTO t_p65890965_refstaff_project.chat_messages 
+                (chat_id, sender_id, message)
+                VALUES (%s, %s, %s)
+                RETURNING id, chat_id, sender_id, message, is_read, created_at
+            """
+            cur.execute(insert_message, (
+                body_data.get('chat_id'),
+                body_data.get('sender_id'),
+                body_data.get('message')
+            ))
+            new_message = cur.fetchone()
+            
+            update_chat = """
+                UPDATE t_p65890965_refstaff_project.chats
+                SET last_message_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+            """
+            cur.execute(update_chat, (body_data.get('chat_id'),))
+            
+            return {
+                'statusCode': 201,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(dict(new_message), default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'GET' and resource == 'messages':
+            chat_id = query_params.get('chat_id')
+            
+            query = """
+                SELECT m.*,
+                       u.first_name || ' ' || u.last_name as sender_name,
+                       u.avatar_url as sender_avatar
+                FROM t_p65890965_refstaff_project.chat_messages m
+                JOIN t_p65890965_refstaff_project.users u ON m.sender_id = u.id
+                WHERE m.chat_id = %s
+                ORDER BY m.created_at ASC
+            """
+            cur.execute(query, (chat_id,))
+            messages = cur.fetchall()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps([dict(m) for m in messages], default=str),
                 'isBase64Encoded': False
             }
         

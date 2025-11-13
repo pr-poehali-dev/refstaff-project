@@ -9,6 +9,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 
 type UserRole = 'guest' | 'employer' | 'employee';
@@ -20,6 +22,8 @@ interface Vacancy {
   salary: string;
   status: 'active' | 'closed';
   recommendations: number;
+  reward: number;
+  referralLink?: string;
 }
 
 interface Employee {
@@ -32,6 +36,8 @@ interface Employee {
   hired: number;
   earnings: number;
   level: number;
+  isHrManager?: boolean;
+  isAdmin?: boolean;
 }
 
 interface Recommendation {
@@ -43,6 +49,15 @@ interface Recommendation {
   reward: number;
 }
 
+interface ChatMessage {
+  id: number;
+  senderId: number;
+  senderName: string;
+  message: string;
+  timestamp: string;
+  isOwn: boolean;
+}
+
 function Index() {
   const [userRole, setUserRole] = useState<UserRole>(() => {
     const saved = localStorage.getItem('userRole');
@@ -51,6 +66,17 @@ function Index() {
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [showInviteDialog, setShowInviteDialog] = useState(false);
+  const [showCompanySettingsDialog, setShowCompanySettingsDialog] = useState(false);
+  const [showChatDialog, setShowChatDialog] = useState(false);
+  const [activeChatEmployee, setActiveChatEmployee] = useState<Employee | null>(null);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    { id: 1, senderId: 1, senderName: 'HR Manager', message: 'Здравствуйте! Как дела с рекомендациями?', timestamp: '10:30', isOwn: false },
+    { id: 2, senderId: 2, senderName: 'Вы', message: 'Отлично! У меня есть кандидат на вакансию Frontend Developer', timestamp: '10:32', isOwn: true },
+  ]);
+  const [newMessage, setNewMessage] = useState('');
+  const [inviteLink, setInviteLink] = useState('https://refstaff.app/join/abc123def456');
+  const [newReward, setNewReward] = useState('30000');
 
   useEffect(() => {
     localStorage.setItem('userRole', userRole);
@@ -61,17 +87,31 @@ function Index() {
     setUserRole('guest');
   };
 
+  const handleSendMessage = () => {
+    if (!newMessage.trim()) return;
+    const newMsg: ChatMessage = {
+      id: chatMessages.length + 1,
+      senderId: 2,
+      senderName: 'Вы',
+      message: newMessage,
+      timestamp: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+      isOwn: true
+    };
+    setChatMessages([...chatMessages, newMsg]);
+    setNewMessage('');
+  };
+
   const vacancies: Vacancy[] = [
-    { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5 },
-    { id: 2, title: 'Product Manager', department: 'Продукт', salary: '200 000 ₽', status: 'active', recommendations: 3 },
-    { id: 3, title: 'UX/UI Designer', department: 'Дизайн', salary: '180 000 ₽', status: 'active', recommendations: 8 },
-    { id: 4, title: 'DevOps Engineer', department: 'Инфраструктура', salary: '220 000 ₽', status: 'active', recommendations: 2 },
+    { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5, reward: 30000, referralLink: 'https://refstaff.app/r/vac1' },
+    { id: 2, title: 'Product Manager', department: 'Продукт', salary: '200 000 ₽', status: 'active', recommendations: 3, reward: 25000, referralLink: 'https://refstaff.app/r/vac2' },
+    { id: 3, title: 'UX/UI Designer', department: 'Дизайн', salary: '180 000 ₽', status: 'active', recommendations: 8, reward: 30000, referralLink: 'https://refstaff.app/r/vac3' },
+    { id: 4, title: 'DevOps Engineer', department: 'Инфраструктура', salary: '220 000 ₽', status: 'active', recommendations: 2, reward: 35000, referralLink: 'https://refstaff.app/r/vac4' },
   ];
 
   const employees: Employee[] = [
-    { id: 1, name: 'Анна Смирнова', position: 'Tech Lead', department: 'Разработка', avatar: '', recommendations: 12, hired: 4, earnings: 120000, level: 5 },
+    { id: 1, name: 'Анна Смирнова', position: 'Tech Lead', department: 'Разработка', avatar: '', recommendations: 12, hired: 4, earnings: 120000, level: 5, isHrManager: true },
     { id: 2, name: 'Дмитрий Иванов', position: 'Senior Developer', department: 'Разработка', avatar: '', recommendations: 8, hired: 2, earnings: 60000, level: 3 },
-    { id: 3, name: 'Мария Петрова', position: 'Product Owner', department: 'Продукт', avatar: '', recommendations: 15, hired: 5, earnings: 150000, level: 6 },
+    { id: 3, name: 'Мария Петрова', position: 'Product Owner', department: 'Продукт', avatar: '', recommendations: 15, hired: 5, earnings: 150000, level: 6, isAdmin: true },
   ];
 
   const recommendations: Recommendation[] = [
@@ -442,6 +482,10 @@ function Index() {
             <Button variant="ghost" size="icon">
               <Icon name="Bell" size={20} />
             </Button>
+            <Button variant="ghost" onClick={() => setShowCompanySettingsDialog(true)}>
+              <Icon name="Settings" className="mr-2" size={18} />
+              Настройки
+            </Button>
             <Button variant="ghost" onClick={handleLogout}>Выход</Button>
           </div>
         </div>
@@ -451,10 +495,11 @@ function Index() {
         <h1 className="text-3xl font-bold mb-8">Личный кабинет работодателя</h1>
 
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-5 lg:w-auto">
             <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
             <TabsTrigger value="employees">Сотрудники</TabsTrigger>
             <TabsTrigger value="recommendations">Рекомендации</TabsTrigger>
+            <TabsTrigger value="chats">Чаты</TabsTrigger>
             <TabsTrigger value="stats">Статистика</TabsTrigger>
           </TabsList>
 
@@ -487,6 +532,17 @@ function Index() {
                       <Input id="salary" placeholder="250 000 ₽" />
                     </div>
                     <div>
+                      <Label htmlFor="reward-amount">Вознаграждение за рекомендацию</Label>
+                      <Input 
+                        id="reward-amount" 
+                        type="number" 
+                        placeholder="30000" 
+                        value={newReward}
+                        onChange={(e) => setNewReward(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Сумма в рублях, которую получит сотрудник за успешный найм</p>
+                    </div>
+                    <div>
                       <Label htmlFor="requirements">Требования</Label>
                       <Textarea id="requirements" placeholder="Опыт работы от 5 лет..." rows={4} />
                     </div>
@@ -509,18 +565,34 @@ function Index() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Icon name="Wallet" size={16} className="text-muted-foreground" />
-                          <span>{vacancy.salary}</span>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-sm">
+                            <Icon name="Wallet" size={16} className="text-muted-foreground" />
+                            <span>{vacancy.salary}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm">
+                            <Icon name="Users" size={16} className="text-muted-foreground" />
+                            <span>{vacancy.recommendations} рекомендаций</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-primary">
+                            <Icon name="Award" size={16} />
+                            <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Icon name="Users" size={16} className="text-muted-foreground" />
-                          <span>{vacancy.recommendations} рекомендаций</span>
+                        <Button variant="outline" size="sm">Редактировать</Button>
+                      </div>
+                      <Separator />
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Реферальная ссылка для сотрудников</Label>
+                        <div className="flex gap-2">
+                          <Input value={vacancy.referralLink} readOnly className="text-xs" />
+                          <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(vacancy.referralLink || '')}>
+                            <Icon name="Copy" size={16} />
+                          </Button>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">Редактировать</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -529,7 +601,13 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-4">
-            <h2 className="text-2xl font-semibold">Сотрудники компании</h2>
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-2xl font-semibold">Сотрудники компании</h2>
+              <Button onClick={() => setShowInviteDialog(true)}>
+                <Icon name="UserPlus" className="mr-2" size={18} />
+                Пригласить сотрудника
+              </Button>
+            </div>
             <div className="grid gap-4">
               {employees.map((employee) => (
                 <Card key={employee.id}>
@@ -540,8 +618,56 @@ function Index() {
                         <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                       </Avatar>
                       <div className="flex-1">
-                        <CardTitle className="text-lg">{employee.name}</CardTitle>
+                        <div className="flex items-center gap-2">
+                          <CardTitle className="text-lg">{employee.name}</CardTitle>
+                          {employee.isHrManager && <Badge variant="secondary">HR Manager</Badge>}
+                          {employee.isAdmin && <Badge>Admin</Badge>}
+                        </div>
                         <CardDescription>{employee.position} • {employee.department}</CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setActiveChatEmployee(employee);
+                            setShowChatDialog(true);
+                          }}
+                        >
+                          <Icon name="MessageCircle" className="mr-1" size={16} />
+                          Написать
+                        </Button>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              <Icon name="Shield" size={16} />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Управление ролями: {employee.name}</DialogTitle>
+                              <DialogDescription>Назначьте права доступа сотруднику</DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 pt-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <Label>HR Manager</Label>
+                                  <p className="text-xs text-muted-foreground">Управление вакансиями и рекомендациями</p>
+                                </div>
+                                <input type="checkbox" defaultChecked={employee.isHrManager} className="rounded" />
+                              </div>
+                              <Separator />
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <Label>Администратор</Label>
+                                  <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
+                                </div>
+                                <input type="checkbox" defaultChecked={employee.isAdmin} className="rounded" />
+                              </div>
+                              <Button className="w-full">Сохранить</Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                       <Badge variant="outline">Уровень {employee.level}</Badge>
                     </div>
@@ -613,6 +739,37 @@ function Index() {
                           </Button>
                         </div>
                       )}
+                      {rec.status === 'accepted' && (
+                        <div className="text-sm text-muted-foreground">
+                          <Icon name="Clock" size={14} className="inline mr-1" />
+                          Выплата через 30 дней
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="chats" className="space-y-4">
+            <h2 className="text-2xl font-semibold mb-4">Чаты с сотрудниками</h2>
+            <div className="grid gap-3">
+              {employees.slice(0, 3).map((emp) => (
+                <Card key={emp.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                  setActiveChatEmployee(emp);
+                  setShowChatDialog(true);
+                }}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-10 w-10">
+                        <AvatarFallback>{emp.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium">{emp.name}</div>
+                        <div className="text-sm text-muted-foreground truncate">Отлично! У меня есть кандидат...</div>
+                      </div>
+                      <Badge variant="secondary">2</Badge>
                     </div>
                   </CardContent>
                 </Card>
@@ -690,6 +847,112 @@ function Index() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Пригласить сотрудника</DialogTitle>
+            <DialogDescription>Отправьте ссылку для регистрации сотрудника в системе</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label>Реферальная ссылка компании</Label>
+              <div className="flex gap-2 mt-2">
+                <Input value={inviteLink} readOnly />
+                <Button onClick={() => navigator.clipboard.writeText(inviteLink)}>
+                  <Icon name="Copy" size={18} />
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Отправьте эту ссылку сотрудникам для регистрации в системе
+              </p>
+            </div>
+            <Separator />
+            <div>
+              <Label>Или отправьте приглашение на email</Label>
+              <div className="flex gap-2 mt-2">
+                <Input type="email" placeholder="email@example.com" />
+                <Button>Отправить</Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showCompanySettingsDialog} onOpenChange={setShowCompanySettingsDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Настройки профиля компании</DialogTitle>
+            <DialogDescription>Управляйте информацией о вашей компании</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="company-name-edit">Название компании</Label>
+              <Input id="company-name-edit" defaultValue="Acme Tech" />
+            </div>
+            <div>
+              <Label htmlFor="company-logo">Логотип</Label>
+              <Input id="company-logo" type="file" accept="image/*" />
+            </div>
+            <div>
+              <Label htmlFor="company-desc">Описание</Label>
+              <Textarea id="company-desc" rows={3} placeholder="Расскажите о вашей компании..." />
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="company-website">Веб-сайт</Label>
+                <Input id="company-website" placeholder="https://example.com" />
+              </div>
+              <div>
+                <Label htmlFor="company-industry">Отрасль</Label>
+                <Select>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Выберите отрасль" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="tech">IT и технологии</SelectItem>
+                    <SelectItem value="finance">Финансы</SelectItem>
+                    <SelectItem value="retail">Розничная торговля</SelectItem>
+                    <SelectItem value="manufacturing">Производство</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button className="w-full">Сохранить изменения</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+        <DialogContent className="max-w-2xl h-[600px] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Чат с {activeChatEmployee?.name}</DialogTitle>
+            <DialogDescription>{activeChatEmployee?.position}</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-3 py-4">
+            {chatMessages.map((msg) => (
+              <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
+                  <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
+                  <div className="text-sm">{msg.message}</div>
+                  <div className="text-xs opacity-70 mt-1">{msg.timestamp}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 pt-4 border-t">
+            <Input 
+              placeholder="Введите сообщение..." 
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            />
+            <Button onClick={handleSendMessage}>
+              <Icon name="Send" size={18} />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
@@ -755,40 +1018,27 @@ function Index() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Icon name="Trophy" className="text-yellow-500" size={24} />
-                Достижения
+                <Icon name="Wallet" className="text-primary" size={24} />
+                Кошелек
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-yellow-100 flex items-center justify-center">
-                    <Icon name="Star" className="text-yellow-600" size={20} />
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">Первая рекомендация</div>
-                    <div className="text-xs text-muted-foreground">Получено</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
-                    <Icon name="Target" className="text-green-600" size={20} />
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">Меткий глаз</div>
-                    <div className="text-xs text-muted-foreground">3 успешных найма</div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 opacity-50">
-                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                    <Icon name="Award" className="text-purple-600" size={20} />
-                  </div>
-                  <div>
-                    <div className="font-medium text-sm">Рекрутер месяца</div>
-                    <div className="text-xs text-muted-foreground">2/5 наймов</div>
-                  </div>
-                </div>
+            <CardContent className="space-y-4">
+              <div>
+                <div className="text-sm text-muted-foreground mb-1">Доступно для вывода</div>
+                <div className="text-3xl font-bold text-green-600">60 000 ₽</div>
               </div>
+              <div>
+                <div className="text-sm text-muted-foreground mb-1">Ожидает разблокировки</div>
+                <div className="text-2xl font-bold text-muted-foreground">60 000 ₽</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  <Icon name="Clock" size={12} className="inline mr-1" />
+                  Разблокируется через 18 дней
+                </p>
+              </div>
+              <Button className="w-full" variant="outline">
+                <Icon name="Download" className="mr-2" size={16} />
+                Вывести средства
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -797,6 +1047,8 @@ function Index() {
           <TabsList>
             <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
             <TabsTrigger value="my-recommendations">Мои рекомендации</TabsTrigger>
+            <TabsTrigger value="achievements">Достижения</TabsTrigger>
+            <TabsTrigger value="wallet-history">История кошелька</TabsTrigger>
           </TabsList>
 
           <TabsContent value="vacancies" className="space-y-4">
@@ -853,7 +1105,8 @@ function Index() {
                                 <Icon name="Award" className="text-primary" size={20} />
                                 <span className="font-medium">Вознаграждение за успешный найм</span>
                               </div>
-                              <div className="text-2xl font-bold text-primary">30 000 ₽</div>
+                              <div className="text-2xl font-bold text-primary">{activeVacancy?.reward.toLocaleString()} ₽</div>
+                              <p className="text-xs text-muted-foreground mt-1">Выплата через 30 дней после найма</p>
                             </div>
                             <Button className="w-full">Отправить рекомендацию</Button>
                           </div>
@@ -873,7 +1126,7 @@ function Index() {
                       </div>
                       <div className="flex items-center gap-2 text-sm text-primary">
                         <Icon name="Award" size={16} />
-                        <span className="font-medium">30 000 ₽ за найм</span>
+                        <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>
                       </div>
                     </div>
                   </CardContent>
@@ -913,6 +1166,112 @@ function Index() {
                       <div className="flex items-center gap-1">
                         <Icon name="Award" size={16} />
                         <span>{rec.reward.toLocaleString()} ₽</span>
+                      </div>
+                      {rec.status === 'accepted' && (
+                        <div className="flex items-center gap-1 text-green-600">
+                          <Icon name="Clock" size={16} />
+                          <span>Разблокировка через 25 дней</span>
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="achievements" className="space-y-4">
+            <h2 className="text-2xl font-semibold">Достижения</h2>
+            <div className="grid md:grid-cols-2 gap-4">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center">
+                      <Icon name="Star" className="text-yellow-600" size={32} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-lg">Первая рекомендация</div>
+                      <div className="text-sm text-muted-foreground">Получено 10.11.2025</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                      <Icon name="Target" className="text-green-600" size={32} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-lg">Меткий глаз</div>
+                      <div className="text-sm text-muted-foreground">3 успешных найма</div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="opacity-50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
+                      <Icon name="Award" className="text-purple-600" size={32} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-lg">Рекрутер месяца</div>
+                      <div className="text-sm text-muted-foreground">2/5 наймов</div>
+                      <Progress value={40} className="h-1 mt-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card className="opacity-50">
+                <CardContent className="p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
+                      <Icon name="Crown" className="text-blue-600" size={32} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-medium text-lg">Золотой рекрутер</div>
+                      <div className="text-sm text-muted-foreground">4/10 успешных наймов</div>
+                      <Progress value={40} className="h-1 mt-2" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="wallet-history" className="space-y-4">
+            <h2 className="text-2xl font-semibold">История кошелька</h2>
+            <div className="space-y-3">
+              {[
+                { id: 1, type: 'pending', amount: 30000, desc: 'Вознаграждение за рекомендацию Елены Новиковой', date: '08.11.2025', unlockDate: '08.12.2025' },
+                { id: 2, type: 'pending', amount: 30000, desc: 'Вознаграждение за рекомендацию Алексея Козлова', date: '10.11.2025', unlockDate: '10.12.2025' },
+                { id: 3, type: 'earned', amount: 30000, desc: 'Вознаграждение за рекомендацию Ивана Петрова', date: '01.10.2025', unlockDate: '01.11.2025' },
+                { id: 4, type: 'earned', amount: 30000, desc: 'Вознаграждение за рекомендацию Марии Сидоровой', date: '15.09.2025', unlockDate: '15.10.2025' },
+              ].map((transaction) => (
+                <Card key={transaction.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                          transaction.type === 'pending' ? 'bg-yellow-100' : 'bg-green-100'
+                        }`}>
+                          <Icon name={transaction.type === 'pending' ? 'Clock' : 'CheckCircle'} 
+                                className={transaction.type === 'pending' ? 'text-yellow-600' : 'text-green-600'} 
+                                size={20} />
+                        </div>
+                        <div>
+                          <div className="font-medium">{transaction.desc}</div>
+                          <div className="text-sm text-muted-foreground">
+                            {transaction.date} 
+                            {transaction.type === 'pending' && ` • Разблокировка ${transaction.unlockDate}`}
+                          </div>
+                        </div>
+                      </div>
+                      <div className={`text-lg font-bold ${
+                        transaction.type === 'pending' ? 'text-yellow-600' : 'text-green-600'
+                      }`}>
+                        +{transaction.amount.toLocaleString()} ₽
                       </div>
                     </div>
                   </CardContent>

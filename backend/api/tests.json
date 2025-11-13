@@ -11,6 +11,18 @@
       "method": "GET",
       "path": "/?resource=employees&company_id=1",
       "expectedStatus": 200
+    },
+    {
+      "name": "Get company profile",
+      "method": "GET",
+      "path": "/?resource=company&company_id=1",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Get wallet info",
+      "method": "GET",
+      "path": "/?resource=wallet&user_id=1",
+      "expectedStatus": 200
     }
   ]
 }
