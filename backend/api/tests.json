@@ -1,0 +1,16 @@
+{
+  "tests": [
+    {
+      "name": "Get vacancies list",
+      "method": "GET",
+      "path": "/?resource=vacancies&company_id=1&status=active",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Get employees list",
+      "method": "GET",
+      "path": "/?resource=employees&company_id=1",
+      "expectedStatus": 200
+    }
+  ]
+}
