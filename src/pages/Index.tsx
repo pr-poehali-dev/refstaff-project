@@ -1159,20 +1159,39 @@ function Index() {
                         </div>
                       </div>
                       <Separator />
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <Label className="text-xs text-muted-foreground">Реферальная ссылка для рекомендаций</Label>
                         <div className="flex gap-2">
-                          <Input value={vacancy.referralLink} readOnly className="text-xs" />
+                          <Input value={vacancy.referralLink} readOnly className="text-xs flex-1" />
                           <Button size="sm" variant="outline" onClick={() => {
                             navigator.clipboard.writeText(vacancy.referralLink || '');
                           }}>
                             <Icon name="Copy" size={16} />
                           </Button>
-                          <Button size="sm" variant="outline" onClick={() => {
-                            const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}, а за успешную рекомендацию получишь ${vacancy.reward.toLocaleString()} ₽. Вот ссылка: ${vacancy.referralLink}`;
+                        </div>
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="outline" className="flex-1" onClick={() => {
+                            const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
+                            const url = `https://t.me/share/url?url=${encodeURIComponent(vacancy.referralLink || '')}&text=${encodeURIComponent(text)}`;
+                            window.open(url, '_blank');
+                          }}>
+                            <Icon name="Send" size={16} className="mr-1" />
+                            Telegram
+                          </Button>
+                          <Button size="sm" variant="outline" className="flex-1" onClick={() => {
+                            const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
+                            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                            window.open(url, '_blank');
+                          }}>
+                            <Icon name="MessageCircle" size={16} className="mr-1" />
+                            WhatsApp
+                          </Button>
+                          <Button size="sm" variant="outline" className="flex-1" onClick={() => {
+                            const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
                             navigator.clipboard.writeText(text);
                           }}>
-                            <Icon name="Share2" size={16} />
+                            <Icon name="Share2" size={16} className="mr-1" />
+                            Копировать
                           </Button>
                         </div>
                         <p className="text-xs text-muted-foreground">Отправьте эту ссылку знакомым, которые ищут работу</p>
