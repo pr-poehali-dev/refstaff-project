@@ -84,6 +84,14 @@ function Index() {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(2);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
+  const [showEditEmployeeDialog, setShowEditEmployeeDialog] = useState(false);
+  const [employeeEditForm, setEmployeeEditForm] = useState({
+    firstName: '',
+    lastName: '',
+    position: '',
+    department: ''
+  });
   const [showIntegrationsDialog, setShowIntegrationsDialog] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const [showNotificationsDialog, setShowNotificationsDialog] = useState(false);
@@ -354,6 +362,26 @@ function Index() {
     } catch (error) {
       console.error('Ошибка обновления профиля:', error);
       alert('Не удалось обновить профиль');
+    }
+  };
+
+  const handleUpdateEmployeeData = async () => {
+    if (!employeeToEdit) return;
+    
+    try {
+      await api.updateEmployee(employeeToEdit.id, {
+        first_name: employeeEditForm.firstName,
+        last_name: employeeEditForm.lastName,
+        position: employeeEditForm.position,
+        department: employeeEditForm.department
+      });
+      await loadData();
+      setShowEditEmployeeDialog(false);
+      setEmployeeToEdit(null);
+      alert('Данные сотрудника обновлены!');
+    } catch (error) {
+      console.error('Ошибка обновления данных сотрудника:', error);
+      alert('Не удалось обновить данные сотрудника');
     }
   };
 
@@ -1082,6 +1110,23 @@ function Index() {
                           <Icon name="MessageCircle" className="mr-1" size={16} />
                           Написать
                         </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEmployeeToEdit(employee);
+                            const [firstName, ...lastNameParts] = employee.name.split(' ');
+                            setEmployeeEditForm({
+                              firstName: firstName,
+                              lastName: lastNameParts.join(' '),
+                              position: employee.position,
+                              department: employee.department
+                            });
+                            setShowEditEmployeeDialog(true);
+                          }}
+                        >
+                          <Icon name="Edit" size={16} />
+                        </Button>
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm">
@@ -1537,6 +1582,71 @@ function Index() {
             <Button onClick={handleSendMessage}>
               <Icon name="Send" size={18} />
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showEditEmployeeDialog} onOpenChange={setShowEditEmployeeDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Редактировать данные сотрудника</DialogTitle>
+            <DialogDescription>
+              Обновите информацию о {employeeToEdit?.name}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="emp-firstName">Имя</Label>
+                <Input 
+                  id="emp-firstName" 
+                  value={employeeEditForm.firstName}
+                  onChange={(e) => setEmployeeEditForm({...employeeEditForm, firstName: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="emp-lastName">Фамилия</Label>
+                <Input 
+                  id="emp-lastName" 
+                  value={employeeEditForm.lastName}
+                  onChange={(e) => setEmployeeEditForm({...employeeEditForm, lastName: e.target.value})}
+                />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="emp-position">Должность</Label>
+              <Input 
+                id="emp-position" 
+                value={employeeEditForm.position}
+                onChange={(e) => setEmployeeEditForm({...employeeEditForm, position: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="emp-department">Отдел</Label>
+              <Input 
+                id="emp-department" 
+                value={employeeEditForm.department}
+                onChange={(e) => setEmployeeEditForm({...employeeEditForm, department: e.target.value})}
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button 
+                className="flex-1"
+                onClick={handleUpdateEmployeeData}
+              >
+                Сохранить изменения
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => {
+                  setShowEditEmployeeDialog(false);
+                  setEmployeeToEdit(null);
+                }}
+              >
+                Отмена
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
