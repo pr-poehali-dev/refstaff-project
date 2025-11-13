@@ -454,6 +454,50 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
+        elif method == 'DELETE' and resource == 'employees':
+            user_id = query_params.get('user_id')
+            
+            if not user_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'user_id is required'}),
+                    'isBase64Encoded': False
+                }
+            
+            delete_query = """
+                DELETE FROM t_p65890965_refstaff_project.users
+                WHERE id = %s AND role = 'employee'
+                RETURNING id, first_name, last_name
+            """
+            
+            cur.execute(delete_query, (user_id,))
+            deleted_user = cur.fetchone()
+            
+            if not deleted_user:
+                return {
+                    'statusCode': 404,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'Employee not found'}),
+                    'isBase64Encoded': False
+                }
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'success': True, 'deleted': dict(deleted_user)}, default=str),
+                'isBase64Encoded': False
+            }
+        
         elif method == 'GET' and resource == 'wallet':
             user_id = query_params.get('user_id')
             

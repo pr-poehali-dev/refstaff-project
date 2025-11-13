@@ -209,6 +209,14 @@ export const api = {
     return response.json();
   },
 
+  async deleteEmployee(userId: number): Promise<{ success: boolean; deleted: Employee }> {
+    const response = await fetch(`${API_URL}/?resource=employees&user_id=${userId}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete employee');
+    return response.json();
+  },
+
   async getWallet(userId: number): Promise<WalletData> {
     const response = await fetch(`${API_URL}/?resource=wallet&user_id=${userId}`);
     if (!response.ok) throw new Error('Failed to fetch wallet');

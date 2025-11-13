@@ -23,6 +23,12 @@
       "method": "GET",
       "path": "/?resource=wallet&user_id=1",
       "expectedStatus": 200
+    },
+    {
+      "name": "Delete employee returns 404 for non-existing",
+      "method": "DELETE",
+      "path": "/?resource=employees&user_id=99999",
+      "expectedStatus": 404
     }
   ]
 }

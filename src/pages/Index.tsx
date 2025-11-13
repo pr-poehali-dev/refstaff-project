@@ -48,6 +48,8 @@ interface Recommendation {
   status: 'pending' | 'accepted' | 'rejected';
   date: string;
   reward: number;
+  recommendedBy?: string;
+  recommendedById?: number;
 }
 
 interface ChatMessage {
@@ -80,6 +82,8 @@ function Index() {
   const [inviteLink, setInviteLink] = useState('https://refstaff.app/join/abc123def456');
   const [newReward, setNewReward] = useState('30000');
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(2);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     localStorage.setItem('userRole', userRole);
@@ -124,10 +128,19 @@ function Index() {
     { id: 3, name: 'Мария Петрова', position: 'Product Owner', department: 'Продукт', avatar: '', recommendations: 15, hired: 5, earnings: 150000, level: 6, isAdmin: true },
   ];
 
+  const calculateEmployeeRank = (emp: Employee) => {
+    const sortedEmployees = [...employees].sort((a, b) => {
+      if (b.hired !== a.hired) return b.hired - a.hired;
+      if (b.recommendations !== a.recommendations) return b.recommendations - a.recommendations;
+      return b.earnings - a.earnings;
+    });
+    return sortedEmployees.findIndex(e => e.id === emp.id) + 1;
+  };
+
   const recommendations: Recommendation[] = [
-    { id: 1, candidateName: 'Алексей Козлов', vacancy: 'Senior Frontend Developer', status: 'pending', date: '2025-11-10', reward: 30000 },
-    { id: 2, candidateName: 'Елена Новикова', vacancy: 'UX/UI Designer', status: 'accepted', date: '2025-11-08', reward: 30000 },
-    { id: 3, candidateName: 'Сергей Волков', vacancy: 'Product Manager', status: 'pending', date: '2025-11-12', reward: 30000 },
+    { id: 1, candidateName: 'Алексей Козлов', vacancy: 'Senior Frontend Developer', status: 'pending', date: '2025-11-10', reward: 30000, recommendedBy: 'Анна Смирнова', recommendedById: 1 },
+    { id: 2, candidateName: 'Елена Новикова', vacancy: 'UX/UI Designer', status: 'accepted', date: '2025-11-08', reward: 30000, recommendedBy: 'Анна Смирнова', recommendedById: 1 },
+    { id: 3, candidateName: 'Сергей Волков', vacancy: 'Product Manager', status: 'pending', date: '2025-11-12', reward: 30000, recommendedBy: 'Дмитрий Иванов', recommendedById: 2 },
   ];
 
   const renderLandingPage = () => (
@@ -654,6 +667,10 @@ function Index() {
                           <CardTitle className="text-lg">{employee.name}</CardTitle>
                           {employee.isHrManager && <Badge variant="secondary">HR Manager</Badge>}
                           {employee.isAdmin && <Badge>Admin</Badge>}
+                          <Badge variant="outline" className="bg-primary/10">
+                            <Icon name="Trophy" size={12} className="mr-1" />
+                            #{calculateEmployeeRank(employee)} в рейтинге
+                          </Badge>
                         </div>
                         <CardDescription>{employee.position} • {employee.department}</CardDescription>
                       </div>
@@ -700,6 +717,16 @@ function Index() {
                             </div>
                           </DialogContent>
                         </Dialog>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setEmployeeToDelete(employee);
+                            setShowDeleteDialog(true);
+                          }}
+                        >
+                          <Icon name="Trash2" size={16} className="text-destructive" />
+                        </Button>
                       </div>
                       <Badge variant="outline">Уровень {employee.level}</Badge>
                     </div>
@@ -732,9 +759,19 @@ function Index() {
                 <Card key={rec.id}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <div>
+                      <div className="flex-1">
                         <CardTitle className="text-lg">{rec.candidateName}</CardTitle>
                         <CardDescription>{rec.vacancy}</CardDescription>
+                        {rec.recommendedBy && (
+                          <div className="flex items-center gap-2 mt-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarFallback className="text-xs">{rec.recommendedBy.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                            </Avatar>
+                            <span className="text-sm text-muted-foreground">
+                              Рекомендовал: <span className="font-medium text-foreground">{rec.recommendedBy}</span>
+                            </span>
+                          </div>
+                        )}
                       </div>
                       <Badge variant={
                         rec.status === 'accepted' ? 'default' : 
@@ -982,6 +1019,53 @@ function Index() {
             <Button onClick={handleSendMessage}>
               <Icon name="Send" size={18} />
             </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Удалить сотрудника?</DialogTitle>
+            <DialogDescription>
+              Вы уверены, что хотите удалить {employeeToDelete?.name} из компании?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+              <div className="flex items-start gap-3">
+                <Icon name="AlertTriangle" className="text-destructive mt-0.5" size={20} />
+                <div className="flex-1 text-sm">
+                  <p className="font-medium text-destructive mb-1">Внимание!</p>
+                  <p className="text-muted-foreground">
+                    Это действие нельзя отменить. Сотрудник потеряет доступ к системе, но его рекомендации и статистика сохранятся.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => {
+                  setShowDeleteDialog(false);
+                  setEmployeeToDelete(null);
+                }}
+              >
+                Отмена
+              </Button>
+              <Button 
+                variant="destructive" 
+                className="flex-1"
+                onClick={() => {
+                  setShowDeleteDialog(false);
+                  setEmployeeToDelete(null);
+                }}
+              >
+                <Icon name="Trash2" className="mr-2" size={16} />
+                Удалить
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
