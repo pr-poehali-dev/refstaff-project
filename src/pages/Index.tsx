@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -44,10 +44,22 @@ interface Recommendation {
 }
 
 function Index() {
-  const [userRole, setUserRole] = useState<UserRole>('guest');
+  const [userRole, setUserRole] = useState<UserRole>(() => {
+    const saved = localStorage.getItem('userRole');
+    return (saved as UserRole) || 'guest';
+  });
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('userRole', userRole);
+  }, [userRole]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('userRole');
+    setUserRole('guest');
+  };
 
   const vacancies: Vacancy[] = [
     { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5 },
@@ -430,7 +442,7 @@ function Index() {
             <Button variant="ghost" size="icon">
               <Icon name="Bell" size={20} />
             </Button>
-            <Button variant="ghost" onClick={() => setUserRole('guest')}>Выход</Button>
+            <Button variant="ghost" onClick={handleLogout}>Выход</Button>
           </div>
         </div>
       </header>
@@ -693,7 +705,7 @@ function Index() {
             <Button variant="ghost" size="icon">
               <Icon name="Bell" size={20} />
             </Button>
-            <Button variant="ghost" onClick={() => setUserRole('guest')}>Выход</Button>
+            <Button variant="ghost" onClick={handleLogout}>Выход</Button>
           </div>
         </div>
       </header>
