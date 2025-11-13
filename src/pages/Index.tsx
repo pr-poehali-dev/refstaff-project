@@ -46,6 +46,8 @@ interface Recommendation {
 function Index() {
   const [userRole, setUserRole] = useState<UserRole>('guest');
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
+  const [showRegisterDialog, setShowRegisterDialog] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
   const vacancies: Vacancy[] = [
     { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5 },
@@ -81,8 +83,8 @@ function Index() {
             <a href="#contact" className="text-sm hover:text-primary transition-colors">Контакты</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => setUserRole('employee')}>Вход</Button>
-            <Button onClick={() => setUserRole('employer')}>Зарегистрировать компанию</Button>
+            <Button variant="ghost" onClick={() => setShowLoginDialog(true)}>Вход</Button>
+            <Button onClick={() => setShowRegisterDialog(true)}>Зарегистрировать компанию</Button>
           </div>
         </div>
       </header>
@@ -96,7 +98,7 @@ function Index() {
           <p className="text-xl text-muted-foreground mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
             Платформа для реферального найма с геймификацией и прозрачной системой вознаграждений
           </p>
-          <Button size="lg" className="animate-scale-in" style={{ animationDelay: '0.2s' }} onClick={() => setUserRole('employer')}>
+          <Button size="lg" className="animate-scale-in" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)}>
             <Icon name="Rocket" className="mr-2" size={20} />
             Начать бесплатно — 14 дней
           </Button>
@@ -184,7 +186,7 @@ function Index() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full" variant="outline" onClick={() => setUserRole('employer')}>Попробовать</Button>
+                <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Попробовать</Button>
               </CardFooter>
             </Card>
 
@@ -220,7 +222,7 @@ function Index() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full" onClick={() => setUserRole('employer')}>Подключить</Button>
+                <Button className="w-full" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
               </CardFooter>
             </Card>
 
@@ -253,7 +255,7 @@ function Index() {
                 </ul>
               </CardContent>
               <CardFooter>
-                <Button className="w-full" variant="outline" onClick={() => setUserRole('employer')}>Подключить</Button>
+                <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
               </CardFooter>
             </Card>
           </div>
@@ -329,6 +331,90 @@ function Index() {
           </div>
         </div>
       </footer>
+
+      <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Регистрация компании</DialogTitle>
+            <DialogDescription>Начните 14-дневный бесплатный пробный период</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="company-name">Название компании</Label>
+              <Input id="company-name" placeholder="Acme Corp" />
+            </div>
+            <div>
+              <Label htmlFor="admin-name">Ваше имя</Label>
+              <Input id="admin-name" placeholder="Иван Иванов" />
+            </div>
+            <div>
+              <Label htmlFor="admin-email">Email</Label>
+              <Input id="admin-email" type="email" placeholder="ivan@company.ru" />
+            </div>
+            <div>
+              <Label htmlFor="admin-password">Пароль</Label>
+              <Input id="admin-password" type="password" placeholder="Минимум 8 символов" />
+            </div>
+            <div>
+              <Label htmlFor="employee-count">Количество сотрудников</Label>
+              <Input id="employee-count" type="number" placeholder="50" />
+            </div>
+            <Button className="w-full" onClick={() => {
+              setShowRegisterDialog(false);
+              setUserRole('employer');
+            }}>
+              Создать аккаунт
+            </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              Нажимая кнопку, вы соглашаетесь с условиями использования
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Вход в систему</DialogTitle>
+            <DialogDescription>Войдите в свой аккаунт</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="login-email">Email</Label>
+              <Input id="login-email" type="email" placeholder="ivan@company.ru" />
+            </div>
+            <div>
+              <Label htmlFor="login-password">Пароль</Label>
+              <Input id="login-password" type="password" placeholder="Ваш пароль" />
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 text-sm">
+                <input type="checkbox" className="rounded" />
+                Запомнить меня
+              </label>
+              <a href="#" className="text-sm text-primary hover:underline">Забыли пароль?</a>
+            </div>
+            <Button className="w-full" onClick={() => {
+              setShowLoginDialog(false);
+              setUserRole('employee');
+            }}>
+              Войти
+            </Button>
+            <div className="text-center text-sm text-muted-foreground">
+              Нет аккаунта?{' '}
+              <button 
+                onClick={() => {
+                  setShowLoginDialog(false);
+                  setShowRegisterDialog(true);
+                }}
+                className="text-primary hover:underline"
+              >
+                Зарегистрируйтесь
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
