@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
+import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Recommendation as ApiRecommendation, type Company, type WalletData } from '@/lib/api';
 
 type UserRole = 'guest' | 'employer' | 'employee';
 
@@ -79,7 +80,6 @@ function Index() {
     { id: 2, senderId: 2, senderName: 'Вы', message: 'Отлично! У меня есть кандидат на вакансию Frontend Developer', timestamp: '10:32', isOwn: true },
   ]);
   const [newMessage, setNewMessage] = useState('');
-  const [inviteLink, setInviteLink] = useState('https://refstaff.app/join/abc123def456');
   const [newReward, setNewReward] = useState('30000');
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(2);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
@@ -93,6 +93,32 @@ function Index() {
     { id: 2, type: 'subscription', message: 'Подписка заканчивается через 12 дней', date: '2025-11-13', read: false },
     { id: 3, type: 'hire', message: 'Кандидат Елена Новикова принята', date: '2025-11-12', read: true },
   ]);
+  
+  const currentEmployeeId = 1;
+  const currentCompanyId = 1;
+  
+  const [vacancies, setVacancies] = useState<Vacancy[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [company, setCompany] = useState<Company | null>(null);
+  const [walletData, setWalletData] = useState<WalletData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  const [vacancyForm, setVacancyForm] = useState({
+    title: '',
+    department: '',
+    salary: '',
+    requirements: '',
+    reward: '30000',
+    payoutDelay: '30'
+  });
+  
+  const [recommendationForm, setRecommendationForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    comment: ''
+  });
 
   useEffect(() => {
     localStorage.setItem('userRole', userRole);
@@ -122,20 +148,72 @@ function Index() {
     setUnreadMessagesCount(0);
   };
 
-  const currentEmployeeId = 1;
-  
-  const vacancies: Vacancy[] = [
-    { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5, reward: 30000, payoutDelayDays: 30, referralLink: `https://refstaff.app/r/vac1?ref=${currentEmployeeId}` },
-    { id: 2, title: 'Product Manager', department: 'Продукт', salary: '200 000 ₽', status: 'active', recommendations: 3, reward: 25000, payoutDelayDays: 45, referralLink: `https://refstaff.app/r/vac2?ref=${currentEmployeeId}` },
-    { id: 3, title: 'UX/UI Designer', department: 'Дизайн', salary: '180 000 ₽', status: 'active', recommendations: 8, reward: 30000, payoutDelayDays: 60, referralLink: `https://refstaff.app/r/vac3?ref=${currentEmployeeId}` },
-    { id: 4, title: 'DevOps Engineer', department: 'Инфраструктура', salary: '220 000 ₽', status: 'active', recommendations: 2, reward: 35000, payoutDelayDays: 90, referralLink: `https://refstaff.app/r/vac4?ref=${currentEmployeeId}` },
-  ];
+  useEffect(() => {
+    if (userRole === 'employer' || userRole === 'employee') {
+      loadData();
+    }
+  }, [userRole]);
 
-  const employees: Employee[] = [
-    { id: 1, name: 'Анна Смирнова', position: 'Tech Lead', department: 'Разработка', avatar: '', recommendations: 12, hired: 4, earnings: 120000, level: 5, isHrManager: true },
-    { id: 2, name: 'Дмитрий Иванов', position: 'Senior Developer', department: 'Разработка', avatar: '', recommendations: 8, hired: 2, earnings: 60000, level: 3 },
-    { id: 3, name: 'Мария Петрова', position: 'Product Owner', department: 'Продукт', avatar: '', recommendations: 15, hired: 5, earnings: 150000, level: 6, isAdmin: true },
-  ];
+  const loadData = async () => {
+    try {
+      setIsLoading(true);
+      const [vacanciesData, employeesData, recommendationsData, companyData] = await Promise.all([
+        api.getVacancies(currentCompanyId).catch(() => []),
+        api.getEmployees(currentCompanyId).catch(() => []),
+        api.getRecommendations(currentCompanyId).catch(() => []),
+        api.getCompany(currentCompanyId).catch(() => null)
+      ]);
+
+      const mappedVacancies: Vacancy[] = vacanciesData.map((v: ApiVacancy) => ({
+        id: v.id,
+        title: v.title,
+        department: v.department,
+        salary: v.salary_display,
+        status: v.status,
+        recommendations: v.recommendations_count || 0,
+        reward: v.reward_amount,
+        payoutDelayDays: v.payout_delay_days || 30,
+        referralLink: v.referral_token ? `https://refstaff.app/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
+      }));
+
+      const mappedEmployees: Employee[] = employeesData.map((e: ApiEmployee) => ({
+        id: e.id,
+        name: `${e.first_name} ${e.last_name}`,
+        position: e.position,
+        department: e.department,
+        avatar: e.avatar_url || '',
+        recommendations: e.total_recommendations,
+        hired: e.successful_hires,
+        earnings: Number(e.total_earnings),
+        level: e.level
+      }));
+
+      const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => ({
+        id: r.id,
+        candidateName: r.candidate_name,
+        vacancy: r.vacancy_title || '',
+        status: r.status,
+        date: new Date(r.created_at).toISOString().split('T')[0],
+        reward: r.reward_amount,
+        recommendedBy: r.recommended_by_name,
+        recommendedById: r.recommended_by
+      }));
+
+      setVacancies(mappedVacancies);
+      setEmployees(mappedEmployees);
+      setRecommendations(mappedRecommendations);
+      setCompany(companyData);
+
+      if (userRole === 'employee') {
+        const wallet = await api.getWallet(currentEmployeeId).catch(() => null);
+        setWalletData(wallet);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const calculateEmployeeRank = (emp: Employee) => {
     const sortedEmployees = [...employees].sort((a, b) => {
@@ -146,11 +224,77 @@ function Index() {
     return sortedEmployees.findIndex(e => e.id === emp.id) + 1;
   };
 
-  const recommendations: Recommendation[] = [
-    { id: 1, candidateName: 'Алексей Козлов', vacancy: 'Senior Frontend Developer', status: 'pending', date: '2025-11-10', reward: 30000, recommendedBy: 'Анна Смирнова', recommendedById: 1 },
-    { id: 2, candidateName: 'Елена Новикова', vacancy: 'UX/UI Designer', status: 'accepted', date: '2025-11-08', reward: 30000, recommendedBy: 'Анна Смирнова', recommendedById: 1 },
-    { id: 3, candidateName: 'Сергей Волков', vacancy: 'Product Manager', status: 'pending', date: '2025-11-12', reward: 30000, recommendedBy: 'Дмитрий Иванов', recommendedById: 2 },
-  ];
+  const handleCreateVacancy = async () => {
+    if (!vacancyForm.title || !vacancyForm.department || !vacancyForm.salary) {
+      alert('Заполните обязательные поля');
+      return;
+    }
+    
+    try {
+      await api.createVacancy({
+        company_id: currentCompanyId,
+        title: vacancyForm.title,
+        department: vacancyForm.department,
+        salary_display: vacancyForm.salary,
+        requirements: vacancyForm.requirements,
+        reward_amount: parseInt(vacancyForm.reward),
+        payout_delay_days: parseInt(vacancyForm.payoutDelay),
+        created_by: currentEmployeeId
+      });
+      await loadData();
+      setVacancyForm({ title: '', department: '', salary: '', requirements: '', reward: '30000', payoutDelay: '30' });
+      alert('Вакансия успешно создана!');
+    } catch (error) {
+      console.error('Ошибка создания вакансии:', error);
+      alert('Не удалось создать вакансию');
+    }
+  };
+
+  const handleCreateRecommendation = async (data: { vacancyId: number; name: string; email: string; phone: string; comment: string }) => {
+    if (!data.name || !data.email) {
+      alert('Заполните обязательные поля: ФИО и Email');
+      return;
+    }
+    
+    try {
+      await api.createRecommendation({
+        vacancy_id: data.vacancyId,
+        recommended_by: currentEmployeeId,
+        candidate_name: data.name,
+        candidate_email: data.email,
+        candidate_phone: data.phone,
+        comment: data.comment
+      });
+      await loadData();
+      setRecommendationForm({ name: '', email: '', phone: '', comment: '' });
+      alert('Рекомендация успешно отправлена!');
+    } catch (error) {
+      console.error('Ошибка создания рекомендации:', error);
+      alert('Не удалось отправить рекомендацию');
+    }
+  };
+
+  const handleUpdateRecommendationStatus = async (id: number, status: string) => {
+    try {
+      await api.updateRecommendationStatus(id, status);
+      await loadData();
+    } catch (error) {
+      console.error('Ошибка обновления статуса:', error);
+      alert('Не удалось обновить статус рекомендации');
+    }
+  };
+
+  const handleDeleteEmployee = async (userId: number) => {
+    try {
+      await api.deleteEmployee(userId);
+      await loadData();
+      setShowDeleteDialog(false);
+      setEmployeeToDelete(null);
+    } catch (error) {
+      console.error('Ошибка удаления сотрудника:', error);
+      alert('Не удалось удалить сотрудника');
+    }
+  };
 
   const renderLandingPage = () => (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
@@ -538,6 +682,14 @@ function Index() {
       <div className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-8">Личный кабинет работодателя</h1>
 
+        {isLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Загрузка данных...</p>
+            </div>
+          </div>
+        ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 lg:w-auto">
             <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
@@ -566,15 +718,30 @@ function Index() {
                   <div className="space-y-4 pt-4">
                     <div>
                       <Label htmlFor="vacancy-title">Название должности</Label>
-                      <Input id="vacancy-title" placeholder="Senior Frontend Developer" />
+                      <Input 
+                        id="vacancy-title" 
+                        placeholder="Senior Frontend Developer"
+                        value={vacancyForm.title}
+                        onChange={(e) => setVacancyForm({...vacancyForm, title: e.target.value})}
+                      />
                     </div>
                     <div>
                       <Label htmlFor="department">Отдел</Label>
-                      <Input id="department" placeholder="Разработка" />
+                      <Input 
+                        id="department" 
+                        placeholder="Разработка"
+                        value={vacancyForm.department}
+                        onChange={(e) => setVacancyForm({...vacancyForm, department: e.target.value})}
+                      />
                     </div>
                     <div>
                       <Label htmlFor="salary">Зарплата</Label>
-                      <Input id="salary" placeholder="250 000 ₽" />
+                      <Input 
+                        id="salary" 
+                        placeholder="250 000 ₽"
+                        value={vacancyForm.salary}
+                        onChange={(e) => setVacancyForm({...vacancyForm, salary: e.target.value})}
+                      />
                     </div>
                     <div>
                       <Label htmlFor="reward-amount">Вознаграждение за рекомендацию</Label>
@@ -582,14 +749,17 @@ function Index() {
                         id="reward-amount" 
                         type="number" 
                         placeholder="30000" 
-                        value={newReward}
-                        onChange={(e) => setNewReward(e.target.value)}
+                        value={vacancyForm.reward}
+                        onChange={(e) => setVacancyForm({...vacancyForm, reward: e.target.value})}
                       />
                       <p className="text-xs text-muted-foreground mt-1">Сумма в рублях, которую получит сотрудник за успешный найм</p>
                     </div>
                     <div>
                       <Label htmlFor="payout-delay">Срок выплаты вознаграждения</Label>
-                      <Select defaultValue="30">
+                      <Select 
+                        value={vacancyForm.payoutDelay}
+                        onValueChange={(value) => setVacancyForm({...vacancyForm, payoutDelay: value})}
+                      >
                         <SelectTrigger id="payout-delay">
                           <SelectValue placeholder="Выберите срок" />
                         </SelectTrigger>
@@ -607,9 +777,15 @@ function Index() {
                     </div>
                     <div>
                       <Label htmlFor="requirements">Требования</Label>
-                      <Textarea id="requirements" placeholder="Опыт работы от 5 лет..." rows={4} />
+                      <Textarea 
+                        id="requirements" 
+                        placeholder="Опыт работы от 5 лет..." 
+                        rows={4}
+                        value={vacancyForm.requirements}
+                        onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
+                      />
                     </div>
-                    <Button className="w-full">Создать вакансию</Button>
+                    <Button className="w-full" onClick={handleCreateVacancy}>Создать вакансию</Button>
                   </div>
                 </DialogContent>
               </Dialog>
@@ -654,7 +830,7 @@ function Index() {
                       <div className="space-y-2">
                         <Label className="text-xs text-muted-foreground">Реферальная ссылка для сотрудников</Label>
                         <div className="flex gap-2">
-                          <Input value={vacancy.referralLink} readOnly className="text-xs" />
+                          <Input value={vacancy.referralLink || ''} readOnly className="text-xs" />
                           <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(vacancy.referralLink || '')}>
                             <Icon name="Copy" size={16} />
                           </Button>
@@ -820,11 +996,11 @@ function Index() {
                       </div>
                       {rec.status === 'pending' && (
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm">
+                          <Button variant="outline" size="sm" onClick={() => handleUpdateRecommendationStatus(rec.id, 'rejected')}>
                             <Icon name="X" className="mr-1" size={16} />
                             Отклонить
                           </Button>
-                          <Button size="sm">
+                          <Button size="sm" onClick={() => handleUpdateRecommendationStatus(rec.id, 'accepted')}>
                             <Icon name="Check" className="mr-1" size={16} />
                             Принять
                           </Button>
@@ -1058,6 +1234,7 @@ function Index() {
             </div>
           </TabsContent>
         </Tabs>
+        )}
       </div>
 
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
@@ -1070,8 +1247,8 @@ function Index() {
             <div>
               <Label>Реферальная ссылка компании</Label>
               <div className="flex gap-2 mt-2">
-                <Input value={inviteLink} readOnly />
-                <Button onClick={() => navigator.clipboard.writeText(inviteLink)}>
+                <Input value={company?.invite_token ? `https://refstaff.app/join/${company.invite_token}` : 'Загрузка...'} readOnly />
+                <Button onClick={() => company?.invite_token && navigator.clipboard.writeText(`https://refstaff.app/join/${company.invite_token}`)}>
                   <Icon name="Copy" size={18} />
                 </Button>
               </div>
@@ -1200,10 +1377,7 @@ function Index() {
               <Button 
                 variant="destructive" 
                 className="flex-1"
-                onClick={() => {
-                  setShowDeleteDialog(false);
-                  setEmployeeToDelete(null);
-                }}
+                onClick={() => employeeToDelete && handleDeleteEmployee(employeeToDelete.id)}
               >
                 <Icon name="Trash2" className="mr-2" size={16} />
                 Удалить
@@ -1439,15 +1613,21 @@ function Index() {
             <CardContent className="space-y-4">
               <div>
                 <div className="text-sm text-muted-foreground mb-1">Доступно для вывода</div>
-                <div className="text-3xl font-bold text-green-600">60 000 ₽</div>
+                <div className="text-3xl font-bold text-green-600">
+                  {walletData?.wallet?.wallet_balance?.toLocaleString() || 0} ₽
+                </div>
               </div>
               <div>
                 <div className="text-sm text-muted-foreground mb-1">Ожидает разблокировки</div>
-                <div className="text-2xl font-bold text-muted-foreground">60 000 ₽</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  <Icon name="Clock" size={12} className="inline mr-1" />
-                  Разблокируется через 18 дней
-                </p>
+                <div className="text-2xl font-bold text-muted-foreground">
+                  {walletData?.wallet?.wallet_pending?.toLocaleString() || 0} ₽
+                </div>
+                {walletData?.pending_payouts && walletData.pending_payouts.length > 0 && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    <Icon name="Clock" size={12} className="inline mr-1" />
+                    Следующая: {new Date(walletData.pending_payouts[0].unlock_date).toLocaleDateString('ru-RU')}
+                  </p>
+                )}
               </div>
               <Button className="w-full" variant="outline">
                 <Icon name="Download" className="mr-2" size={16} />
@@ -1496,23 +1676,41 @@ function Index() {
                           <div className="space-y-4 pt-4">
                             <div>
                               <Label htmlFor="candidate-name">ФИО кандидата</Label>
-                              <Input id="candidate-name" placeholder="Иван Иванов" />
+                              <Input 
+                                id="candidate-name" 
+                                placeholder="Иван Иванов"
+                                value={recommendationForm.name}
+                                onChange={(e) => setRecommendationForm({...recommendationForm, name: e.target.value})}
+                              />
                             </div>
                             <div>
                               <Label htmlFor="candidate-email">Email</Label>
-                              <Input id="candidate-email" type="email" placeholder="ivan@example.com" />
+                              <Input 
+                                id="candidate-email" 
+                                type="email" 
+                                placeholder="ivan@example.com"
+                                value={recommendationForm.email}
+                                onChange={(e) => setRecommendationForm({...recommendationForm, email: e.target.value})}
+                              />
                             </div>
                             <div>
                               <Label htmlFor="candidate-phone">Телефон</Label>
-                              <Input id="candidate-phone" placeholder="+7 (999) 123-45-67" />
-                            </div>
-                            <div>
-                              <Label htmlFor="candidate-resume">Резюме (DOC, DOCX, PDF)</Label>
-                              <Input id="candidate-resume" type="file" accept=".doc,.docx,.pdf" />
+                              <Input 
+                                id="candidate-phone" 
+                                placeholder="+7 (999) 123-45-67"
+                                value={recommendationForm.phone}
+                                onChange={(e) => setRecommendationForm({...recommendationForm, phone: e.target.value})}
+                              />
                             </div>
                             <div>
                               <Label htmlFor="comment">Комментарий</Label>
-                              <Textarea id="comment" placeholder="Почему этот кандидат подходит..." rows={3} />
+                              <Textarea 
+                                id="comment" 
+                                placeholder="Почему этот кандидат подходит..." 
+                                rows={3}
+                                value={recommendationForm.comment}
+                                onChange={(e) => setRecommendationForm({...recommendationForm, comment: e.target.value})}
+                              />
                             </div>
                             <div className="bg-primary/10 p-4 rounded-lg">
                               <div className="flex items-center gap-2 mb-2">
@@ -1527,7 +1725,18 @@ function Index() {
                                 }
                               </p>
                             </div>
-                            <Button className="w-full">Отправить рекомендацию</Button>
+                            <Button 
+                              className="w-full" 
+                              onClick={() => activeVacancy && handleCreateRecommendation({
+                                vacancyId: activeVacancy.id,
+                                name: recommendationForm.name,
+                                email: recommendationForm.email,
+                                phone: recommendationForm.phone,
+                                comment: recommendationForm.comment
+                              })}
+                            >
+                              Отправить рекомендацию
+                            </Button>
                           </div>
                         </DialogContent>
                       </Dialog>
