@@ -304,6 +304,59 @@ function Index() {
     }
   };
 
+  const handleUpdateVacancy = async () => {
+    if (!activeVacancy || !vacancyForm.title || !vacancyForm.department || !vacancyForm.salary) {
+      alert('Заполните обязательные поля');
+      return;
+    }
+    
+    try {
+      await api.updateVacancy(activeVacancy.id, {
+        title: vacancyForm.title,
+        department: vacancyForm.department,
+        salary_display: vacancyForm.salary,
+        requirements: vacancyForm.requirements,
+        reward_amount: parseInt(vacancyForm.reward),
+        payout_delay_days: parseInt(vacancyForm.payoutDelay)
+      });
+      await loadData();
+      setActiveVacancy(null);
+      setVacancyForm({ title: '', department: '', salary: '', requirements: '', reward: '30000', payoutDelay: '30' });
+      alert('Вакансия успешно обновлена!');
+    } catch (error) {
+      console.error('Ошибка обновления вакансии:', error);
+      alert('Не удалось обновить вакансию');
+    }
+  };
+
+  const handleCloseVacancy = async (vacancyId: number) => {
+    try {
+      await api.updateVacancy(vacancyId, { status: 'closed' });
+      await loadData();
+      alert('Вакансия закрыта');
+    } catch (error) {
+      console.error('Ошибка закрытия вакансии:', error);
+      alert('Не удалось закрыть вакансию');
+    }
+  };
+
+  const handleUpdateProfile = async () => {
+    try {
+      await api.updateEmployee(currentEmployeeId, {
+        first_name: profileForm.firstName,
+        last_name: profileForm.lastName,
+        position: profileForm.position,
+        department: profileForm.department
+      });
+      await loadData();
+      setShowEditProfileDialog(false);
+      alert('Профиль успешно обновлён!');
+    } catch (error) {
+      console.error('Ошибка обновления профиля:', error);
+      alert('Не удалось обновить профиль');
+    }
+  };
+
   const renderLandingPage = () => (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50">
@@ -864,7 +917,23 @@ function Index() {
                             <span>Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'}</span>
                           </div>
                         </div>
-                        <Button variant="outline" size="sm">Редактировать</Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setActiveVacancy(vacancy);
+                            setVacancyForm({
+                              title: vacancy.title,
+                              department: vacancy.department,
+                              salary: vacancy.salary,
+                              requirements: '',
+                              reward: vacancy.reward.toString(),
+                              payoutDelay: vacancy.payoutDelayDays.toString()
+                            });
+                          }}
+                        >
+                          Редактировать
+                        </Button>
                       </div>
                       <Separator />
                       <div className="space-y-2">
@@ -881,6 +950,95 @@ function Index() {
                 </Card>
               ))}
             </div>
+
+            <Dialog open={activeVacancy !== null} onOpenChange={(open) => !open && setActiveVacancy(null)}>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Редактировать вакансию</DialogTitle>
+                  <DialogDescription>Обновите информацию о вакансии</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 pt-4">
+                  <div>
+                    <Label htmlFor="edit-vacancy-title">Название должности</Label>
+                    <Input 
+                      id="edit-vacancy-title" 
+                      value={vacancyForm.title}
+                      onChange={(e) => setVacancyForm({...vacancyForm, title: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-department">Отдел</Label>
+                    <Input 
+                      id="edit-department" 
+                      value={vacancyForm.department}
+                      onChange={(e) => setVacancyForm({...vacancyForm, department: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-salary">Зарплата</Label>
+                    <Input 
+                      id="edit-salary" 
+                      value={vacancyForm.salary}
+                      onChange={(e) => setVacancyForm({...vacancyForm, salary: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-reward-amount">Вознаграждение за рекомендацию</Label>
+                    <Input 
+                      id="edit-reward-amount" 
+                      type="number" 
+                      value={vacancyForm.reward}
+                      onChange={(e) => setVacancyForm({...vacancyForm, reward: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-payout-delay">Срок выплаты вознаграждения</Label>
+                    <Select 
+                      value={vacancyForm.payoutDelay}
+                      onValueChange={(value) => setVacancyForm({...vacancyForm, payoutDelay: value})}
+                    >
+                      <SelectTrigger id="edit-payout-delay">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0">Сразу после найма</SelectItem>
+                        <SelectItem value="7">Через 7 дней</SelectItem>
+                        <SelectItem value="14">Через 14 дней</SelectItem>
+                        <SelectItem value="30">Через 30 дней</SelectItem>
+                        <SelectItem value="45">Через 45 дней</SelectItem>
+                        <SelectItem value="60">Через 60 дней</SelectItem>
+                        <SelectItem value="90">Через 90 дней (испытательный срок)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-requirements">Требования</Label>
+                    <Textarea 
+                      id="edit-requirements" 
+                      rows={4}
+                      value={vacancyForm.requirements}
+                      onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button className="flex-1" onClick={handleUpdateVacancy}>Сохранить изменения</Button>
+                    {activeVacancy?.status === 'active' && (
+                      <Button 
+                        variant="destructive"
+                        onClick={() => {
+                          if (activeVacancy) {
+                            handleCloseVacancy(activeVacancy.id);
+                            setActiveVacancy(null);
+                          }
+                        }}
+                      >
+                        Закрыть вакансию
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-4">
@@ -2189,9 +2347,7 @@ function Index() {
             <div className="flex gap-2 pt-4">
               <Button 
                 className="flex-1"
-                onClick={() => {
-                  setShowEditProfileDialog(false);
-                }}
+                onClick={handleUpdateProfile}
               >
                 Сохранить
               </Button>

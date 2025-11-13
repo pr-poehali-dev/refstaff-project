@@ -131,6 +131,16 @@ export const api = {
     return response.json();
   },
 
+  async updateVacancy(vacancyId: number, data: Partial<Vacancy>): Promise<Vacancy> {
+    const response = await fetch(`${API_URL}/?resource=vacancies`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: vacancyId, ...data })
+    });
+    if (!response.ok) throw new Error('Failed to update vacancy');
+    return response.json();
+  },
+
   async getEmployees(companyId: number = 1): Promise<Employee[]> {
     const response = await fetch(`${API_URL}/?resource=employees&company_id=${companyId}`);
     if (!response.ok) throw new Error('Failed to fetch employees');
