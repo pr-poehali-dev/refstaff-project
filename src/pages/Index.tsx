@@ -71,6 +71,7 @@ function Index() {
   const [showCompanySettingsDialog, setShowCompanySettingsDialog] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [activeChatEmployee, setActiveChatEmployee] = useState<Employee | null>(null);
+  const [showCompanyProfileDialog, setShowCompanyProfileDialog] = useState(false);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     { id: 1, senderId: 1, senderName: 'HR Manager', message: 'Здравствуйте! Как дела с рекомендациями?', timestamp: '10:30', isOwn: false },
     { id: 2, senderId: 2, senderName: 'Вы', message: 'Отлично! У меня есть кандидат на вакансию Frontend Developer', timestamp: '10:32', isOwn: true },
@@ -102,11 +103,13 @@ function Index() {
     setNewMessage('');
   };
 
+  const currentEmployeeId = 1;
+  
   const vacancies: Vacancy[] = [
-    { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5, reward: 30000, payoutDelayDays: 30, referralLink: 'https://refstaff.app/r/vac1' },
-    { id: 2, title: 'Product Manager', department: 'Продукт', salary: '200 000 ₽', status: 'active', recommendations: 3, reward: 25000, payoutDelayDays: 45, referralLink: 'https://refstaff.app/r/vac2' },
-    { id: 3, title: 'UX/UI Designer', department: 'Дизайн', salary: '180 000 ₽', status: 'active', recommendations: 8, reward: 30000, payoutDelayDays: 60, referralLink: 'https://refstaff.app/r/vac3' },
-    { id: 4, title: 'DevOps Engineer', department: 'Инфраструктура', salary: '220 000 ₽', status: 'active', recommendations: 2, reward: 35000, payoutDelayDays: 90, referralLink: 'https://refstaff.app/r/vac4' },
+    { id: 1, title: 'Senior Frontend Developer', department: 'Разработка', salary: '250 000 ₽', status: 'active', recommendations: 5, reward: 30000, payoutDelayDays: 30, referralLink: `https://refstaff.app/r/vac1?ref=${currentEmployeeId}` },
+    { id: 2, title: 'Product Manager', department: 'Продукт', salary: '200 000 ₽', status: 'active', recommendations: 3, reward: 25000, payoutDelayDays: 45, referralLink: `https://refstaff.app/r/vac2?ref=${currentEmployeeId}` },
+    { id: 3, title: 'UX/UI Designer', department: 'Дизайн', salary: '180 000 ₽', status: 'active', recommendations: 8, reward: 30000, payoutDelayDays: 60, referralLink: `https://refstaff.app/r/vac3?ref=${currentEmployeeId}` },
+    { id: 4, title: 'DevOps Engineer', department: 'Инфраструктура', salary: '220 000 ₽', status: 'active', recommendations: 2, reward: 35000, payoutDelayDays: 90, referralLink: `https://refstaff.app/r/vac4?ref=${currentEmployeeId}` },
   ];
 
   const employees: Employee[] = [
@@ -991,6 +994,14 @@ function Index() {
             <Button variant="ghost" size="icon">
               <Icon name="Bell" size={20} />
             </Button>
+            <Button variant="ghost" onClick={() => setShowCompanyProfileDialog(true)}>
+              <Icon name="Building2" className="mr-2" size={18} />
+              О компании
+            </Button>
+            <Button variant="ghost" onClick={() => setShowChatDialog(true)}>
+              <Icon name="MessageCircle" className="mr-2" size={18} />
+              Чат с HR
+            </Button>
             <Button variant="ghost" onClick={handleLogout}>Выход</Button>
           </div>
         </div>
@@ -1349,6 +1360,84 @@ function Index() {
           </TabsContent>
         </Tabs>
       </div>
+
+      <Dialog open={showCompanyProfileDialog} onOpenChange={setShowCompanyProfileDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Профиль компании</DialogTitle>
+            <DialogDescription>Информация о вашей компании</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-4">
+            <div className="flex items-center gap-4">
+              <div className="w-20 h-20 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Icon name="Building2" className="text-primary" size={40} />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold">Acme Tech</h3>
+                <p className="text-muted-foreground">IT и технологии</p>
+              </div>
+            </div>
+            <Separator />
+            <div className="space-y-4">
+              <div>
+                <Label className="text-sm font-medium">О компании</Label>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Мы ведущая технологическая компания, специализирующаяся на разработке инновационных решений для бизнеса. 
+                  Наша команда состоит из 500+ профессионалов по всему миру.
+                </p>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Веб-сайт</Label>
+                  <a href="https://acme-tech.com" target="_blank" className="text-sm text-primary hover:underline mt-1 flex items-center gap-1">
+                    acme-tech.com
+                    <Icon name="ExternalLink" size={14} />
+                  </a>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Количество сотрудников</Label>
+                  <p className="text-sm text-muted-foreground mt-1">500+</p>
+                </div>
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Открытые вакансии</Label>
+                <p className="text-sm text-muted-foreground mt-1">{vacancies.length} активных вакансий</p>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+        <DialogContent className="max-w-2xl h-[600px] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Чат с HR отделом</DialogTitle>
+            <DialogDescription>Задайте вопросы о рекомендациях и вакансиях</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-3 py-4">
+            {chatMessages.map((msg) => (
+              <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
+                  <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
+                  <div className="text-sm">{msg.message}</div>
+                  <div className="text-xs opacity-70 mt-1">{msg.timestamp}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 pt-4 border-t">
+            <Input 
+              placeholder="Введите сообщение..." 
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            />
+            <Button onClick={handleSendMessage}>
+              <Icon name="Send" size={18} />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 

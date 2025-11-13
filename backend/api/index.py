@@ -45,6 +45,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if method == 'GET' and resource == 'vacancies':
             company_id = query_params.get('company_id', '1')
             status = query_params.get('status', 'active')
+            user_id = query_params.get('user_id')
             
             query = """
                 SELECT v.id, v.title, v.department, v.salary_display, v.status, 
@@ -62,13 +63,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(query, (company_id, status))
             vacancies = cur.fetchall()
             
+            result = []
+            for vac in vacancies:
+                vac_dict = dict(vac)
+                if user_id and vac_dict.get('referral_token'):
+                    vac_dict['referral_link'] = f"https://refstaff.app/r/{vac_dict['referral_token']}?ref={user_id}"
+                result.append(vac_dict)
+            
             return {
                 'statusCode': 200,
                 'headers': {
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps([dict(row) for row in vacancies], default=str),
+                'body': json.dumps(result, default=str),
                 'isBase64Encoded': False
             }
         
