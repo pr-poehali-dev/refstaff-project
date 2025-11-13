@@ -1571,6 +1571,7 @@ function Index() {
     const employeeNotifications = notifications.filter(n => n.type !== 'subscription');
     
     return (
+    <>
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -2143,6 +2144,69 @@ function Index() {
         </DialogContent>
       </Dialog>
     </div>
+
+      <Dialog open={showEditProfileDialog} onOpenChange={setShowEditProfileDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Редактировать профиль</DialogTitle>
+            <DialogDescription>
+              Обновите информацию о вашем профиле
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="firstName">Имя</Label>
+              <Input 
+                id="firstName" 
+                value={profileForm.firstName}
+                onChange={(e) => setProfileForm({...profileForm, firstName: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="lastName">Фамилия</Label>
+              <Input 
+                id="lastName" 
+                value={profileForm.lastName}
+                onChange={(e) => setProfileForm({...profileForm, lastName: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="position">Должность</Label>
+              <Input 
+                id="position" 
+                value={profileForm.position}
+                onChange={(e) => setProfileForm({...profileForm, position: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="department">Отдел</Label>
+              <Input 
+                id="department" 
+                value={profileForm.department}
+                onChange={(e) => setProfileForm({...profileForm, department: e.target.value})}
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button 
+                className="flex-1"
+                onClick={() => {
+                  setShowEditProfileDialog(false);
+                }}
+              >
+                Сохранить
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => setShowEditProfileDialog(false)}
+              >
+                Отмена
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
     );
   };
 
