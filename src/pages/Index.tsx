@@ -84,6 +84,15 @@ function Index() {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(2);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showIntegrationsDialog, setShowIntegrationsDialog] = useState(false);
+  const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
+  const [showNotificationsDialog, setShowNotificationsDialog] = useState(false);
+  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState(12);
+  const [notifications, setNotifications] = useState<Array<{id: number; type: string; message: string; date: string; read: boolean}>>([
+    { id: 1, type: 'recommendation', message: 'Новая рекомендация от Анны Смирновой', date: '2025-11-13', read: false },
+    { id: 2, type: 'subscription', message: 'Подписка заканчивается через 12 дней', date: '2025-11-13', read: false },
+    { id: 3, type: 'hire', message: 'Кандидат Елена Новикова принята', date: '2025-11-12', read: true },
+  ]);
 
   useEffect(() => {
     localStorage.setItem('userRole', userRole);
@@ -497,13 +506,25 @@ function Index() {
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setUserRole('guest')}>
             <Icon name="Rocket" className="text-primary" size={28} />
             <span className="text-xl font-bold">RefStaff</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
               <Icon name="Bell" size={20} />
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              )}
+            </Button>
+            <Button variant="ghost" onClick={() => setShowSubscriptionDialog(true)}>
+              <Icon name="CreditCard" className="mr-2" size={18} />
+              Подписка
+              {subscriptionDaysLeft < 14 && (
+                <Badge variant="destructive" className="ml-2">{subscriptionDaysLeft} дн.</Badge>
+              )}
             </Button>
             <Button variant="ghost" onClick={() => setShowCompanySettingsDialog(true)}>
               <Icon name="Settings" className="mr-2" size={18} />
@@ -518,11 +539,12 @@ function Index() {
         <h1 className="text-3xl font-bold mb-8">Личный кабинет работодателя</h1>
 
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-6 lg:w-auto">
             <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
             <TabsTrigger value="employees">Сотрудники</TabsTrigger>
             <TabsTrigger value="recommendations">Рекомендации</TabsTrigger>
             <TabsTrigger value="chats">Чаты</TabsTrigger>
+            <TabsTrigger value="integrations">Интеграции</TabsTrigger>
             <TabsTrigger value="stats">Статистика</TabsTrigger>
           </TabsList>
 
@@ -914,6 +936,127 @@ function Index() {
               </CardContent>
             </Card>
           </TabsContent>
+
+          <TabsContent value="integrations" className="space-y-4">
+            <h2 className="text-2xl font-semibold">Интеграции с внешними сервисами</h2>
+            <p className="text-muted-foreground">Подключите внешние сервисы для автоматизации процессов рекрутинга</p>
+            
+            <div className="grid md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
+                      <Icon name="Mail" className="text-blue-600" size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">Email уведомления</CardTitle>
+                      <CardDescription>SendGrid / Mailgun</CardDescription>
+                    </div>
+                    <Badge variant="secondary">Активна</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">Автоматическая отправка уведомлений сотрудникам и кандидатам</p>
+                  <Button variant="outline" size="sm" className="w-full">Настроить</Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+                      <Icon name="MessageSquare" className="text-green-600" size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">Slack интеграция</CardTitle>
+                      <CardDescription>Уведомления в Slack</CardDescription>
+                    </div>
+                    <Badge variant="outline">Не подключена</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">Получайте уведомления о новых рекомендациях в Slack</p>
+                  <Button size="sm" className="w-full">Подключить</Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
+                      <Icon name="Calendar" className="text-purple-600" size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">Календарь</CardTitle>
+                      <CardDescription>Google Calendar / Outlook</CardDescription>
+                    </div>
+                    <Badge variant="outline">Не подключена</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">Синхронизация собеседований с календарем</p>
+                  <Button size="sm" className="w-full">Подключить</Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center">
+                      <Icon name="FileText" className="text-orange-600" size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">ATS системы</CardTitle>
+                      <CardDescription">BambooHR / Greenhouse</CardDescription>
+                    </div>
+                    <Badge variant="outline">Не подключена</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">Интеграция с вашей системой управления персоналом</p>
+                  <Button size="sm" className="w-full">Подключить</Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center">
+                      <Icon name="Link" className="text-red-600" size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">Webhook API</CardTitle>
+                      <CardDescription>Собственная интеграция</CardDescription>
+                    </div>
+                    <Badge variant="outline">Не подключена</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">Подключите свои системы через Webhook</p>
+                  <Button size="sm" className="w-full">Настроить</Button>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
+                      <Icon name="Smartphone" className="text-yellow-600" size={24} />
+                    </div>
+                    <div className="flex-1">
+                      <CardTitle className="text-lg">SMS уведомления</CardTitle>
+                      <CardDescription>Twilio / SMS.ru</CardDescription>
+                    </div>
+                    <Badge variant="outline">Не подключена</Badge>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">Отправка SMS кандидатам и сотрудникам</p>
+                  <Button size="sm" className="w-full">Подключить</Button>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -1069,6 +1212,143 @@ function Index() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={showSubscriptionDialog} onOpenChange={setShowSubscriptionDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Управление подпиской</DialogTitle>
+            <DialogDescription>Ваш текущий тарифный план</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-4">
+            <Card className="border-primary">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle>До 300 сотрудников</CardTitle>
+                  <Badge variant={subscriptionDaysLeft < 7 ? 'destructive' : 'secondary'}>
+                    {subscriptionDaysLeft} дней осталось
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-3xl font-bold">19 900 ₽ / мес</div>
+                <Progress value={(subscriptionDaysLeft / 30) * 100} className="h-2" />
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={16} />
+                    <span>Неограниченные вакансии</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={16} />
+                    <span>API интеграция</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={16} />
+                    <span>Аналитика и отчёты</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <div className="space-y-3">
+              <Button className="w-full" size="lg">
+                <Icon name="CreditCard" className="mr-2" size={18} />
+                Продлить подписку
+              </Button>
+              <Button variant="outline" className="w-full">
+                Изменить тарифный план
+              </Button>
+              <Button variant="ghost" className="w-full text-muted-foreground">
+                История платежей
+              </Button>
+            </div>
+
+            {subscriptionDaysLeft < 7 && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Icon name="AlertTriangle" className="text-destructive mt-0.5" size={20} />
+                  <div className="flex-1 text-sm">
+                    <p className="font-medium text-destructive mb-1">Подписка заканчивается!</p>
+                    <p className="text-muted-foreground">
+                      Продлите подписку, чтобы не потерять доступ к функциям платформы
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showNotificationsDialog} onOpenChange={setShowNotificationsDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Уведомления</DialogTitle>
+            <DialogDescription>Последние обновления и события</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 pt-4 max-h-[500px] overflow-y-auto">
+            {notifications.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Icon name="Bell" size={48} className="mx-auto mb-2 opacity-20" />
+                <p>Нет новых уведомлений</p>
+              </div>
+            ) : (
+              notifications.map((notif) => (
+                <Card 
+                  key={notif.id} 
+                  className={`cursor-pointer transition-all ${!notif.read ? 'bg-primary/5 border-primary/20' : ''}`}
+                  onClick={() => {
+                    setNotifications(notifications.map(n => 
+                      n.id === notif.id ? { ...n, read: true } : n
+                    ));
+                  }}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        notif.type === 'recommendation' ? 'bg-blue-100' :
+                        notif.type === 'subscription' ? 'bg-orange-100' :
+                        'bg-green-100'
+                      }`}>
+                        <Icon 
+                          name={
+                            notif.type === 'recommendation' ? 'UserPlus' :
+                            notif.type === 'subscription' ? 'CreditCard' :
+                            'CheckCircle'
+                          } 
+                          className={
+                            notif.type === 'recommendation' ? 'text-blue-600' :
+                            notif.type === 'subscription' ? 'text-orange-600' :
+                            'text-green-600'
+                          }
+                          size={20} 
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{notif.message}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(notif.date).toLocaleDateString('ru-RU')}
+                        </p>
+                      </div>
+                      {!notif.read && (
+                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+          <div className="pt-4 border-t">
+            <Button 
+              variant="ghost" 
+              className="w-full"
+              onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
+            >
+              Отметить все как прочитанные
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 
@@ -1076,13 +1356,18 @@ function Index() {
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setUserRole('guest')}>
             <Icon name="Rocket" className="text-primary" size={28} />
             <span className="text-xl font-bold">RefStaff</span>
           </div>
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
               <Icon name="Bell" size={20} />
+              {notifications.filter(n => !n.read).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {notifications.filter(n => !n.read).length}
+                </span>
+              )}
             </Button>
             <Button variant="ghost" onClick={() => setShowCompanyProfileDialog(true)}>
               <Icon name="Building2" className="mr-2" size={18} />
@@ -1529,6 +1814,77 @@ function Index() {
             />
             <Button onClick={handleSendMessage}>
               <Icon name="Send" size={18} />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showNotificationsDialog} onOpenChange={setShowNotificationsDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Уведомления</DialogTitle>
+            <DialogDescription>Последние обновления и события</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 pt-4 max-h-[500px] overflow-y-auto">
+            {notifications.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Icon name="Bell" size={48} className="mx-auto mb-2 opacity-20" />
+                <p>Нет новых уведомлений</p>
+              </div>
+            ) : (
+              notifications.map((notif) => (
+                <Card 
+                  key={notif.id} 
+                  className={`cursor-pointer transition-all ${!notif.read ? 'bg-primary/5 border-primary/20' : ''}`}
+                  onClick={() => {
+                    setNotifications(notifications.map(n => 
+                      n.id === notif.id ? { ...n, read: true } : n
+                    ));
+                  }}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        notif.type === 'recommendation' ? 'bg-blue-100' :
+                        notif.type === 'subscription' ? 'bg-orange-100' :
+                        'bg-green-100'
+                      }`}>
+                        <Icon 
+                          name={
+                            notif.type === 'recommendation' ? 'UserPlus' :
+                            notif.type === 'subscription' ? 'CreditCard' :
+                            'CheckCircle'
+                          } 
+                          className={
+                            notif.type === 'recommendation' ? 'text-blue-600' :
+                            notif.type === 'subscription' ? 'text-orange-600' :
+                            'text-green-600'
+                          }
+                          size={20} 
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium">{notif.message}</p>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {new Date(notif.date).toLocaleDateString('ru-RU')}
+                        </p>
+                      </div>
+                      {!notif.read && (
+                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+          <div className="pt-4 border-t">
+            <Button 
+              variant="ghost" 
+              className="w-full"
+              onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
+            >
+              Отметить все как прочитанные
             </Button>
           </div>
         </DialogContent>
