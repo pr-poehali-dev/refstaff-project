@@ -95,6 +95,10 @@ function Index() {
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [activeChatEmployee, setActiveChatEmployee] = useState<Employee | null>(null);
   const [showCompanyProfileDialog, setShowCompanyProfileDialog] = useState(false);
+  const [showAboutDialog, setShowAboutDialog] = useState(false);
+  const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
+  const [showTermsDialog, setShowTermsDialog] = useState(false);
+  const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     { id: 1, senderId: 1, senderName: 'HR Manager', message: 'Здравствуйте! Как дела с рекомендациями?', timestamp: '10:30', isOwn: false },
     { id: 2, senderId: 2, senderName: 'Вы', message: 'Отлично! У меня есть кандидат на вакансию Frontend Developer', timestamp: '10:32', isOwn: true },
@@ -743,7 +747,25 @@ function Index() {
         <section id="pricing" className="py-20 px-4 bg-white" aria-labelledby="pricing-title">
           <div className="container mx-auto max-w-6xl">
             <h2 id="pricing-title" className="text-4xl font-bold text-center mb-4">Тарифы</h2>
-            <p className="text-center text-muted-foreground mb-16">14 дней бесплатно для всех новых клиентов</p>
+            <p className="text-center text-muted-foreground mb-8">14 дней бесплатно для всех новых клиентов</p>
+            
+            <div className="flex items-center justify-center gap-3 mb-12">
+              <Button 
+                variant={pricingPeriod === 'monthly' ? 'default' : 'outline'} 
+                onClick={() => setPricingPeriod('monthly')}
+                className="min-w-[120px]"
+              >
+                Месяц
+              </Button>
+              <Button 
+                variant={pricingPeriod === 'yearly' ? 'default' : 'outline'} 
+                onClick={() => setPricingPeriod('yearly')}
+                className="min-w-[120px]"
+              >
+                Год
+                <Badge className="ml-2 bg-green-500 text-white">-20%</Badge>
+              </Button>
+            </div>
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-2">
               <CardHeader>
@@ -782,9 +804,14 @@ function Index() {
                 <CardDescription>Для растущих компаний</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold mb-1">19 900 ₽</div>
+                <div className="text-4xl font-bold mb-1">
+                  {pricingPeriod === 'monthly' ? '19 900 ₽' : '15 920 ₽'}
+                </div>
                 <p className="text-sm text-muted-foreground mb-2">в месяц</p>
-                <p className="text-sm text-green-600 font-medium mb-6">15 920 ₽/мес при годовой оплате</p>
+                {pricingPeriod === 'yearly' && (
+                  <p className="text-sm text-green-600 font-medium mb-6">190 800 ₽/год (экономия 47 880 ₽)</p>
+                )}
+                {pricingPeriod === 'monthly' && <div className="mb-6"></div>}
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <Icon name="Check" className="text-green-600 mt-1" size={18} />
@@ -815,9 +842,14 @@ function Index() {
                 <CardDescription>Для крупных компаний</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-4xl font-bold mb-1">48 900 ₽</div>
+                <div className="text-4xl font-bold mb-1">
+                  {pricingPeriod === 'monthly' ? '48 900 ₽' : '39 120 ₽'}
+                </div>
                 <p className="text-sm text-muted-foreground mb-2">в месяц</p>
-                <p className="text-sm text-green-600 font-medium mb-6">39 120 ₽/мес при годовой оплате</p>
+                {pricingPeriod === 'yearly' && (
+                  <p className="text-sm text-green-600 font-medium mb-6">469 440 ₽/год (экономия 117 360 ₽)</p>
+                )}
+                {pricingPeriod === 'monthly' && <div className="mb-6"></div>}
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2">
                     <Icon name="Check" className="text-green-600 mt-1" size={18} />
@@ -897,7 +929,7 @@ function Index() {
             <nav aria-label="Компания">
               <h4 className="font-semibold mb-4">Компания</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#how" className="hover:text-primary">О нас</a></li>
+                <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
                 <li><a href="#contact" className="hover:text-primary">Блог</a></li>
                 <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
               </ul>
@@ -905,8 +937,8 @@ function Index() {
             <nav aria-label="Правовая информация">
               <h4 className="font-semibold mb-4">Правовая информация</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">Политика конфиденциальности</a></li>
-                <li><a href="#" className="hover:text-primary">Пользовательское соглашение</a></li>
+                <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary">Политика конфиденциальности</button></li>
+                <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary">Пользовательское соглашение</button></li>
               </ul>
             </nav>
           </div>
@@ -954,7 +986,10 @@ function Index() {
               Создать аккаунт
             </Button>
             <p className="text-xs text-center text-muted-foreground">
-              Нажимая кнопку, вы соглашаетесь с условиями использования
+              Нажимая кнопку, вы соглашаетесь с{' '}
+              <button onClick={() => setShowTermsDialog(true)} className="text-primary hover:underline">условиями использования</button>
+              {' '}и{' '}
+              <button onClick={() => setShowPrivacyDialog(true)} className="text-primary hover:underline">политикой конфиденциальности</button>
             </p>
           </div>
         </DialogContent>
@@ -999,6 +1034,346 @@ function Index() {
               >
                 Зарегистрируйтесь
               </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showAboutDialog} onOpenChange={setShowAboutDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">О RefStaff</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6 pt-4">
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Наша миссия</h3>
+              <p className="text-muted-foreground">
+                RefStaff создан для того, чтобы сделать процесс найма персонала максимально эффективным и прозрачным. 
+                Мы верим, что лучшие кандидаты приходят по рекомендациям доверенных сотрудников, и наша платформа 
+                помогает компаниям использовать этот потенциал на 100%.
+              </p>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Почему мы?</h3>
+              <div className="space-y-4">
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Target" className="text-primary" size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Фокус на результат</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Наши клиенты сокращают время найма в 2 раза и экономят до 70% бюджета на рекрутинг.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Users" className="text-primary" size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Вовлечение сотрудников</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Геймификация и прозрачная система вознаграждений мотивируют команду активно участвовать в найме.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Icon name="Zap" className="text-primary" size={20} />
+                  </div>
+                  <div>
+                    <h4 className="font-medium mb-1">Простота внедрения</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Настройка занимает 5 минут. Интуитивный интерфейс не требует обучения.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Наши достижения</h3>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-3xl font-bold text-primary mb-1">500+</div>
+                  <div className="text-sm text-muted-foreground">Компаний используют</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-3xl font-bold text-primary mb-1">15,000+</div>
+                  <div className="text-sm text-muted-foreground">Успешных найма</div>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <div className="text-3xl font-bold text-primary mb-1">4.8/5</div>
+                  <div className="text-sm text-muted-foreground">Средняя оценка</div>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Свяжитесь с нами</h3>
+              <div className="space-y-2 text-sm">
+                <p className="flex items-center gap-2">
+                  <Icon name="Mail" size={16} className="text-muted-foreground" />
+                  <a href="mailto:info@refstaff.ru" className="text-primary hover:underline">info@refstaff.ru</a>
+                </p>
+                <p className="flex items-center gap-2">
+                  <Icon name="Phone" size={16} className="text-muted-foreground" />
+                  <a href="tel:+74951234567" className="text-primary hover:underline">+7 (495) 123-45-67</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showPrivacyDialog} onOpenChange={setShowPrivacyDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Политика конфиденциальности</DialogTitle>
+            <DialogDescription>Последнее обновление: 14 ноября 2025 г.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-4 text-sm">
+            <div>
+              <h3 className="text-lg font-semibold mb-3">1. Общие положения</h3>
+              <p className="text-muted-foreground">
+                Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных 
+                пользователей платформы RefStaff (далее — «Платформа»). Используя Платформу, вы соглашаетесь с условиями 
+                настоящей Политики.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">2. Какие данные мы собираем</h3>
+              <p className="text-muted-foreground mb-2">Мы можем собирать следующие категории персональных данных:</p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
+                <li>Контактные данные: имя, фамилия, электронная почта, номер телефона</li>
+                <li>Данные компании: название, ИНН, количество сотрудников, отрасль</li>
+                <li>Данные о вакансиях и рекомендациях кандидатов</li>
+                <li>Техническая информация: IP-адрес, тип браузера, операционная система</li>
+                <li>Данные об использовании Платформы: активность, статистика взаимодействий</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">3. Цели обработки данных</h3>
+              <p className="text-muted-foreground mb-2">Мы обрабатываем ваши персональные данные для:</p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
+                <li>Предоставления услуг Платформы и их улучшения</li>
+                <li>Выполнения договорных обязательств</li>
+                <li>Технической поддержки пользователей</li>
+                <li>Отправки уведомлений о важных событиях</li>
+                <li>Аналитики и улучшения функционала</li>
+                <li>Соблюдения законодательных требований</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">4. Защита данных</h3>
+              <p className="text-muted-foreground">
+                Мы применяем современные технические и организационные меры для защиты ваших данных от несанкционированного 
+                доступа, изменения, раскрытия или уничтожения. Данные хранятся на защищенных серверах с использованием 
+                шифрования и других методов защиты.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">5. Передача данных третьим лицам</h3>
+              <p className="text-muted-foreground">
+                Мы не продаем и не передаем ваши персональные данные третьим лицам, за исключением случаев:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4 mt-2">
+                <li>Когда это необходимо для предоставления услуг (например, платежные системы)</li>
+                <li>По требованию законодательства или государственных органов</li>
+                <li>С вашего явного согласия</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">6. Ваши права</h3>
+              <p className="text-muted-foreground mb-2">Вы имеете право:</p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
+                <li>Запрашивать доступ к своим персональным данным</li>
+                <li>Требовать исправления неточных данных</li>
+                <li>Запрашивать удаление своих данных</li>
+                <li>Отозвать согласие на обработку данных</li>
+                <li>Ограничить обработку данных</li>
+                <li>Получить копию своих данных</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">7. Cookies</h3>
+              <p className="text-muted-foreground">
+                Мы используем cookies для улучшения работы Платформы, анализа трафика и персонализации контента. 
+                Вы можете настроить параметры cookies в своем браузере.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">8. Изменения в Политике</h3>
+              <p className="text-muted-foreground">
+                Мы можем периодически обновлять настоящую Политику. О существенных изменениях мы уведомим вас 
+                по электронной почте или через Платформу.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">9. Контакты</h3>
+              <p className="text-muted-foreground">
+                По вопросам обработки персональных данных обращайтесь:
+              </p>
+              <p className="text-muted-foreground mt-2">
+                Email: <a href="mailto:privacy@refstaff.ru" className="text-primary hover:underline">privacy@refstaff.ru</a>
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showTermsDialog} onOpenChange={setShowTermsDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-2xl">Пользовательское соглашение</DialogTitle>
+            <DialogDescription>Последнее обновление: 14 ноября 2025 г.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-4 text-sm">
+            <div>
+              <h3 className="text-lg font-semibold mb-3">1. Общие условия</h3>
+              <p className="text-muted-foreground">
+                Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует отношения между RefStaff 
+                (далее — «Сервис») и пользователями платформы. Регистрируясь на Платформе, вы подтверждаете, что 
+                прочитали, поняли и согласны соблюдать условия настоящего Соглашения.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">2. Предмет Соглашения</h3>
+              <p className="text-muted-foreground">
+                RefStaff предоставляет онлайн-платформу для организации реферального рекрутинга, включающую:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4 mt-2">
+                <li>Управление вакансиями и кандидатами</li>
+                <li>Систему вознаграждений за рекомендации</li>
+                <li>Инструменты коммуникации и аналитики</li>
+                <li>Интеграцию с внешними сервисами</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">3. Регистрация и учетная запись</h3>
+              <p className="text-muted-foreground mb-2">При регистрации вы обязуетесь:</p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
+                <li>Предоставить достоверные и актуальные данные</li>
+                <li>Обеспечить конфиденциальность учетных данных</li>
+                <li>Немедленно уведомлять о несанкционированном доступе к аккаунту</li>
+                <li>Нести ответственность за все действия, совершенные через вашу учетную запись</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">4. Тарифы и оплата</h3>
+              <p className="text-muted-foreground">
+                Сервис предоставляет 14-дневный бесплатный пробный период. После окончания пробного периода использование 
+                Платформы осуществляется на платной основе согласно выбранному тарифному плану.
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4 mt-2">
+                <li>Оплата производится ежемесячно или ежегодно</li>
+                <li>Цены указаны на сайте и могут быть изменены с уведомлением за 30 дней</li>
+                <li>Возврат средств возможен в течение 14 дней с момента оплаты</li>
+                <li>При просрочке оплаты доступ к Платформе может быть ограничен</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">5. Права и обязанности пользователя</h3>
+              <p className="text-muted-foreground mb-2">Пользователь обязуется:</p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
+                <li>Использовать Платформу в законных целях</li>
+                <li>Не нарушать права третьих лиц</li>
+                <li>Не распространять вредоносное ПО</li>
+                <li>Не создавать несколько аккаунтов для одной компании без согласования</li>
+                <li>Соблюдать правила работы с персональными данными кандидатов</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">6. Права и обязанности Сервиса</h3>
+              <p className="text-muted-foreground mb-2">RefStaff имеет право:</p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
+                <li>Изменять функционал Платформы</li>
+                <li>Проводить технические работы с уведомлением пользователей</li>
+                <li>Ограничить доступ при нарушении условий Соглашения</li>
+                <li>Удалить аккаунт при систематических нарушениях</li>
+              </ul>
+              <p className="text-muted-foreground mt-2 mb-2">RefStaff обязуется:</p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
+                <li>Обеспечивать доступность Платформы не менее 99% времени</li>
+                <li>Защищать персональные данные пользователей</li>
+                <li>Предоставлять техническую поддержку</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">7. Интеллектуальная собственность</h3>
+              <p className="text-muted-foreground">
+                Все права на Платформу, включая код, дизайн, логотипы и контент, принадлежат RefStaff. 
+                Использование материалов Платформы без письменного разрешения запрещено.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">8. Ограничение ответственности</h3>
+              <p className="text-muted-foreground">
+                RefStaff не несет ответственности за:
+              </p>
+              <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4 mt-2">
+                <li>Качество и достоверность информации о кандидатах</li>
+                <li>Результаты найма персонала</li>
+                <li>Действия пользователей на Платформе</li>
+                <li>Технические сбои, вызванные внешними факторами</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">9. Расторжение Соглашения</h3>
+              <p className="text-muted-foreground">
+                Вы можете прекратить использование Платформы в любое время, удалив свою учетную запись. 
+                RefStaff может расторгнуть Соглашение при нарушении его условий.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">10. Изменения Соглашения</h3>
+              <p className="text-muted-foreground">
+                RefStaff оставляет за собой право изменять условия настоящего Соглашения. О существенных изменениях 
+                пользователи будут уведомлены за 30 дней.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">11. Применимое право</h3>
+              <p className="text-muted-foreground">
+                Настоящее Соглашение регулируется законодательством Российской Федерации. Все споры разрешаются 
+                путем переговоров, а при невозможности достижения согласия — в судебном порядке.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">12. Контакты</h3>
+              <p className="text-muted-foreground">
+                По вопросам Соглашения обращайтесь:
+              </p>
+              <p className="text-muted-foreground mt-2">
+                Email: <a href="mailto:legal@refstaff.ru" className="text-primary hover:underline">legal@refstaff.ru</a>
+              </p>
             </div>
           </div>
         </DialogContent>
