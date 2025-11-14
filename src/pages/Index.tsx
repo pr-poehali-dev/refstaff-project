@@ -211,8 +211,11 @@ function Index() {
   }, [userRole]);
 
   const handleLogout = () => {
-    localStorage.removeItem('userRole');
-    setUserRole('guest');
+    if (window.confirm('Вы уверены, что хотите выйти из системы?')) {
+      localStorage.removeItem('userRole');
+      setUserRole('guest');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleSendMessage = () => {
@@ -549,15 +552,15 @@ function Index() {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <Icon name="Rocket" className="text-primary" size={32} aria-hidden="true" />
             <span className="text-2xl font-bold">RefStaff</span>
           </div>
           <nav className="hidden md:flex items-center gap-8" role="navigation" aria-label="Основная навигация">
-            <a href="#how" className="text-sm hover:text-primary transition-colors">Как работает</a>
-            <a href="#benefits" className="text-sm hover:text-primary transition-colors">Преимущества</a>
-            <a href="#pricing" className="text-sm hover:text-primary transition-colors">Тарифы</a>
-            <a href="#contact" className="text-sm hover:text-primary transition-colors">Контакты</a>
+            <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Как работает</button>
+            <button onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Преимущества</button>
+            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Тарифы</button>
+            <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Контакты</button>
           </nav>
           <div className="flex items-center gap-3">
             <Button variant="ghost" onClick={() => setShowLoginDialog(true)} aria-label="Войти в систему">Вход</Button>
@@ -982,6 +985,7 @@ function Index() {
             <Button className="w-full" onClick={() => {
               setShowRegisterDialog(false);
               setUserRole('employer');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}>
               Создать аккаунт
             </Button>
@@ -1020,6 +1024,7 @@ function Index() {
             <Button className="w-full" onClick={() => {
               setShowLoginDialog(false);
               setUserRole('employee');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
             }}>
               Войти
             </Button>
@@ -3509,6 +3514,24 @@ function Index() {
     </>
     );
   };
+
+  useEffect(() => {
+    const handleHashNavigation = () => {
+      const hash = window.location.hash;
+      if (hash) {
+        const element = document.getElementById(hash.slice(1));
+        if (element) {
+          setTimeout(() => {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      }
+    };
+
+    handleHashNavigation();
+    window.addEventListener('hashchange', handleHashNavigation);
+    return () => window.removeEventListener('hashchange', handleHashNavigation);
+  }, []);
 
   return (
     <>
