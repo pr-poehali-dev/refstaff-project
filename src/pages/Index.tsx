@@ -69,6 +69,17 @@ interface NewsPost {
   author: string;
   date: string;
   category: 'news' | 'achievement' | 'announcement' | 'blog';
+  likes: number;
+  comments: NewsComment[];
+}
+
+interface NewsComment {
+  id: number;
+  newsId: number;
+  authorName: string;
+  authorAvatar?: string;
+  comment: string;
+  date: string;
 }
 
 function Index() {
@@ -152,7 +163,11 @@ function Index() {
       content: 'Мы рады запустить новую систему вознаграждений за рекомендацию кандидатов. Теперь вы можете зарабатывать бонусы, помогая компании находить лучшие таланты.', 
       author: 'HR Отдел', 
       date: '2025-11-10',
-      category: 'announcement'
+      category: 'announcement',
+      likes: 12,
+      comments: [
+        { id: 1, newsId: 1, authorName: 'Анна Смирнова', comment: 'Отличная инициатива!', date: '2025-11-11' }
+      ]
     },
     { 
       id: 2, 
@@ -160,7 +175,9 @@ function Index() {
       content: 'Благодаря вашим рекомендациям, наша команда достигла важной отметки. Спасибо всем за активное участие в программе!', 
       author: 'Руководство', 
       date: '2025-11-08',
-      category: 'achievement'
+      category: 'achievement',
+      likes: 25,
+      comments: []
     },
     { 
       id: 3, 
@@ -168,15 +185,22 @@ function Index() {
       content: 'Открыты 5 новых позиций для frontend и backend разработчиков. Повышенное вознаграждение - до 50 000 ₽ за успешный найм!', 
       author: 'Отдел разработки', 
       date: '2025-11-05',
-      category: 'news'
+      category: 'news',
+      likes: 8,
+      comments: []
     }
   ]);
   const [showCreateNewsDialog, setShowCreateNewsDialog] = useState(false);
+  const [showEditNewsDialog, setShowEditNewsDialog] = useState(false);
+  const [newsToEdit, setNewsToEdit] = useState<NewsPost | null>(null);
   const [newsForm, setNewsForm] = useState({
     title: '',
     content: '',
     category: 'news' as 'news' | 'achievement' | 'announcement' | 'blog'
   });
+  const [showCommentsDialog, setShowCommentsDialog] = useState(false);
+  const [activeNewsPost, setActiveNewsPost] = useState<NewsPost | null>(null);
+  const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
     localStorage.setItem('userRole', userRole);
@@ -439,7 +463,9 @@ function Index() {
       content: newsForm.content,
       author: company?.name || 'Администратор',
       date: new Date().toISOString().split('T')[0],
-      category: newsForm.category
+      category: newsForm.category,
+      likes: 0,
+      comments: []
     };
 
     setNewsPosts([newPost, ...newsPosts]);
@@ -448,9 +474,71 @@ function Index() {
     alert('Новость успешно опубликована!');
   };
 
+  const handleUpdateNews = () => {
+    if (!newsToEdit || !newsForm.title || !newsForm.content) {
+      alert('Заполните все поля');
+      return;
+    }
+
+    setNewsPosts(newsPosts.map(post => 
+      post.id === newsToEdit.id 
+        ? { ...post, title: newsForm.title, content: newsForm.content, category: newsForm.category }
+        : post
+    ));
+    setNewsForm({ title: '', content: '', category: 'news' });
+    setShowEditNewsDialog(false);
+    setNewsToEdit(null);
+    alert('Новость успешно обновлена!');
+  };
+
   const handleDeleteNews = (id: number) => {
     setNewsPosts(newsPosts.filter(post => post.id !== id));
     alert('Новость удалена');
+  };
+
+  const handleLikeNews = (newsId: number) => {
+    setNewsPosts(newsPosts.map(post => 
+      post.id === newsId ? { ...post, likes: post.likes + 1 } : post
+    ));
+  };
+
+  const handleAddComment = () => {
+    if (!activeNewsPost || !newComment.trim()) {
+      alert('Напишите комментарий');
+      return;
+    }
+
+    const comment: NewsComment = {
+      id: Date.now(),
+      newsId: activeNewsPost.id,
+      authorName: 'Анна Смирнова',
+      comment: newComment,
+      date: new Date().toISOString().split('T')[0]
+    };
+
+    setNewsPosts(newsPosts.map(post => 
+      post.id === activeNewsPost.id 
+        ? { ...post, comments: [...post.comments, comment] }
+        : post
+    ));
+
+    setNewComment('');
+    setActiveNewsPost({ ...activeNewsPost, comments: [...activeNewsPost.comments, comment] });
+  };
+
+  const handleDeleteComment = (commentId: number) => {
+    if (!activeNewsPost) return;
+
+    setNewsPosts(newsPosts.map(post => 
+      post.id === activeNewsPost.id 
+        ? { ...post, comments: post.comments.filter(c => c.id !== commentId) }
+        : post
+    ));
+
+    setActiveNewsPost({
+      ...activeNewsPost,
+      comments: activeNewsPost.comments.filter(c => c.id !== commentId)
+    });
   };
 
   const renderLandingPage = () => (
@@ -1365,18 +1453,49 @@ function Index() {
                         <CardTitle className="text-xl">{post.title}</CardTitle>
                         <CardDescription className="mt-1">Автор: {post.author}</CardDescription>
                       </div>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleDeleteNews(post.id)}
-                      >
-                        <Icon name="Trash2" size={16} className="text-destructive" />
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => {
+                            setNewsToEdit(post);
+                            setNewsForm({
+                              title: post.title,
+                              content: post.content,
+                              category: post.category
+                            });
+                            setShowEditNewsDialog(true);
+                          }}
+                        >
+                          <Icon name="Edit" size={16} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleDeleteNews(post.id)}
+                        >
+                          <Icon name="Trash2" size={16} className="text-destructive" />
+                        </Button>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
                   </CardContent>
+                  <CardFooter className="flex-col items-stretch gap-3 border-t pt-4">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center gap-4">
+                        <span className="flex items-center gap-1">
+                          <Icon name="ThumbsUp" size={16} />
+                          {post.likes}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Icon name="MessageCircle" size={16} />
+                          {post.comments.length}
+                        </span>
+                      </div>
+                    </div>
+                  </CardFooter>
                 </Card>
               ))}
             </div>
@@ -1842,6 +1961,75 @@ function Index() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={showEditNewsDialog} onOpenChange={setShowEditNewsDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Редактировать новость</DialogTitle>
+            <DialogDescription>
+              Внесите изменения в новость
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="edit-news-category">Категория</Label>
+              <Select 
+                value={newsForm.category}
+                onValueChange={(value) => setNewsForm({...newsForm, category: value as any})}
+              >
+                <SelectTrigger id="edit-news-category">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="news">📰 Новость</SelectItem>
+                  <SelectItem value="achievement">🏆 Достижение</SelectItem>
+                  <SelectItem value="announcement">📢 Объявление</SelectItem>
+                  <SelectItem value="blog">✍️ Блог</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="edit-news-title">Заголовок</Label>
+              <Input 
+                id="edit-news-title" 
+                placeholder="Введите заголовок новости"
+                value={newsForm.title}
+                onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-news-content">Содержание</Label>
+              <Textarea 
+                id="edit-news-content" 
+                placeholder="Расскажите подробнее..."
+                rows={8}
+                value={newsForm.content}
+                onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
+              />
+            </div>
+            <div className="flex gap-2 pt-4">
+              <Button 
+                className="flex-1"
+                onClick={handleUpdateNews}
+              >
+                <Icon name="Save" className="mr-2" size={18} />
+                Сохранить изменения
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => {
+                  setShowEditNewsDialog(false);
+                  setNewsToEdit(null);
+                  setNewsForm({ title: '', content: '', category: 'news' });
+                }}
+              >
+                Отмена
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <DialogContent>
           <DialogHeader>
@@ -2188,15 +2376,28 @@ function Index() {
                       <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
                     </CardContent>
                     <CardFooter className="border-t pt-4">
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                        <Button variant="ghost" size="sm">
-                          <Icon name="Heart" className="mr-1" size={16} />
-                          Нравится
-                        </Button>
-                        <Button variant="ghost" size="sm">
-                          <Icon name="MessageCircle" className="mr-1" size={16} />
-                          Комментарии
-                        </Button>
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center gap-4">
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => handleLikeNews(post.id)}
+                          >
+                            <Icon name="Heart" className="mr-1" size={16} />
+                            {post.likes}
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={() => {
+                              setActiveNewsPost(post);
+                              setShowCommentsDialog(true);
+                            }}
+                          >
+                            <Icon name="MessageCircle" className="mr-1" size={16} />
+                            {post.comments.length}
+                          </Button>
+                        </div>
                       </div>
                     </CardFooter>
                   </Card>
@@ -2714,6 +2915,73 @@ function Index() {
                 onClick={() => setShowEditProfileDialog(false)}
               >
                 Отмена
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Комментарии</DialogTitle>
+            <DialogDescription>
+              {activeNewsPost?.title}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-4 py-4">
+            {activeNewsPost && activeNewsPost.comments.length === 0 ? (
+              <div className="text-center py-12">
+                <Icon name="MessageCircle" size={48} className="mx-auto mb-4 text-muted-foreground opacity-20" />
+                <p className="text-muted-foreground">Пока нет комментариев</p>
+                <p className="text-sm text-muted-foreground mt-1">Будьте первым!</p>
+              </div>
+            ) : (
+              activeNewsPost?.comments.map((comment) => (
+                <Card key={comment.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-xs">
+                          {comment.authorName.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-sm">{comment.authorName}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(comment.date).toLocaleDateString('ru-RU')}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{comment.comment}</p>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteComment(comment.id)}
+                      >
+                        <Icon name="Trash2" size={14} className="text-destructive" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+          <div className="border-t pt-4">
+            <div className="flex gap-2">
+              <Textarea
+                placeholder="Напишите комментарий..."
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
+                rows={2}
+                className="resize-none"
+              />
+              <Button 
+                onClick={handleAddComment}
+                className="self-end"
+              >
+                <Icon name="Send" size={18} />
               </Button>
             </div>
           </div>

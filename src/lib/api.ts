@@ -215,6 +215,16 @@ export const api = {
     return response.json();
   },
 
+  async updateEmployee(userId: number, data: Partial<Employee>): Promise<Employee> {
+    const response = await fetch(`${API_URL}/?resource=employees`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, ...data })
+    });
+    if (!response.ok) throw new Error('Failed to update employee');
+    return response.json();
+  },
+
   async updateEmployeeRole(userId: number, isHrManager?: boolean, isAdmin?: boolean): Promise<Employee> {
     const response = await fetch(`${API_URL}/?resource=employees&action=role`, {
       method: 'PUT',
