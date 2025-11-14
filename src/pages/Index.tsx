@@ -1395,7 +1395,7 @@ function Index() {
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setUserRole('guest')}>
+          <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={28} />
             <span className="text-xl font-bold">RefStaff</span>
           </div>
@@ -2740,7 +2740,7 @@ function Index() {
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => setUserRole('guest')}>
+          <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={28} />
             <span className="text-xl font-bold">RefStaff</span>
           </div>
