@@ -564,75 +564,187 @@ function Index() {
 
       <main>
         <section className="pt-32 pb-20 px-4" aria-labelledby="hero-title">
-          <div className="container mx-auto text-center max-w-4xl">
-            <Badge className="mb-6 animate-fade-in">Реферальный рекрутинг нового поколения</Badge>
-            <h1 id="hero-title" className="text-5xl md:text-6xl font-bold mb-6 animate-slide-up">
-              Нанимайте лучших кандидатов через своих сотрудников
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-              Платформа для реферального найма с геймификацией и прозрачной системой вознаграждений
-            </p>
-            <Button size="lg" className="animate-scale-in" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
-              <Icon name="Rocket" className="mr-2" size={20} aria-hidden="true" />
-              Начать бесплатно — 14 дней
-            </Button>
-          </div>
-        </section>
-
-        <section id="how" className="py-20 px-4 bg-white" aria-labelledby="how-title">
-          <div className="container mx-auto max-w-6xl">
-            <h2 id="how-title" className="text-4xl font-bold text-center mb-16">Как это работает</h2>
-          <div className="grid md:grid-cols-4 gap-8">
-            {[
-              { icon: 'Building2', title: 'Регистрация', desc: 'Зарегистрируйте компанию и добавьте вакансии' },
-              { icon: 'Users', title: 'Приглашение', desc: 'Пригласите сотрудников в систему' },
-              { icon: 'UserPlus', title: 'Рекомендации', desc: 'Сотрудники рекомендуют кандидатов' },
-              { icon: 'TrendingUp', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за успешный найм' },
-            ].map((step, i) => (
-              <article key={i} className="text-center hover:shadow-lg transition-shadow">
-                <Card>
-                  <CardHeader>
-                    <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Icon name={step.icon as any} className="text-primary" size={32} aria-hidden="true" />
+          <div className="container mx-auto max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="text-center lg:text-left">
+                <Badge className="mb-6 animate-fade-in">🚀 Реферальный рекрутинг нового поколения</Badge>
+                <h1 id="hero-title" className="text-5xl md:text-6xl font-bold mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Нанимайте лучших кандидатов через своих сотрудников
+                </h1>
+                <p className="text-xl text-muted-foreground mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                  Платформа для реферального найма с геймификацией и прозрачной системой вознаграждений
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <Button size="lg" className="animate-scale-in shadow-lg shadow-primary/25" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
+                    <Icon name="Rocket" className="mr-2" size={20} aria-hidden="true" />
+                    Начать бесплатно — 14 дней
+                  </Button>
+                  <Button size="lg" variant="outline" className="animate-scale-in" style={{ animationDelay: '0.3s' }} onClick={() => setShowLoginDialog(true)}>
+                    <Icon name="LogIn" className="mr-2" size={20} />
+                    Войти
+                  </Button>
+                </div>
+                <div className="mt-8 flex items-center gap-6 justify-center lg:justify-start text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={18} />
+                    <span>Без кредитной карты</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={18} />
+                    <span>Настройка за 5 минут</span>
+                  </div>
+                </div>
+              </div>
+              <div className="relative animate-fade-in" style={{ animationDelay: '0.4s' }}>
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/e96124dc-c09c-454b-a967-49eff0e74945.jpg" 
+                    alt="Команда сотрудников работает вместе"
+                    className="w-full h-auto"
+                  />
+                </div>
+                <div className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                      <Icon name="TrendingUp" className="text-green-600" size={24} />
                     </div>
-                    <CardTitle as="h3">{step.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{step.desc}</p>
-                  </CardContent>
-                </Card>
-              </article>
-            ))}
+                    <div>
+                      <div className="text-2xl font-bold text-green-600">+127%</div>
+                      <div className="text-xs text-muted-foreground">эффективность найма</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
         </section>
 
-        <section id="benefits" className="py-20 px-4" aria-labelledby="benefits-title">
+        <section id="how" className="py-20 px-4 bg-gradient-to-b from-white to-gray-50" aria-labelledby="how-title">
           <div className="container mx-auto max-w-6xl">
-            <h2 id="benefits-title" className="text-4xl font-bold text-center mb-16">Преимущества платформы</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              { icon: 'Wallet', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%' },
-              { icon: 'Zap', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза' },
-              { icon: 'Shield', title: 'Качество кандидатов', desc: 'Рекомендации от проверенных сотрудников' },
-              { icon: 'Trophy', title: 'Геймификация', desc: 'Вовлечение сотрудников через достижения' },
-              { icon: 'BarChart3', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса' },
-              { icon: 'Link', title: 'Интеграция', desc: 'API для подключения к вашим системам' },
-            ].map((benefit, i) => (
-              <article key={i}>
-                <Card className="hover:shadow-lg transition-shadow h-full">
-                  <CardHeader>
-                    <Icon name={benefit.icon as any} className="text-secondary mb-3" size={40} aria-hidden="true" />
-                    <CardTitle as="h3" className="text-xl">{benefit.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">{benefit.desc}</p>
-                  </CardContent>
-                </Card>
-              </article>
-            ))}
+            <div className="text-center mb-16">
+              <Badge className="mb-4">⚡ Простой процесс</Badge>
+              <h2 id="how-title" className="text-4xl font-bold mb-4">Как это работает</h2>
+              <p className="text-xl text-muted-foreground">Запустите реферальную программу за 4 простых шага</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[
+                { icon: 'Building2', emoji: '🏢', title: 'Регистрация', desc: 'Зарегистрируйте компанию и добавьте вакансии', color: 'bg-blue-500' },
+                { icon: 'Users', emoji: '👥', title: 'Приглашение', desc: 'Пригласите сотрудников в систему', color: 'bg-green-500' },
+                { icon: 'UserPlus', emoji: '🎯', title: 'Рекомендации', desc: 'Сотрудники рекомендуют кандидатов', color: 'bg-purple-500' },
+                { icon: 'TrendingUp', emoji: '💰', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за успешный найм', color: 'bg-orange-500' },
+              ].map((step, i) => (
+                <article key={i} className="relative">
+                  <Card className="h-full border-2 hover:border-primary hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
+                    <CardHeader>
+                      <div className={`mx-auto mb-4 w-16 h-16 rounded-2xl ${step.color} flex items-center justify-center shadow-lg`}>
+                        <span className="text-3xl">{step.emoji}</span>
+                      </div>
+                      <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
+                        {i + 1}
+                      </div>
+                      <CardTitle as="h3" className="text-xl">{step.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground">{step.desc}</p>
+                    </CardContent>
+                  </Card>
+                  {i < 3 && (
+                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+                      <Icon name="ArrowRight" className="text-primary" size={24} />
+                    </div>
+                  )}
+                </article>
+              ))}
+            </div>
+            <div className="mt-16 text-center">
+              <img 
+                src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/aee2b7dc-52bc-4384-8297-da59e9d1890b.jpg" 
+                alt="Процесс реферального рекрутинга"
+                className="mx-auto rounded-2xl shadow-2xl max-w-2xl w-full"
+              />
+            </div>
           </div>
-        </div>
+        </section>
+
+        <section id="benefits" className="py-20 px-4 bg-gradient-to-b from-gray-50 to-white" aria-labelledby="benefits-title">
+          <div className="container mx-auto max-w-6xl">
+            <div className="text-center mb-16">
+              <Badge className="mb-4">✨ Почему RefStaff</Badge>
+              <h2 id="benefits-title" className="text-4xl font-bold mb-4">Преимущества платформы</h2>
+              <p className="text-xl text-muted-foreground">Все инструменты для эффективного реферального найма</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[
+                { icon: 'Wallet', emoji: '💵', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%', gradient: 'from-green-500 to-emerald-500' },
+                { icon: 'Zap', emoji: '⚡', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза', gradient: 'from-yellow-500 to-orange-500' },
+                { icon: 'Shield', emoji: '🛡️', title: 'Качество кандидатов', desc: 'Рекомендации от проверенных сотрудников', gradient: 'from-blue-500 to-cyan-500' },
+                { icon: 'Trophy', emoji: '🏆', title: 'Геймификация', desc: 'Вовлечение сотрудников через достижения', gradient: 'from-purple-500 to-pink-500' },
+                { icon: 'BarChart3', emoji: '📊', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса', gradient: 'from-indigo-500 to-purple-500' },
+                { icon: 'Link', emoji: '🔗', title: 'Интеграция', desc: 'API для подключения к вашим системам', gradient: 'from-red-500 to-pink-500' },
+              ].map((benefit, i) => (
+                <article key={i}>
+                  <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full border-2 group">
+                    <CardHeader>
+                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
+                        <span className="text-3xl">{benefit.emoji}</span>
+                      </div>
+                      <CardTitle as="h3" className="text-xl">{benefit.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-muted-foreground">{benefit.desc}</p>
+                    </CardContent>
+                  </Card>
+                </article>
+              ))}
+            </div>
+            <div className="mt-16">
+              <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+                <CardContent className="p-8">
+                  <div className="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                      <h3 className="text-2xl font-bold mb-4">🎯 Результаты наших клиентов</h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                            <span className="text-2xl">📈</span>
+                          </div>
+                          <div>
+                            <div className="font-bold text-xl">+127%</div>
+                            <div className="text-sm text-muted-foreground">рост числа рекомендаций</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                            <span className="text-2xl">⏱️</span>
+                          </div>
+                          <div>
+                            <div className="font-bold text-xl">-40%</div>
+                            <div className="text-sm text-muted-foreground">сокращение времени найма</div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+                            <span className="text-2xl">💎</span>
+                          </div>
+                          <div>
+                            <div className="font-bold text-xl">92%</div>
+                            <div className="text-sm text-muted-foreground">прошли испытательный срок</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div>
+                      <img 
+                        src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/ff1c4a57-63e0-4e5e-ab1b-8c592b9d9ac2.jpg" 
+                        alt="Статистика и результаты"
+                        className="rounded-xl shadow-xl"
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </section>
 
         <section id="pricing" className="py-20 px-4 bg-white" aria-labelledby="pricing-title">
@@ -940,7 +1052,13 @@ function Index() {
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Личный кабинет работодателя</h1>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
+            <span className="text-4xl">📈</span>
+            Личный кабинет работодателя
+          </h1>
+          <p className="text-muted-foreground">Управляйте вакансиями, сотрудниками и рекомендациями</p>
+        </div>
 
         {isSubscriptionExpired && (
           <Card className="mb-8 bg-destructive/10 border-destructive">
@@ -975,18 +1093,21 @@ function Index() {
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
           <TabsList className="grid w-full grid-cols-7 lg:w-auto">
-            <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
-            <TabsTrigger value="employees">Сотрудники</TabsTrigger>
-            <TabsTrigger value="recommendations">Рекомендации</TabsTrigger>
-            <TabsTrigger value="news">Новости</TabsTrigger>
-            <TabsTrigger value="chats">Чаты</TabsTrigger>
-            <TabsTrigger value="integrations">Интеграции</TabsTrigger>
-            <TabsTrigger value="stats">Статистика</TabsTrigger>
+            <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
+            <TabsTrigger value="employees">👥 Сотрудники</TabsTrigger>
+            <TabsTrigger value="recommendations">🎯 Рекомендации</TabsTrigger>
+            <TabsTrigger value="news">📢 Новости</TabsTrigger>
+            <TabsTrigger value="chats">💬 Чаты</TabsTrigger>
+            <TabsTrigger value="integrations">🔗 Интеграции</TabsTrigger>
+            <TabsTrigger value="stats">📊 Статистика</TabsTrigger>
           </TabsList>
 
           <TabsContent value="vacancies" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold">Активные вакансии</h2>
+              <h2 className="text-2xl font-semibold flex items-center gap-2">
+                <span>💼</span>
+                Активные вакансии
+              </h2>
               <Dialog>
                 <DialogTrigger asChild>
                   <Button disabled={isSubscriptionExpired}>
@@ -1234,7 +1355,10 @@ function Index() {
 
           <TabsContent value="employees" className="space-y-4">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold">Сотрудники компании</h2>
+              <h2 className="text-2xl font-semibold flex items-center gap-2">
+                <span>👥</span>
+                Сотрудники компании
+              </h2>
               <Button onClick={() => setShowInviteDialog(true)}>
                 <Icon name="UserPlus" className="mr-2" size={18} />
                 Пригласить сотрудника
@@ -1357,7 +1481,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="recommendations" className="space-y-4">
-            <h2 className="text-2xl font-semibold">Рекомендации кандидатов</h2>
+            <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
+              <span>🎯</span>
+              Рекомендации кандидатов
+            </h2>
             <div className="grid gap-4">
               {recommendations.map((rec) => (
                 <Card key={rec.id}>
@@ -1427,7 +1554,10 @@ function Index() {
 
           <TabsContent value="news" className="space-y-4">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold">Новости компании</h2>
+              <h2 className="text-2xl font-semibold flex items-center gap-2">
+                <span>📢</span>
+                Новости компании
+              </h2>
               <Button onClick={() => setShowCreateNewsDialog(true)}>
                 <Icon name="Plus" className="mr-2" size={18} />
                 Создать новость
@@ -1508,7 +1638,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="chats" className="space-y-4">
-            <h2 className="text-2xl font-semibold mb-4">Чаты с сотрудниками</h2>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <span>💬</span>
+              Чаты с сотрудниками
+            </h2>
             <div className="grid gap-3">
               {employees.slice(0, 3).map((emp) => (
                 <Card key={emp.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
@@ -1533,7 +1666,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">
-            <h2 className="text-2xl font-semibold">Статистика по компании</h2>
+            <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
+              <span>📊</span>
+              Статистика по компании
+            </h2>
             
             <div className="grid md:grid-cols-4 gap-4">
               <Card>
@@ -1602,7 +1738,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="integrations" className="space-y-4">
-            <h2 className="text-2xl font-semibold">Интеграции с внешними сервисами</h2>
+            <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
+              <span>🔗</span>
+              Интеграции с внешними сервисами
+            </h2>
             <p className="text-muted-foreground">Подключите внешние сервисы для автоматизации процессов рекрутинга</p>
             
             <div className="grid md:grid-cols-2 gap-4">
@@ -2285,14 +2424,17 @@ function Index() {
                 </div>
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t">
                   <div className="text-center">
+                    <div className="text-3xl mb-1">🎯</div>
                     <div className="text-2xl font-bold text-primary">12</div>
                     <div className="text-xs text-muted-foreground">Рекомендаций</div>
                   </div>
                   <div className="text-center">
+                    <div className="text-3xl mb-1">✅</div>
                     <div className="text-2xl font-bold text-green-600">4</div>
                     <div className="text-xs text-muted-foreground">Нанято</div>
                   </div>
                   <div className="text-center">
+                    <div className="text-3xl mb-1">💸</div>
                     <div className="text-2xl font-bold text-secondary">120К ₽</div>
                     <div className="text-xs text-muted-foreground">Заработано</div>
                   </div>
@@ -2304,7 +2446,7 @@ function Index() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Icon name="Wallet" className="text-primary" size={24} />
+                <span className="text-2xl">💰</span>
                 Кошелек
               </CardTitle>
             </CardHeader>
@@ -2337,15 +2479,18 @@ function Index() {
 
         <Tabs defaultValue="news" className="space-y-6">
           <TabsList>
-            <TabsTrigger value="news">Новости</TabsTrigger>
-            <TabsTrigger value="vacancies">Вакансии</TabsTrigger>
-            <TabsTrigger value="my-recommendations">Мои рекомендации</TabsTrigger>
-            <TabsTrigger value="achievements">Достижения</TabsTrigger>
-            <TabsTrigger value="wallet-history">История кошелька</TabsTrigger>
+            <TabsTrigger value="news">📢 Новости</TabsTrigger>
+            <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
+            <TabsTrigger value="my-recommendations">⭐ Мои рекомендации</TabsTrigger>
+            <TabsTrigger value="achievements">🏆 Достижения</TabsTrigger>
+            <TabsTrigger value="wallet-history">💳 История кошелька</TabsTrigger>
           </TabsList>
 
           <TabsContent value="news" className="space-y-4">
-            <h2 className="text-2xl font-semibold mb-4">Новости компании</h2>
+            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+              <span>📢</span>
+              Новости компании
+            </h2>
             
             {newsPosts.length === 0 ? (
               <Card>
