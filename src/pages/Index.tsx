@@ -543,44 +543,45 @@ function Index() {
 
   const renderLandingPage = () => (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50">
+      <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Icon name="Rocket" className="text-primary" size={32} />
+            <Icon name="Rocket" className="text-primary" size={32} aria-hidden="true" />
             <span className="text-2xl font-bold">RefStaff</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-8" role="navigation" aria-label="Основная навигация">
             <a href="#how" className="text-sm hover:text-primary transition-colors">Как работает</a>
             <a href="#benefits" className="text-sm hover:text-primary transition-colors">Преимущества</a>
             <a href="#pricing" className="text-sm hover:text-primary transition-colors">Тарифы</a>
             <a href="#contact" className="text-sm hover:text-primary transition-colors">Контакты</a>
           </nav>
           <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => setShowLoginDialog(true)}>Вход</Button>
-            <Button onClick={() => setShowRegisterDialog(true)}>Зарегистрировать компанию</Button>
+            <Button variant="ghost" onClick={() => setShowLoginDialog(true)} aria-label="Войти в систему">Вход</Button>
+            <Button onClick={() => setShowRegisterDialog(true)} aria-label="Зарегистрировать компанию">Зарегистрировать компанию</Button>
           </div>
         </div>
       </header>
 
-      <section className="pt-32 pb-20 px-4">
-        <div className="container mx-auto text-center max-w-4xl">
-          <Badge className="mb-6 animate-fade-in">Реферальный рекрутинг нового поколения</Badge>
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-slide-up">
-            Нанимайте лучших кандидатов через своих сотрудников
-          </h1>
-          <p className="text-xl text-muted-foreground mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-            Платформа для реферального найма с геймификацией и прозрачной системой вознаграждений
-          </p>
-          <Button size="lg" className="animate-scale-in" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)}>
-            <Icon name="Rocket" className="mr-2" size={20} />
-            Начать бесплатно — 14 дней
-          </Button>
-        </div>
-      </section>
+      <main>
+        <section className="pt-32 pb-20 px-4" aria-labelledby="hero-title">
+          <div className="container mx-auto text-center max-w-4xl">
+            <Badge className="mb-6 animate-fade-in">Реферальный рекрутинг нового поколения</Badge>
+            <h1 id="hero-title" className="text-5xl md:text-6xl font-bold mb-6 animate-slide-up">
+              Нанимайте лучших кандидатов через своих сотрудников
+            </h1>
+            <p className="text-xl text-muted-foreground mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+              Платформа для реферального найма с геймификацией и прозрачной системой вознаграждений
+            </p>
+            <Button size="lg" className="animate-scale-in" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
+              <Icon name="Rocket" className="mr-2" size={20} aria-hidden="true" />
+              Начать бесплатно — 14 дней
+            </Button>
+          </div>
+        </section>
 
-      <section id="how" className="py-20 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-4xl font-bold text-center mb-16">Как это работает</h2>
+        <section id="how" className="py-20 px-4 bg-white" aria-labelledby="how-title">
+          <div className="container mx-auto max-w-6xl">
+            <h2 id="how-title" className="text-4xl font-bold text-center mb-16">Как это работает</h2>
           <div className="grid md:grid-cols-4 gap-8">
             {[
               { icon: 'Building2', title: 'Регистрация', desc: 'Зарегистрируйте компанию и добавьте вакансии' },
@@ -588,25 +589,27 @@ function Index() {
               { icon: 'UserPlus', title: 'Рекомендации', desc: 'Сотрудники рекомендуют кандидатов' },
               { icon: 'TrendingUp', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за успешный найм' },
             ].map((step, i) => (
-              <Card key={i} className="text-center hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                    <Icon name={step.icon as any} className="text-primary" size={32} />
-                  </div>
-                  <CardTitle>{step.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{step.desc}</p>
-                </CardContent>
-              </Card>
+              <article key={i} className="text-center hover:shadow-lg transition-shadow">
+                <Card>
+                  <CardHeader>
+                    <div className="mx-auto mb-4 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Icon name={step.icon as any} className="text-primary" size={32} aria-hidden="true" />
+                    </div>
+                    <CardTitle as="h3">{step.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{step.desc}</p>
+                  </CardContent>
+                </Card>
+              </article>
             ))}
           </div>
         </div>
-      </section>
+        </section>
 
-      <section id="benefits" className="py-20 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-4xl font-bold text-center mb-16">Преимущества платформы</h2>
+        <section id="benefits" className="py-20 px-4" aria-labelledby="benefits-title">
+          <div className="container mx-auto max-w-6xl">
+            <h2 id="benefits-title" className="text-4xl font-bold text-center mb-16">Преимущества платформы</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
               { icon: 'Wallet', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%' },
@@ -616,24 +619,26 @@ function Index() {
               { icon: 'BarChart3', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса' },
               { icon: 'Link', title: 'Интеграция', desc: 'API для подключения к вашим системам' },
             ].map((benefit, i) => (
-              <Card key={i} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <Icon name={benefit.icon as any} className="text-secondary mb-3" size={40} />
-                  <CardTitle className="text-xl">{benefit.title}</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{benefit.desc}</p>
-                </CardContent>
-              </Card>
+              <article key={i}>
+                <Card className="hover:shadow-lg transition-shadow h-full">
+                  <CardHeader>
+                    <Icon name={benefit.icon as any} className="text-secondary mb-3" size={40} aria-hidden="true" />
+                    <CardTitle as="h3" className="text-xl">{benefit.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{benefit.desc}</p>
+                  </CardContent>
+                </Card>
+              </article>
             ))}
           </div>
         </div>
-      </section>
+        </section>
 
-      <section id="pricing" className="py-20 px-4 bg-white">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-4xl font-bold text-center mb-4">Тарифы</h2>
-          <p className="text-center text-muted-foreground mb-16">14 дней бесплатно для всех новых клиентов</p>
+        <section id="pricing" className="py-20 px-4 bg-white" aria-labelledby="pricing-title">
+          <div className="container mx-auto max-w-6xl">
+            <h2 id="pricing-title" className="text-4xl font-bold text-center mb-4">Тарифы</h2>
+            <p className="text-center text-muted-foreground mb-16">14 дней бесплатно для всех новых клиентов</p>
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-2">
               <CardHeader>
@@ -733,37 +738,38 @@ function Index() {
             </Card>
           </div>
         </div>
-      </section>
+        </section>
 
-      <section id="contact" className="py-20 px-4">
-        <div className="container mx-auto max-w-2xl">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">Остались вопросы?</CardTitle>
-              <CardDescription>Свяжитесь с нами, и мы с радостью ответим</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Имя</Label>
-                  <Input id="name" placeholder="Иван Иванов" />
-                </div>
-                <div>
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="ivan@company.ru" />
-                </div>
-                <div>
-                  <Label htmlFor="message">Сообщение</Label>
-                  <Textarea id="message" placeholder="Расскажите о вашем проекте..." rows={4} />
-                </div>
-                <Button className="w-full">Отправить</Button>
-              </form>
-            </CardContent>
-          </Card>
-        </div>
-      </section>
+        <section id="contact" className="py-20 px-4" aria-labelledby="contact-title">
+          <div className="container mx-auto max-w-2xl">
+            <Card>
+              <CardHeader>
+                <CardTitle as="h2" id="contact-title" className="text-2xl">Остались вопросы?</CardTitle>
+                <CardDescription>Свяжитесь с нами, и мы с радостью ответим</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <form className="space-y-4" aria-label="Форма обратной связи">
+                  <div>
+                    <Label htmlFor="name">Имя</Label>
+                    <Input id="name" name="name" placeholder="Иван Иванов" autoComplete="name" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" placeholder="ivan@company.ru" autoComplete="email" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="message">Сообщение</Label>
+                    <Textarea id="message" name="message" placeholder="Расскажите о вашем проекте..." rows={4} required />
+                  </div>
+                  <Button type="submit" className="w-full">Отправить</Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+        </section>
+      </main>
 
-      <footer className="border-t bg-gray-50 py-12 px-4">
+      <footer className="border-t bg-gray-50 py-12 px-4" role="contentinfo">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
@@ -775,29 +781,29 @@ function Index() {
                 Платформа реферального рекрутинга с геймификацией
               </p>
             </div>
-            <div>
+            <nav aria-label="Продукт">
               <h4 className="font-semibold mb-4">Продукт</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">Возможности</a></li>
-                <li><a href="#" className="hover:text-primary">Тарифы</a></li>
-                <li><a href="#" className="hover:text-primary">API документация</a></li>
+                <li><a href="#benefits" className="hover:text-primary">Возможности</a></li>
+                <li><a href="#pricing" className="hover:text-primary">Тарифы</a></li>
+                <li><a href="#contact" className="hover:text-primary">API документация</a></li>
               </ul>
-            </div>
-            <div>
+            </nav>
+            <nav aria-label="Компания">
               <h4 className="font-semibold mb-4">Компания</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary">О нас</a></li>
-                <li><a href="#" className="hover:text-primary">Блог</a></li>
-                <li><a href="#" className="hover:text-primary">Контакты</a></li>
+                <li><a href="#how" className="hover:text-primary">О нас</a></li>
+                <li><a href="#contact" className="hover:text-primary">Блог</a></li>
+                <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
               </ul>
-            </div>
-            <div>
+            </nav>
+            <nav aria-label="Правовая информация">
               <h4 className="font-semibold mb-4">Правовая информация</h4>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#" className="hover:text-primary">Политика конфиденциальности</a></li>
                 <li><a href="#" className="hover:text-primary">Пользовательское соглашение</a></li>
               </ul>
-            </div>
+            </nav>
           </div>
           <div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
             © 2025 RefStaff. Все права защищены.
