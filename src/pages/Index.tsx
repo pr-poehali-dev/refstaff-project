@@ -84,9 +84,15 @@ interface NewsComment {
 
 function Index() {
   const [userRole, setUserRole] = useState<UserRole>(() => {
-    const saved = localStorage.getItem('userRole');
-    return (saved as UserRole) || 'guest';
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      const saved = localStorage.getItem('userRole');
+      return (saved as UserRole) || 'guest';
+    }
+    return 'guest';
   });
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem('authToken'));
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
@@ -151,6 +157,23 @@ function Index() {
     phone: '',
     comment: ''
   });
+
+  const [registerForm, setRegisterForm] = useState({
+    companyName: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    inn: '',
+    employeeCount: '50'
+  });
+
+  const [loginForm, setLoginForm] = useState({
+    email: '',
+    password: ''
+  });
+
+  const [isAuthLoading, setIsAuthLoading] = useState(false);
   
   const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -207,13 +230,45 @@ function Index() {
   const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
-    localStorage.setItem('userRole', userRole);
+    if (userRole !== 'guest') {
+      localStorage.setItem('userRole', userRole);
+    }
   }, [userRole]);
+
+  useEffect(() => {
+    if (authToken && userRole !== 'guest') {
+      verifyToken();
+    }
+  }, []);
+
+  const verifyToken = async () => {
+    try {
+      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+        method: 'GET',
+        headers: {
+          'X-Auth-Token': authToken || ''
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setCurrentUser(data.user);
+      } else {
+        handleLogout();
+      }
+    } catch (error) {
+      console.error('Ошибка проверки токена:', error);
+      handleLogout();
+    }
+  };
 
   const handleLogout = () => {
     if (window.confirm('Вы уверены, что хотите выйти из системы?')) {
       localStorage.removeItem('userRole');
+      localStorage.removeItem('authToken');
       setUserRole('guest');
+      setAuthToken(null);
+      setCurrentUser(null);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -455,6 +510,97 @@ function Index() {
     } catch (error) {
       console.error('Ошибка обновления данных сотрудника:', error);
       alert('Не удалось обновить данные сотрудника');
+    }
+  };
+
+  const handleRegister = async () => {
+    if (!registerForm.companyName || !registerForm.firstName || !registerForm.lastName || !registerForm.email || !registerForm.password) {
+      alert('Заполните все обязательные поля');
+      return;
+    }
+
+    if (registerForm.password.length < 8) {
+      alert('Пароль должен быть минимум 8 символов');
+      return;
+    }
+
+    setIsAuthLoading(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'register',
+          email: registerForm.email,
+          password: registerForm.password,
+          first_name: registerForm.firstName,
+          last_name: registerForm.lastName,
+          company_name: registerForm.companyName,
+          company_inn: registerForm.inn || undefined,
+          employee_count: parseInt(registerForm.employeeCount)
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userRole', 'employer');
+        setAuthToken(data.token);
+        setCurrentUser(data.user);
+        setUserRole('employer');
+        setShowRegisterDialog(false);
+        setRegisterForm({ companyName: '', firstName: '', lastName: '', email: '', password: '', inn: '', employeeCount: '50' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert(data.error || 'Ошибка регистрации');
+      }
+    } catch (error) {
+      console.error('Ошибка регистрации:', error);
+      alert('Не удалось зарегистрироваться');
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleLogin = async () => {
+    if (!loginForm.email || !loginForm.password) {
+      alert('Введите email и пароль');
+      return;
+    }
+
+    setIsAuthLoading(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'login',
+          email: loginForm.email,
+          password: loginForm.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('authToken', data.token);
+        const role = data.user.role === 'admin' ? 'employer' : 'employee';
+        localStorage.setItem('userRole', role);
+        setAuthToken(data.token);
+        setCurrentUser(data.user);
+        setUserRole(role);
+        setShowLoginDialog(false);
+        setLoginForm({ email: '', password: '' });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        alert(data.error || 'Неверный email или пароль');
+      }
+    } catch (error) {
+      console.error('Ошибка входа:', error);
+      alert('Не удалось войти в систему');
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -960,34 +1106,73 @@ function Index() {
           <div className="space-y-4 pt-4">
             <div>
               <Label htmlFor="company-name">Название компании</Label>
-              <Input id="company-name" placeholder="Acme Corp" />
+              <Input 
+                id="company-name" 
+                placeholder="Acme Corp" 
+                value={registerForm.companyName}
+                onChange={(e) => setRegisterForm({...registerForm, companyName: e.target.value})}
+              />
             </div>
             <div>
-              <Label htmlFor="admin-name">Ваше имя</Label>
-              <Input id="admin-name" placeholder="Иван Иванов" />
+              <Label htmlFor="admin-first-name">Имя</Label>
+              <Input 
+                id="admin-first-name" 
+                placeholder="Иван" 
+                value={registerForm.firstName}
+                onChange={(e) => setRegisterForm({...registerForm, firstName: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="admin-last-name">Фамилия</Label>
+              <Input 
+                id="admin-last-name" 
+                placeholder="Иванов" 
+                value={registerForm.lastName}
+                onChange={(e) => setRegisterForm({...registerForm, lastName: e.target.value})}
+              />
             </div>
             <div>
               <Label htmlFor="admin-email">Email</Label>
-              <Input id="admin-email" type="email" placeholder="ivan@company.ru" />
+              <Input 
+                id="admin-email" 
+                type="email" 
+                placeholder="ivan@company.ru" 
+                value={registerForm.email}
+                onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
+              />
             </div>
             <div>
               <Label htmlFor="admin-password">Пароль</Label>
-              <Input id="admin-password" type="password" placeholder="Минимум 8 символов" />
+              <Input 
+                id="admin-password" 
+                type="password" 
+                placeholder="Минимум 8 символов" 
+                value={registerForm.password}
+                onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+              />
             </div>
             <div>
-              <Label htmlFor="company-inn">ИНН компании</Label>
-              <Input id="company-inn" placeholder="1234567890" maxLength={12} />
+              <Label htmlFor="company-inn">ИНН компании (необязательно)</Label>
+              <Input 
+                id="company-inn" 
+                placeholder="1234567890" 
+                maxLength={12} 
+                value={registerForm.inn}
+                onChange={(e) => setRegisterForm({...registerForm, inn: e.target.value})}
+              />
             </div>
             <div>
               <Label htmlFor="employee-count">Количество сотрудников</Label>
-              <Input id="employee-count" type="number" placeholder="50" />
+              <Input 
+                id="employee-count" 
+                type="number" 
+                placeholder="50" 
+                value={registerForm.employeeCount}
+                onChange={(e) => setRegisterForm({...registerForm, employeeCount: e.target.value})}
+              />
             </div>
-            <Button className="w-full" onClick={() => {
-              setShowRegisterDialog(false);
-              setUserRole('employer');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}>
-              Создать аккаунт
+            <Button className="w-full" onClick={handleRegister} disabled={isAuthLoading}>
+              {isAuthLoading ? 'Регистрация...' : 'Создать аккаунт'}
             </Button>
             <p className="text-xs text-center text-muted-foreground">
               Нажимая кнопку, вы соглашаетесь с{' '}
@@ -1008,11 +1193,24 @@ function Index() {
           <div className="space-y-4 pt-4">
             <div>
               <Label htmlFor="login-email">Email</Label>
-              <Input id="login-email" type="email" placeholder="ivan@company.ru" />
+              <Input 
+                id="login-email" 
+                type="email" 
+                placeholder="ivan@company.ru" 
+                value={loginForm.email}
+                onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
+              />
             </div>
             <div>
               <Label htmlFor="login-password">Пароль</Label>
-              <Input id="login-password" type="password" placeholder="Ваш пароль" />
+              <Input 
+                id="login-password" 
+                type="password" 
+                placeholder="Ваш пароль" 
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+              />
             </div>
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 text-sm">
@@ -1021,12 +1219,8 @@ function Index() {
               </label>
               <a href="#" className="text-sm text-primary hover:underline">Забыли пароль?</a>
             </div>
-            <Button className="w-full" onClick={() => {
-              setShowLoginDialog(false);
-              setUserRole('employee');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}>
-              Войти
+            <Button className="w-full" onClick={handleLogin} disabled={isAuthLoading}>
+              {isAuthLoading ? 'Вход...' : 'Войти'}
             </Button>
             <div className="text-center text-sm text-muted-foreground">
               Нет аккаунта?{' '}
