@@ -656,13 +656,6 @@ function Index() {
                 </article>
               ))}
             </div>
-            <div className="mt-16 text-center">
-              <img 
-                src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/aee2b7dc-52bc-4384-8297-da59e9d1890b.jpg" 
-                alt="Процесс реферального рекрутинга"
-                className="mx-auto rounded-2xl shadow-2xl max-w-2xl w-full"
-              />
-            </div>
           </div>
         </section>
 
