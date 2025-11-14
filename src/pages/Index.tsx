@@ -183,6 +183,15 @@ function Index() {
     department: 'Разработка'
   });
 
+  const [inviteForm, setInviteForm] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+    position: '',
+    department: ''
+  });
+
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([
     { 
       id: 1, 
@@ -510,6 +519,60 @@ function Index() {
     } catch (error) {
       console.error('Ошибка обновления данных сотрудника:', error);
       alert('Не удалось обновить данные сотрудника');
+    }
+  };
+
+  const handleInviteEmployee = async () => {
+    if (!inviteForm.firstName || !inviteForm.lastName || !inviteForm.email || !inviteForm.password || !inviteForm.position || !inviteForm.department) {
+      alert('Заполните все обязательные поля');
+      return;
+    }
+
+    if (inviteForm.password.length < 8) {
+      alert('Пароль должен быть минимум 8 символов');
+      return;
+    }
+
+    if (!authToken || !currentUser?.company_id) {
+      alert('Ошибка: не найдена информация о компании');
+      return;
+    }
+
+    setIsAuthLoading(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Auth-Token': authToken
+        },
+        body: JSON.stringify({
+          action: 'invite_employee',
+          email: inviteForm.email,
+          password: inviteForm.password,
+          first_name: inviteForm.firstName,
+          last_name: inviteForm.lastName,
+          position: inviteForm.position,
+          department: inviteForm.department,
+          company_id: currentUser.company_id
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        alert('Сотрудник успешно добавлен!');
+        setShowInviteDialog(false);
+        setInviteForm({ firstName: '', lastName: '', email: '', password: '', position: '', department: '' });
+        await loadData();
+      } else {
+        alert(data.error || 'Ошибка создания аккаунта сотрудника');
+      }
+    } catch (error) {
+      console.error('Ошибка создания аккаунта сотрудника:', error);
+      alert('Не удалось создать аккаунт сотрудника');
+    } finally {
+      setIsAuthLoading(false);
     }
   };
 
@@ -2432,32 +2495,75 @@ function Index() {
       </div>
 
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Пригласить сотрудника</DialogTitle>
-            <DialogDescription>Отправьте ссылку для регистрации сотрудника в системе</DialogDescription>
+            <DialogTitle>Добавить сотрудника</DialogTitle>
+            <DialogDescription>Создайте аккаунт для нового сотрудника компании</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
-              <Label>Реферальная ссылка компании</Label>
-              <div className="flex gap-2 mt-2">
-                <Input value={company?.invite_token ? `${window.location.origin}/invite/${company.invite_token}` : 'Загрузка...'} readOnly />
-                <Button onClick={() => company?.invite_token && navigator.clipboard.writeText(`${window.location.origin}/invite/${company.invite_token}`)}>
-                  <Icon name="Copy" size={18} />
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Отправьте эту ссылку сотрудникам для регистрации в системе
-              </p>
+              <Label htmlFor="invite-first-name">Имя</Label>
+              <Input 
+                id="invite-first-name"
+                placeholder="Иван"
+                value={inviteForm.firstName}
+                onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})}
+              />
             </div>
-            <Separator />
             <div>
-              <Label>Или отправьте приглашение на email</Label>
-              <div className="flex gap-2 mt-2">
-                <Input type="email" placeholder="email@example.com" />
-                <Button>Отправить</Button>
-              </div>
+              <Label htmlFor="invite-last-name">Фамилия</Label>
+              <Input 
+                id="invite-last-name"
+                placeholder="Иванов"
+                value={inviteForm.lastName}
+                onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})}
+              />
             </div>
+            <div>
+              <Label htmlFor="invite-email">Email</Label>
+              <Input 
+                id="invite-email"
+                type="email"
+                placeholder="ivan@company.ru"
+                value={inviteForm.email}
+                onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="invite-password">Пароль</Label>
+              <Input 
+                id="invite-password"
+                type="password"
+                placeholder="Минимум 8 символов"
+                value={inviteForm.password}
+                onChange={(e) => setInviteForm({...inviteForm, password: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="invite-position">Должность</Label>
+              <Input 
+                id="invite-position"
+                placeholder="Frontend Developer"
+                value={inviteForm.position}
+                onChange={(e) => setInviteForm({...inviteForm, position: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="invite-department">Отдел</Label>
+              <Input 
+                id="invite-department"
+                placeholder="Разработка"
+                value={inviteForm.department}
+                onChange={(e) => setInviteForm({...inviteForm, department: e.target.value})}
+              />
+            </div>
+            <Button 
+              className="w-full" 
+              onClick={handleInviteEmployee}
+              disabled={isAuthLoading}
+            >
+              {isAuthLoading ? 'Создание...' : 'Создать аккаунт сотрудника'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

@@ -176,6 +176,77 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     })
                 }
             
+            elif action == 'invite_employee':
+                auth_header = event.get('headers', {}).get('X-Auth-Token') or event.get('headers', {}).get('x-auth-token')
+                if not auth_header:
+                    return {
+                        'statusCode': 401,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Authentication required'})
+                    }
+                
+                admin_payload = verify_jwt(auth_header)
+                if not admin_payload:
+                    return {
+                        'statusCode': 401,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Invalid or expired token'})
+                    }
+                
+                email = body_data.get('email', '').strip().lower()
+                password = body_data.get('password', '')
+                first_name = body_data.get('first_name', '')
+                last_name = body_data.get('last_name', '')
+                position = body_data.get('position', '')
+                department = body_data.get('department', '')
+                company_id = body_data.get('company_id') or admin_payload.get('company_id')
+                
+                if not email or not password or not first_name or not last_name or not position or not department:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Missing required fields'})
+                    }
+                
+                if len(password) < 8:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Password must be at least 8 characters'})
+                    }
+                
+                cursor.execute("SELECT id FROM t_p65890965_refstaff_project.users WHERE email = %s", (email,))
+                if cursor.fetchone():
+                    return {
+                        'statusCode': 409,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Email already registered'})
+                    }
+                
+                pwd_hash, salt = hash_password(password)
+                
+                cursor.execute("""
+                    INSERT INTO t_p65890965_refstaff_project.users 
+                    (company_id, email, password_hash, first_name, last_name, position, department, role, 
+                     level, experience_points, total_recommendations, successful_hires, total_earnings, 
+                     wallet_balance, wallet_pending, is_admin, is_hr_manager, created_at, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, 'employee', 1, 0, 0, 0, 0, 0, 0, FALSE, FALSE, 
+                            CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    RETURNING id
+                """, (company_id, email, f"{pwd_hash}:{salt}", first_name, last_name, position, department))
+                
+                user_id = cursor.fetchone()['id']
+                conn.commit()
+                
+                return {
+                    'statusCode': 201,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'message': 'Employee invited successfully',
+                        'user_id': user_id
+                    })
+                }
+            
             elif action == 'login':
                 email = body_data.get('email', '').strip().lower()
                 password = body_data.get('password', '')
