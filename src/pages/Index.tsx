@@ -773,7 +773,7 @@ function Index() {
           </nav>
           <div className="flex items-center gap-3">
             <Button variant="ghost" onClick={() => setShowLoginDialog(true)} aria-label="Войти в систему">Вход</Button>
-            <Button onClick={() => setShowRegisterDialog(true)} aria-label="Зарегистрировать компанию">Зарегистрировать компанию</Button>
+            <Button onClick={() => setShowRegisterDialog(true)} aria-label="Зарегистрировать компанию" className="text-xs">Зарегистрировать компанию</Button>
           </div>
         </div>
       </header>
