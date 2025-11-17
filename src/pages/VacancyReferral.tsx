@@ -136,11 +136,11 @@ function VacancyReferral() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50 safe-area-inset-top">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Icon name="Rocket" className="text-primary" size={28} />
-            <span className="text-xl font-bold">RefStaff</span>
+            <Icon name="Rocket" className="text-primary" size={24} />
+            <span className="text-lg sm:text-xl font-bold">RefStaff</span>
           </div>
           {company?.website && (
             <Button variant="ghost" size="sm" onClick={() => window.open(company.website, '_blank')}>
@@ -151,16 +151,16 @@ function VacancyReferral() {
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <div className="grid md:grid-cols-2 gap-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8 lg:py-12 max-w-4xl">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           <div className="space-y-6">
             <div>
               <Badge className="mb-4">
                 <Icon name="Briefcase" className="mr-1" size={14} />
                 Вакансия
               </Badge>
-              <h1 className="text-4xl font-bold mb-4">{vacancy.title}</h1>
-              <div className="flex flex-wrap gap-4 text-muted-foreground">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">{vacancy.title}</h1>
+              <div className="flex flex-wrap gap-3 sm:gap-4 text-sm sm:text-base text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <Icon name="Building2" size={18} />
                   <span>{company?.name}</span>
@@ -248,8 +248,8 @@ function VacancyReferral() {
             )}
           </div>
 
-          <div>
-            <Card className="sticky top-24">
+          <div className="pb-6 safe-area-inset-bottom">
+            <Card className="md:sticky md:top-24">
               <CardHeader>
                 <CardTitle>Откликнуться на вакансию</CardTitle>
                 <CardDescription>Заполните форму, и мы свяжемся с вами</CardDescription>

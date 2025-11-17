@@ -100,15 +100,15 @@ function EmployeeInvite() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4 sm:p-6 safe-area-inset-top safe-area-inset-bottom">
       <Card className="w-full max-w-2xl shadow-xl">
-        <CardHeader className="space-y-4 pb-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <Icon name="Rocket" className="text-primary" size={40} />
-            <span className="text-3xl font-bold">RefStaff</span>
+        <CardHeader className="space-y-3 sm:space-y-4 pb-6 sm:pb-8">
+          <div className="flex items-center justify-center gap-2 mb-2 sm:mb-4">
+            <Icon name="Rocket" className="text-primary" size={32} />
+            <span className="text-2xl sm:text-3xl font-bold">RefStaff</span>
           </div>
-          <CardTitle className="text-2xl text-center">Регистрация сотрудника</CardTitle>
-          <CardDescription className="text-center text-lg">
+          <CardTitle className="text-xl sm:text-2xl text-center">Регистрация сотрудника</CardTitle>
+          <CardDescription className="text-center text-base sm:text-lg">
             Вы приглашены присоединиться к реферальной программе компании <span className="font-semibold text-primary">{companyName}</span>
           </CardDescription>
         </CardHeader>
@@ -121,7 +121,7 @@ function EmployeeInvite() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="firstName">Имя *</Label>
                 <Input 
