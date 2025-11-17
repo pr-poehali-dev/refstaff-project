@@ -803,7 +803,7 @@ function Index() {
                 <div className="mt-8 flex items-center gap-6 justify-center lg:justify-start text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
                     <Icon name="Check" className="text-green-600" size={18} />
-                    <span>Без кредитной карты</span>
+                    <span>Просто в использовании</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Icon name="Check" className="text-green-600" size={18} />
