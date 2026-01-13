@@ -1103,7 +1103,7 @@ function Index() {
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Icon name="Rocket" className="text-primary" size={24} />
-                <span className="text-lg font-bold">RefStaff</span>
+                <span className="text-lg font-bold">iHUNT</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Платформа реферального рекрутинга с геймификацией
@@ -1134,7 +1134,7 @@ function Index() {
             </nav>
           </div>
           <div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
-            © 2025 RefStaff. Все права защищены.
+            © 2025 iHUNT. Все права защищены.
           </div>
         </div>
       </footer>
@@ -1283,13 +1283,13 @@ function Index() {
       <Dialog open={showAboutDialog} onOpenChange={setShowAboutDialog}>
         <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle className="text-2xl">О RefStaff</DialogTitle>
+            <DialogTitle className="text-2xl">О iHUNT</DialogTitle>
           </DialogHeader>
           <div className="space-y-6 pt-4">
             <div>
               <h3 className="text-lg font-semibold mb-3">Наша миссия</h3>
               <p className="text-muted-foreground">
-                RefStaff создан для того, чтобы сделать процесс найма персонала максимально эффективным и прозрачным. 
+                iHUNT создан для того, чтобы сделать процесс найма персонала максимально эффективным и прозрачным. 
                 Мы верим, что лучшие кандидаты приходят по рекомендациям доверенных сотрудников, и наша платформа 
                 помогает компаниям использовать этот потенциал на 100%.
               </p>
@@ -1363,7 +1363,7 @@ function Index() {
               <div className="space-y-2 text-sm">
                 <p className="flex items-center gap-2">
                   <Icon name="Mail" size={16} className="text-muted-foreground" />
-                  <a href="mailto:info@refstaff.ru" className="text-primary hover:underline">info@refstaff.ru</a>
+                  <a href="mailto:info@ihunt.ru" className="text-primary hover:underline">info@ihunt.ru</a>
                 </p>
                 <p className="flex items-center gap-2">
                   <Icon name="Phone" size={16} className="text-muted-foreground" />
@@ -1386,7 +1386,7 @@ function Index() {
               <h3 className="text-lg font-semibold mb-3">1. Общие положения</h3>
               <p className="text-muted-foreground">
                 Настоящая Политика конфиденциальности определяет порядок обработки и защиты персональных данных 
-                пользователей платформы RefStaff (далее — «Платформа»). Используя Платформу, вы соглашаетесь с условиями 
+                пользователей платформы iHUNT (далее — «Платформа»). Используя Платформу, вы соглашаетесь с условиями 
                 настоящей Политики.
               </p>
             </div>
@@ -1472,7 +1472,7 @@ function Index() {
                 По вопросам обработки персональных данных обращайтесь:
               </p>
               <p className="text-muted-foreground mt-2">
-                Email: <a href="mailto:privacy@refstaff.ru" className="text-primary hover:underline">privacy@refstaff.ru</a>
+                Email: <a href="mailto:privacy@ihunt.ru" className="text-primary hover:underline">privacy@ihunt.ru</a>
               </p>
             </div>
           </div>
@@ -1489,7 +1489,7 @@ function Index() {
             <div>
               <h3 className="text-lg font-semibold mb-3">1. Общие условия</h3>
               <p className="text-muted-foreground">
-                Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует отношения между RefStaff 
+                Настоящее Пользовательское соглашение (далее — «Соглашение») регулирует отношения между iHUNT 
                 (далее — «Сервис») и пользователями платформы. Регистрируясь на Платформе, вы подтверждаете, что 
                 прочитали, поняли и согласны соблюдать условия настоящего Соглашения.
               </p>
@@ -1498,7 +1498,7 @@ function Index() {
             <div>
               <h3 className="text-lg font-semibold mb-3">2. Предмет Соглашения</h3>
               <p className="text-muted-foreground">
-                RefStaff предоставляет онлайн-платформу для организации реферального рекрутинга, включающую:
+                iHUNT предоставляет онлайн-платформу для организации реферального рекрутинга, включающую:
               </p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4 mt-2">
                 <li>Управление вакансиями и кандидатами</li>
@@ -1547,14 +1547,14 @@ function Index() {
 
             <div>
               <h3 className="text-lg font-semibold mb-3">6. Права и обязанности Сервиса</h3>
-              <p className="text-muted-foreground mb-2">RefStaff имеет право:</p>
+              <p className="text-muted-foreground mb-2">iHUNT имеет право:</p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
                 <li>Изменять функционал Платформы</li>
                 <li>Проводить технические работы с уведомлением пользователей</li>
                 <li>Ограничить доступ при нарушении условий Соглашения</li>
                 <li>Удалить аккаунт при систематических нарушениях</li>
               </ul>
-              <p className="text-muted-foreground mt-2 mb-2">RefStaff обязуется:</p>
+              <p className="text-muted-foreground mt-2 mb-2">iHUNT обязуется:</p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4">
                 <li>Обеспечивать доступность Платформы не менее 99% времени</li>
                 <li>Защищать персональные данные пользователей</li>
@@ -1565,7 +1565,7 @@ function Index() {
             <div>
               <h3 className="text-lg font-semibold mb-3">7. Интеллектуальная собственность</h3>
               <p className="text-muted-foreground">
-                Все права на Платформу, включая код, дизайн, логотипы и контент, принадлежат RefStaff. 
+                Все права на Платформу, включая код, дизайн, логотипы и контент, принадлежат iHUNT. 
                 Использование материалов Платформы без письменного разрешения запрещено.
               </p>
             </div>
@@ -1573,7 +1573,7 @@ function Index() {
             <div>
               <h3 className="text-lg font-semibold mb-3">8. Ограничение ответственности</h3>
               <p className="text-muted-foreground">
-                RefStaff не несет ответственности за:
+                iHUNT не несет ответственности за:
               </p>
               <ul className="list-disc list-inside space-y-1 text-muted-foreground ml-4 mt-2">
                 <li>Качество и достоверность информации о кандидатах</li>
@@ -1587,14 +1587,14 @@ function Index() {
               <h3 className="text-lg font-semibold mb-3">9. Расторжение Соглашения</h3>
               <p className="text-muted-foreground">
                 Вы можете прекратить использование Платформы в любое время, удалив свою учетную запись. 
-                RefStaff может расторгнуть Соглашение при нарушении его условий.
+                iHUNT может расторгнуть Соглашение при нарушении его условий.
               </p>
             </div>
 
             <div>
               <h3 className="text-lg font-semibold mb-3">10. Изменения Соглашения</h3>
               <p className="text-muted-foreground">
-                RefStaff оставляет за собой право изменять условия настоящего Соглашения. О существенных изменениях 
+                iHUNT оставляет за собой право изменять условия настоящего Соглашения. О существенных изменениях 
                 пользователи будут уведомлены за 30 дней.
               </p>
             </div>
@@ -1613,7 +1613,7 @@ function Index() {
                 По вопросам Соглашения обращайтесь:
               </p>
               <p className="text-muted-foreground mt-2">
-                Email: <a href="mailto:legal@refstaff.ru" className="text-primary hover:underline">legal@refstaff.ru</a>
+                Email: <a href="mailto:legal@ihunt.ru" className="text-primary hover:underline">legal@ihunt.ru</a>
               </p>
             </div>
           </div>
@@ -1633,7 +1633,7 @@ function Index() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={28} />
-            <span className="text-xl font-bold">RefStaff</span>
+            <span className="text-xl font-bold">iHUNT</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
@@ -3021,7 +3021,7 @@ function Index() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={28} />
-            <span className="text-xl font-bold">RefStaff</span>
+            <span className="text-xl font-bold">iHUNT</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
