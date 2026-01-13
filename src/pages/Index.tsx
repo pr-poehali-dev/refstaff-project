@@ -763,7 +763,7 @@ function Index() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <Icon name="Rocket" className="text-primary" size={32} aria-hidden="true" />
-            <span className="text-2xl font-bold">RefStaff</span>
+            <span className="text-2xl font-bold">iHUNT</span>
           </div>
           <nav className="hidden md:flex items-center gap-8" role="navigation" aria-label="Основная навигация">
             <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Как работает</button>
@@ -878,7 +878,7 @@ function Index() {
         <section id="benefits" className="py-20 px-4 bg-gradient-to-b from-gray-50 to-white" aria-labelledby="benefits-title">
           <div className="container mx-auto max-w-6xl">
             <div className="text-center mb-16">
-              <Badge className="mb-4">✨ Почему RefStaff</Badge>
+              <Badge className="mb-4">✨ Почему iHUNT</Badge>
               <h2 id="benefits-title" className="text-4xl font-bold mb-4">Преимущества платформы</h2>
               <p className="text-xl text-muted-foreground">Все инструменты для эффективного реферального найма</p>
             </div>

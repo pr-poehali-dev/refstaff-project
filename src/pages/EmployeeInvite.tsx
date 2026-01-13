@@ -105,7 +105,7 @@ function EmployeeInvite() {
         <CardHeader className="space-y-3 sm:space-y-4 pb-6 sm:pb-8">
           <div className="flex items-center justify-center gap-2 mb-2 sm:mb-4">
             <Icon name="Rocket" className="text-primary" size={32} />
-            <span className="text-2xl sm:text-3xl font-bold">RefStaff</span>
+            <span className="text-2xl sm:text-3xl font-bold">iHUNT</span>
           </div>
           <CardTitle className="text-xl sm:text-2xl text-center">Регистрация сотрудника</CardTitle>
           <CardDescription className="text-center text-base sm:text-lg">

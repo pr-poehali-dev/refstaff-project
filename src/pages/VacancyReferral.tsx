@@ -140,7 +140,7 @@ function VacancyReferral() {
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={24} />
-            <span className="text-lg sm:text-xl font-bold">RefStaff</span>
+            <span className="text-lg sm:text-xl font-bold">iHUNT</span>
           </div>
           {company?.website && (
             <Button variant="ghost" size="sm" onClick={() => window.open(company.website, '_blank')}>
