@@ -87,7 +87,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'Access-Control-Allow-Headers': 'Content-Type, X-Auth-Token',
                 'Access-Control-Max-Age': '86400'
             },
-            'body': ''
+            'body': '',
+            'isBase64Encoded': False
         }
     
     try:
@@ -111,14 +112,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Missing required fields'})
+                        'body': json.dumps({'error': 'Missing required fields'}),
+                        'isBase64Encoded': False
                     }
                 
                 if len(password) < 8:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Password must be at least 8 characters'})
+                        'body': json.dumps({'error': 'Password must be at least 8 characters'}),
+                        'isBase64Encoded': False
                     }
                 
                 cursor.execute("SELECT id FROM t_p65890965_refstaff_project.users WHERE email = %s", (email,))
@@ -126,7 +129,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 409,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Email already registered'})
+                        'body': json.dumps({'error': 'Email already registered'}),
+                        'isBase64Encoded': False
                     }
                 
                 pwd_hash, salt = hash_password(password)
@@ -173,7 +177,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'company_id': company_id,
                             'role': role
                         }
-                    })
+                    }),
+                    'isBase64Encoded': False
                 }
             
             elif action == 'invite_employee':
@@ -182,7 +187,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 401,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Authentication required'})
+                        'body': json.dumps({'error': 'Authentication required'}),
+                        'isBase64Encoded': False
                     }
                 
                 admin_payload = verify_jwt(auth_header)
@@ -190,7 +196,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 401,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Invalid or expired token'})
+                        'body': json.dumps({'error': 'Invalid or expired token'}),
+                        'isBase64Encoded': False
                     }
                 
                 email = body_data.get('email', '').strip().lower()
@@ -205,14 +212,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Missing required fields'})
+                        'body': json.dumps({'error': 'Missing required fields'}),
+                        'isBase64Encoded': False
                     }
                 
                 if len(password) < 8:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Password must be at least 8 characters'})
+                        'body': json.dumps({'error': 'Password must be at least 8 characters'}),
+                        'isBase64Encoded': False
                     }
                 
                 cursor.execute("SELECT id FROM t_p65890965_refstaff_project.users WHERE email = %s", (email,))
@@ -220,7 +229,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 409,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Email already registered'})
+                        'body': json.dumps({'error': 'Email already registered'}),
+                        'isBase64Encoded': False
                     }
                 
                 pwd_hash, salt = hash_password(password)
@@ -244,7 +254,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({
                         'message': 'Employee invited successfully',
                         'user_id': user_id
-                    })
+                    }),
+                    'isBase64Encoded': False
                 }
             
             elif action == 'login':
@@ -255,7 +266,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 400,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Email and password required'})
+                        'body': json.dumps({'error': 'Email and password required'}),
+                        'isBase64Encoded': False
                     }
                 
                 cursor.execute("""
@@ -270,7 +282,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 401,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Invalid credentials'})
+                        'body': json.dumps({'error': 'Invalid credentials'}),
+                        'isBase64Encoded': False
                     }
                 
                 pwd_hash_parts = user['password_hash'].split(':')
@@ -278,7 +291,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 500,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Invalid password format'})
+                        'body': json.dumps({'error': 'Invalid password format'}),
+                        'isBase64Encoded': False
                     }
                 
                 pwd_hash, salt = pwd_hash_parts
@@ -286,7 +300,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     return {
                         'statusCode': 401,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                        'body': json.dumps({'error': 'Invalid credentials'})
+                        'body': json.dumps({'error': 'Invalid credentials'}),
+                        'isBase64Encoded': False
                     }
                 
                 token = create_jwt(user['id'], user['email'], user['company_id'], user['role'])
@@ -311,7 +326,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                             'is_admin': user['is_admin'],
                             'is_hr_manager': user['is_hr_manager']
                         }
-                    })
+                    }),
+                    'isBase64Encoded': False
                 }
         
         elif method == 'GET':
@@ -321,7 +337,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 401,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'No token provided'})
+                    'body': json.dumps({'error': 'No token provided'}),
+                    'isBase64Encoded': False
                 }
             
             payload = verify_jwt(auth_header)
@@ -329,7 +346,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 401,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'Invalid or expired token'})
+                    'body': json.dumps({'error': 'Invalid or expired token'}),
+                    'isBase64Encoded': False
                 }
             
             cursor.execute("""
@@ -345,7 +363,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 return {
                     'statusCode': 404,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                    'body': json.dumps({'error': 'User not found'})
+                    'body': json.dumps({'error': 'User not found'}),
+                    'isBase64Encoded': False
                 }
             
             return {
@@ -353,20 +372,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                 'body': json.dumps({
                     'user': dict(user)
-                })
+                }),
+                'isBase64Encoded': False
             }
         
         return {
             'statusCode': 405,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': 'Method not allowed'})
+            'body': json.dumps({'error': 'Method not allowed'}),
+            'isBase64Encoded': False
         }
     
     except Exception as e:
         return {
             'statusCode': 500,
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-            'body': json.dumps({'error': str(e)})
+            'body': json.dumps({'error': str(e)}),
+            'isBase64Encoded': False
         }
     finally:
         if 'cursor' in locals():
