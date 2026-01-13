@@ -187,6 +187,7 @@ function Index() {
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'GET',
+        mode: 'cors',
         headers: {
           'X-Auth-Token': authToken || ''
         }
@@ -475,6 +476,7 @@ function Index() {
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'POST',
+        mode: 'cors',
         headers: { 
           'Content-Type': 'application/json',
           'X-Auth-Token': authToken
@@ -524,6 +526,7 @@ function Index() {
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'POST',
+        mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'register',
@@ -569,6 +572,7 @@ function Index() {
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'POST',
+        mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'login',
