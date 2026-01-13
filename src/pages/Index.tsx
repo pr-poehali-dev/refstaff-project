@@ -740,13 +740,9 @@ function Index() {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <img 
-              src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/e66b7cbd-f0ad-490f-8e31-1c8bac289696.jpg" 
-              alt="iHUNT logo"
-              className="h-10 w-auto"
-            />
-            <span className="text-2xl font-bold bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">iHUNT</span>
+          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <Icon name="Rocket" className="text-primary" size={32} aria-hidden="true" />
+            <span className="text-2xl font-bold">iHUNT</span>
           </div>
           <nav className="hidden md:flex items-center gap-8" role="navigation" aria-label="Основная навигация">
             <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Как работает</button>
