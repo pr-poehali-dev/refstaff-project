@@ -13,74 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Recommendation as ApiRecommendation, type Company, type WalletData } from '@/lib/api';
-
-type UserRole = 'guest' | 'employer' | 'employee';
-
-interface Vacancy {
-  id: number;
-  title: string;
-  department: string;
-  salary: string;
-  status: 'active' | 'closed';
-  recommendations: number;
-  reward: number;
-  payoutDelayDays: number;
-  referralLink?: string;
-}
-
-interface Employee {
-  id: number;
-  name: string;
-  position: string;
-  department: string;
-  avatar: string;
-  recommendations: number;
-  hired: number;
-  earnings: number;
-  level: number;
-  isHrManager?: boolean;
-  isAdmin?: boolean;
-}
-
-interface Recommendation {
-  id: number;
-  candidateName: string;
-  vacancy: string;
-  status: 'pending' | 'accepted' | 'rejected';
-  date: string;
-  reward: number;
-  recommendedBy?: string;
-  recommendedById?: number;
-}
-
-interface ChatMessage {
-  id: number;
-  senderId: number;
-  senderName: string;
-  message: string;
-  timestamp: string;
-  isOwn: boolean;
-}
-
-interface NewsPost {
-  id: number;
-  title: string;
-  content: string;
-  author: string;
-  date: string;
-  category: 'news' | 'achievement' | 'announcement' | 'blog';
-  likes: number;
-  comments: NewsComment[];
-}
-
-interface NewsComment {
-  id: number;
-  newsId: number;
-  authorName: string;
-  authorAvatar?: string;
-  comment: string;
-  date: string;
-}
+import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment } from '@/types';
 
 function Index() {
   const [userRole, setUserRole] = useState<UserRole>(() => {
@@ -757,7 +690,49 @@ function Index() {
     });
   };
 
-  const renderLandingPage = () => (
+  const renderLandingPage = () => renderLandingPageComponent(
+    setShowRegisterDialog,
+    setShowLoginDialog,
+    setShowAboutDialog,
+    setShowPrivacyDialog,
+    setShowTermsDialog,
+    pricingPeriod,
+    setPricingPeriod,
+    showRegisterDialog,
+    showLoginDialog,
+    showAboutDialog,
+    showPrivacyDialog,
+    showTermsDialog,
+    registerForm,
+    setRegisterForm,
+    loginForm,
+    setLoginForm,
+    handleRegister,
+    handleLogin,
+    isAuthLoading
+  );
+
+  const renderLandingPageComponent = (
+    setShowRegisterDialog: (show: boolean) => void,
+    setShowLoginDialog: (show: boolean) => void,
+    setShowAboutDialog: (show: boolean) => void,
+    setShowPrivacyDialog: (show: boolean) => void,
+    setShowTermsDialog: (show: boolean) => void,
+    pricingPeriod: 'monthly' | 'yearly',
+    setPricingPeriod: (period: 'monthly' | 'yearly') => void,
+    showRegisterDialog: boolean,
+    showLoginDialog: boolean,
+    showAboutDialog: boolean,
+    showPrivacyDialog: boolean,
+    showTermsDialog: boolean,
+    registerForm: any,
+    setRegisterForm: (form: any) => void,
+    loginForm: any,
+    setLoginForm: (form: any) => void,
+    handleRegister: () => void,
+    handleLogin: () => void,
+    isAuthLoading: boolean
+  ) => (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
