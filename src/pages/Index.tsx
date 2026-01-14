@@ -133,6 +133,9 @@ function Index() {
 
   const [referralLink, setReferralLink] = useState('');
   const [showReferralLinkDialog, setShowReferralLinkDialog] = useState(false);
+  const [activeRecommendation, setActiveRecommendation] = useState<Recommendation | null>(null);
+  const [showRecommendationDetailsDialog, setShowRecommendationDetailsDialog] = useState(false);
+  const [loginType, setLoginType] = useState<'employer' | 'employee'>('employer');
 
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([
     { 
@@ -288,12 +291,15 @@ function Index() {
       const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => ({
         id: r.id,
         candidateName: r.candidate_name,
+        candidateEmail: r.candidate_email,
+        candidatePhone: r.candidate_phone,
         vacancy: r.vacancy_title || '',
         status: r.status,
         date: new Date(r.created_at).toISOString().split('T')[0],
         reward: r.reward_amount,
         recommendedBy: r.recommended_by_name,
-        recommendedById: r.recommended_by
+        recommendedById: r.recommended_by,
+        comment: r.comment
       }));
 
       setVacancies(mappedVacancies);
@@ -1277,9 +1283,32 @@ function Index() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Вход в систему</DialogTitle>
-            <DialogDescription>Войдите в свой аккаунт</DialogDescription>
+            <DialogDescription>Выберите тип аккаунта и войдите</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
+            <div>
+              <Label>Тип аккаунта</Label>
+              <div className="grid grid-cols-2 gap-3 mt-2">
+                <Button
+                  type="button"
+                  variant={loginType === 'employer' ? 'default' : 'outline'}
+                  className="w-full"
+                  onClick={() => setLoginType('employer')}
+                >
+                  <Icon name="Building2" className="mr-2" size={18} />
+                  Компания
+                </Button>
+                <Button
+                  type="button"
+                  variant={loginType === 'employee' ? 'default' : 'outline'}
+                  className="w-full"
+                  onClick={() => setLoginType('employee')}
+                >
+                  <Icon name="User" className="mr-2" size={18} />
+                  Сотрудник
+                </Button>
+              </div>
+            </div>
             <div>
               <Label htmlFor="login-email">Email</Label>
               <Input 
@@ -1748,13 +1777,12 @@ function Index() {
           </div>
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-6 lg:w-auto">
             <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
             <TabsTrigger value="employees">👥 Сотрудники</TabsTrigger>
             <TabsTrigger value="recommendations">🎯 Рекомендации</TabsTrigger>
             <TabsTrigger value="news">📢 Новости</TabsTrigger>
             <TabsTrigger value="chats">💬 Чаты</TabsTrigger>
-            <TabsTrigger value="integrations">🔗 Интеграции</TabsTrigger>
             <TabsTrigger value="stats">📊 Статистика</TabsTrigger>
           </TabsList>
 
@@ -1764,12 +1792,7 @@ function Index() {
                 <span>💼</span>
                 Вакансии
               </h2>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleGenerateReferralLink}>
-                  <Icon name="Link" className="mr-2" size={18} />
-                  Ссылка для регистрации сотрудников
-                </Button>
-                <Dialog>
+              <Dialog>
                   <DialogTrigger asChild>
                     <Button disabled={isSubscriptionExpired}>
                       <Icon name="Plus" className="mr-2" size={18} />
@@ -2074,10 +2097,16 @@ function Index() {
                 <span>👥</span>
                 Сотрудники компании
               </h2>
-              <Button onClick={() => setShowInviteDialog(true)}>
-                <Icon name="UserPlus" className="mr-2" size={18} />
-                Пригласить сотрудника
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleGenerateReferralLink}>
+                  <Icon name="Link" className="mr-2" size={18} />
+                  Ссылка для регистрации
+                </Button>
+                <Button onClick={() => setShowInviteDialog(true)}>
+                  <Icon name="UserPlus" className="mr-2" size={18} />
+                  Добавить сотрудника
+                </Button>
+              </div>
             </div>
             <div className="grid gap-4">
               {employees.map((employee) => (
@@ -2202,7 +2231,10 @@ function Index() {
             </h2>
             <div className="grid gap-4">
               {recommendations.map((rec) => (
-                <Card key={rec.id}>
+                <Card key={rec.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+                  setActiveRecommendation(rec);
+                  setShowRecommendationDetailsDialog(true);
+                }}>
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
@@ -2244,11 +2276,17 @@ function Index() {
                       </div>
                       {rec.status === 'pending' && (
                         <div className="flex gap-2">
-                          <Button variant="outline" size="sm" onClick={() => handleUpdateRecommendationStatus(rec.id, 'rejected')} disabled={isSubscriptionExpired}>
+                          <Button variant="outline" size="sm" onClick={(e) => {
+                            e.stopPropagation();
+                            handleUpdateRecommendationStatus(rec.id, 'rejected');
+                          }} disabled={isSubscriptionExpired}>
                             <Icon name="X" className="mr-1" size={16} />
                             Отклонить
                           </Button>
-                          <Button size="sm" onClick={() => handleUpdateRecommendationStatus(rec.id, 'accepted')} disabled={isSubscriptionExpired}>
+                          <Button size="sm" onClick={(e) => {
+                            e.stopPropagation();
+                            handleUpdateRecommendationStatus(rec.id, 'accepted');
+                          }} disabled={isSubscriptionExpired}>
                             <Icon name="Check" className="mr-1" size={16} />
                             Принять
                           </Button>
@@ -2452,129 +2490,7 @@ function Index() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="integrations" className="space-y-4">
-            <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
-              <span>🔗</span>
-              Интеграции с внешними сервисами
-            </h2>
-            <p className="text-muted-foreground">Подключите внешние сервисы для автоматизации процессов рекрутинга</p>
-            
-            <div className="grid md:grid-cols-2 gap-4">
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center">
-                      <Icon name="Mail" className="text-blue-600" size={24} />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">Email уведомления</CardTitle>
-                      <CardDescription>SendGrid / Mailgun</CardDescription>
-                    </div>
-                    <Badge variant="secondary">Активна</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">Автоматическая отправка уведомлений сотрудникам и кандидатам</p>
-                  <Button variant="outline" size="sm" className="w-full">Настроить</Button>
-                </CardContent>
-              </Card>
 
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
-                      <Icon name="MessageSquare" className="text-green-600" size={24} />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">Slack интеграция</CardTitle>
-                      <CardDescription>Уведомления в Slack</CardDescription>
-                    </div>
-                    <Badge variant="outline">Не подключена</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">Получайте уведомления о новых рекомендациях в Slack</p>
-                  <Button size="sm" className="w-full">Подключить</Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-purple-100 flex items-center justify-center">
-                      <Icon name="Calendar" className="text-purple-600" size={24} />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">Календарь</CardTitle>
-                      <CardDescription>Google Calendar / Outlook</CardDescription>
-                    </div>
-                    <Badge variant="outline">Не подключена</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">Синхронизация собеседований с календарем</p>
-                  <Button size="sm" className="w-full">Подключить</Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-orange-100 flex items-center justify-center">
-                      <Icon name="FileText" className="text-orange-600" size={24} />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">ATS системы</CardTitle>
-                      <CardDescription>BambooHR / Greenhouse</CardDescription>
-                    </div>
-                    <Badge variant="outline">Не подключена</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">Интеграция с вашей системой управления персоналом</p>
-                  <Button size="sm" className="w-full">Подключить</Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-red-100 flex items-center justify-center">
-                      <Icon name="Link" className="text-red-600" size={24} />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">Webhook API</CardTitle>
-                      <CardDescription>Собственная интеграция</CardDescription>
-                    </div>
-                    <Badge variant="outline">Не подключена</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">Подключите свои системы через Webhook</p>
-                  <Button size="sm" className="w-full">Настроить</Button>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-lg bg-yellow-100 flex items-center justify-center">
-                      <Icon name="Smartphone" className="text-yellow-600" size={24} />
-                    </div>
-                    <div className="flex-1">
-                      <CardTitle className="text-lg">SMS уведомления</CardTitle>
-                      <CardDescription>Twilio / SMS.ru</CardDescription>
-                    </div>
-                    <Badge variant="outline">Не подключена</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground mb-4">Отправка SMS кандидатам и сотрудникам</p>
-                  <Button size="sm" className="w-full">Подключить</Button>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
         </Tabs>
         )}
       </div>
@@ -2654,7 +2570,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showCompanySettingsDialog} onOpenChange={setShowCompanySettingsDialog}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Настройки профиля компании</DialogTitle>
             <DialogDescription>Управляйте информацией о вашей компании</DialogDescription>
@@ -2688,11 +2604,74 @@ function Index() {
                     <SelectItem value="finance">Финансы</SelectItem>
                     <SelectItem value="retail">Розничная торговля</SelectItem>
                     <SelectItem value="manufacturing">Производство</SelectItem>
+                    <SelectItem value="services">Услуги</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            <Button className="w-full">Сохранить изменения</Button>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Контакты</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="company-phone">Телефон</Label>
+                  <Input 
+                    id="company-phone" 
+                    type="tel" 
+                    placeholder="+7 (999) 123-45-67" 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="company-email">Email</Label>
+                  <Input 
+                    id="company-email" 
+                    type="email" 
+                    placeholder="info@company.ru" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-lg font-semibold mb-3">Социальные сети</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="company-telegram">
+                    <div className="flex items-center gap-2">
+                      <Icon name="Send" size={16} />
+                      Telegram
+                    </div>
+                  </Label>
+                  <Input 
+                    id="company-telegram" 
+                    placeholder="@company или https://t.me/company" 
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="company-vk">
+                    <div className="flex items-center gap-2">
+                      <Icon name="MessageCircle" size={16} />
+                      VK
+                    </div>
+                  </Label>
+                  <Input 
+                    id="company-vk" 
+                    placeholder="https://vk.com/company" 
+                  />
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            <Button className="w-full" size="lg">
+              <Icon name="Save" className="mr-2" size={18} />
+              Сохранить изменения
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -2812,6 +2791,112 @@ function Index() {
               После регистрации по этой ссылке сотрудник автоматически присоединится к вашей компании
             </p>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showRecommendationDetailsDialog} onOpenChange={setShowRecommendationDetailsDialog}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Детали рекомендации</DialogTitle>
+            <DialogDescription>
+              Полная информация о кандидате {activeRecommendation?.candidateName}
+            </DialogDescription>
+          </DialogHeader>
+          {activeRecommendation && (
+            <div className="space-y-4 pt-4">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-xs text-muted-foreground">ФИО кандидата</Label>
+                  <p className="font-medium">{activeRecommendation.candidateName}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Вакансия</Label>
+                  <p className="font-medium">{activeRecommendation.vacancy}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Email</Label>
+                  <p className="font-medium">{activeRecommendation.candidateEmail}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Телефон</Label>
+                  <p className="font-medium">{activeRecommendation.candidatePhone || 'Не указан'}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Дата рекомендации</Label>
+                  <p className="font-medium">{new Date(activeRecommendation.date).toLocaleDateString('ru-RU')}</p>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground">Статус</Label>
+                  <Badge variant={
+                    activeRecommendation.status === 'accepted' ? 'default' : 
+                    activeRecommendation.status === 'rejected' ? 'destructive' : 
+                    'secondary'
+                  }>
+                    {activeRecommendation.status === 'accepted' ? 'Принят' : 
+                     activeRecommendation.status === 'rejected' ? 'Отклонён' : 
+                     'На рассмотрении'}
+                  </Badge>
+                </div>
+              </div>
+
+              {activeRecommendation.recommendedBy && (
+                <div>
+                  <Label className="text-xs text-muted-foreground">Рекомендовал</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Avatar className="h-8 w-8">
+                      <AvatarFallback className="text-xs">
+                        {activeRecommendation.recommendedBy.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium">{activeRecommendation.recommendedBy}</span>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <Label className="text-xs text-muted-foreground">Комментарий</Label>
+                <p className="mt-1 p-3 bg-muted rounded-md whitespace-pre-wrap">
+                  {activeRecommendation.comment || 'Комментарий отсутствует'}
+                </p>
+              </div>
+
+              <div>
+                <Label className="text-xs text-muted-foreground">Вознаграждение</Label>
+                <div className="flex items-center gap-2 mt-1">
+                  <Icon name="Award" size={20} className="text-primary" />
+                  <span className="text-xl font-bold">{activeRecommendation.reward.toLocaleString()} ₽</span>
+                </div>
+              </div>
+
+              {activeRecommendation.status === 'pending' && (
+                <div className="flex gap-2 pt-4 border-t">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => {
+                      handleUpdateRecommendationStatus(activeRecommendation.id, 'rejected');
+                      setShowRecommendationDetailsDialog(false);
+                    }}
+                    disabled={isSubscriptionExpired}
+                  >
+                    <Icon name="X" className="mr-2" size={18} />
+                    Отклонить
+                  </Button>
+                  <Button 
+                    className="flex-1"
+                    onClick={() => {
+                      handleUpdateRecommendationStatus(activeRecommendation.id, 'accepted');
+                      setShowRecommendationDetailsDialog(false);
+                    }}
+                    disabled={isSubscriptionExpired}
+                  >
+                    <Icon name="Check" className="mr-2" size={18} />
+                    Принять кандидата
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 

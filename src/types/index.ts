@@ -29,12 +29,15 @@ export interface Employee {
 export interface Recommendation {
   id: number;
   candidateName: string;
+  candidateEmail: string;
+  candidatePhone?: string;
   vacancy: string;
   status: 'pending' | 'accepted' | 'rejected';
   date: string;
   reward: number;
   recommendedBy?: string;
   recommendedById?: number;
+  comment?: string;
 }
 
 export interface ChatMessage {
