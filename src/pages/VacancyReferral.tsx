@@ -27,6 +27,8 @@ function VacancyReferral() {
     comment: ''
   });
 
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+
   useEffect(() => {
     loadVacancyData();
   }, [token]);
@@ -60,13 +62,19 @@ function VacancyReferral() {
     }
 
     try {
+      let resumeComment = form.comment;
+      
+      if (resumeFile) {
+        resumeComment += `\n\n[Приложено резюме: ${resumeFile.name}]`;
+      }
+
       await api.createRecommendation({
         vacancy_id: vacancy.id,
         recommended_by: referrerId ? parseInt(referrerId) : undefined,
         candidate_name: form.name,
         candidate_email: form.email,
         candidate_phone: form.phone,
-        comment: form.comment
+        comment: resumeComment
       });
       
       setIsSubmitted(true);
@@ -231,21 +239,7 @@ function VacancyReferral() {
               </>
             )}
 
-            {vacancy.reward_amount && (
-              <Card className="bg-primary/5 border-primary/20">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                      <Icon name="Award" className="text-primary" size={24} />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-muted-foreground">Вознаграждение за рекомендацию</p>
-                      <p className="text-xl font-bold text-primary">{vacancy.reward_amount.toLocaleString()} ₽</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+
           </div>
 
           <div className="pb-6 safe-area-inset-bottom">
@@ -301,6 +295,40 @@ function VacancyReferral() {
                     />
                   </div>
 
+                  <div>
+                    <Label htmlFor="resume">Резюме (необязательно)</Label>
+                    <Input
+                      id="resume"
+                      type="file"
+                      accept=".pdf,.doc,.docx"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                          if (!allowedTypes.includes(file.type)) {
+                            alert('Поддерживаются только файлы PDF, DOC, DOCX');
+                            e.target.value = '';
+                            return;
+                          }
+                          if (file.size > 10 * 1024 * 1024) {
+                            alert('Размер файла не должен превышать 10 МБ');
+                            e.target.value = '';
+                            return;
+                          }
+                          setResumeFile(file);
+                        }
+                      }}
+                    />
+                    {resumeFile && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Выбран файл: {resumeFile.name} ({(resumeFile.size / 1024 / 1024).toFixed(2)} МБ)
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Форматы: PDF, DOC, DOCX. Максимальный размер: 10 МБ
+                    </p>
+                  </div>
+
                   {referrerId && (
                     <div className="bg-blue-50 p-3 rounded-lg text-sm">
                       <Icon name="Info" size={16} className="inline mr-2 text-blue-600" />
@@ -325,7 +353,7 @@ function VacancyReferral() {
 
       <footer className="border-t bg-white py-8 mt-20">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 RefStaff. Платформа реферального рекрутинга</p>
+          <p>© 2025 iHUNT. Платформа реферального рекрутинга</p>
         </div>
       </footer>
     </div>

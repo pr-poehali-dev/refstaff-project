@@ -1,5 +1,6 @@
 """
-Business: API для управления данными RefStaff (вакансии, рекомендации, сотрудники)
+Business: API для управления данными iHUNT (вакансии, рекомендации, сотрудники)
+Поддерживает фильтрацию вакансий, архивирование, удаление, регистрацию сотрудников
 Args: event - dict с httpMethod, body, queryStringParameters, pathParams
       context - объект с request_id, function_name и другими атрибутами
 Returns: HTTP response dict с statusCode, headers, body
@@ -44,10 +45,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         if method == 'GET' and resource == 'vacancies':
             company_id = query_params.get('company_id', '1')
-            status = query_params.get('status', 'active')
+            status = query_params.get('status', 'all')
             user_id = query_params.get('user_id')
             
-            query = """
+            where_clause = 'WHERE v.company_id = %s'
+            params = [company_id]
+            
+            if status and status != 'all':
+                where_clause += ' AND v.status = %s'
+                params.append(status)
+            
+            query = f"""
                 SELECT v.id, v.title, v.department, v.salary_display, v.status, 
                        v.reward_amount, v.payout_delay_days, v.requirements, v.description,
                        v.referral_token, v.created_at,
@@ -56,11 +64,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 FROM t_p65890965_refstaff_project.vacancies v
                 LEFT JOIN t_p65890965_refstaff_project.recommendations r ON v.id = r.vacancy_id
                 LEFT JOIN t_p65890965_refstaff_project.users u ON v.created_by = u.id
-                WHERE v.company_id = %s AND v.status = %s
+                {where_clause}
                 GROUP BY v.id, u.first_name, u.last_name
                 ORDER BY v.created_at DESC
             """
-            cur.execute(query, (company_id, status))
+            cur.execute(query, params)
             vacancies = cur.fetchall()
             
             result = []
@@ -252,6 +260,125 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Access-Control-Allow-Origin': '*'
                 },
                 'body': json.dumps(dict(updated_recommendation), default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'PUT' and resource == 'vacancies':
+            body_data = json.loads(event.get('body', '{}'))
+            vacancy_id = body_data.get('id')
+            
+            if not vacancy_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'vacancy id is required'}),
+                    'isBase64Encoded': False
+                }
+            
+            update_fields = []
+            params = []
+            
+            if 'title' in body_data:
+                update_fields.append('title = %s')
+                params.append(body_data['title'])
+            if 'department' in body_data:
+                update_fields.append('department = %s')
+                params.append(body_data['department'])
+            if 'salary_display' in body_data:
+                update_fields.append('salary_display = %s')
+                params.append(body_data['salary_display'])
+            if 'requirements' in body_data:
+                update_fields.append('requirements = %s')
+                params.append(body_data['requirements'])
+            if 'description' in body_data:
+                update_fields.append('description = %s')
+                params.append(body_data['description'])
+            if 'reward_amount' in body_data:
+                update_fields.append('reward_amount = %s')
+                params.append(body_data['reward_amount'])
+            if 'payout_delay_days' in body_data:
+                update_fields.append('payout_delay_days = %s')
+                params.append(body_data['payout_delay_days'])
+            if 'status' in body_data:
+                update_fields.append('status = %s')
+                params.append(body_data['status'])
+            
+            if not update_fields:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'No fields to update'}),
+                    'isBase64Encoded': False
+                }
+            
+            params.append(vacancy_id)
+            query = f"""
+                UPDATE t_p65890965_refstaff_project.vacancies 
+                SET {', '.join(update_fields)}
+                WHERE id = %s
+                RETURNING id, title, department, salary_display, status, reward_amount, payout_delay_days
+            """
+            
+            cur.execute(query, params)
+            updated_vacancy = cur.fetchone()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(dict(updated_vacancy), default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'DELETE' and resource == 'vacancies':
+            vacancy_id = query_params.get('id')
+            
+            if not vacancy_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'vacancy id is required'}),
+                    'isBase64Encoded': False
+                }
+            
+            delete_query = """
+                DELETE FROM t_p65890965_refstaff_project.vacancies
+                WHERE id = %s AND status = 'archived'
+                RETURNING id, title
+            """
+            
+            cur.execute(delete_query, (vacancy_id,))
+            deleted_vacancy = cur.fetchone()
+            
+            if not deleted_vacancy:
+                return {
+                    'statusCode': 404,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'Vacancy not found or not archived'}),
+                    'isBase64Encoded': False
+                }
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps({'success': True}),
                 'isBase64Encoded': False
             }
         

@@ -125,6 +125,15 @@ function Index() {
     department: ''
   });
 
+  const [vacancyFilter, setVacancyFilter] = useState({
+    search: '',
+    department: 'all',
+    status: 'all'
+  });
+
+  const [referralLink, setReferralLink] = useState('');
+  const [showReferralLinkDialog, setShowReferralLinkDialog] = useState(false);
+
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([
     { 
       id: 1, 
@@ -244,8 +253,9 @@ function Index() {
   const loadData = async () => {
     try {
       setIsLoading(true);
+      const vacancyStatus = userRole === 'employer' ? 'all' : 'active';
       const [vacanciesData, employeesData, recommendationsData, companyData] = await Promise.all([
-        api.getVacancies(currentCompanyId).catch(() => []),
+        api.getVacancies(currentCompanyId, vacancyStatus).catch(() => []),
         api.getEmployees(currentCompanyId).catch(() => []),
         api.getRecommendations(currentCompanyId).catch(() => []),
         api.getCompany(currentCompanyId).catch(() => null)
@@ -417,6 +427,43 @@ function Index() {
       console.error('Ошибка закрытия вакансии:', error);
       alert('Не удалось закрыть вакансию');
     }
+  };
+
+  const handleArchiveVacancy = async (vacancyId: number) => {
+    try {
+      await api.updateVacancy(vacancyId, { status: 'archived' });
+      await loadData();
+      alert('Вакансия перенесена в архив');
+    } catch (error) {
+      console.error('Ошибка архивирования вакансии:', error);
+      alert('Не удалось архивировать вакансию');
+    }
+  };
+
+  const handleDeleteVacancy = async (vacancyId: number) => {
+    if (!window.confirm('Вы уверены, что хотите удалить вакансию? Это действие нельзя отменить.')) {
+      return;
+    }
+    try {
+      await api.deleteVacancy(vacancyId);
+      await loadData();
+      alert('Вакансия удалена');
+    } catch (error) {
+      console.error('Ошибка удаления вакансии:', error);
+      alert('Не удалось удалить вакансию');
+    }
+  };
+
+  const handleGenerateReferralLink = () => {
+    const token = Math.random().toString(36).substring(2, 15);
+    const link = `${window.location.origin}/employee-register?company=${currentCompanyId}&token=${token}`;
+    setReferralLink(link);
+    setShowReferralLinkDialog(true);
+  };
+
+  const handleCopyLink = (link: string) => {
+    navigator.clipboard.writeText(link);
+    alert('Ссылка скопирована в буфер обмена');
   };
 
   const handleUpdateProfile = async () => {
@@ -1712,18 +1759,23 @@ function Index() {
           </TabsList>
 
           <TabsContent value="vacancies" className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold flex items-center gap-2">
                 <span>💼</span>
-                Активные вакансии
+                Вакансии
               </h2>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button disabled={isSubscriptionExpired}>
-                    <Icon name="Plus" className="mr-2" size={18} />
-                    Добавить вакансию
-                  </Button>
-                </DialogTrigger>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={handleGenerateReferralLink}>
+                  <Icon name="Link" className="mr-2" size={18} />
+                  Ссылка для регистрации сотрудников
+                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button disabled={isSubscriptionExpired}>
+                      <Icon name="Plus" className="mr-2" size={18} />
+                      Добавить вакансию
+                    </Button>
+                  </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Новая вакансия</DialogTitle>
@@ -1805,8 +1857,35 @@ function Index() {
               </Dialog>
             </div>
 
+            <div className="flex gap-4 mb-4">
+              <div className="flex-1">
+                <Input 
+                  placeholder="Поиск по названию или отделу..."
+                  value={vacancyFilter.search}
+                  onChange={(e) => setVacancyFilter({...vacancyFilter, search: e.target.value})}
+                />
+              </div>
+              <Select value={vacancyFilter.status} onValueChange={(value) => setVacancyFilter({...vacancyFilter, status: value})}>
+                <SelectTrigger className="w-[200px]">
+                  <SelectValue placeholder="Статус" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все статусы</SelectItem>
+                  <SelectItem value="active">Активные</SelectItem>
+                  <SelectItem value="closed">Закрытые</SelectItem>
+                  <SelectItem value="archived">Архив</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="grid gap-4">
-              {vacancies.map((vacancy) => (
+              {vacancies.filter(v => {
+                const searchMatch = vacancyFilter.search === '' || 
+                  v.title.toLowerCase().includes(vacancyFilter.search.toLowerCase()) ||
+                  v.department.toLowerCase().includes(vacancyFilter.search.toLowerCase());
+                const statusMatch = vacancyFilter.status === 'all' || v.status === vacancyFilter.status;
+                return searchMatch && statusMatch;
+              }).map((vacancy) => (
                 <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -1814,7 +1893,9 @@ function Index() {
                         <CardTitle>{vacancy.title}</CardTitle>
                         <CardDescription>{vacancy.department}</CardDescription>
                       </div>
-                      <Badge variant="secondary">{vacancy.status === 'active' ? 'Активна' : 'Закрыта'}</Badge>
+                      <Badge variant="secondary">
+                        {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'В архиве' : 'Закрыта'}
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -1838,23 +1919,47 @@ function Index() {
                             <span>Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'}</span>
                           </div>
                         </div>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setActiveVacancy(vacancy);
-                            setVacancyForm({
-                              title: vacancy.title,
-                              department: vacancy.department,
-                              salary: vacancy.salary,
-                              requirements: '',
-                              reward: vacancy.reward.toString(),
-                              payoutDelay: vacancy.payoutDelayDays.toString()
-                            });
-                          }}
-                        >
-                          Редактировать
-                        </Button>
+                        <div className="flex gap-2">
+                          {vacancy.status !== 'archived' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setActiveVacancy(vacancy);
+                                setVacancyForm({
+                                  title: vacancy.title,
+                                  department: vacancy.department,
+                                  salary: vacancy.salary,
+                                  requirements: '',
+                                  reward: vacancy.reward.toString(),
+                                  payoutDelay: vacancy.payoutDelayDays.toString()
+                                });
+                              }}
+                            >
+                              Редактировать
+                            </Button>
+                          )}
+                          {vacancy.status === 'active' && (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleArchiveVacancy(vacancy.id)}
+                            >
+                              <Icon name="Archive" size={16} className="mr-1" />
+                              В архив
+                            </Button>
+                          )}
+                          {vacancy.status === 'archived' && (
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => handleDeleteVacancy(vacancy.id)}
+                            >
+                              <Icon name="Trash2" size={16} className="mr-1" />
+                              Удалить
+                            </Button>
+                          )}
+                        </div>
                       </div>
                       <Separator />
                       <div className="space-y-2">
@@ -2683,6 +2788,28 @@ function Index() {
                 Отмена
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showReferralLinkDialog} onOpenChange={setShowReferralLinkDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ссылка для регистрации сотрудников</DialogTitle>
+            <DialogDescription>
+              Отправьте эту ссылку новым сотрудникам для регистрации в системе
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="flex gap-2">
+              <Input value={referralLink} readOnly />
+              <Button onClick={() => handleCopyLink(referralLink)}>
+                <Icon name="Copy" size={18} />
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              После регистрации по этой ссылке сотрудник автоматически присоединится к вашей компании
+            </p>
           </div>
         </DialogContent>
       </Dialog>

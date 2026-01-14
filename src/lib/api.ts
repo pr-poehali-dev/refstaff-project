@@ -7,7 +7,7 @@ export interface Vacancy {
   salary_display: string;
   requirements?: string;
   description?: string;
-  status: 'active' | 'closed';
+  status: 'active' | 'closed' | 'archived';
   reward_amount: number;
   payout_delay_days?: number;
   referral_token?: string;
@@ -138,6 +138,14 @@ export const api = {
       body: JSON.stringify({ id: vacancyId, ...data })
     });
     if (!response.ok) throw new Error('Failed to update vacancy');
+    return response.json();
+  },
+
+  async deleteVacancy(vacancyId: number): Promise<{ success: boolean }> {
+    const response = await fetch(`${API_URL}/?resource=vacancies&id=${vacancyId}`, {
+      method: 'DELETE'
+    });
+    if (!response.ok) throw new Error('Failed to delete vacancy');
     return response.json();
   },
 
