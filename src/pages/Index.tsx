@@ -1855,6 +1855,7 @@ function Index() {
                   </div>
                 </DialogContent>
               </Dialog>
+              </div>
             </div>
 
             <div className="flex gap-4 mb-4">
