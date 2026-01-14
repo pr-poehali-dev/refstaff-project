@@ -1340,18 +1340,20 @@ function Index() {
             <Button className="w-full" onClick={handleLogin} disabled={isAuthLoading}>
               {isAuthLoading ? 'Вход...' : 'Войти'}
             </Button>
-            <div className="text-center text-sm text-muted-foreground">
-              Нет аккаунта?{' '}
-              <button 
-                onClick={() => {
-                  setShowLoginDialog(false);
-                  setShowRegisterDialog(true);
-                }}
-                className="text-primary hover:underline"
-              >
-                Зарегистрируйтесь
-              </button>
-            </div>
+            {loginType === 'employer' && (
+              <div className="text-center text-sm text-muted-foreground">
+                Нет аккаунта?{' '}
+                <button 
+                  onClick={() => {
+                    setShowLoginDialog(false);
+                    setShowRegisterDialog(true);
+                  }}
+                  className="text-primary hover:underline"
+                >
+                  Зарегистрируйтесь
+                </button>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
