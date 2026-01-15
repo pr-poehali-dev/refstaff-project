@@ -27,14 +27,6 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
-  const stats = {
-    total: employeeRecommendations.length,
-    pending: employeeRecommendations.filter(r => r.status === 'pending').length,
-    interview: employeeRecommendations.filter(r => r.status === 'interview').length,
-    hired: employeeRecommendations.filter(r => r.status === 'hired').length,
-    rejected: employeeRecommendations.filter(r => r.status === 'rejected').length,
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -74,49 +66,6 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
                 <p className="font-medium">{employee.vk}</p>
               </div>
             )}
-          </div>
-
-          <div className="grid grid-cols-5 gap-4">
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground">Всего</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stats.total}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground whitespace-nowrap">На рассмотрении</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground whitespace-nowrap">На интервью</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">{stats.interview}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground">Приняты</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">{stats.hired}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-2">
-                <CardTitle className="text-xs font-medium text-muted-foreground">Отклонены</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
-              </CardContent>
-            </Card>
           </div>
 
           <div>
