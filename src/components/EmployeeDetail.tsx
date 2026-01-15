@@ -79,7 +79,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
           <div className="grid grid-cols-5 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Всего</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground">Всего</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stats.total}</div>
@@ -87,7 +87,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">На рассмотрении</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground whitespace-nowrap">На рассмотрении</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
@@ -95,7 +95,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">На интервью</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground whitespace-nowrap">На интервью</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-blue-600">{stats.interview}</div>
@@ -103,7 +103,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Приняты</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground">Приняты</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-green-600">{stats.hired}</div>
@@ -111,7 +111,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Отклонены</CardTitle>
+                <CardTitle className="text-xs font-medium text-muted-foreground">Отклонены</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-red-600">{stats.rejected}</div>
