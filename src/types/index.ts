@@ -87,4 +87,8 @@ export interface PayoutRequest {
   createdAt: string;
   reviewedAt?: string;
   reviewedBy?: number;
+  candidateName?: string;
+  candidateEmail?: string;
+  vacancyTitle?: string;
+  recommendationId?: number;
 }

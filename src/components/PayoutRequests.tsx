@@ -21,6 +21,10 @@ export interface PayoutRequest {
   createdAt: string;
   reviewedAt?: string;
   reviewedBy?: number;
+  candidateName?: string;
+  candidateEmail?: string;
+  vacancyTitle?: string;
+  recommendationId?: number;
 }
 
 interface PayoutRequestsProps {
@@ -84,6 +88,20 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
+          {request.candidateName && (
+            <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
+              <p className="text-sm font-medium text-blue-900 mb-1">Кандидат</p>
+              <div className="space-y-1">
+                <p className="text-sm font-semibold text-blue-800">{request.candidateName}</p>
+                {request.candidateEmail && (
+                  <p className="text-xs text-blue-600">{request.candidateEmail}</p>
+                )}
+                {request.vacancyTitle && (
+                  <p className="text-xs text-blue-600">Вакансия: {request.vacancyTitle}</p>
+                )}
+              </div>
+            </div>
+          )}
           <div>
             <p className="text-sm font-medium text-muted-foreground">Дата запроса</p>
             <p className="text-sm">{new Date(request.createdAt).toLocaleString('ru-RU')}</p>
