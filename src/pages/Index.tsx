@@ -16,6 +16,8 @@ import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Rec
 import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment, PayoutRequest } from '@/types';
 import { EmployeeDetail } from '@/components/EmployeeDetail';
 import { PayoutRequests } from '@/components/PayoutRequests';
+import { VacancyDetail } from '@/components/VacancyDetail';
+import { CandidateDetail } from '@/components/CandidateDetail';
 
 function Index() {
   const [userRole, setUserRole] = useState<UserRole>(() => {
@@ -64,7 +66,10 @@ function Index() {
   const [notifications, setNotifications] = useState<Array<{id: number; type: string; message: string; date: string; read: boolean}>>([
     { id: 1, type: 'recommendation', message: 'Новая рекомендация от Анны Смирновой', date: '2025-11-13', read: false },
     { id: 2, type: 'subscription', message: 'Подписка заканчивается через 12 дней', date: '2025-11-13', read: false },
-    { id: 3, type: 'hire', message: 'Кандидат Елена Новикова принята', date: '2025-11-12', read: true },
+    { id: 3, type: 'hire', message: 'Кандидат Елена Новикова принята на должность', date: '2025-11-12', read: true },
+    { id: 4, type: 'payout', message: 'Ваш запрос на выплату 30 000 ₽ одобрен', date: '2026-01-15', read: false },
+    { id: 5, type: 'recommendation', message: 'Ваш кандидат приглашён на интервью', date: '2026-01-14', read: false },
+    { id: 6, type: 'payout', message: 'Выплата 15 000 ₽ зачислена на ваш счёт', date: '2026-01-13', read: true },
   ]);
   
   const currentEmployeeId = 1;
@@ -80,6 +85,24 @@ function Index() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [showEmployeeDetail, setShowEmployeeDetail] = useState(false);
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
+  const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
+  const [showVacancyDetail, setShowVacancyDetail] = useState(false);
+  const [selectedCandidate, setSelectedCandidate] = useState<Recommendation | null>(null);
+  const [showCandidateDetail, setShowCandidateDetail] = useState(false);
+  const [vacancySearchQuery, setVacancySearchQuery] = useState('');
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
+  const [withdrawForm, setWithdrawForm] = useState({
+    amount: '',
+    paymentMethod: 'card',
+    paymentDetails: ''
+  });
+  const [showProfileEditDialog, setShowProfileEditDialog] = useState(false);
+  const [profileForm, setProfileForm] = useState({
+    phone: '',
+    telegram: '',
+    vk: '',
+    avatar: ''
+  });
   
   const [vacancyForm, setVacancyForm] = useState({
     title: '',
@@ -3432,8 +3455,16 @@ function Index() {
                   <AvatarFallback>АС</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
-                  <CardTitle className="text-2xl">Анна Смирнова</CardTitle>
-                  <CardDescription>Tech Lead • Разработка</CardDescription>
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    Анна Смирнова
+                    <Badge variant="secondary" className="text-xs">
+                      🏆 #{employees.findIndex(e => e.id === currentEmployeeId) + 1 || 1} в рейтинге
+                    </Badge>
+                  </CardTitle>
+                  <CardDescription className="flex items-center gap-2">
+                    Tech Lead • Разработка
+                    <span className="text-primary font-medium">• Мастер рекрутинга</span>
+                  </CardDescription>
                 </div>
                 <Button variant="outline" onClick={() => setShowEditProfileDialog(true)}>Редактировать</Button>
               </div>
@@ -3494,7 +3525,12 @@ function Index() {
                   </p>
                 )}
               </div>
-              <Button className="w-full" variant="outline">
+              <Button 
+                className="w-full" 
+                variant="outline"
+                onClick={() => setShowWithdrawDialog(true)}
+                disabled={(walletData?.wallet?.wallet_balance || 0) === 0}
+              >
                 <Icon name="Download" className="mr-2" size={16} />
                 Вывести средства
               </Button>
@@ -3508,6 +3544,7 @@ function Index() {
             <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
             <TabsTrigger value="my-recommendations">⭐ Мои рекомендации</TabsTrigger>
             <TabsTrigger value="achievements">🏆 Достижения</TabsTrigger>
+            <TabsTrigger value="notifications">🔔 Уведомления</TabsTrigger>
             <TabsTrigger value="wallet-history">💳 История кошелька</TabsTrigger>
           </TabsList>
 
@@ -3583,13 +3620,32 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="vacancies" className="space-y-4">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-4">
               <h2 className="text-2xl font-semibold">Открытые вакансии</h2>
+            </div>
+            <div className="mb-4">
+              <Input
+                placeholder="Поиск вакансий по названию или отделу..."
+                value={vacancySearchQuery}
+                onChange={(e) => setVacancySearchQuery(e.target.value)}
+                className="max-w-md"
+              />
             </div>
 
             <div className="grid gap-4">
-              {vacancies.map((vacancy) => (
-                <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
+              {vacancies.filter(v =>
+                vacancySearchQuery === '' ||
+                v.title.toLowerCase().includes(vacancySearchQuery.toLowerCase()) ||
+                v.department.toLowerCase().includes(vacancySearchQuery.toLowerCase())
+              ).map((vacancy) => (
+                <Card 
+                  key={vacancy.id} 
+                  className="hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => {
+                    setSelectedVacancyDetail(vacancy);
+                    setShowVacancyDetail(true);
+                  }}
+                >
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
@@ -3598,7 +3654,10 @@ function Index() {
                       </div>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button onClick={() => setActiveVacancy(vacancy)}>
+                          <Button onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveVacancy(vacancy);
+                          }}>
                             <Icon name="UserPlus" className="mr-2" size={18} />
                             Рекомендовать
                           </Button>
@@ -3686,10 +3745,6 @@ function Index() {
                           <Icon name="Wallet" size={16} className="text-muted-foreground" />
                           <span>{vacancy.salary}</span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Icon name="Users" size={16} className="text-muted-foreground" />
-                          <span>{vacancy.recommendations} рекомендаций</span>
-                        </div>
                         <div className="flex items-center gap-2 text-sm text-primary">
                           <Icon name="Award" size={16} />
                           <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>
@@ -3741,23 +3796,32 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="my-recommendations" className="space-y-4">
-            <h2 className="text-2xl font-semibold">Мои рекомендации</h2>
+            <h2 className="text-2xl font-semibold mb-4">Мои рекомендации</h2>
             <div className="grid gap-4">
-              {recommendations.slice(0, 2).map((rec) => (
-                <Card key={rec.id}>
+              {recommendations.filter(r => r.employeeId === currentEmployeeId).map((rec) => (
+                <Card 
+                  key={rec.id} 
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => {
+                    setSelectedCandidate(rec);
+                    setShowCandidateDetail(true);
+                  }}
+                >
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
                         <CardTitle className="text-lg">{rec.candidateName}</CardTitle>
-                        <CardDescription>{rec.vacancy}</CardDescription>
+                        <CardDescription>{rec.vacancyTitle || rec.vacancy}</CardDescription>
                       </div>
                       <Badge variant={
-                        rec.status === 'accepted' ? 'default' : 
-                        rec.status === 'rejected' ? 'destructive' : 
+                        rec.status === 'hired' ? 'default' : 
+                        rec.status === 'rejected' ? 'destructive' :
+                        rec.status === 'interview' ? 'outline' :
                         'secondary'
                       }>
-                        {rec.status === 'accepted' ? 'Принят' : 
+                        {rec.status === 'hired' ? 'Принят' : 
                          rec.status === 'rejected' ? 'Отклонён' : 
+                         rec.status === 'interview' ? 'На интервью' :
                          'На рассмотрении'}
                       </Badge>
                     </div>
@@ -3786,7 +3850,60 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="achievements" className="space-y-4">
-            <h2 className="text-2xl font-semibold">Достижения</h2>
+            <h2 className="text-2xl font-semibold mb-4">Достижения и рейтинг</h2>
+            
+            <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Icon name="Trophy" size={24} className="text-primary" />
+                  Рейтинг сотрудников
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  {employees
+                    .sort((a, b) => {
+                      if (b.hired !== a.hired) return b.hired - a.hired;
+                      if (b.recommendations !== a.recommendations) return b.recommendations - a.recommendations;
+                      return b.earnings - a.earnings;
+                    })
+                    .slice(0, 10)
+                    .map((emp, idx) => (
+                      <div key={emp.id} className={`flex items-center gap-3 p-3 rounded-lg ${emp.id === currentEmployeeId ? 'bg-primary/20 border-2 border-primary' : 'bg-background'}`}>
+                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                          idx === 0 ? 'bg-yellow-500 text-white' :
+                          idx === 1 ? 'bg-gray-400 text-white' :
+                          idx === 2 ? 'bg-orange-600 text-white' :
+                          'bg-muted text-muted-foreground'
+                        }`}>
+                          {idx + 1}
+                        </div>
+                        <Avatar className="h-10 w-10">
+                          <AvatarFallback>{emp.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1">
+                          <div className="font-medium">{emp.name}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {emp.hired} нанято • {emp.recommendations} рекомендаций
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="font-bold text-green-600">{emp.earnings.toLocaleString()} ₽</div>
+                          <div className="text-xs text-muted-foreground">
+                            {emp.hired >= 10 ? '👑 Легенда' :
+                             emp.hired >= 5 ? '⭐ Мастер' :
+                             emp.hired >= 3 ? '🎯 Профи' :
+                             emp.hired >= 1 ? '🌟 Новичок' : '🔰 Старт'}
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  }
+                </div>
+              </CardContent>
+            </Card>
+
+            <h3 className="text-lg font-semibold mt-6">Мои достижения</h3>
             <div className="grid md:grid-cols-2 gap-4">
               <Card>
                 <CardContent className="p-6">
@@ -3882,6 +3999,71 @@ function Index() {
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="notifications" className="space-y-4">
+            <h2 className="text-2xl font-semibold mb-4">Уведомления</h2>
+            <div className="space-y-3">
+              {notifications
+                .filter(n => {
+                  if (userRole === 'employee') {
+                    return n.type !== 'subscription';
+                  }
+                  return true;
+                })
+                .map((notif) => (
+                  <Card key={notif.id} className={notif.read ? 'opacity-60' : ''}>
+                    <CardContent className="p-4">
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-full ${
+                          notif.type === 'recommendation' ? 'bg-blue-100' :
+                          notif.type === 'hire' ? 'bg-green-100' :
+                          notif.type === 'payout' ? 'bg-yellow-100' :
+                          'bg-gray-100'
+                        }`}>
+                          <Icon 
+                            name={
+                              notif.type === 'recommendation' ? 'UserPlus' :
+                              notif.type === 'hire' ? 'CheckCircle' :
+                              notif.type === 'payout' ? 'DollarSign' :
+                              'Bell'
+                            }
+                            size={20}
+                            className={
+                              notif.type === 'recommendation' ? 'text-blue-600' :
+                              notif.type === 'hire' ? 'text-green-600' :
+                              notif.type === 'payout' ? 'text-yellow-600' :
+                              'text-gray-600'
+                            }
+                          />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-medium">{notif.message}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(notif.date).toLocaleDateString('ru-RU', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </p>
+                        </div>
+                        {!notif.read && (
+                          <Badge variant="default" className="text-xs">Новое</Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              }
+              {notifications.filter(n => userRole === 'employee' ? n.type !== 'subscription' : true).length === 0 && (
+                <Card>
+                  <CardContent className="py-12 text-center">
+                    <Icon name="Bell" size={48} className="mx-auto mb-2 text-muted-foreground opacity-50" />
+                    <p className="text-muted-foreground">Нет уведомлений</p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
           </TabsContent>
         </Tabs>
@@ -4160,6 +4342,150 @@ function Index() {
                 <Icon name="Send" size={18} />
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <VacancyDetail
+        vacancy={selectedVacancyDetail}
+        open={showVacancyDetail}
+        onOpenChange={setShowVacancyDetail}
+        onRecommend={() => {
+          if (selectedVacancyDetail) {
+            setActiveVacancy(selectedVacancyDetail);
+            setShowVacancyDetail(false);
+          }
+        }}
+      />
+
+      <CandidateDetail
+        recommendation={selectedCandidate}
+        open={showCandidateDetail}
+        onOpenChange={setShowCandidateDetail}
+      />
+
+      <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Запрос на выплату</DialogTitle>
+            <DialogDescription>
+              Доступно для вывода: {walletData?.wallet?.wallet_balance?.toLocaleString() || 0} ₽
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Сумма</Label>
+              <Input
+                type="number"
+                placeholder="Введите сумму"
+                value={withdrawForm.amount}
+                onChange={(e) => setWithdrawForm({...withdrawForm, amount: e.target.value})}
+                max={walletData?.wallet?.wallet_balance || 0}
+              />
+            </div>
+            <div>
+              <Label>Способ выплаты</Label>
+              <Select value={withdrawForm.paymentMethod} onValueChange={(v) => setWithdrawForm({...withdrawForm, paymentMethod: v})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="card">Банковская карта</SelectItem>
+                  <SelectItem value="sbp">СБП</SelectItem>
+                  <SelectItem value="account">Расчётный счёт</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Реквизиты</Label>
+              <Input
+                placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
+                value={withdrawForm.paymentDetails}
+                onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
+              />
+            </div>
+            <Button 
+              className="w-full"
+              onClick={async () => {
+                try {
+                  const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      user_id: currentEmployeeId,
+                      amount: parseFloat(withdrawForm.amount),
+                      payment_method: withdrawForm.paymentMethod === 'card' ? 'Банковская карта' : 
+                                      withdrawForm.paymentMethod === 'sbp' ? 'СБП' : 'Расчётный счёт',
+                      payment_details: withdrawForm.paymentDetails
+                    })
+                  });
+                  
+                  if (response.ok) {
+                    alert('Запрос на выплату успешно отправлен!');
+                    setShowWithdrawDialog(false);
+                    setWithdrawForm({ amount: '', paymentMethod: 'card', paymentDetails: '' });
+                  } else {
+                    alert('Ошибка при отправке запроса');
+                  }
+                } catch (error) {
+                  console.error('Ошибка:', error);
+                  alert('Не удалось отправить запрос');
+                }
+              }}
+            >
+              Отправить запрос
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showProfileEditDialog} onOpenChange={setShowProfileEditDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Редактировать профиль</DialogTitle>
+            <DialogDescription>
+              Обновите свои контактные данные и фото
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Телефон</Label>
+              <Input
+                placeholder="+7 (900) 123-45-67"
+                value={profileForm.phone}
+                onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label>Telegram</Label>
+              <Input
+                placeholder="@username"
+                value={profileForm.telegram}
+                onChange={(e) => setProfileForm({...profileForm, telegram: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label>ВКонтакте</Label>
+              <Input
+                placeholder="vk.com/username"
+                value={profileForm.vk}
+                onChange={(e) => setProfileForm({...profileForm, vk: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label>Фото профиля (URL)</Label>
+              <Input
+                placeholder="https://..."
+                value={profileForm.avatar}
+                onChange={(e) => setProfileForm({...profileForm, avatar: e.target.value})}
+              />
+            </div>
+            <Button className="w-full" onClick={() => {
+              alert('Профиль обновлён!');
+              setShowProfileEditDialog(false);
+            }}>
+              Сохранить
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
