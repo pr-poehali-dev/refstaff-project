@@ -2111,7 +2111,7 @@ function Index() {
                           )}
                           <div className="flex items-center gap-2 text-xs sm:text-sm">
                             <Icon name="Users" size={16} className="text-muted-foreground" />
-                            <span>{vacancy.recommendations} рекомендаций</span>
+                            <span>{vacancy.recommendations} {vacancy.recommendations === 1 ? 'рекомендация' : vacancy.recommendations < 5 ? 'рекомендации' : 'рекомендаций'}</span>
                           </div>
                           <div className="flex items-center gap-2 text-xs sm:text-sm text-primary">
                             <Icon name="Award" size={16} />
