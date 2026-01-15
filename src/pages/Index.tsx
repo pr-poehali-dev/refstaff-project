@@ -1876,10 +1876,9 @@ function Index() {
           </div>
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto">
             <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
             <TabsTrigger value="employees">👥 Сотрудники</TabsTrigger>
-            <TabsTrigger value="leaderboard">🏆 Рейтинг</TabsTrigger>
             <TabsTrigger value="recommendations">🎯 Рекомендации</TabsTrigger>
             <TabsTrigger value="payouts">💰 Выплаты</TabsTrigger>
             <TabsTrigger value="news">📢 Новости</TabsTrigger>
@@ -2417,90 +2416,6 @@ function Index() {
                   </CardContent>
                 </Card>
               ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="leaderboard" className="space-y-4">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
-                <span>🏆</span>
-                Рейтинг сотрудников
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Лучшие сотрудники по количеству успешных рекомендаций и нанятых кандидатов
-              </p>
-            </div>
-
-            <div className="grid gap-4">
-              {employees
-                .filter(emp => emp.recommendations > 0 || emp.hired > 0)
-                .sort((a, b) => {
-                  const scoreA = (a.hired * 10) + a.recommendations;
-                  const scoreB = (b.hired * 10) + b.recommendations;
-                  return scoreB - scoreA;
-                })
-                .map((employee, index) => (
-                  <Card 
-                    key={employee.id} 
-                    className="hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => {
-                      setSelectedEmployee(employee);
-                      setShowEmployeeDetail(true);
-                    }}
-                  >
-                    <CardContent className="p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="flex-shrink-0">
-                          {index < 3 ? (
-                            <div className="w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-gradient-to-br from-yellow-400 to-yellow-600">
-                              {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
-                            </div>
-                          ) : (
-                            <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold bg-gray-200 text-gray-600">
-                              #{index + 1}
-                            </div>
-                          )}
-                        </div>
-                        <Avatar className="h-16 w-16">
-                          <AvatarImage src={employee.avatar} alt={employee.name} />
-                          <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-lg">{employee.name}</h3>
-                          <p className="text-sm text-muted-foreground">{employee.position}</p>
-                          <p className="text-xs text-muted-foreground">{employee.department}</p>
-                        </div>
-                        <div className="flex gap-6 text-center">
-                          <div>
-                            <div className="text-2xl font-bold text-green-600">{employee.hired}</div>
-                            <p className="text-xs text-muted-foreground">Нанято</p>
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold text-blue-600">{employee.recommendations}</div>
-                            <p className="text-xs text-muted-foreground">Рекомендаций</p>
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold text-primary">{employee.earnings.toLocaleString('ru-RU')} ₽</div>
-                            <p className="text-xs text-muted-foreground">Заработано</p>
-                          </div>
-                        </div>
-                        <Icon name="ChevronRight" size={24} className="text-muted-foreground" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              
-              {employees.filter(emp => emp.recommendations > 0 || emp.hired > 0).length === 0 && (
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="text-center text-muted-foreground py-12">
-                      <Icon name="Trophy" size={48} className="mx-auto mb-2 opacity-50" />
-                      <p>Пока нет активных рекомендаций</p>
-                      <p className="text-sm mt-2">Как только сотрудники начнут рекомендовать кандидатов, здесь появится рейтинг</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
             </div>
           </TabsContent>
 
