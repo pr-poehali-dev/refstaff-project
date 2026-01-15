@@ -4576,6 +4576,7 @@ function Index() {
         vacancy={selectedVacancyDetail}
         open={showVacancyDetail}
         onOpenChange={setShowVacancyDetail}
+        showRecommendButton={userRole === 'employee'}
         onRecommend={() => {
           if (selectedVacancyDetail) {
             setActiveVacancy(selectedVacancyDetail);
