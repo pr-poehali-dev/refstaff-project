@@ -169,6 +169,12 @@ function Index() {
   const [activeRecommendation, setActiveRecommendation] = useState<Recommendation | null>(null);
   const [showRecommendationDetailsDialog, setShowRecommendationDetailsDialog] = useState(false);
   const [loginType, setLoginType] = useState<'employer' | 'employee'>('employer');
+  const [employeeToEditRoles, setEmployeeToEditRoles] = useState<Employee | null>(null);
+  const [showEditRolesDialog, setShowEditRolesDialog] = useState(false);
+  const [rolesForm, setRolesForm] = useState({
+    isHrManager: false,
+    isAdmin: false
+  });
 
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([
     { 
@@ -830,6 +836,21 @@ function Index() {
       ...activeNewsPost,
       comments: activeNewsPost.comments.filter(c => c.id !== commentId)
     });
+  };
+
+  const handleUpdateEmployeeRoles = async () => {
+    if (!employeeToEditRoles) return;
+    
+    try {
+      await api.updateEmployeeRole(employeeToEditRoles.id, rolesForm.isHrManager, rolesForm.isAdmin);
+      await loadData();
+      setShowEditRolesDialog(false);
+      setEmployeeToEditRoles(null);
+      alert('Права сотрудника обновлены!');
+    } catch (error) {
+      console.error('Ошибка обновления прав сотрудника:', error);
+      alert('Не удалось обновить права сотрудника');
+    }
   };
 
   const renderLandingPage = () => renderLandingPageComponent(
@@ -2385,9 +2406,22 @@ function Index() {
                         >
                           <Icon name="Edit" size={16} />
                         </Button>
-                        <Dialog>
+                        <Dialog open={showEditRolesDialog && employeeToEditRoles?.id === employee.id} onOpenChange={(open) => {
+                          if (!open) {
+                            setShowEditRolesDialog(false);
+                            setEmployeeToEditRoles(null);
+                          }
+                        }}>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
+                            <Button variant="outline" size="sm" onClick={(e) => {
+                              e.stopPropagation();
+                              setEmployeeToEditRoles(employee);
+                              setRolesForm({
+                                isHrManager: employee.isHrManager || false,
+                                isAdmin: employee.isAdmin || false
+                              });
+                              setShowEditRolesDialog(true);
+                            }}>
                               <Icon name="Shield" size={16} />
                             </Button>
                           </DialogTrigger>
@@ -2402,7 +2436,10 @@ function Index() {
                                   <Label>HR Manager</Label>
                                   <p className="text-xs text-muted-foreground">Управление вакансиями и рекомендациями</p>
                                 </div>
-                                <input type="checkbox" defaultChecked={employee.isHrManager} className="rounded" />
+                                <Checkbox
+                                  checked={rolesForm.isHrManager}
+                                  onCheckedChange={(checked) => setRolesForm({...rolesForm, isHrManager: checked as boolean})}
+                                />
                               </div>
                               <Separator />
                               <div className="flex items-center justify-between">
@@ -2410,9 +2447,12 @@ function Index() {
                                   <Label>Администратор</Label>
                                   <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
                                 </div>
-                                <input type="checkbox" defaultChecked={employee.isAdmin} className="rounded" />
+                                <Checkbox
+                                  checked={rolesForm.isAdmin}
+                                  onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
+                                />
                               </div>
-                              <Button className="w-full">Сохранить</Button>
+                              <Button className="w-full" onClick={handleUpdateEmployeeRoles}>Сохранить</Button>
                             </div>
                           </DialogContent>
                         </Dialog>
