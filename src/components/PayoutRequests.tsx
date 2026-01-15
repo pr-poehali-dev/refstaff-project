@@ -156,8 +156,8 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <CardTitle className="text-sm font-medium text-muted-foreground">На рассмотрении</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-yellow-600">{pendingRequests.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-2xl font-bold text-yellow-600 mx-0 px-0 my-0">{pendingRequests.length}</div>
+              <p className="text-xs text-muted-foreground mx-0 my-[37px]">
                 {pendingRequests.reduce((sum, r) => sum + r.amount, 0).toLocaleString('ru-RU')} ₽
               </p>
             </CardContent>
@@ -167,7 +167,7 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <CardTitle className="text-sm font-medium text-muted-foreground">Одобрено</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{approvedRequests.length}</div>
+              <div className="text-2xl font-bold text-blue-600 my-[33px]">{approvedRequests.length}</div>
               <p className="text-xs text-muted-foreground mt-1">
                 {approvedRequests.reduce((sum, r) => sum + r.amount, 0).toLocaleString('ru-RU')} ₽
               </p>
@@ -178,8 +178,8 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <CardTitle className="text-sm font-medium text-muted-foreground">Выплачено</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">{paidRequests.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-2xl font-bold text-green-600 my-[30px]">{paidRequests.length}</div>
+              <p className="text-xs text-muted-foreground my-[34px]">
                 {paidRequests.reduce((sum, r) => sum + r.amount, 0).toLocaleString('ru-RU')} ₽
               </p>
             </CardContent>
@@ -189,8 +189,8 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <CardTitle className="text-sm font-medium text-muted-foreground">Отклонено</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">{rejectedRequests.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+              <div className="text-2xl font-bold text-red-600 my-[25px]">{rejectedRequests.length}</div>
+              <p className="text-xs text-muted-foreground my-0">
                 {rejectedRequests.reduce((sum, r) => sum + r.amount, 0).toLocaleString('ru-RU')} ₽
               </p>
             </CardContent>

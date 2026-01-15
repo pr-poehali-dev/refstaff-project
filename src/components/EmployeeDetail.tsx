@@ -80,7 +80,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
                 </CardContent>
               </Card>
             ) : (
-              <div className="space-y-3">
+              <div className="grid grid-cols-5 gap-4 mx-0 my-[34px] px-0">
                 {employeeRecommendations.map((rec) => (
                   <Card key={rec.id}>
                     <CardHeader>
