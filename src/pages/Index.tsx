@@ -630,7 +630,8 @@ function Index() {
         body: JSON.stringify({
           action: 'login',
           email: loginForm.email,
-          password: loginForm.password
+          password: loginForm.password,
+          userType: loginType
         })
       });
 
@@ -1308,6 +1309,23 @@ function Index() {
                   Сотрудник
                 </Button>
               </div>
+            </div>
+            <div className="bg-muted/50 p-3 rounded-lg border">
+              <p className="text-xs font-medium mb-2 flex items-center gap-1">
+                <Icon name="Info" size={14} />
+                Тестовые данные для входа:
+              </p>
+              {loginType === 'employer' ? (
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p><strong>Email:</strong> admin@company.ru</p>
+                  <p><strong>Пароль:</strong> admin123</p>
+                </div>
+              ) : (
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p><strong>Email:</strong> employee@company.ru</p>
+                  <p><strong>Пароль:</strong> employee123</p>
+                </div>
+              )}
             </div>
             <div>
               <Label htmlFor="login-email">Email</Label>
