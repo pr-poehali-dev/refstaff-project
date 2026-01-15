@@ -898,53 +898,57 @@ function Index() {
   ) => (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <Icon name="Rocket" className="text-primary" size={32} aria-hidden="true" />
-            <span className="text-2xl text-sky-500 px-0 py-0 my-0 font-bold">iHUNT</span>
+            <Icon name="Rocket" className="text-primary" size={24} aria-hidden="true" />
+            <span className="text-xl sm:text-2xl text-sky-500 px-0 py-0 my-0 font-bold">iHUNT</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8" role="navigation" aria-label="Основная навигация">
-            <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Как работает</button>
-            <button onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Преимущества</button>
-            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Тарифы</button>
-            <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Контакты</button>
+          <nav className="hidden md:flex items-center gap-4 lg:gap-8" role="navigation" aria-label="Основная навигация">
+            <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Как работает</button>
+            <button onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Преимущества</button>
+            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Тарифы</button>
+            <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Контакты</button>
           </nav>
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" onClick={() => setShowLoginDialog(true)} aria-label="Войти в систему">Вход</Button>
-            <Button onClick={() => setShowRegisterDialog(true)} aria-label="Зарегистрировать компанию" className="text-xs">Зарегистрировать компанию</Button>
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" onClick={() => setShowLoginDialog(true)} aria-label="Войти в систему" size="sm" className="text-xs sm:text-sm">Вход</Button>
+            <Button onClick={() => setShowRegisterDialog(true)} aria-label="Зарегистрировать компанию" size="sm" className="text-xs">
+              <span className="hidden sm:inline">Зарегистрировать</span>
+              <span className="sm:hidden">Регистрация</span>
+            </Button>
           </div>
         </div>
       </header>
 
       <main>
-        <section className="pt-32 pb-20 px-4" aria-labelledby="hero-title">
+        <section className="pt-20 sm:pt-24 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-4" aria-labelledby="hero-title">
           <div className="container mx-auto max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
               <div className="text-center lg:text-left">
-                <Badge className="mb-6 animate-fade-in">🚀 Реферальный рекрутинг нового поколения</Badge>
-                <h1 id="hero-title" className="text-5xl md:text-6xl font-bold mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <Badge className="mb-4 sm:mb-6 animate-fade-in text-xs sm:text-sm">🚀 Реферальный рекрутинг</Badge>
+                <h1 id="hero-title" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   Нанимайте лучших кандидатов через своих сотрудников
                 </h1>
-                <p className="text-xl text-muted-foreground mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
-                  Платформа для реферального найма с геймификацией и прозрачной системой вознаграждений
+                <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                  Платформа для реферального найма с геймификацией
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <Button size="lg" className="animate-scale-in shadow-lg shadow-primary/25" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
-                    <Icon name="Rocket" className="mr-2" size={20} aria-hidden="true" />
-                    Начать бесплатно — 14 дней
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+                  <Button size="default" className="animate-scale-in shadow-lg shadow-primary/25 text-sm sm:text-base" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
+                    <Icon name="Rocket" className="mr-2" size={18} aria-hidden="true" />
+                    <span className="hidden sm:inline">Начать бесплатно — 14 дней</span>
+                    <span className="sm:hidden">Начать бесплатно</span>
                   </Button>
-                  <Button size="lg" variant="outline" className="animate-scale-in" style={{ animationDelay: '0.3s' }} onClick={() => setShowLoginDialog(true)}>
-                    <Icon name="LogIn" className="mr-2" size={20} />
+                  <Button size="default" variant="outline" className="animate-scale-in text-sm sm:text-base" style={{ animationDelay: '0.3s' }} onClick={() => setShowLoginDialog(true)}>
+                    <Icon name="LogIn" className="mr-2" size={18} />
                     Войти
                   </Button>
                 </div>
-                <div className="mt-8 flex items-center gap-6 justify-center lg:justify-start text-sm text-muted-foreground">
+                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-6 justify-center lg:justify-start text-xs sm:text-sm text-muted-foreground">
                   <div className="flex items-center gap-2">
-                    <Icon name="Check" className="text-green-600" size={18} />
+                    <Icon name="Check" className="text-green-600" size={16} />
                     <span>Прост в использовании</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Icon name="Check" className="text-green-600" size={18} />
+                    <Icon name="Check" className="text-green-600" size={16} />
                     <span>Настройка за 5 минут</span>
                   </div>
                 </div>
@@ -1831,55 +1835,59 @@ function Index() {
     return (
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Icon name="Rocket" className="text-primary" size={28} />
-            <span className="text-xl font-bold">iHUNT</span>
+            <Icon name="Rocket" className="text-primary" size={24} />
+            <span className="text-lg sm:text-xl font-bold">iHUNT</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
-              <Icon name="Bell" size={20} />
+              <Icon name="Bell" size={18} />
               {notifications.filter(n => !n.read).length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center text-[10px] sm:text-xs">
                   {notifications.filter(n => !n.read).length}
                 </span>
               )}
             </Button>
-            <Button variant="ghost" onClick={() => setShowSubscriptionDialog(true)}>
+            <Button variant="ghost" onClick={() => setShowSubscriptionDialog(true)} size="sm" className="hidden sm:flex">
               <Icon name="CreditCard" className="mr-2" size={18} />
-              Подписка
+              <span className="hidden lg:inline">Подписка</span>
               {subscriptionDaysLeft < 14 && (
-                <Badge variant="destructive" className="ml-2">{subscriptionDaysLeft} дн.</Badge>
+                <Badge variant="destructive" className="ml-2 text-xs">{subscriptionDaysLeft} дн.</Badge>
               )}
             </Button>
-            <Button variant="ghost" onClick={() => setShowCompanySettingsDialog(true)}>
-              <Icon name="Settings" className="mr-2" size={18} />
-              Настройки
+            <Button variant="ghost" onClick={() => setShowCompanySettingsDialog(true)} size="icon" className="sm:hidden">
+              <Icon name="Settings" size={18} />
             </Button>
-            <Button variant="ghost" onClick={handleLogout}>Выход</Button>
+            <Button variant="ghost" onClick={() => setShowCompanySettingsDialog(true)} size="sm" className="hidden sm:flex">
+              <Icon name="Settings" className="mr-2" size={18} />
+              <span className="hidden lg:inline">Настройки</span>
+            </Button>
+            <Button variant="ghost" onClick={handleLogout} size="sm" className="text-xs sm:text-sm">Выход</Button>
           </div>
         </div>
       </header>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2 flex items-center gap-3">
-            <span className="text-4xl">📈</span>
-            Личный кабинет работодателя
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center gap-2 sm:gap-3">
+            <span className="text-3xl sm:text-4xl">📈</span>
+            <span className="hidden sm:inline">Личный кабинет работодателя</span>
+            <span className="sm:hidden">Личный кабинет</span>
           </h1>
-          <p className="text-muted-foreground">Управляйте вакансиями, сотрудниками и рекомендациями</p>
+          <p className="text-sm sm:text-base text-muted-foreground">Управление вакансиями и сотрудниками</p>
         </div>
 
         {isSubscriptionExpired && (
-          <Card className="mb-8 bg-destructive/10 border-destructive">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0">
-                  <Icon name="AlertTriangle" className="text-destructive" size={24} />
+          <Card className="mb-6 sm:mb-8 bg-destructive/10 border-destructive">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex items-start gap-3 sm:gap-4">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-destructive/20 flex items-center justify-center flex-shrink-0">
+                  <Icon name="AlertTriangle" className="text-destructive" size={20} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-semibold text-lg mb-2 text-destructive">Подписка истекла</h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <h3 className="font-semibold text-base sm:text-lg mb-2 text-destructive">Подписка истекла</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-4">
                     Ваша подписка закончилась. Данные сохранены, но доступ к функционалу ограничен. 
                     Продлите подписку, чтобы продолжить управление вакансиями и рекомендациями.
                   </p>
@@ -1902,27 +1910,27 @@ function Index() {
           </div>
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-auto">
-            <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
-            <TabsTrigger value="employees">👥 Сотрудники</TabsTrigger>
-            <TabsTrigger value="recommendations">🎯 Рекомендации</TabsTrigger>
-            <TabsTrigger value="payouts">💰 Выплаты</TabsTrigger>
-            <TabsTrigger value="news">📢 Новости</TabsTrigger>
-            <TabsTrigger value="chats">💬 Чаты</TabsTrigger>
-            <TabsTrigger value="stats">📊 Статистика</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-1">
+            <TabsTrigger value="vacancies" className="text-xs sm:text-sm">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
+            <TabsTrigger value="employees" className="text-xs sm:text-sm">👥 <span className="hidden sm:inline">Сотрудники</span></TabsTrigger>
+            <TabsTrigger value="recommendations" className="text-xs sm:text-sm">🎯 <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
+            <TabsTrigger value="payouts" className="text-xs sm:text-sm">💰 <span className="hidden sm:inline">Выплаты</span></TabsTrigger>
+            <TabsTrigger value="news" className="text-xs sm:text-sm">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
+            <TabsTrigger value="chats" className="text-xs sm:text-sm">💬 <span className="hidden sm:inline">Чаты</span></TabsTrigger>
+            <TabsTrigger value="stats" className="text-xs sm:text-sm">📊 <span className="hidden sm:inline">Статистика</span></TabsTrigger>
           </TabsList>
 
           <TabsContent value="vacancies" className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+              <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
                 <span>💼</span>
-                Вакансии
+                <span className="hidden sm:inline">Вакансии</span>
               </h2>
               <Dialog>
                   <DialogTrigger asChild>
-                    <Button disabled={isSubscriptionExpired}>
+                    <Button disabled={isSubscriptionExpired} size="sm" className="w-full sm:w-auto">
                       <Icon name="Plus" className="mr-2" size={18} />
-                      Добавить вакансию
+                      <span className="hidden sm:inline">Добавить</span> вакансию
                     </Button>
                   </DialogTrigger>
                 <DialogContent>
@@ -2026,16 +2034,16 @@ function Index() {
               </Dialog>
             </div>
 
-            <div className="flex gap-4 mb-4">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <div className="flex-1">
                 <Input 
-                  placeholder="Поиск по названию или отделу..."
+                  placeholder="Поиск вакансий..."
                   value={vacancyFilter.search}
                   onChange={(e) => setVacancyFilter({...vacancyFilter, search: e.target.value})}
                 />
               </div>
               <Select value={vacancyFilter.status} onValueChange={(value) => setVacancyFilter({...vacancyFilter, status: value})}>
-                <SelectTrigger className="w-[200px]">
+                <SelectTrigger className="w-full sm:w-[200px]">
                   <SelectValue placeholder="Статус" />
                 </SelectTrigger>
                 <SelectContent>
@@ -2057,14 +2065,14 @@ function Index() {
               }).map((vacancy) => (
                 <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
                       <div 
-                        className="cursor-pointer hover:opacity-70 transition-opacity"
+                        className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
                         onClick={() => {
                           window.location.hash = `vacancy-${vacancy.id}`;
                         }}
                       >
-                        <CardTitle className="flex items-center gap-2">
+                        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
                           {vacancy.title}
                           <Icon name="ExternalLink" size={16} className="text-muted-foreground" />
                         </CardTitle>
@@ -2085,32 +2093,33 @@ function Index() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-sm">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="space-y-2 w-full sm:w-auto">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm">
                             <Icon name="Wallet" size={16} className="text-muted-foreground" />
-                            <span>{vacancy.salary}</span>
+                            <span className="truncate">{vacancy.salary}</span>
                           </div>
                           {vacancy.city && (
-                            <div className="flex items-center gap-2 text-sm">
+                            <div className="flex items-center gap-2 text-xs sm:text-sm">
                               <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={16} className="text-muted-foreground" />
-                              <span>{vacancy.city}</span>
+                              <span className="truncate">{vacancy.city}</span>
                             </div>
                           )}
-                          <div className="flex items-center gap-2 text-sm">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm">
                             <Icon name="Users" size={16} className="text-muted-foreground" />
                             <span>{vacancy.recommendations} рекомендаций</span>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-primary">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-primary">
                             <Icon name="Award" size={16} />
-                            <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>
+                            <span className="font-medium">{vacancy.reward.toLocaleString()} ₽</span>
                           </div>
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                             <Icon name="Clock" size={16} />
-                            <span>Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'}</span>
+                            <span className="hidden sm:inline">Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'}</span>
+                            <span className="sm:hidden">{vacancy.payoutDelayDays} дн.</span>
                           </div>
                         </div>
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
                           {vacancy.status !== 'archived' && (
                             <Button 
                               variant="outline" 
@@ -2128,8 +2137,10 @@ function Index() {
                                   isRemote: vacancy.isRemote || false
                                 });
                               }}
+                              className="flex-1 sm:flex-none"
                             >
-                              Редактировать
+                              <span className="hidden sm:inline">Редактировать</span>
+                              <span className="sm:hidden">Изменить</span>
                             </Button>
                           )}
                           {vacancy.status === 'active' && (
@@ -2137,9 +2148,11 @@ function Index() {
                               variant="outline" 
                               size="sm"
                               onClick={() => handleArchiveVacancy(vacancy.id)}
+                              className="flex-1 sm:flex-none"
                             >
                               <Icon name="Archive" size={16} className="mr-1" />
-                              В архив
+                              <span className="hidden sm:inline">В архив</span>
+                              <span className="sm:hidden">Архив</span>
                             </Button>
                           )}
                           {vacancy.status === 'archived' && (
@@ -2148,14 +2161,17 @@ function Index() {
                                 variant="outline" 
                                 size="sm"
                                 onClick={() => handleRestoreVacancy(vacancy.id)}
+                                className="flex-1 sm:flex-none"
                               >
                                 <Icon name="RotateCcw" size={16} className="mr-1" />
-                                Восстановить
+                                <span className="hidden sm:inline">Восстановить</span>
+                                <span className="sm:hidden">Вернуть</span>
                               </Button>
                               <Button 
                                 variant="destructive" 
                                 size="sm"
                                 onClick={() => handleDeleteVacancy(vacancy.id)}
+                                className="flex-1 sm:flex-none"
                               >
                                 <Icon name="Trash2" size={16} className="mr-1" />
                                 Удалить
@@ -2312,33 +2328,36 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-4">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col gap-4 mb-6">
               <div>
-                <h2 className="text-2xl font-semibold flex items-center gap-2">
+                <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
                   <span>👥</span>
-                  Сотрудники компании
+                  <span className="hidden sm:inline">Сотрудники компании</span>
+                  <span className="sm:hidden">Сотрудники</span>
                 </h2>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Зарегистрировано сотрудников: <span className="font-semibold">{employees.length}</span>
+                  Всего: <span className="font-semibold">{employees.length}</span>
                 </p>
               </div>
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={handleGenerateReferralLink}>
+              <div className="flex flex-col sm:flex-row gap-2">
+                <Button variant="outline" onClick={handleGenerateReferralLink} size="sm" className="w-full sm:w-auto">
                   <Icon name="Link" className="mr-2" size={18} />
-                  Ссылка для регистрации
+                  <span className="hidden sm:inline">Ссылка для регистрации</span>
+                  <span className="sm:hidden">Ссылка</span>
                 </Button>
-                <Button onClick={() => setShowInviteDialog(true)}>
+                <Button onClick={() => setShowInviteDialog(true)} size="sm" className="w-full sm:w-auto">
                   <Icon name="UserPlus" className="mr-2" size={18} />
-                  Добавить сотрудника
+                  <span className="hidden sm:inline">Добавить сотрудника</span>
+                  <span className="sm:hidden">Добавить</span>
                 </Button>
               </div>
             </div>
             <div className="mb-4">
               <Input
-                placeholder="Поиск сотрудника по имени, email или должности..."
+                placeholder="Поиск сотрудников..."
                 value={employeeSearchQuery}
                 onChange={(e) => setEmployeeSearchQuery(e.target.value)}
-                className="max-w-md"
+                className="w-full"
               />
             </div>
             <div className="grid gap-4">
@@ -2358,24 +2377,24 @@ function Index() {
                   }}
                 >
                   <CardHeader>
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-12 w-12">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
                         <AvatarImage src={employee.avatar} />
                         <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                       </Avatar>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <CardTitle className="text-lg">{employee.name}</CardTitle>
-                          {employee.isHrManager && <Badge variant="secondary">HR Manager</Badge>}
-                          {employee.isAdmin && <Badge>Admin</Badge>}
-                          <Badge variant="outline" className="bg-primary/10">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
+                          <CardTitle className="text-base sm:text-lg truncate">{employee.name}</CardTitle>
+                          {employee.isHrManager && <Badge variant="secondary" className="text-xs">HR</Badge>}
+                          {employee.isAdmin && <Badge className="text-xs">Admin</Badge>}
+                          <Badge variant="outline" className="bg-primary/10 text-xs hidden sm:inline-flex">
                             <Icon name="Trophy" size={12} className="mr-1" />
-                            #{calculateEmployeeRank(employee)} в рейтинге
+                            #{calculateEmployeeRank(employee)}
                           </Badge>
                         </div>
-                        <CardDescription>{employee.position} • {employee.department}</CardDescription>
+                        <CardDescription className="text-xs sm:text-sm truncate">{employee.position} • {employee.department}</CardDescription>
                       </div>
-                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex flex-wrap gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -2384,9 +2403,10 @@ function Index() {
                             setActiveChatEmployee(employee);
                             setShowChatDialog(true);
                           }}
+                          className="flex-1 sm:flex-none text-xs sm:text-sm"
                         >
-                          <Icon name="MessageCircle" className="mr-1" size={16} />
-                          Написать
+                          <Icon name="MessageCircle" className="sm:mr-1" size={16} />
+                          <span className="hidden sm:inline">Написать</span>
                         </Button>
                         <Button 
                           variant="outline" 
@@ -2403,6 +2423,7 @@ function Index() {
                             });
                             setShowEditEmployeeDialog(true);
                           }}
+                          className="flex-1 sm:flex-none text-xs sm:text-sm"
                         >
                           <Icon name="Edit" size={16} />
                         </Button>
@@ -2421,7 +2442,7 @@ function Index() {
                                 isAdmin: employee.isAdmin || false
                               });
                               setShowEditRolesDialog(true);
-                            }}>
+                            }} className="flex-1 sm:flex-none text-xs sm:text-sm">
                               <Icon name="Shield" size={16} />
                             </Button>
                           </DialogTrigger>
@@ -2464,6 +2485,7 @@ function Index() {
                             setEmployeeToDelete(employee);
                             setShowDeleteDialog(true);
                           }}
+                          className="flex-1 sm:flex-none text-xs sm:text-sm"
                         >
                           <Icon name="Trash2" size={16} className="text-destructive" />
                         </Button>
@@ -2613,14 +2635,15 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="news" className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-semibold flex items-center gap-2">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+              <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
                 <span>📢</span>
-                Новости компании
+                <span className="hidden sm:inline">Новости компании</span>
+                <span className="sm:hidden">Новости</span>
               </h2>
-              <Button onClick={() => setShowCreateNewsDialog(true)}>
+              <Button onClick={() => setShowCreateNewsDialog(true)} size="sm" className="w-full sm:w-auto">
                 <Icon name="Plus" className="mr-2" size={18} />
-                Создать новость
+                Создать
               </Button>
             </div>
 
