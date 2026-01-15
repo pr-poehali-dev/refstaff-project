@@ -3133,7 +3133,7 @@ function Index() {
                   <p className="font-medium">{new Date(activeRecommendation.date).toLocaleDateString('ru-RU')}</p>
                 </div>
                 <div>
-                  <Label className="text-xs text-muted-foreground">Статус</Label>
+                  <Label className="text-xs text-muted-foreground">Статус </Label>
                   <Badge variant={
                     activeRecommendation.status === 'accepted' ? 'default' : 
                     activeRecommendation.status === 'rejected' ? 'destructive' : 
