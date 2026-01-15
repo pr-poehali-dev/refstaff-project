@@ -3562,6 +3562,13 @@ function Index() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <VacancyDetail
+        vacancy={selectedVacancyDetail}
+        open={showVacancyDetail}
+        onOpenChange={setShowVacancyDetail}
+        showRecommendButton={false}
+      />
     </div>
     );
   };
