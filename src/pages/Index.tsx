@@ -3753,7 +3753,7 @@ function Index() {
                             Рекомендовать
                           </Button>
                         </DialogTrigger>
-                        <DialogContent>
+                        <DialogContent onClick={(e) => e.stopPropagation()}>
                           <DialogHeader>
                             <DialogTitle>Рекомендовать кандидата</DialogTitle>
                             <DialogDescription>
