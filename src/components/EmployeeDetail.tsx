@@ -62,6 +62,18 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
               <p className="text-sm text-muted-foreground">Телефон</p>
               <p className="font-medium">{employee.phone || '—'}</p>
             </div>
+            {employee.telegram && (
+              <div>
+                <p className="text-sm text-muted-foreground">Telegram</p>
+                <p className="font-medium">{employee.telegram}</p>
+              </div>
+            )}
+            {employee.vk && (
+              <div>
+                <p className="text-sm text-muted-foreground">VK</p>
+                <p className="font-medium">{employee.vk}</p>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-5 gap-4">

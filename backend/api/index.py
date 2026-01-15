@@ -388,7 +388,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             query = """
                 SELECT id, first_name, last_name, position, department, 
                        level, experience_points, total_recommendations, 
-                       successful_hires, total_earnings, avatar_url
+                       successful_hires, total_earnings, avatar_url,
+                       email, phone, telegram, vk
                 FROM t_p65890965_refstaff_project.users
                 WHERE company_id = %s AND role = 'employee'
                 ORDER BY successful_hires DESC, total_recommendations DESC
@@ -566,6 +567,81 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 SET {', '.join(update_fields)}
                 WHERE id = %s
                 RETURNING id, first_name, last_name, is_hr_manager, is_admin
+            """
+            
+            cur.execute(query, params)
+            updated_user = cur.fetchone()
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                'body': json.dumps(dict(updated_user), default=str),
+                'isBase64Encoded': False
+            }
+        
+        elif method == 'PUT' and resource == 'employees' and not action:
+            body_data = json.loads(event.get('body', '{}'))
+            user_id = body_data.get('user_id')
+            
+            if not user_id:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'user_id is required'}),
+                    'isBase64Encoded': False
+                }
+            
+            update_fields = []
+            params = []
+            
+            if 'first_name' in body_data:
+                update_fields.append('first_name = %s')
+                params.append(body_data['first_name'])
+            if 'last_name' in body_data:
+                update_fields.append('last_name = %s')
+                params.append(body_data['last_name'])
+            if 'position' in body_data:
+                update_fields.append('position = %s')
+                params.append(body_data['position'])
+            if 'department' in body_data:
+                update_fields.append('department = %s')
+                params.append(body_data['department'])
+            if 'phone' in body_data:
+                update_fields.append('phone = %s')
+                params.append(body_data['phone'])
+            if 'telegram' in body_data:
+                update_fields.append('telegram = %s')
+                params.append(body_data['telegram'])
+            if 'vk' in body_data:
+                update_fields.append('vk = %s')
+                params.append(body_data['vk'])
+            if 'avatar_url' in body_data:
+                update_fields.append('avatar_url = %s')
+                params.append(body_data['avatar_url'])
+            
+            if not update_fields:
+                return {
+                    'statusCode': 400,
+                    'headers': {
+                        'Content-Type': 'application/json',
+                        'Access-Control-Allow-Origin': '*'
+                    },
+                    'body': json.dumps({'error': 'No fields to update'}),
+                    'isBase64Encoded': False
+                }
+            
+            params.append(user_id)
+            query = f"""
+                UPDATE t_p65890965_refstaff_project.users 
+                SET {', '.join(update_fields)}
+                WHERE id = %s
+                RETURNING id, first_name, last_name, position, department, phone, telegram, vk, avatar_url
             """
             
             cur.execute(query, params)

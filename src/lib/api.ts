@@ -27,6 +27,10 @@ export interface Employee {
   successful_hires: number;
   total_earnings: number;
   avatar_url?: string;
+  email?: string;
+  phone?: string;
+  telegram?: string;
+  vk?: string;
 }
 
 export interface Recommendation {

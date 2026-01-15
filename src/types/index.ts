@@ -26,6 +26,8 @@ export interface Employee {
   isAdmin?: boolean;
   email?: string;
   phone?: string;
+  telegram?: string;
+  vk?: string;
 }
 
 export interface Recommendation {

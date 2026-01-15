@@ -314,7 +314,9 @@ function Index() {
         earnings: Number(e.total_earnings),
         level: e.level,
         email: e.email,
-        phone: e.phone
+        phone: e.phone,
+        telegram: e.telegram,
+        vk: e.vk
       }));
 
       const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => ({
@@ -523,13 +525,13 @@ function Index() {
   const handleUpdateProfile = async () => {
     try {
       await api.updateEmployee(currentEmployeeId, {
-        first_name: profileForm.firstName,
-        last_name: profileForm.lastName,
-        position: profileForm.position,
-        department: profileForm.department
+        phone: profileForm.phone,
+        telegram: profileForm.telegram,
+        vk: profileForm.vk,
+        avatar_url: profileForm.avatar
       });
       await loadData();
-      setShowEditProfileDialog(false);
+      setShowProfileEditDialog(false);
       alert('Профиль успешно обновлён!');
     } catch (error) {
       console.error('Ошибка обновления профиля:', error);
@@ -3460,7 +3462,24 @@ function Index() {
                     <span className="text-primary font-medium">• Мастер рекрутинга</span>
                   </CardDescription>
                 </div>
-                <Button variant="outline" onClick={() => setShowEditProfileDialog(true)}>Редактировать</Button>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setShowEditProfileDialog(true)}>Редактировать</Button>
+                  <Button variant="outline" onClick={() => {
+                    const currentEmployee = employees.find(e => e.id === currentEmployeeId);
+                    if (currentEmployee) {
+                      setProfileForm({
+                        phone: currentEmployee.phone || '',
+                        telegram: currentEmployee.telegram || '',
+                        vk: currentEmployee.vk || '',
+                        avatar: currentEmployee.avatar || ''
+                      });
+                    }
+                    setShowProfileEditDialog(true);
+                  }}>
+                    <Icon name="User" size={16} className="mr-2" />
+                    Контакты
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -4474,10 +4493,7 @@ function Index() {
                 onChange={(e) => setProfileForm({...profileForm, avatar: e.target.value})}
               />
             </div>
-            <Button className="w-full" onClick={() => {
-              alert('Профиль обновлён!');
-              setShowProfileEditDialog(false);
-            }}>
+            <Button className="w-full" onClick={handleUpdateProfile}>
               Сохранить
             </Button>
           </div>
