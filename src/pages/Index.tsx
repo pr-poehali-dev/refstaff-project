@@ -13,7 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Recommendation as ApiRecommendation, type Company, type WalletData } from '@/lib/api';
-import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment } from '@/types';
+import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment, PayoutRequest } from '@/types';
+import { EmployeeDetail } from '@/components/EmployeeDetail';
+import { PayoutRequests } from '@/components/PayoutRequests';
 
 function Index() {
   const [userRole, setUserRole] = useState<UserRole>(() => {
@@ -74,6 +76,10 @@ function Index() {
   const [company, setCompany] = useState<Company | null>(null);
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
+  const [showEmployeeDetail, setShowEmployeeDetail] = useState(false);
+  const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
   
   const [vacancyForm, setVacancyForm] = useState({
     title: '',
@@ -257,11 +263,15 @@ function Index() {
     try {
       setIsLoading(true);
       const vacancyStatus = userRole === 'employer' ? 'all' : 'active';
-      const [vacanciesData, employeesData, recommendationsData, companyData] = await Promise.all([
+      const [vacanciesData, employeesData, recommendationsData, companyData, payoutsData] = await Promise.all([
         api.getVacancies(currentCompanyId, vacancyStatus).catch(() => []),
         api.getEmployees(currentCompanyId).catch(() => []),
         api.getRecommendations(currentCompanyId).catch(() => []),
-        api.getCompany(currentCompanyId).catch(() => null)
+        api.getCompany(currentCompanyId).catch(() => null),
+        userRole === 'employer' 
+          ? fetch(`https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901?company_id=${currentCompanyId}`)
+              .then(res => res.json()).catch(() => [])
+          : Promise.resolve([])
       ]);
 
       const mappedVacancies: Vacancy[] = vacanciesData.map((v: ApiVacancy) => ({
@@ -285,7 +295,9 @@ function Index() {
         recommendations: e.total_recommendations,
         hired: e.successful_hires,
         earnings: Number(e.total_earnings),
-        level: e.level
+        level: e.level,
+        email: e.email,
+        phone: e.phone
       }));
 
       const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => ({
@@ -294,11 +306,12 @@ function Index() {
         candidateEmail: r.candidate_email,
         candidatePhone: r.candidate_phone,
         vacancy: r.vacancy_title || '',
-        status: r.status,
+        vacancyTitle: r.vacancy_title || '',
+        status: r.status as 'pending' | 'interview' | 'hired' | 'rejected',
         date: new Date(r.created_at).toISOString().split('T')[0],
         reward: r.reward_amount,
         recommendedBy: r.recommended_by_name,
-        recommendedById: r.recommended_by,
+        employeeId: r.recommended_by,
         comment: r.comment
       }));
 
@@ -306,6 +319,24 @@ function Index() {
       setEmployees(mappedEmployees);
       setRecommendations(mappedRecommendations);
       setCompany(companyData);
+      
+      if (userRole === 'employer' && Array.isArray(payoutsData)) {
+        const mappedPayouts: PayoutRequest[] = payoutsData.map((p: any) => ({
+          id: p.id,
+          userId: p.user_id,
+          userName: p.user_name,
+          userEmail: p.user_email,
+          amount: parseFloat(p.amount),
+          status: p.status,
+          paymentMethod: p.payment_method,
+          paymentDetails: p.payment_details,
+          adminComment: p.admin_comment,
+          createdAt: p.created_at,
+          reviewedAt: p.reviewed_at,
+          reviewedBy: p.reviewed_by
+        }));
+        setPayoutRequests(mappedPayouts);
+      }
 
       if (userRole === 'employee') {
         const wallet = await api.getWallet(currentEmployeeId).catch(() => null);
@@ -1797,10 +1828,11 @@ function Index() {
           </div>
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto">
             <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
             <TabsTrigger value="employees">👥 Сотрудники</TabsTrigger>
             <TabsTrigger value="recommendations">🎯 Рекомендации</TabsTrigger>
+            <TabsTrigger value="payouts">💰 Выплаты</TabsTrigger>
             <TabsTrigger value="news">📢 Новости</TabsTrigger>
             <TabsTrigger value="chats">💬 Чаты</TabsTrigger>
             <TabsTrigger value="stats">📊 Статистика</TabsTrigger>
@@ -2014,6 +2046,47 @@ function Index() {
                           </Button>
                         </div>
                       </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Поделиться вакансией</Label>
+                        <div className="flex gap-2">
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение за рекомендацию: ${vacancy.reward.toLocaleString()} ₽`;
+                              const url = vacancy.referralLink || window.location.href;
+                              window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+                            }}
+                          >
+                            <Icon name="Send" size={14} className="mr-1" />
+                            Telegram
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
+                              const url = vacancy.referralLink || window.location.href;
+                              window.open(`https://vk.com/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(vacancy.title)}&description=${encodeURIComponent(text)}`, '_blank');
+                            }}
+                          >
+                            <Icon name="Share2" size={14} className="mr-1" />
+                            ВКонтакте
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              const text = `${vacancy.title} — ${vacancy.department}. Зарплата: ${vacancy.salary}. Вознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
+                              const url = vacancy.referralLink || window.location.href;
+                              window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+                            }}
+                          >
+                            <Icon name="MessageCircle" size={14} className="mr-1" />
+                            WhatsApp
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -2112,10 +2185,15 @@ function Index() {
 
           <TabsContent value="employees" className="space-y-4">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-semibold flex items-center gap-2">
-                <span>👥</span>
-                Сотрудники компании
-              </h2>
+              <div>
+                <h2 className="text-2xl font-semibold flex items-center gap-2">
+                  <span>👥</span>
+                  Сотрудники компании
+                </h2>
+                <p className="text-sm text-muted-foreground mt-1">
+                  Зарегистрировано сотрудников: <span className="font-semibold">{employees.length}</span>
+                </p>
+              </div>
               <div className="flex gap-2">
                 <Button variant="outline" onClick={handleGenerateReferralLink}>
                   <Icon name="Link" className="mr-2" size={18} />
@@ -2127,9 +2205,30 @@ function Index() {
                 </Button>
               </div>
             </div>
+            <div className="mb-4">
+              <Input
+                placeholder="Поиск сотрудника по имени, email или должности..."
+                value={employeeSearchQuery}
+                onChange={(e) => setEmployeeSearchQuery(e.target.value)}
+                className="max-w-md"
+              />
+            </div>
             <div className="grid gap-4">
-              {employees.map((employee) => (
-                <Card key={employee.id}>
+              {employees.filter(emp => 
+                employeeSearchQuery === '' || 
+                emp.name.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
+                emp.position.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
+                emp.department.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
+                (emp.email && emp.email.toLowerCase().includes(employeeSearchQuery.toLowerCase()))
+              ).map((employee) => (
+                <Card 
+                  key={employee.id} 
+                  className="cursor-pointer hover:shadow-lg transition-shadow"
+                  onClick={() => {
+                    setSelectedEmployee(employee);
+                    setShowEmployeeDetail(true);
+                  }}
+                >
                   <CardHeader>
                     <div className="flex items-center gap-4">
                       <Avatar className="h-12 w-12">
@@ -2148,11 +2247,12 @@ function Index() {
                         </div>
                         <CardDescription>{employee.position} • {employee.department}</CardDescription>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setActiveChatEmployee(employee);
                             setShowChatDialog(true);
                           }}
@@ -2163,7 +2263,8 @@ function Index() {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setEmployeeToEdit(employee);
                             const [firstName, ...lastNameParts] = employee.name.split(' ');
                             setEmployeeEditForm({
@@ -2211,7 +2312,8 @@ function Index() {
                         <Button 
                           variant="outline" 
                           size="sm"
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setEmployeeToDelete(employee);
                             setShowDeleteDialog(true);
                           }}
@@ -2322,6 +2424,45 @@ function Index() {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          <TabsContent value="payouts" className="space-y-4">
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
+                <span>💰</span>
+                Запросы на выплаты
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Управляйте запросами сотрудников на вывод заработанных средств
+              </p>
+            </div>
+            <PayoutRequests 
+              requests={payoutRequests}
+              onUpdateStatus={async (requestId, status, comment) => {
+                try {
+                  const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      request_id: requestId,
+                      status: status,
+                      admin_comment: comment,
+                      reviewed_by: currentUser?.id || 1
+                    })
+                  });
+                  
+                  if (response.ok) {
+                    await loadData();
+                  } else {
+                    const error = await response.json();
+                    alert(`Ошибка: ${error.error || 'Не удалось обновить статус'}`);
+                  }
+                } catch (error) {
+                  console.error('Ошибка обновления статуса выплаты:', error);
+                  alert('Не удалось обновить статус выплаты');
+                }
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="news" className="space-y-4">
@@ -4049,6 +4190,13 @@ function Index() {
       {userRole === 'guest' && renderLandingPage()}
       {userRole === 'employer' && renderEmployerDashboard()}
       {userRole === 'employee' && renderEmployeeDashboard()}
+      
+      <EmployeeDetail
+        employee={selectedEmployee}
+        open={showEmployeeDetail}
+        onOpenChange={setShowEmployeeDetail}
+        recommendations={recommendations}
+      />
     </>
   );
 }

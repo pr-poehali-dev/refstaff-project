@@ -24,6 +24,8 @@ export interface Employee {
   level: number;
   isHrManager?: boolean;
   isAdmin?: boolean;
+  email?: string;
+  phone?: string;
 }
 
 export interface Recommendation {
@@ -32,11 +34,12 @@ export interface Recommendation {
   candidateEmail: string;
   candidatePhone?: string;
   vacancy: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  vacancyTitle?: string;
+  status: 'pending' | 'interview' | 'hired' | 'rejected';
   date: string;
   reward: number;
   recommendedBy?: string;
-  recommendedById?: number;
+  employeeId?: number;
   comment?: string;
 }
 
@@ -67,4 +70,19 @@ export interface NewsComment {
   authorAvatar?: string;
   comment: string;
   date: string;
+}
+
+export interface PayoutRequest {
+  id: number;
+  userId: number;
+  userName: string;
+  userEmail: string;
+  amount: number;
+  status: 'pending' | 'approved' | 'rejected' | 'paid';
+  paymentMethod?: string;
+  paymentDetails?: string;
+  adminComment?: string;
+  createdAt: string;
+  reviewedAt?: string;
+  reviewedBy?: number;
 }
