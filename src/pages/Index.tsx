@@ -2679,17 +2679,28 @@ function Index() {
                     <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
                   </CardContent>
                   <CardFooter className="flex-col items-stretch gap-3 border-t pt-4">
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-4">
-                        <span className="flex items-center gap-1">
-                          <Icon name="ThumbsUp" size={16} />
-                          {post.likes}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Icon name="MessageCircle" size={16} />
-                          {post.comments.length}
-                        </span>
-                      </div>
+                    <div className="flex items-center gap-3">
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => handleLikeNews(post.id)}
+                        className="flex items-center gap-2"
+                      >
+                        <Icon name="ThumbsUp" size={16} />
+                        {post.likes}
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={() => {
+                          setActiveNewsPost(post);
+                          setShowCommentsDialog(true);
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <Icon name="MessageCircle" size={16} />
+                        {post.comments.length}
+                      </Button>
                     </div>
                   </CardFooter>
                 </Card>
@@ -4504,6 +4515,13 @@ function Index() {
                         </div>
                         <p className="text-sm text-muted-foreground">{comment.comment}</p>
                       </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteComment(comment.id)}
+                      >
+                        <Icon name="Trash2" size={14} className="text-destructive" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
