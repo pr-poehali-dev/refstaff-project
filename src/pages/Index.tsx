@@ -514,6 +514,17 @@ function Index() {
     }
   };
 
+  const handleRestoreVacancy = async (vacancyId: number) => {
+    try {
+      await api.updateVacancy(vacancyId, { status: 'active' });
+      await loadData();
+      alert('Вакансия восстановлена в активные');
+    } catch (error) {
+      console.error('Ошибка восстановления вакансии:', error);
+      alert('Не удалось восстановить вакансию');
+    }
+  };
+
   const handleDeleteVacancy = async (vacancyId: number) => {
     if (!window.confirm('Вы уверены, что хотите удалить вакансию? Это действие нельзя отменить.')) {
       return;
@@ -2001,8 +2012,16 @@ function Index() {
                 <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle>{vacancy.title}</CardTitle>
+                      <div 
+                        className="cursor-pointer hover:opacity-70 transition-opacity"
+                        onClick={() => {
+                          window.location.hash = `vacancy-${vacancy.id}`;
+                        }}
+                      >
+                        <CardTitle className="flex items-center gap-2">
+                          {vacancy.title}
+                          <Icon name="ExternalLink" size={16} className="text-muted-foreground" />
+                        </CardTitle>
                         <CardDescription>{vacancy.department}</CardDescription>
                       </div>
                       <div className="flex gap-2">
@@ -2070,14 +2089,24 @@ function Index() {
                             </Button>
                           )}
                           {vacancy.status === 'archived' && (
-                            <Button 
-                              variant="destructive" 
-                              size="sm"
-                              onClick={() => handleDeleteVacancy(vacancy.id)}
-                            >
-                              <Icon name="Trash2" size={16} className="mr-1" />
-                              Удалить
-                            </Button>
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => handleRestoreVacancy(vacancy.id)}
+                              >
+                                <Icon name="RotateCcw" size={16} className="mr-1" />
+                                Восстановить
+                              </Button>
+                              <Button 
+                                variant="destructive" 
+                                size="sm"
+                                onClick={() => handleDeleteVacancy(vacancy.id)}
+                              >
+                                <Icon name="Trash2" size={16} className="mr-1" />
+                                Удалить
+                              </Button>
+                            </>
                           )}
                         </div>
                       </div>
@@ -2099,8 +2128,8 @@ function Index() {
                             variant="outline"
                             onClick={() => {
                               const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение за рекомендацию: ${vacancy.reward.toLocaleString()} ₽`;
-                              const url = vacancy.referralLink || window.location.href;
-                              window.open(`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
+                              const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
+                              window.open(`https://t.me/share/url?url=${encodeURIComponent(vacancyUrl)}&text=${encodeURIComponent(text)}`, '_blank');
                             }}
                           >
                             <Icon name="Send" size={14} className="mr-1" />
@@ -2111,8 +2140,8 @@ function Index() {
                             variant="outline"
                             onClick={() => {
                               const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
-                              const url = vacancy.referralLink || window.location.href;
-                              window.open(`https://vk.com/share.php?url=${encodeURIComponent(url)}&title=${encodeURIComponent(vacancy.title)}&description=${encodeURIComponent(text)}`, '_blank');
+                              const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
+                              window.open(`https://vk.com/share.php?url=${encodeURIComponent(vacancyUrl)}&title=${encodeURIComponent(vacancy.title)}&description=${encodeURIComponent(text)}`, '_blank');
                             }}
                           >
                             <Icon name="Share2" size={14} className="mr-1" />
@@ -2123,8 +2152,8 @@ function Index() {
                             variant="outline"
                             onClick={() => {
                               const text = `${vacancy.title} — ${vacancy.department}. Зарплата: ${vacancy.salary}. Вознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
-                              const url = vacancy.referralLink || window.location.href;
-                              window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + url)}`, '_blank');
+                              const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
+                              window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + vacancyUrl)}`, '_blank');
                             }}
                           >
                             <Icon name="MessageCircle" size={14} className="mr-1" />
