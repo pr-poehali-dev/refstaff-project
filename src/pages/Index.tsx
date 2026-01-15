@@ -72,8 +72,8 @@ function Index() {
     { id: 6, type: 'payout', message: 'Выплата 15 000 ₽ зачислена на ваш счёт', date: '2026-01-13', read: true },
   ]);
   
-  const currentEmployeeId = 1;
-  const currentCompanyId = 1;
+  const currentEmployeeId = currentUser?.id || 1;
+  const currentCompanyId = currentUser?.company_id || 1;
   
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -102,6 +102,13 @@ function Index() {
     telegram: '',
     vk: '',
     avatar: ''
+  });
+  
+  const [editProfileForm, setEditProfileForm] = useState({
+    firstName: '',
+    lastName: '',
+    position: '',
+    department: ''
   });
   
   const [vacancyForm, setVacancyForm] = useState({
@@ -283,7 +290,9 @@ function Index() {
       const [vacanciesData, employeesData, recommendationsData, companyData, payoutsData] = await Promise.all([
         api.getVacancies(currentCompanyId, vacancyStatus).catch(() => []),
         api.getEmployees(currentCompanyId).catch(() => []),
-        api.getRecommendations(currentCompanyId).catch(() => []),
+        userRole === 'employer'
+          ? api.getRecommendations(currentCompanyId).catch(() => [])
+          : api.getRecommendations(currentCompanyId, undefined, currentEmployeeId).catch(() => []),
         api.getCompany(currentCompanyId).catch(() => null),
         userRole === 'employer' 
           ? fetch(`https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901?company_id=${currentCompanyId}`)
@@ -300,7 +309,7 @@ function Index() {
         recommendations: v.recommendations_count || 0,
         reward: v.reward_amount,
         payoutDelayDays: v.payout_delay_days || 30,
-        referralLink: v.referral_token ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
+        referralLink: v.referral_token && userRole === 'employee' ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
 
       const mappedEmployees: Employee[] = employeesData.map((e: ApiEmployee) => ({
@@ -319,20 +328,27 @@ function Index() {
         vk: e.vk
       }));
 
-      const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => ({
-        id: r.id,
-        candidateName: r.candidate_name,
-        candidateEmail: r.candidate_email,
-        candidatePhone: r.candidate_phone,
-        vacancy: r.vacancy_title || '',
-        vacancyTitle: r.vacancy_title || '',
-        status: r.status as 'pending' | 'interview' | 'hired' | 'rejected',
-        date: new Date(r.created_at).toISOString().split('T')[0],
-        reward: r.reward_amount,
-        recommendedBy: r.recommended_by_name,
-        employeeId: r.recommended_by,
-        comment: r.comment
-      }));
+      const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => {
+        let status: 'pending' | 'interview' | 'hired' | 'rejected' = 'pending';
+        if (r.status === 'accepted') status = 'hired';
+        else if (r.status === 'rejected') status = 'rejected';
+        else status = 'pending';
+        
+        return {
+          id: r.id,
+          candidateName: r.candidate_name,
+          candidateEmail: r.candidate_email,
+          candidatePhone: r.candidate_phone,
+          vacancy: r.vacancy_title || '',
+          vacancyTitle: r.vacancy_title || '',
+          status,
+          date: new Date(r.created_at).toISOString().split('T')[0],
+          reward: r.reward_amount,
+          recommendedBy: r.recommended_by_name,
+          employeeId: r.recommended_by,
+          comment: r.comment
+        };
+      });
 
       setVacancies(mappedVacancies);
       setEmployees(mappedEmployees);
@@ -429,8 +445,10 @@ function Index() {
 
   const handleUpdateRecommendationStatus = async (id: number, status: string) => {
     try {
-      await api.updateRecommendationStatus(id, status);
+      const backendStatus = status === 'hired' ? 'accepted' : status;
+      await api.updateRecommendationStatus(id, backendStatus);
       await loadData();
+      alert(status === 'hired' ? 'Кандидат принят! Вознаграждение начислено.' : 'Рекомендация отклонена.');
     } catch (error) {
       console.error('Ошибка обновления статуса:', error);
       alert('Не удалось обновить статус рекомендации');
@@ -1987,9 +2005,17 @@ function Index() {
                         <CardTitle>{vacancy.title}</CardTitle>
                         <CardDescription>{vacancy.department}</CardDescription>
                       </div>
-                      <Badge variant="secondary">
-                        {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'В архиве' : 'Закрыта'}
-                      </Badge>
+                      <div className="flex gap-2">
+                        <Badge variant="secondary">
+                          {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'В архиве' : 'Закрыта'}
+                        </Badge>
+                        {vacancy.recommendations > 0 && (
+                          <Badge variant="outline">
+                            <Icon name="Users" size={12} className="mr-1" />
+                            {vacancy.recommendations}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent>
@@ -3448,22 +3474,39 @@ function Index() {
             <CardHeader>
               <div className="flex items-center gap-4">
                 <Avatar className="h-16 w-16">
-                  <AvatarFallback>АС</AvatarFallback>
+                  <AvatarImage src={employees.find(e => e.id === currentEmployeeId)?.avatar} />
+                  <AvatarFallback>
+                    {currentUser?.first_name?.[0]}{currentUser?.last_name?.[0]}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
                   <CardTitle className="text-2xl flex items-center gap-2">
-                    Анна Смирнова
+                    {currentUser?.first_name} {currentUser?.last_name}
                     <Badge variant="secondary" className="text-xs">
-                      🏆 #{employees.findIndex(e => e.id === currentEmployeeId) + 1 || 1} в рейтинге
+                      🏆 #{calculateEmployeeRank(employees.find(e => e.id === currentEmployeeId) || employees[0])} в рейтинге
                     </Badge>
                   </CardTitle>
                   <CardDescription className="flex items-center gap-2">
-                    Tech Lead • Разработка
-                    <span className="text-primary font-medium">• Мастер рекрутинга</span>
+                    {employees.find(e => e.id === currentEmployeeId)?.position || currentUser?.position} • {employees.find(e => e.id === currentEmployeeId)?.department || currentUser?.department}
+                    {(employees.find(e => e.id === currentEmployeeId)?.hired || 0) >= 5 && (
+                      <span className="text-primary font-medium">• Мастер рекрутинга</span>
+                    )}
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => setShowEditProfileDialog(true)}>Редактировать</Button>
+                  <Button variant="outline" onClick={() => {
+                    const currentEmployee = employees.find(e => e.id === currentEmployeeId);
+                    if (currentEmployee) {
+                      const names = currentEmployee.name.split(' ');
+                      setEditProfileForm({
+                        firstName: names[0] || '',
+                        lastName: names[1] || '',
+                        position: currentEmployee.position || '',
+                        department: currentEmployee.department || ''
+                      });
+                    }
+                    setShowEditProfileDialog(true);
+                  }}>Редактировать</Button>
                   <Button variant="outline" onClick={() => {
                     const currentEmployee = employees.find(e => e.id === currentEmployeeId);
                     if (currentEmployee) {
@@ -3494,17 +3537,23 @@ function Index() {
                 <div className="grid grid-cols-3 gap-4 pt-4 border-t">
                   <div className="text-center">
                     <div className="text-3xl mb-1">🎯</div>
-                    <div className="text-2xl font-bold text-primary">12</div>
+                    <div className="text-2xl font-bold text-primary">
+                      {employees.find(e => e.id === currentEmployeeId)?.recommendations || 0}
+                    </div>
                     <div className="text-xs text-muted-foreground">Рекомендаций</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl mb-1">✅</div>
-                    <div className="text-2xl font-bold text-green-600">4</div>
+                    <div className="text-2xl font-bold text-green-600">
+                      {employees.find(e => e.id === currentEmployeeId)?.hired || 0}
+                    </div>
                     <div className="text-xs text-muted-foreground">Нанято</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl mb-1">💸</div>
-                    <div className="text-2xl font-bold text-secondary">120К ₽</div>
+                    <div className="text-2xl font-bold text-secondary">
+                      {(employees.find(e => e.id === currentEmployeeId)?.earnings || 0).toLocaleString()} ₽
+                    </div>
                     <div className="text-xs text-muted-foreground">Заработано</div>
                   </div>
                 </div>
@@ -4245,38 +4294,53 @@ function Index() {
               <Label htmlFor="firstName">Имя</Label>
               <Input 
                 id="firstName" 
-                value={profileForm.firstName}
-                onChange={(e) => setProfileForm({...profileForm, firstName: e.target.value})}
+                value={editProfileForm.firstName}
+                onChange={(e) => setEditProfileForm({...editProfileForm, firstName: e.target.value})}
               />
             </div>
             <div>
               <Label htmlFor="lastName">Фамилия</Label>
               <Input 
                 id="lastName" 
-                value={profileForm.lastName}
-                onChange={(e) => setProfileForm({...profileForm, lastName: e.target.value})}
+                value={editProfileForm.lastName}
+                onChange={(e) => setEditProfileForm({...editProfileForm, lastName: e.target.value})}
               />
             </div>
             <div>
               <Label htmlFor="position">Должность</Label>
               <Input 
                 id="position" 
-                value={profileForm.position}
-                onChange={(e) => setProfileForm({...profileForm, position: e.target.value})}
+                value={editProfileForm.position}
+                onChange={(e) => setEditProfileForm({...editProfileForm, position: e.target.value})}
               />
             </div>
             <div>
               <Label htmlFor="department">Отдел</Label>
               <Input 
                 id="department" 
-                value={profileForm.department}
-                onChange={(e) => setProfileForm({...profileForm, department: e.target.value})}
+                value={editProfileForm.department}
+                onChange={(e) => setEditProfileForm({...editProfileForm, department: e.target.value})}
               />
             </div>
             <div className="flex gap-2 pt-4">
               <Button 
                 className="flex-1"
-                onClick={handleUpdateProfile}
+                onClick={async () => {
+                  try {
+                    await api.updateEmployee(currentEmployeeId, {
+                      first_name: editProfileForm.firstName,
+                      last_name: editProfileForm.lastName,
+                      position: editProfileForm.position,
+                      department: editProfileForm.department
+                    });
+                    await loadData();
+                    setShowEditProfileDialog(false);
+                    alert('Профиль успешно обновлён!');
+                  } catch (error) {
+                    console.error('Ошибка обновления профиля:', error);
+                    alert('Не удалось обновить профиль');
+                  }
+                }}
               >
                 Сохранить
               </Button>
