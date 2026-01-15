@@ -2073,7 +2073,8 @@ function Index() {
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
                         onClick={() => {
-                          window.location.hash = `vacancy-${vacancy.id}`;
+                          setSelectedVacancyDetail(vacancy);
+                          setShowVacancyDetail(true);
                         }}
                       >
                         <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
