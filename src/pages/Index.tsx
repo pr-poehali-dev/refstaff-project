@@ -862,9 +862,12 @@ function Index() {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <Icon name="Rocket" className="text-primary" size={32} aria-hidden="true" />
-            <span className="text-2xl font-bold">iHUNT</span>
+          <div className="flex items-center gap-3 cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <Icon name="Rocket" className="text-primary relative" size={32} aria-hidden="true" />
+            </div>
+            <span className="text-2xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent tracking-tight">iHUNT</span>
           </div>
           <nav className="hidden md:flex items-center gap-8" role="navigation" aria-label="Основная навигация">
             <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-sm hover:text-primary transition-colors">Как работает</button>
@@ -892,11 +895,11 @@ function Index() {
                   Платформа для реферального найма с геймификацией и прозрачной системой вознаграждений
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <Button size="lg" className="animate-scale-in shadow-lg shadow-primary/25" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
+                  <Button size="lg" className="animate-scale-in shadow-lg shadow-primary/30 bg-gradient-to-r from-primary to-secondary hover:shadow-xl hover:scale-105 transition-all" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
                     <Icon name="Rocket" className="mr-2" size={20} aria-hidden="true" />
                     Начать бесплатно — 14 дней
                   </Button>
-                  <Button size="lg" variant="outline" className="animate-scale-in" style={{ animationDelay: '0.3s' }} onClick={() => setShowLoginDialog(true)}>
+                  <Button size="lg" variant="outline" className="animate-scale-in border-2 hover:border-primary hover:bg-primary/5 transition-all" style={{ animationDelay: '0.3s' }} onClick={() => setShowLoginDialog(true)}>
                     <Icon name="LogIn" className="mr-2" size={20} />
                     Войти
                   </Button>
@@ -1219,13 +1222,16 @@ function Index() {
         </section>
       </main>
 
-      <footer className="border-t bg-gray-50 py-12 px-4" role="contentinfo">
+      <footer className="border-t bg-gradient-to-b from-white to-gray-50 py-12 px-4" role="contentinfo">
         <div className="container mx-auto max-w-6xl">
           <div className="grid md:grid-cols-4 gap-8">
             <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Icon name="Rocket" className="text-primary" size={24} />
-                <span className="text-lg font-bold">iHUNT</span>
+              <div className="flex items-center gap-3 mb-4 group">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-lg blur opacity-60"></div>
+                  <Icon name="Rocket" className="text-primary relative" size={24} />
+                </div>
+                <span className="text-lg font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent tracking-tight">iHUNT</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Платформа реферального рекрутинга с геймификацией
@@ -1793,11 +1799,14 @@ function Index() {
     
     return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
+      <header className="border-b bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon name="Rocket" className="text-primary" size={28} />
-            <span className="text-xl font-bold">iHUNT</span>
+          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <Icon name="Rocket" className="text-primary relative" size={28} />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent tracking-tight">iHUNT</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
@@ -3435,11 +3444,14 @@ function Index() {
     return (
     <>
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b bg-white">
+      <header className="border-b bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon name="Rocket" className="text-primary" size={28} />
-            <span className="text-xl font-bold">iHUNT</span>
+          <div className="flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+            <div className="relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-lg blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+              <Icon name="Rocket" className="text-primary relative" size={28} />
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-primary via-secondary to-primary bg-clip-text text-transparent tracking-tight">iHUNT</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
