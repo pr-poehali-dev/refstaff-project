@@ -2186,15 +2186,6 @@ function Index() {
                       </div>
                       <Separator />
                       <div className="space-y-2">
-                        <Label className="text-xs text-muted-foreground">Реферальная ссылка для сотрудников</Label>
-                        <div className="flex gap-2">
-                          <Input value={vacancy.referralLink || ''} readOnly className="text-xs" />
-                          <Button size="sm" variant="outline" onClick={() => navigator.clipboard.writeText(vacancy.referralLink || '')}>
-                            <Icon name="Copy" size={16} />
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
                         <Label className="text-xs text-muted-foreground">Поделиться вакансией</Label>
                         <div className="flex gap-2">
                           <Button 
