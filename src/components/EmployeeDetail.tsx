@@ -80,7 +80,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-5 gap-4 mx-0 my-[34px] px-0">
+              <div className="space-y-3">
                 {employeeRecommendations.map((rec) => (
                   <Card key={rec.id}>
                     <CardHeader>
@@ -90,12 +90,12 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
                           <CardDescription>
                             <div className="flex items-center gap-2 mt-1">
                               <Icon name="Mail" size={14} />
-                              {rec.candidateEmail}
+                              <span>{rec.candidateEmail}</span>
                             </div>
                             {rec.candidatePhone && (
                               <div className="flex items-center gap-2 mt-1">
                                 <Icon name="Phone" size={14} />
-                                {rec.candidatePhone}
+                                <span>{rec.candidatePhone}</span>
                               </div>
                             )}
                           </CardDescription>
@@ -104,24 +104,24 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
                       </div>
                     </CardHeader>
                     <CardContent>
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         <div>
-                          <p className="text-sm font-medium text-muted-foreground">Вакансия</p>
+                          <p className="text-sm font-medium text-muted-foreground mb-1">Вакансия</p>
                           <p className="text-sm">{rec.vacancyTitle}</p>
                         </div>
                         {rec.comment && (
                           <div>
-                            <p className="text-sm font-medium text-muted-foreground">Комментарий</p>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">Комментарий</p>
                             <p className="text-sm">{rec.comment}</p>
                           </div>
                         )}
                         <div>
-                          <p className="text-sm font-medium text-muted-foreground">Дата рекомендации</p>
+                          <p className="text-sm font-medium text-muted-foreground mb-1">Дата рекомендации</p>
                           <p className="text-sm">{new Date(rec.date).toLocaleDateString('ru-RU')}</p>
                         </div>
                         {rec.reward && (
                           <div>
-                            <p className="text-sm font-medium text-muted-foreground">Вознаграждение</p>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">Вознаграждение</p>
                             <p className="text-sm font-semibold text-green-600">{rec.reward.toLocaleString('ru-RU')} ₽</p>
                           </div>
                         )}
