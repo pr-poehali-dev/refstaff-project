@@ -1910,15 +1910,17 @@ function Index() {
           </div>
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 sm:grid-cols-4 lg:grid-cols-7 gap-1">
-            <TabsTrigger value="vacancies" className="text-xs sm:text-sm">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
-            <TabsTrigger value="employees" className="text-xs sm:text-sm">👥 <span className="hidden sm:inline">Сотрудники</span></TabsTrigger>
-            <TabsTrigger value="recommendations" className="text-xs sm:text-sm">🎯 <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
-            <TabsTrigger value="payouts" className="text-xs sm:text-sm">💰 <span className="hidden sm:inline">Выплаты</span></TabsTrigger>
-            <TabsTrigger value="news" className="text-xs sm:text-sm">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
-            <TabsTrigger value="chats" className="text-xs sm:text-sm">💬 <span className="hidden sm:inline">Чаты</span></TabsTrigger>
-            <TabsTrigger value="stats" className="text-xs sm:text-sm">📊 <span className="hidden sm:inline">Статистика</span></TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex min-w-full sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-7 gap-1">
+              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
+              <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3">👥 <span className="hidden sm:inline">Сотрудники</span></TabsTrigger>
+              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3">🎯 <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
+              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3">💰 <span className="hidden sm:inline">Выплаты</span></TabsTrigger>
+              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
+              <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3">💬 <span className="hidden sm:inline">Чаты</span></TabsTrigger>
+              <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3">📊 <span className="hidden sm:inline">Статистика</span></TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="vacancies" className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
@@ -1928,12 +1930,13 @@ function Index() {
               </h2>
               <Dialog>
                   <DialogTrigger asChild>
-                    <Button disabled={isSubscriptionExpired} size="sm" className="w-full sm:w-auto">
-                      <Icon name="Plus" className="mr-2" size={18} />
-                      <span className="hidden sm:inline">Добавить</span> вакансию
+                    <Button disabled={isSubscriptionExpired} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                      <Icon name="Plus" className="mr-1 sm:mr-2" size={16} />
+                      <span className="hidden sm:inline">Добавить</span>
+                      <span className="sm:hidden">+</span> вакансию
                     </Button>
                   </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Новая вакансия</DialogTitle>
                     <DialogDescription>Создайте новую вакансию для реферального найма</DialogDescription>
@@ -2034,16 +2037,17 @@ function Index() {
               </Dialog>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
               <div className="flex-1">
                 <Input 
-                  placeholder="Поиск вакансий..."
+                  placeholder="Поиск..."
                   value={vacancyFilter.search}
                   onChange={(e) => setVacancyFilter({...vacancyFilter, search: e.target.value})}
+                  className="text-sm"
                 />
               </div>
               <Select value={vacancyFilter.status} onValueChange={(value) => setVacancyFilter({...vacancyFilter, status: value})}>
-                <SelectTrigger className="w-full sm:w-[200px]">
+                <SelectTrigger className="w-full sm:w-[160px] text-sm">
                   <SelectValue placeholder="Статус" />
                 </SelectTrigger>
                 <SelectContent>
@@ -2340,24 +2344,24 @@ function Index() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button variant="outline" onClick={handleGenerateReferralLink} size="sm" className="w-full sm:w-auto">
-                  <Icon name="Link" className="mr-2" size={18} />
-                  <span className="hidden sm:inline">Ссылка для регистрации</span>
-                  <span className="sm:hidden">Ссылка</span>
+                <Button variant="outline" onClick={handleGenerateReferralLink} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                  <Icon name="Link" className="mr-1 sm:mr-2" size={16} />
+                  <span className="hidden md:inline">Ссылка для регистрации</span>
+                  <span className="md:hidden">Ссылка</span>
                 </Button>
-                <Button onClick={() => setShowInviteDialog(true)} size="sm" className="w-full sm:w-auto">
-                  <Icon name="UserPlus" className="mr-2" size={18} />
-                  <span className="hidden sm:inline">Добавить сотрудника</span>
-                  <span className="sm:hidden">Добавить</span>
+                <Button onClick={() => setShowInviteDialog(true)} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                  <Icon name="UserPlus" className="mr-1 sm:mr-2" size={16} />
+                  <span className="hidden md:inline">Добавить сотрудника</span>
+                  <span className="md:hidden">Добавить</span>
                 </Button>
               </div>
             </div>
             <div className="mb-4">
               <Input
-                placeholder="Поиск сотрудников..."
+                placeholder="Поиск..."
                 value={employeeSearchQuery}
                 onChange={(e) => setEmployeeSearchQuery(e.target.value)}
-                className="w-full"
+                className="w-full text-sm"
               />
             </div>
             <div className="grid gap-4">
@@ -2494,18 +2498,18 @@ function Index() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
                       <div>
-                        <div className="text-2xl font-bold text-primary">{employee.recommendations}</div>
-                        <div className="text-xs text-muted-foreground">Рекомендаций</div>
+                        <div className="text-lg sm:text-2xl font-bold text-primary">{employee.recommendations}</div>
+                        <div className="text-[10px] sm:text-xs text-muted-foreground">Реком.</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-green-600">{employee.hired}</div>
-                        <div className="text-xs text-muted-foreground">Нанято</div>
+                        <div className="text-lg sm:text-2xl font-bold text-green-600">{employee.hired}</div>
+                        <div className="text-[10px] sm:text-xs text-muted-foreground">Нанято</div>
                       </div>
                       <div>
-                        <div className="text-2xl font-bold text-secondary">{employee.earnings.toLocaleString()} ₽</div>
-                        <div className="text-xs text-muted-foreground">Заработано</div>
+                        <div className="text-base sm:text-xl font-bold text-secondary truncate">{employee.earnings.toLocaleString()} ₽</div>
+                        <div className="text-[10px] sm:text-xs text-muted-foreground">Зараб.</div>
                       </div>
                     </div>
                   </CardContent>
@@ -2515,9 +2519,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="recommendations" className="space-y-4">
-            <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
+            <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 mb-4">
               <span>🎯</span>
-              Рекомендации кандидатов
+              <span className="hidden sm:inline">Рекомендации кандидатов</span>
+              <span className="sm:hidden">Рекомендации</span>
             </h2>
             <div className="grid gap-4">
               {recommendations.map((rec) => (
@@ -2526,17 +2531,17 @@ function Index() {
                   setShowRecommendationDetailsDialog(true);
                 }}>
                   <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <CardTitle className="text-lg">{rec.candidateName}</CardTitle>
-                        <CardDescription>{rec.vacancy}</CardDescription>
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-4">
+                      <div className="flex-1 min-w-0">
+                        <CardTitle className="text-base sm:text-lg truncate">{rec.candidateName}</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm truncate">{rec.vacancy}</CardDescription>
                         {rec.recommendedBy && (
                           <div className="flex items-center gap-2 mt-2">
-                            <Avatar className="h-6 w-6">
+                            <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
                               <AvatarFallback className="text-xs">{rec.recommendedBy.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                             </Avatar>
-                            <span className="text-sm text-muted-foreground">
-                              Рекомендовал: <span className="font-medium text-foreground">{rec.recommendedBy}</span>
+                            <span className="text-xs sm:text-sm text-muted-foreground truncate">
+                              <span className="hidden sm:inline">Рекомендовал: </span><span className="font-medium text-foreground">{rec.recommendedBy}</span>
                             </span>
                           </div>
                         )}
@@ -2545,7 +2550,7 @@ function Index() {
                         rec.status === 'accepted' ? 'default' : 
                         rec.status === 'rejected' ? 'destructive' : 
                         'secondary'
-                      }>
+                      } className="text-xs whitespace-nowrap">
                         {rec.status === 'accepted' ? 'Принят' : 
                          rec.status === 'rejected' ? 'Отклонён' : 
                          'На рассмотрении'}
@@ -2553,32 +2558,32 @@ function Index() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
                         <div className="flex items-center gap-1">
-                          <Icon name="Calendar" size={16} />
-                          <span>{new Date(rec.date).toLocaleDateString('ru-RU')}</span>
+                          <Icon name="Calendar" size={14} />
+                          <span className="whitespace-nowrap">{new Date(rec.date).toLocaleDateString('ru-RU')}</span>
                         </div>
                         <div className="flex items-center gap-1">
-                          <Icon name="Award" size={16} />
-                          <span>{rec.reward.toLocaleString()} ₽</span>
+                          <Icon name="Award" size={14} />
+                          <span className="whitespace-nowrap">{rec.reward.toLocaleString()} ₽</span>
                         </div>
                       </div>
                       {rec.status === 'pending' && (
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 w-full sm:w-auto">
                           <Button variant="outline" size="sm" onClick={(e) => {
                             e.stopPropagation();
                             handleUpdateRecommendationStatus(rec.id, 'rejected');
-                          }} disabled={isSubscriptionExpired}>
-                            <Icon name="X" className="mr-1" size={16} />
-                            Отклонить
+                          }} disabled={isSubscriptionExpired} className="flex-1 sm:flex-none text-xs sm:text-sm">
+                            <Icon name="X" className="sm:mr-1" size={14} />
+                            <span className="hidden sm:inline">Отклонить</span>
                           </Button>
                           <Button size="sm" onClick={(e) => {
                             e.stopPropagation();
                             handleUpdateRecommendationStatus(rec.id, 'accepted');
-                          }} disabled={isSubscriptionExpired}>
-                            <Icon name="Check" className="mr-1" size={16} />
-                            Принять
+                          }} disabled={isSubscriptionExpired} className="flex-1 sm:flex-none text-xs sm:text-sm">
+                            <Icon name="Check" className="sm:mr-1" size={14} />
+                            <span className="hidden sm:inline">Принять</span>
                           </Button>
                         </div>
                       )}
@@ -2596,13 +2601,14 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="payouts" className="space-y-4">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
+            <div className="mb-4 sm:mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 mb-2">
                 <span>💰</span>
-                Запросы на выплаты
+                <span className="hidden sm:inline">Запросы на выплаты</span>
+                <span className="sm:hidden">Выплаты</span>
               </h2>
-              <p className="text-sm text-muted-foreground">
-                Управляйте запросами сотрудников на вывод заработанных средств
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Управление запросами сотрудников
               </p>
             </div>
             <PayoutRequests 
@@ -2641,8 +2647,8 @@ function Index() {
                 <span className="hidden sm:inline">Новости компании</span>
                 <span className="sm:hidden">Новости</span>
               </h2>
-              <Button onClick={() => setShowCreateNewsDialog(true)} size="sm" className="w-full sm:w-auto">
-                <Icon name="Plus" className="mr-2" size={18} />
+              <Button onClick={() => setShowCreateNewsDialog(true)} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                <Icon name="Plus" className="mr-1 sm:mr-2" size={16} />
                 Создать
               </Button>
             </div>
@@ -2651,28 +2657,28 @@ function Index() {
               {newsPosts.map((post) => (
                 <Card key={post.id} className="hover:shadow-md transition-shadow">
                   <CardHeader>
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Badge variant={
                             post.category === 'news' ? 'default' :
                             post.category === 'achievement' ? 'secondary' :
                             post.category === 'announcement' ? 'outline' :
                             'default'
-                          }>
+                          } className="text-xs">
                             {post.category === 'news' ? '📰 Новость' :
                              post.category === 'achievement' ? '🏆 Достижение' :
                              post.category === 'announcement' ? '📢 Объявление' :
                              '✍️ Блог'}
                           </Badge>
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-muted-foreground whitespace-nowrap">
                             {new Date(post.date).toLocaleDateString('ru-RU')}
                           </span>
                         </div>
-                        <CardTitle className="text-xl">{post.title}</CardTitle>
-                        <CardDescription className="mt-1">Автор: {post.author}</CardDescription>
+                        <CardTitle className="text-base sm:text-xl">{post.title}</CardTitle>
+                        <CardDescription className="mt-1 text-xs sm:text-sm truncate">Автор: {post.author}</CardDescription>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex gap-1 sm:gap-2 flex-shrink-0">
                         <Button 
                           variant="ghost" 
                           size="sm"
@@ -2685,31 +2691,33 @@ function Index() {
                             });
                             setShowEditNewsDialog(true);
                           }}
+                          className="h-8 w-8 p-0"
                         >
-                          <Icon name="Edit" size={16} />
+                          <Icon name="Edit" size={14} />
                         </Button>
                         <Button 
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleDeleteNews(post.id)}
+                          className="h-8 w-8 p-0"
                         >
-                          <Icon name="Trash2" size={16} className="text-destructive" />
+                          <Icon name="Trash2" size={14} className="text-destructive" />
                         </Button>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
+                    <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-wrap line-clamp-3">{post.content}</p>
                   </CardContent>
-                  <CardFooter className="flex-col items-stretch gap-3 border-t pt-4">
-                    <div className="flex items-center gap-3">
+                  <CardFooter className="flex-col items-stretch gap-2 sm:gap-3 border-t pt-3 sm:pt-4">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <Button 
                         variant="ghost" 
                         size="sm"
                         onClick={() => handleLikeNews(post.id)}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
                       >
-                        <Icon name="ThumbsUp" size={16} />
+                        <Icon name="ThumbsUp" size={14} />
                         {post.likes}
                       </Button>
                       <Button 
@@ -2719,9 +2727,9 @@ function Index() {
                           setActiveNewsPost(post);
                           setShowCommentsDialog(true);
                         }}
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
                       >
-                        <Icon name="MessageCircle" size={16} />
+                        <Icon name="MessageCircle" size={14} />
                         {post.comments.length}
                       </Button>
                     </div>
@@ -2732,9 +2740,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="chats" className="space-y-4">
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className="text-xl sm:text-2xl font-semibold mb-4 flex items-center gap-2">
               <span>💬</span>
-              Чаты с сотрудниками
+              <span className="hidden sm:inline">Чаты с сотрудниками</span>
+              <span className="sm:hidden">Чаты</span>
             </h2>
             <div className="grid gap-3">
               {employees.slice(0, 3).map((emp) => (
