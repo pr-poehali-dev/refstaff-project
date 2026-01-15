@@ -138,12 +138,6 @@ function Index() {
   const [isAuthLoading, setIsAuthLoading] = useState(false);
   
   const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
-  const [profileForm, setProfileForm] = useState({
-    firstName: 'Анна',
-    lastName: 'Смирнова',
-    position: 'Tech Lead',
-    department: 'Разработка'
-  });
 
   const [inviteForm, setInviteForm] = useState({
     firstName: '',
