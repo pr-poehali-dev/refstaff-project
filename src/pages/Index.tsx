@@ -4387,14 +4387,44 @@ function Index() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label>Сумма</Label>
+              <div className="flex items-center justify-between mb-2">
+                <Label>Сумма</Label>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-xs"
+                  onClick={() => setWithdrawForm({
+                    ...withdrawForm,
+                    amount: String(walletData?.wallet?.wallet_balance || 0)
+                  })}
+                >
+                  Вывести всё
+                </Button>
+              </div>
               <Input
                 type="number"
                 placeholder="Введите сумму"
                 value={withdrawForm.amount}
                 onChange={(e) => setWithdrawForm({...withdrawForm, amount: e.target.value})}
                 max={walletData?.wallet?.wallet_balance || 0}
+                min={0}
+                className={
+                  withdrawForm.amount && parseFloat(withdrawForm.amount) > (walletData?.wallet?.wallet_balance || 0)
+                    ? 'border-red-500'
+                    : ''
+                }
               />
+              <p className={`text-xs mt-1 ${
+                withdrawForm.amount && parseFloat(withdrawForm.amount) > (walletData?.wallet?.wallet_balance || 0)
+                  ? 'text-red-500'
+                  : 'text-muted-foreground'
+              }`}>
+                {withdrawForm.amount && parseFloat(withdrawForm.amount) > (walletData?.wallet?.wallet_balance || 0)
+                  ? `Сумма превышает доступный баланс! `
+                  : ''}
+                Максимальная сумма: {walletData?.wallet?.wallet_balance?.toLocaleString() || 0} ₽
+              </p>
             </div>
             <div>
               <Label>Способ выплаты</Label>
@@ -4420,13 +4450,31 @@ function Index() {
             <Button 
               className="w-full"
               onClick={async () => {
+                const requestedAmount = parseFloat(withdrawForm.amount);
+                const availableBalance = walletData?.wallet?.wallet_balance || 0;
+                
+                if (!withdrawForm.amount || requestedAmount <= 0) {
+                  alert('Введите сумму больше 0');
+                  return;
+                }
+                
+                if (requestedAmount > availableBalance) {
+                  alert(`Недостаточно средств. Доступно для вывода: ${availableBalance.toLocaleString()} ₽`);
+                  return;
+                }
+                
+                if (!withdrawForm.paymentDetails.trim()) {
+                  alert('Укажите реквизиты для выплаты');
+                  return;
+                }
+                
                 try {
                   const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       user_id: currentEmployeeId,
-                      amount: parseFloat(withdrawForm.amount),
+                      amount: requestedAmount,
                       payment_method: withdrawForm.paymentMethod === 'card' ? 'Банковская карта' : 
                                       withdrawForm.paymentMethod === 'sbp' ? 'СБП' : 'Расчётный счёт',
                       payment_details: withdrawForm.paymentDetails
@@ -4437,6 +4485,7 @@ function Index() {
                     alert('Запрос на выплату успешно отправлен!');
                     setShowWithdrawDialog(false);
                     setWithdrawForm({ amount: '', paymentMethod: 'card', paymentDetails: '' });
+                    await loadData();
                   } else {
                     alert('Ошибка при отправке запроса');
                   }
