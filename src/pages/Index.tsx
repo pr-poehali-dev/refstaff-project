@@ -3846,7 +3846,8 @@ function Index() {
                         <Label className="text-xs text-muted-foreground">Реферальная ссылка для рекомендаций</Label>
                         <div className="flex gap-2">
                           <Input value={vacancy.referralLink} readOnly className="text-xs flex-1" />
-                          <Button size="sm" variant="outline" onClick={() => {
+                          <Button size="sm" variant="outline" onClick={(e) => {
+                            e.stopPropagation();
                             navigator.clipboard.writeText(vacancy.referralLink || '');
                           }}>
                             <Icon name="Copy" size={16} />
