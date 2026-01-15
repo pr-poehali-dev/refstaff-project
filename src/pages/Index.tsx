@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Checkbox } from '@/components/ui/checkbox';
 import Icon from '@/components/ui/icon';
 import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Recommendation as ApiRecommendation, type Company, type WalletData } from '@/lib/api';
 import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment, PayoutRequest } from '@/types';
@@ -117,7 +118,9 @@ function Index() {
     salary: '',
     requirements: '',
     reward: '30000',
-    payoutDelay: '30'
+    payoutDelay: '30',
+    city: '',
+    isRemote: false
   });
   
   const [recommendationForm, setRecommendationForm] = useState({
@@ -408,10 +411,12 @@ function Index() {
         requirements: vacancyForm.requirements,
         reward_amount: parseInt(vacancyForm.reward),
         payout_delay_days: parseInt(vacancyForm.payoutDelay),
-        created_by: currentEmployeeId
+        created_by: currentEmployeeId,
+        city: vacancyForm.city,
+        is_remote: vacancyForm.isRemote
       });
       await loadData();
-      setVacancyForm({ title: '', department: '', salary: '', requirements: '', reward: '30000', payoutDelay: '30' });
+      setVacancyForm({ title: '', department: '', salary: '', requirements: '', reward: '30000', payoutDelay: '30', city: '', isRemote: false });
       alert('Вакансия успешно создана!');
     } catch (error) {
       console.error('Ошибка создания вакансии:', error);
@@ -1933,6 +1938,26 @@ function Index() {
                       />
                     </div>
                     <div>
+                      <Label htmlFor="city">Город</Label>
+                      <Input 
+                        id="city" 
+                        placeholder="Москва"
+                        value={vacancyForm.city}
+                        onChange={(e) => setVacancyForm({...vacancyForm, city: e.target.value})}
+                        disabled={vacancyForm.isRemote}
+                      />
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="isRemote"
+                        checked={vacancyForm.isRemote}
+                        onCheckedChange={(checked) => setVacancyForm({...vacancyForm, isRemote: checked as boolean, city: checked ? 'Удалённо' : ''})}
+                      />
+                      <Label htmlFor="isRemote" className="cursor-pointer">
+                        Удалённая работа
+                      </Label>
+                    </div>
+                    <div>
                       <Label htmlFor="reward-amount">Вознаграждение за рекомендацию</Label>
                       <Input 
                         id="reward-amount" 
@@ -2045,6 +2070,12 @@ function Index() {
                             <Icon name="Wallet" size={16} className="text-muted-foreground" />
                             <span>{vacancy.salary}</span>
                           </div>
+                          {vacancy.city && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={16} className="text-muted-foreground" />
+                              <span>{vacancy.city}</span>
+                            </div>
+                          )}
                           <div className="flex items-center gap-2 text-sm">
                             <Icon name="Users" size={16} className="text-muted-foreground" />
                             <span>{vacancy.recommendations} рекомендаций</span>
@@ -2071,7 +2102,9 @@ function Index() {
                                   salary: vacancy.salary,
                                   requirements: '',
                                   reward: vacancy.reward.toString(),
-                                  payoutDelay: vacancy.payoutDelayDays.toString()
+                                  payoutDelay: vacancy.payoutDelayDays.toString(),
+                                  city: vacancy.city || '',
+                                  isRemote: vacancy.isRemote || false
                                 });
                               }}
                             >
@@ -3836,6 +3869,12 @@ function Index() {
                           <Icon name="Wallet" size={16} className="text-muted-foreground" />
                           <span>{vacancy.salary}</span>
                         </div>
+                        {vacancy.city && (
+                          <div className="flex items-center gap-2 text-sm">
+                            <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={16} className="text-muted-foreground" />
+                            <span>{vacancy.city}</span>
+                          </div>
+                        )}
                         <div className="flex items-center gap-2 text-sm text-primary">
                           <Icon name="Award" size={16} />
                           <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>

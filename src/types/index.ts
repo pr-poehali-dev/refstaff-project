@@ -10,6 +10,8 @@ export interface Vacancy {
   reward: number;
   payoutDelayDays: number;
   referralLink?: string;
+  city?: string;
+  isRemote?: boolean;
 }
 
 export interface Employee {
