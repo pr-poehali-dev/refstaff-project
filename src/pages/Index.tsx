@@ -2503,30 +2503,6 @@ function Index() {
                           </>
                         )}
                       </div>
-                      <div className="pt-1.5 sm:pt-2 border-t">
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => {
-                            const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
-                            const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
-                            if (navigator.share) {
-                              navigator.share({
-                                title: vacancy.title,
-                                text: text,
-                                url: vacancyUrl
-                              }).catch(() => {});
-                            } else {
-                              navigator.clipboard.writeText(`${text}\n${vacancyUrl}`);
-                              alert('Ссылка скопирована в буфер обмена');
-                            }
-                          }}
-                          className="w-full text-[10px] sm:text-sm h-7 sm:h-9"
-                        >
-                          <Icon name="Share2" size={14} className="mr-1.5" />
-                          Поделиться вакансией
-                        </Button>
-                      </div>
                     </div>
                   </CardContent>
                 </Card>
