@@ -4818,7 +4818,9 @@ function Index() {
         recommendations={recommendations}
       />
       
-      <ChatBot />
+      {(userRole === 'employer' || userRole === 'employee') && (
+        <ChatBot userRole={userRole} />
+      )}
     </>
   );
 }
