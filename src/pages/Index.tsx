@@ -457,10 +457,13 @@ function Index() {
 
   const handleUpdateRecommendationStatus = async (id: number, status: string) => {
     try {
-      const backendStatus = status === 'hired' ? 'accepted' : status;
-      await api.updateRecommendationStatus(id, backendStatus);
+      await api.updateRecommendationStatus(id, status);
       await loadData();
-      alert(status === 'hired' ? 'Кандидат принят! Вознаграждение начислено.' : 'Рекомендация отклонена.');
+      if (status === 'accepted') {
+        alert('Кандидат принят!');
+      } else if (status === 'rejected') {
+        alert('Рекомендация отклонена.');
+      }
     } catch (error) {
       console.error('Ошибка обновления статуса:', error);
       alert('Не удалось обновить статус рекомендации');
