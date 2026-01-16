@@ -3977,48 +3977,52 @@ function Index() {
                         </div>
                       </div>
                       <Separator />
-                      <div className="space-y-2 sm:space-y-3">
+                      <div className="space-y-2">
                         <Label className="text-[10px] sm:text-xs text-muted-foreground">Реферальная ссылка</Label>
-                        <div className="flex gap-2">
+                        <div className="flex gap-1 sm:gap-2">
                           <Input 
                             value={vacancy.referralLink} 
                             readOnly 
                             className="text-[10px] sm:text-xs flex-1" 
                             onClick={(e) => e.stopPropagation()}
                           />
-                          <Button size="sm" variant="outline" onClick={(e) => {
+                          <Button size="sm" variant="outline" className="px-2 sm:px-3" onClick={(e) => {
                             e.stopPropagation();
                             navigator.clipboard.writeText(vacancy.referralLink || '');
+                            alert('Ссылка скопирована');
                           }}>
                             <Icon name="Copy" size={14} />
                           </Button>
                         </div>
-                        <div className="flex gap-2">
-                          <Button size="sm" variant="outline" className="flex-1" onClick={() => {
+                        <div className="grid grid-cols-3 gap-1 sm:gap-2">
+                          <Button size="sm" variant="outline" className="text-[10px] sm:text-xs px-1 sm:px-3" onClick={(e) => {
+                            e.stopPropagation();
                             const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
                             const url = `https://t.me/share/url?url=${encodeURIComponent(vacancy.referralLink || '')}&text=${encodeURIComponent(text)}`;
                             window.open(url, '_blank');
                           }}>
-                            <Icon name="Send" size={16} className="mr-1" />
-                            Telegram
+                            <Icon name="Send" size={14} className="sm:mr-1" />
+                            <span className="hidden sm:inline">Telegram</span>
                           </Button>
-                          <Button size="sm" variant="outline" className="flex-1" onClick={() => {
+                          <Button size="sm" variant="outline" className="text-[10px] sm:text-xs px-1 sm:px-3" onClick={(e) => {
+                            e.stopPropagation();
                             const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
                             const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
                             window.open(url, '_blank');
                           }}>
-                            <Icon name="MessageCircle" size={16} className="mr-1" />
-                            WhatsApp
+                            <Icon name="MessageCircle" size={14} className="sm:mr-1" />
+                            <span className="hidden sm:inline">WhatsApp</span>
                           </Button>
-                          <Button size="sm" variant="outline" className="flex-1" onClick={() => {
+                          <Button size="sm" variant="outline" className="text-[10px] sm:text-xs px-1 sm:px-3" onClick={(e) => {
+                            e.stopPropagation();
                             const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
                             navigator.clipboard.writeText(text);
+                            alert('Текст скопирован');
                           }}>
-                            <Icon name="Share2" size={16} className="mr-1" />
-                            Копировать
+                            <Icon name="Share2" size={14} className="sm:mr-1" />
+                            <span className="hidden sm:inline">Текст</span>
                           </Button>
                         </div>
-                        <p className="text-xs text-muted-foreground">Отправьте эту ссылку знакомым, которые ищут работу</p>
                       </div>
                     </div>
                   </CardContent>
