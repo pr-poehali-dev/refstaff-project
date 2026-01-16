@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+import { api } from '@/lib/api';
 
 export interface PayoutRequest {
   id: number;
@@ -37,6 +38,9 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<'approved' | 'rejected' | 'paid'>('approved');
   const [reviewComment, setReviewComment] = useState('');
+  const [showRecommendationsDialog, setShowRecommendationsDialog] = useState(false);
+  const [employeeRecommendations, setEmployeeRecommendations] = useState<any[]>([]);
+  const [loadingRecommendations, setLoadingRecommendations] = useState(false);
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
@@ -63,6 +67,34 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
       setSelectedRequest(null);
       setReviewComment('');
     }
+  };
+
+  const handleShowRecommendations = async (request: PayoutRequest) => {
+    setSelectedRequest(request);
+    setShowRecommendationsDialog(true);
+    setLoadingRecommendations(true);
+    
+    try {
+      const recommendations = await api.getRecommendations(1, undefined, request.userId);
+      setEmployeeRecommendations(recommendations);
+    } catch (error) {
+      console.error('Ошибка загрузки рекомендаций:', error);
+      setEmployeeRecommendations([]);
+    } finally {
+      setLoadingRecommendations(false);
+    }
+  };
+
+  const getRecommendationStatusBadge = (status: string) => {
+    const config: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
+      pending: { label: 'На рассмотрении', variant: 'secondary' },
+      accepted: { label: 'Принято', variant: 'default' },
+      rejected: { label: 'Отклонено', variant: 'destructive' },
+      interview: { label: 'Интервью', variant: 'outline' },
+      hired: { label: 'Нанят', variant: 'default' },
+    };
+    const cfg = config[status] || config.pending;
+    return <Badge variant={cfg.variant}>{cfg.label}</Badge>;
   };
 
   const pendingRequests = requests.filter(r => r.status === 'pending');
@@ -130,18 +162,24 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <p className="text-sm">{new Date(request.reviewedAt).toLocaleString('ru-RU')}</p>
             </div>
           )}
-          {request.status === 'pending' && (
-            <Button onClick={() => handleReview(request)} className="w-full mt-2">
-              <Icon name="CheckCircle" size={16} className="mr-2" />
-              Рассмотреть запрос
+          <div className="flex flex-col gap-2 mt-2">
+            <Button onClick={() => handleShowRecommendations(request)} variant="outline" className="w-full">
+              <Icon name="Users" size={16} className="mr-2" />
+              Показать рекомендации
             </Button>
-          )}
-          {request.status === 'approved' && (
-            <Button onClick={() => onUpdateStatus(request.id, 'paid')} className="w-full mt-2" variant="outline">
-              <Icon name="DollarSign" size={16} className="mr-2" />
-              Отметить как выплачено
-            </Button>
-          )}
+            {request.status === 'pending' && (
+              <Button onClick={() => handleReview(request)} className="w-full">
+                <Icon name="CheckCircle" size={16} className="mr-2" />
+                Рассмотреть запрос
+              </Button>
+            )}
+            {request.status === 'approved' && (
+              <Button onClick={() => onUpdateStatus(request.id, 'paid')} className="w-full" variant="outline">
+                <Icon name="DollarSign" size={16} className="mr-2" />
+                Отметить как выплачено
+              </Button>
+            )}
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -289,6 +327,79 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
                 Отмена
               </Button>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showRecommendationsDialog} onOpenChange={setShowRecommendationsDialog}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Рекомендации сотрудника</DialogTitle>
+            <DialogDescription>
+              {selectedRequest && `${selectedRequest.userName} — все рекомендации кандидатов`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            {loadingRecommendations ? (
+              <div className="flex items-center justify-center py-8">
+                <Icon name="Loader2" className="animate-spin text-primary" size={32} />
+              </div>
+            ) : employeeRecommendations.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Icon name="Users" size={48} className="mx-auto mb-3 opacity-50" />
+                <p>У этого сотрудника пока нет рекомендаций</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {employeeRecommendations.map((rec) => (
+                  <Card key={rec.id}>
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <CardTitle className="text-base">{rec.candidate_name}</CardTitle>
+                          <CardDescription className="text-xs">{rec.candidate_email}</CardDescription>
+                        </div>
+                        {getRecommendationStatusBadge(rec.status)}
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 text-sm">
+                        {rec.vacancy_title && (
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground">Вакансия</p>
+                            <p className="font-medium">{rec.vacancy_title}</p>
+                          </div>
+                        )}
+                        {rec.candidate_phone && (
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground">Телефон</p>
+                            <p>{rec.candidate_phone}</p>
+                          </div>
+                        )}
+                        {rec.comment && (
+                          <div>
+                            <p className="text-xs font-medium text-muted-foreground">Комментарий</p>
+                            <p className="text-xs">{rec.comment}</p>
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground">Дата рекомендации</p>
+                          <p className="text-xs">{new Date(rec.created_at).toLocaleString('ru-RU')}</p>
+                        </div>
+                        {rec.status === 'hired' && (
+                          <div className="bg-green-50 p-2 rounded-md border border-green-200">
+                            <p className="text-xs font-medium text-green-800">
+                              <Icon name="CheckCircle" size={14} className="inline mr-1" />
+                              Вознаграждение: {rec.reward_amount.toLocaleString('ru-RU')} ₽
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
