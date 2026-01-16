@@ -54,6 +54,12 @@ export interface ChatMessage {
   message: string;
   timestamp: string;
   isOwn: boolean;
+  attachments?: {
+    type: 'image' | 'file';
+    url: string;
+    name: string;
+    size?: number;
+  }[];
 }
 
 export interface NewsPost {
