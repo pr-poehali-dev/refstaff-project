@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -22,6 +23,7 @@ import { CandidateDetail } from '@/components/CandidateDetail';
 import ChatBot from '@/components/ChatBot';
 
 function Index() {
+  const navigate = useNavigate();
   const [userRole, setUserRole] = useState<UserRole>(() => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -2396,10 +2398,7 @@ function Index() {
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-1.5 sm:gap-3">
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
-                        onClick={() => {
-                          setSelectedVacancyDetail(vacancy);
-                          setShowVacancyDetail(true);
-                        }}
+                        onClick={() => navigate(`/vacancy/${vacancy.id}`)}
                       >
                         <CardTitle className="flex items-center gap-1.5 text-xs sm:text-lg">
                           {vacancy.title}

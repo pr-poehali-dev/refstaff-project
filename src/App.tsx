@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import VacancyReferral from "./pages/VacancyReferral";
+import VacancyApply from "./pages/VacancyApply";
 import EmployeeInvite from "./pages/EmployeeInvite";
 import EmployeeRegister from "./pages/EmployeeRegister";
 import NotFound from "./pages/NotFound";
@@ -21,6 +22,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/r/:token" element={<VacancyReferral />} />
+          <Route path="/vacancy/:vacancyId" element={<VacancyApply />} />
           <Route path="/invite/:token" element={<EmployeeInvite />} />
           <Route path="/employee-register" element={<EmployeeRegister />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
