@@ -33,6 +33,45 @@ function VacancyReferral() {
     loadVacancyData();
   }, [token]);
 
+  useEffect(() => {
+    if (vacancy) {
+      const ogImageUrl = `https://functions.poehali.dev/c7d354d0-8ca6-4954-9c7d-d831a0fee869?title=${encodeURIComponent(vacancy.title)}&department=${encodeURIComponent(vacancy.department)}&salary=${encodeURIComponent(vacancy.salary_display)}`;
+      const vacancyUrl = `${window.location.origin}/r/${token}${referrerId ? `?ref=${referrerId}` : ''}`;
+      
+      document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
+      
+      updateMetaTag('og:title', `${vacancy.title} — ${vacancy.department}`);
+      updateMetaTag('og:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title} в компании. Заработная плата: ${vacancy.salary_display}. Вознаграждение за рекомендацию: ${vacancy.reward_amount.toLocaleString()} ₽`);
+      updateMetaTag('og:image', ogImageUrl);
+      updateMetaTag('og:url', vacancyUrl);
+      updateMetaTag('og:type', 'website');
+      
+      updateMetaTag('twitter:card', 'summary_large_image');
+      updateMetaTag('twitter:title', `${vacancy.title} — ${vacancy.department}`);
+      updateMetaTag('twitter:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title}`);
+      updateMetaTag('twitter:image', ogImageUrl);
+    }
+  }, [vacancy, token, referrerId]);
+
+  const updateMetaTag = (property: string, content: string) => {
+    let selector = `meta[property="${property}"]`;
+    if (!property.startsWith('og:') && !property.startsWith('twitter:')) {
+      selector = `meta[name="${property}"]`;
+    }
+    
+    let meta = document.querySelector(selector) as HTMLMetaElement;
+    if (!meta) {
+      meta = document.createElement('meta');
+      if (property.startsWith('og:') || property.startsWith('twitter:')) {
+        meta.setAttribute('property', property);
+      } else {
+        meta.setAttribute('name', property);
+      }
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', content);
+  };
+
   const loadVacancyData = async () => {
     try {
       setIsLoading(true);

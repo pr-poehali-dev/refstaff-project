@@ -31,6 +31,45 @@ function VacancyApply() {
     loadVacancyData();
   }, [vacancyId]);
 
+  useEffect(() => {
+    if (vacancy) {
+      const ogImageUrl = `https://functions.poehali.dev/c7d354d0-8ca6-4954-9c7d-d831a0fee869?title=${encodeURIComponent(vacancy.title)}&department=${encodeURIComponent(vacancy.department)}&salary=${encodeURIComponent(vacancy.salary_display)}`;
+      const vacancyUrl = `${window.location.origin}/vacancy/${vacancy.id}`;
+      
+      document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
+      
+      updateMetaTag('og:title', `${vacancy.title} — ${vacancy.department}`);
+      updateMetaTag('og:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title} в компании. Заработная плата: ${vacancy.salary_display}`);
+      updateMetaTag('og:image', ogImageUrl);
+      updateMetaTag('og:url', vacancyUrl);
+      updateMetaTag('og:type', 'website');
+      
+      updateMetaTag('twitter:card', 'summary_large_image');
+      updateMetaTag('twitter:title', `${vacancy.title} — ${vacancy.department}`);
+      updateMetaTag('twitter:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title}`);
+      updateMetaTag('twitter:image', ogImageUrl);
+    }
+  }, [vacancy]);
+
+  const updateMetaTag = (property: string, content: string) => {
+    let selector = `meta[property="${property}"]`;
+    if (!property.startsWith('og:') && !property.startsWith('twitter:')) {
+      selector = `meta[name="${property}"]`;
+    }
+    
+    let meta = document.querySelector(selector) as HTMLMetaElement;
+    if (!meta) {
+      meta = document.createElement('meta');
+      if (property.startsWith('og:') || property.startsWith('twitter:')) {
+        meta.setAttribute('property', property);
+      } else {
+        meta.setAttribute('name', property);
+      }
+      document.head.appendChild(meta);
+    }
+    meta.setAttribute('content', content);
+  };
+
   const loadVacancyData = async () => {
     try {
       setIsLoading(true);
@@ -137,14 +176,37 @@ function VacancyApply() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <div className="container max-w-4xl mx-auto py-8 px-4">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')}
-          className="mb-6"
-        >
-          <Icon name="ArrowLeft" size={16} className="mr-2" />
-          Назад
-        </Button>
+        <div className="flex justify-between items-center mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+          >
+            <Icon name="ArrowLeft" size={16} className="mr-2" />
+            Назад
+          </Button>
+          
+          <Button
+            variant="outline"
+            onClick={() => {
+              const vacancyUrl = `${window.location.origin}/vacancy/${vacancy.id}`;
+              const text = `${vacancy.title} — ${vacancy.department}\n${vacancy.salary_display}`;
+              
+              if (navigator.share) {
+                navigator.share({
+                  title: vacancy.title,
+                  text: text,
+                  url: vacancyUrl
+                }).catch(() => {});
+              } else {
+                navigator.clipboard.writeText(`${text}\n${vacancyUrl}`);
+                alert('Ссылка скопирована!');
+              }
+            }}
+          >
+            <Icon name="Share2" size={16} className="mr-2" />
+            Поделиться
+          </Button>
+        </div>
 
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-6">
