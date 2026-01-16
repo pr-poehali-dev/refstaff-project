@@ -39,7 +39,7 @@ export interface Recommendation {
   candidatePhone?: string;
   vacancy: string;
   vacancyTitle?: string;
-  status: 'pending' | 'interview' | 'hired' | 'rejected';
+  status: 'pending' | 'interview' | 'hired' | 'rejected' | 'accepted';
   date: string;
   reward: number;
   recommendedBy?: string;

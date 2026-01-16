@@ -341,11 +341,6 @@ function Index() {
       }));
 
       const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => {
-        let status: 'pending' | 'interview' | 'hired' | 'rejected' = 'pending';
-        if (r.status === 'accepted') status = 'hired';
-        else if (r.status === 'rejected') status = 'rejected';
-        else status = 'pending';
-        
         return {
           id: r.id,
           candidateName: r.candidate_name,
@@ -353,7 +348,7 @@ function Index() {
           candidatePhone: r.candidate_phone,
           vacancy: r.vacancy_title || '',
           vacancyTitle: r.vacancy_title || '',
-          status,
+          status: r.status as 'pending' | 'interview' | 'hired' | 'rejected' | 'accepted',
           date: new Date(r.created_at).toISOString().split('T')[0],
           reward: r.reward_amount,
           recommendedBy: r.recommended_by_name,
@@ -2526,7 +2521,10 @@ function Index() {
                   rec.candidateName.toLowerCase().includes(recommendationSearchQuery.toLowerCase()) ||
                   rec.vacancy.toLowerCase().includes(recommendationSearchQuery.toLowerCase()) ||
                   (rec.recommendedBy && rec.recommendedBy.toLowerCase().includes(recommendationSearchQuery.toLowerCase()));
-                const matchesStatus = recommendationStatusFilter === 'all' || rec.status === recommendationStatusFilter;
+                const matchesStatus = recommendationStatusFilter === 'all' || 
+                  rec.status === recommendationStatusFilter || 
+                  (recommendationStatusFilter === 'accepted' && rec.status === 'hired') ||
+                  (recommendationStatusFilter === 'hired' && rec.status === 'accepted');
                 return matchesSearch && matchesStatus;
               }).map((rec) => (
                 <Card key={rec.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
@@ -2550,11 +2548,11 @@ function Index() {
                         )}
                       </div>
                       <Badge variant={
-                        rec.status === 'accepted' ? 'default' : 
+                        rec.status === 'accepted' || rec.status === 'hired' ? 'default' : 
                         rec.status === 'rejected' ? 'destructive' : 
                         'secondary'
                       } className="text-xs whitespace-nowrap">
-                        {rec.status === 'accepted' ? 'Принят' : 
+                        {rec.status === 'accepted' || rec.status === 'hired' ? 'Принят' : 
                          rec.status === 'rejected' ? 'Отклонён' : 
                          'На рассмотрении'}
                       </Badge>
@@ -2590,7 +2588,7 @@ function Index() {
                           </Button>
                         </div>
                       )}
-                      {rec.status === 'accepted' && (
+                      {(rec.status === 'accepted' || rec.status === 'hired') && (
                         <div className="text-sm text-muted-foreground">
                           <Icon name="Clock" size={14} className="inline mr-1" />
                           Выплата через 30 дней
