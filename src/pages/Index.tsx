@@ -2064,8 +2064,8 @@ function Index() {
                 return searchMatch && statusMatch;
               }).map((vacancy) => (
                 <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="p-3 sm:p-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-3">
+                  <CardHeader className="p-2 sm:p-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-1.5 sm:gap-3">
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
                         onClick={() => {
@@ -2073,153 +2073,143 @@ function Index() {
                           setShowVacancyDetail(true);
                         }}
                       >
-                        <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
+                        <CardTitle className="flex items-center gap-1.5 text-xs sm:text-lg">
                           {vacancy.title}
-                          <Icon name="ExternalLink" size={14} className="text-muted-foreground" />
+                          <Icon name="ExternalLink" size={12} className="text-muted-foreground" />
                         </CardTitle>
-                        <CardDescription className="text-xs sm:text-sm">{vacancy.department}</CardDescription>
+                        <CardDescription className="text-[10px] sm:text-sm">{vacancy.department}</CardDescription>
                       </div>
-                      <div className="flex gap-1 sm:gap-2">
-                        <Badge variant="secondary" className="text-[10px] sm:text-xs px-1.5 sm:px-2">
-                          {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'В архиве' : 'Закрыта'}
+                      <div className="flex gap-1">
+                        <Badge variant="secondary" className="text-[9px] sm:text-xs px-1 sm:px-2">
+                          {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'Архив' : 'Закрыта'}
                         </Badge>
                         {vacancy.recommendations > 0 && (
-                          <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 sm:px-2">
-                            <Icon name="Users" size={10} className="mr-0.5 sm:mr-1" />
+                          <Badge variant="outline" className="text-[9px] sm:text-xs px-1 sm:px-2">
+                            <Icon name="Users" size={8} className="mr-0.5" />
                             {vacancy.recommendations}
                           </Badge>
                         )}
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-                    <div className="space-y-3 sm:space-y-4">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-                        <div className="space-y-1.5 sm:space-y-2 w-full sm:w-auto">
-                          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm">
-                            <Icon name="Wallet" size={14} className="text-muted-foreground" />
-                            <span className="truncate">{vacancy.salary}</span>
-                          </div>
-                          {vacancy.city && (
-                            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm">
-                              <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={14} className="text-muted-foreground" />
-                              <span className="truncate">{vacancy.city}</span>
-                            </div>
-                          )}
-                          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm">
-                            <Icon name="Users" size={14} className="text-muted-foreground" />
-                            <span>{vacancy.recommendations} {vacancy.recommendations === 1 ? 'рекомендация' : vacancy.recommendations < 5 ? 'рекомендации' : 'рекомендаций'}</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm text-primary">
-                            <Icon name="Award" size={14} />
-                            <span className="font-medium">{vacancy.reward.toLocaleString()} ₽</span>
-                          </div>
-                          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm text-muted-foreground">
-                            <Icon name="Clock" size={14} />
-                            <span className="hidden sm:inline">Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'}</span>
-                            <span className="sm:hidden">{vacancy.payoutDelayDays} дн.</span>
-                          </div>
+                  <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
+                    <div className="space-y-2 sm:space-y-4">
+                      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-[10px] sm:text-sm">
+                        <div className="flex items-center gap-1">
+                          <Icon name="Wallet" size={12} className="text-muted-foreground" />
+                          <span className="truncate">{vacancy.salary}</span>
                         </div>
-                        <div className="flex flex-wrap gap-2 w-full sm:w-auto">
-                          {vacancy.status !== 'archived' && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => {
-                                setActiveVacancy(vacancy);
-                                setVacancyForm({
-                                  title: vacancy.title,
-                                  department: vacancy.department,
-                                  salary: vacancy.salary,
-                                  requirements: '',
-                                  reward: vacancy.reward.toString(),
-                                  payoutDelay: vacancy.payoutDelayDays.toString(),
-                                  city: vacancy.city || '',
-                                  isRemote: vacancy.isRemote || false
-                                });
-                              }}
-                              className="flex-1 sm:flex-none"
-                            >
-                              <span className="hidden sm:inline">Редактировать</span>
-                              <span className="sm:hidden">Изменить</span>
-                            </Button>
-                          )}
-                          {vacancy.status === 'active' && (
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleArchiveVacancy(vacancy.id)}
-                              className="flex-1 sm:flex-none"
-                            >
-                              <Icon name="Archive" size={16} className="mr-1" />
-                              <span className="hidden sm:inline">В архив</span>
-                              <span className="sm:hidden">Архив</span>
-                            </Button>
-                          )}
-                          {vacancy.status === 'archived' && (
-                            <>
-                              <Button 
-                                variant="outline" 
-                                size="sm"
-                                onClick={() => handleRestoreVacancy(vacancy.id)}
-                                className="flex-1 sm:flex-none"
-                              >
-                                <Icon name="RotateCcw" size={16} className="mr-1" />
-                                <span className="hidden sm:inline">Восстановить</span>
-                                <span className="sm:hidden">Вернуть</span>
-                              </Button>
-                              <Button 
-                                variant="destructive" 
-                                size="sm"
-                                onClick={() => handleDeleteVacancy(vacancy.id)}
-                                className="flex-1 sm:flex-none"
-                              >
-                                <Icon name="Trash2" size={16} className="mr-1" />
-                                Удалить
-                              </Button>
-                            </>
-                          )}
+                        {vacancy.city && (
+                          <div className="flex items-center gap-1">
+                            <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={12} className="text-muted-foreground" />
+                            <span className="truncate">{vacancy.city}</span>
+                          </div>
+                        )}
+                        <div className="flex items-center gap-1 text-primary font-medium">
+                          <Icon name="Award" size={12} />
+                          <span>{vacancy.reward.toLocaleString()} ₽</span>
+                        </div>
+                        <div className="flex items-center gap-1 text-muted-foreground">
+                          <Icon name="Clock" size={12} />
+                          <span>{vacancy.payoutDelayDays} дн.</span>
                         </div>
                       </div>
-                      <Separator />
-                      <div className="space-y-2">
-                        <Label className="text-xs text-muted-foreground">Поделиться вакансией</Label>
-                        <div className="flex gap-2">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                        {vacancy.status !== 'archived' && (
                           <Button 
-                            size="sm" 
-                            variant="outline"
+                            variant="outline" 
+                            size="sm"
                             onClick={() => {
-                              const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение за рекомендацию: ${vacancy.reward.toLocaleString()} ₽`;
-                              const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
-                              window.open(`https://t.me/share/url?url=${encodeURIComponent(vacancyUrl)}&text=${encodeURIComponent(text)}`, '_blank');
+                              setActiveVacancy(vacancy);
+                              setVacancyForm({
+                                title: vacancy.title,
+                                department: vacancy.department,
+                                salary: vacancy.salary,
+                                requirements: '',
+                                reward: vacancy.reward.toString(),
+                                payoutDelay: vacancy.payoutDelayDays.toString(),
+                                city: vacancy.city || '',
+                                isRemote: vacancy.isRemote || false
+                              });
                             }}
+                            className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                           >
-                            <Icon name="Send" size={14} className="mr-1" />
-                            Telegram
+                            <Icon name="Pencil" size={12} className="sm:mr-1" />
+                            <span className="hidden sm:inline">Ред.</span>
                           </Button>
+                        )}
+                        {vacancy.status === 'active' && (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleArchiveVacancy(vacancy.id)}
+                            className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                          >
+                            <Icon name="Archive" size={12} className="sm:mr-1" />
+                            <span className="hidden sm:inline">Архив</span>
+                          </Button>
+                        )}
+                        {vacancy.status === 'archived' && (
+                          <>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleRestoreVacancy(vacancy.id)}
+                              className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                            >
+                              <Icon name="RotateCcw" size={12} />
+                            </Button>
+                            <Button 
+                              variant="destructive" 
+                              size="sm"
+                              onClick={() => handleDeleteVacancy(vacancy.id)}
+                              className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                            >
+                              <Icon name="Trash2" size={12} />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                      <div className="pt-1.5 sm:pt-2 border-t">
+                        <div className="grid grid-cols-3 gap-1 sm:gap-2">
                           <Button 
                             size="sm" 
                             variant="outline"
                             onClick={() => {
                               const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
                               const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
-                              window.open(`https://vk.com/share.php?url=${encodeURIComponent(vacancyUrl)}&title=${encodeURIComponent(vacancy.title)}&description=${encodeURIComponent(text)}`, '_blank');
+                              window.open(`https://t.me/share/url?url=${encodeURIComponent(vacancyUrl)}&text=${encodeURIComponent(text)}`, '_blank');
                             }}
+                            className="text-[9px] sm:text-xs h-7 sm:h-9 px-1 sm:px-2"
                           >
-                            <Icon name="Share2" size={14} className="mr-1" />
-                            ВКонтакте
+                            <Icon name="Send" size={12} />
+                            <span className="hidden sm:inline ml-1">TG</span>
                           </Button>
                           <Button 
                             size="sm" 
                             variant="outline"
                             onClick={() => {
-                              const text = `${vacancy.title} — ${vacancy.department}. Зарплата: ${vacancy.salary}. Вознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
+                              const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}`;
+                              const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
+                              window.open(`https://vk.com/share.php?url=${encodeURIComponent(vacancyUrl)}&title=${encodeURIComponent(text)}`, '_blank');
+                            }}
+                            className="text-[9px] sm:text-xs h-7 sm:h-9 px-1 sm:px-2"
+                          >
+                            <Icon name="Share2" size={12} />
+                            <span className="hidden sm:inline ml-1">VK</span>
+                          </Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline"
+                            onClick={() => {
+                              const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}`;
                               const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
                               window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + vacancyUrl)}`, '_blank');
                             }}
+                            className="text-[9px] sm:text-xs h-7 sm:h-9 px-1 sm:px-2"
                           >
-                            <Icon name="MessageCircle" size={14} className="mr-1" />
-                            WhatsApp
+                            <Icon name="MessageCircle" size={12} />
+                            <span className="hidden sm:inline ml-1">WA</span>
                           </Button>
                         </div>
                       </div>
