@@ -3580,6 +3580,70 @@ function Index() {
         onOpenChange={setShowVacancyDetail}
         showRecommendButton={false}
       />
+
+      <Dialog open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Комментарии</DialogTitle>
+            <DialogDescription>
+              {activeNewsPost?.title}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-4 py-4">
+            {activeNewsPost && activeNewsPost.comments.length === 0 ? (
+              <div className="text-center py-12">
+                <Icon name="MessageCircle" size={48} className="mx-auto mb-4 text-muted-foreground opacity-20" />
+                <p className="text-muted-foreground">Пока нет комментариев</p>
+                <p className="text-sm text-muted-foreground mt-1">Будьте первым!</p>
+              </div>
+            ) : (
+              activeNewsPost?.comments.map((comment) => (
+                <Card key={comment.id}>
+                  <CardContent className="p-4">
+                    <div className="flex items-start gap-3">
+                      <Avatar className="h-8 w-8">
+                        <AvatarFallback className="text-xs">
+                          {comment.authorName.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-medium text-sm">{comment.authorName}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(comment.date).toLocaleDateString('ru-RU')}
+                          </span>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{comment.comment}</p>
+                      </div>
+                      {userRole === 'employer' && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteComment(comment.id)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Icon name="Trash2" size={14} className="text-destructive" />
+                        </Button>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+          <div className="flex gap-2 pt-4 border-t">
+            <Input
+              placeholder="Написать комментарий..."
+              value={newComment}
+              onChange={(e) => setNewComment(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleAddComment()}
+            />
+            <Button onClick={handleAddComment} disabled={!newComment.trim()}>
+              <Icon name="Send" size={18} />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
     );
   };
