@@ -92,6 +92,8 @@ function Index() {
   const [selectedCandidate, setSelectedCandidate] = useState<Recommendation | null>(null);
   const [showCandidateDetail, setShowCandidateDetail] = useState(false);
   const [vacancySearchQuery, setVacancySearchQuery] = useState('');
+  const [recommendationSearchQuery, setRecommendationSearchQuery] = useState('');
+  const [recommendationStatusFilter, setRecommendationStatusFilter] = useState<'all' | 'pending' | 'accepted' | 'rejected'>('all');
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [withdrawForm, setWithdrawForm] = useState({
     amount: '',
@@ -2487,13 +2489,46 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="recommendations" className="space-y-4">
-            <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 mb-4">
-              <span>🎯</span>
-              <span className="hidden sm:inline">Рекомендации кандидатов</span>
-              <span className="sm:hidden">Рекомендации</span>
-            </h2>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+              <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
+                <span>🎯</span>
+                <span className="hidden sm:inline">Рекомендации кандидатов</span>
+                <span className="sm:hidden">Рекомендации</span>
+              </h2>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-2 mb-4">
+              <div className="relative flex-1">
+                <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Поиск по кандидатам..."
+                  value={recommendationSearchQuery}
+                  onChange={(e) => setRecommendationSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={recommendationStatusFilter} onValueChange={(value: any) => setRecommendationStatusFilter(value)}>
+                <SelectTrigger className="w-full sm:w-[200px]">
+                  <SelectValue placeholder="Фильтр по статусу" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Все статусы</SelectItem>
+                  <SelectItem value="pending">На рассмотрении</SelectItem>
+                  <SelectItem value="accepted">Принятые</SelectItem>
+                  <SelectItem value="rejected">Отклонённые</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
             <div className="grid gap-4">
-              {recommendations.map((rec) => (
+              {recommendations.filter(rec => {
+                const matchesSearch = recommendationSearchQuery === '' || 
+                  rec.candidateName.toLowerCase().includes(recommendationSearchQuery.toLowerCase()) ||
+                  rec.vacancy.toLowerCase().includes(recommendationSearchQuery.toLowerCase()) ||
+                  (rec.recommendedBy && rec.recommendedBy.toLowerCase().includes(recommendationSearchQuery.toLowerCase()));
+                const matchesStatus = recommendationStatusFilter === 'all' || rec.status === recommendationStatusFilter;
+                return matchesSearch && matchesStatus;
+              }).map((rec) => (
                 <Card key={rec.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
                   setActiveRecommendation(rec);
                   setShowRecommendationDetailsDialog(true);
