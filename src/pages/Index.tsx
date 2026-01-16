@@ -2589,9 +2589,27 @@ function Index() {
                         </div>
                       )}
                       {(rec.status === 'accepted' || rec.status === 'hired') && (
-                        <div className="text-sm text-muted-foreground">
-                          <Icon name="Clock" size={14} className="inline mr-1" />
-                          Выплата через 30 дней
+                        <div className="flex gap-2 items-center">
+                          <div className="text-xs sm:text-sm text-muted-foreground">
+                            <Icon name="Clock" size={14} className="inline mr-1" />
+                            <span className="hidden sm:inline">Выплата через 30 дней</span>
+                            <span className="sm:hidden">30 дн.</span>
+                          </div>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm('Отменить принятие кандидата? Статус вернётся в "На рассмотрении".')) {
+                                handleUpdateRecommendationStatus(rec.id, 'pending');
+                              }
+                            }} 
+                            disabled={isSubscriptionExpired}
+                            className="text-xs"
+                          >
+                            <Icon name="RotateCcw" className="sm:mr-1" size={14} />
+                            <span className="hidden sm:inline">Отменить</span>
+                          </Button>
                         </div>
                       )}
                     </div>
