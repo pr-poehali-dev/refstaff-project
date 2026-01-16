@@ -4202,7 +4202,7 @@ function Index() {
 
           <TabsContent value="wallet-history" className="space-y-4">
             <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-              <span>💳</span>
+              <span>💳 История баланса</span>
               <span className="hidden sm:inline">История кошелька</span>
             </h2>
             <div className="space-y-2 sm:space-y-3">
