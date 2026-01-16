@@ -2910,7 +2910,7 @@ function Index() {
       <Dialog open={showCompanySettingsDialog} onOpenChange={setShowCompanySettingsDialog}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Настройки профиля компании</DialogTitle>
+            <DialogTitle>Профиль компании</DialogTitle>
             <DialogDescription>Управляйте информацией о вашей компании</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
