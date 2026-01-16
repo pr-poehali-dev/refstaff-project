@@ -2363,7 +2363,8 @@ function Index() {
                         </div>
                         <CardDescription className="text-xs sm:text-sm truncate">{employee.position} • {employee.department}</CardDescription>
                       </div>
-                      <div className="flex flex-wrap gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
+                    </div>
+                    <div className="flex flex-wrap gap-1 sm:gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -2459,8 +2460,8 @@ function Index() {
                           <Icon name="Trash2" size={16} className="text-destructive" />
                         </Button>
                       </div>
-                      <Badge variant="outline">Уровень {employee.level}</Badge>
                     </div>
+                    <Badge variant="outline" className="mt-2">Уровень {employee.level}</Badge>
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
