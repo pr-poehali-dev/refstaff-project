@@ -1870,12 +1870,12 @@ function Index() {
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-2 flex items-center gap-2 sm:gap-3">
-            <span className="text-3xl sm:text-4xl">📈</span>
+          <h1 className="text-xl sm:text-3xl font-bold mb-2 flex items-center gap-2 sm:gap-3">
+            <span className="text-2xl sm:text-4xl">📈</span>
             <span className="hidden sm:inline">Личный кабинет работодателя</span>
-            <span className="sm:hidden">Личный кабинет</span>
+            <span className="sm:hidden text-base">Кабинет</span>
           </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">Управление вакансиями и сотрудниками</p>
+          <p className="text-xs sm:text-base text-muted-foreground">Управление вакансиями и сотрудниками</p>
         </div>
 
         {isSubscriptionExpired && (
