@@ -86,7 +86,10 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <CardTitle className="text-base">{rec.candidateName}</CardTitle>
+                          <div className="flex items-center gap-3 mb-2">
+                            <CardTitle className="text-base">{rec.candidateName}</CardTitle>
+                            {getStatusBadge(rec.status)}
+                          </div>
                           <CardDescription>
                             <div className="flex items-center gap-2 mt-1">
                               <Icon name="Mail" size={14} />
@@ -100,7 +103,6 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
                             )}
                           </CardDescription>
                         </div>
-                        {getStatusBadge(rec.status)}
                       </div>
                     </CardHeader>
                     <CardContent>
