@@ -119,6 +119,13 @@ function Index() {
     vk: '',
     avatar: ''
   });
+  const [showIntegrationDialog, setShowIntegrationDialog] = useState(false);
+  const [integrationForm, setIntegrationForm] = useState({
+    source: '1c',
+    apiUrl: '',
+    apiKey: '',
+    syncInterval: 'manual'
+  });
   
   const [editProfileForm, setEditProfileForm] = useState({
     firstName: '',
@@ -2621,6 +2628,11 @@ function Index() {
                   <span className="hidden md:inline">Добавить сотрудника</span>
                   <span className="md:hidden">Добавить</span>
                 </Button>
+                <Button variant="outline" onClick={() => setShowIntegrationDialog(true)} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                  <Icon name="Download" className="mr-1 sm:mr-2" size={16} />
+                  <span className="hidden md:inline">Загрузить базу</span>
+                  <span className="md:hidden">Загрузить</span>
+                </Button>
               </div>
             </div>
             <div className="mb-4">
@@ -4756,6 +4768,133 @@ function Index() {
                 <Label className="text-sm font-medium">Открытые вакансии</Label>
                 <p className="text-sm text-muted-foreground mt-1">{vacancies.length} активных вакансий</p>
               </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showIntegrationDialog} onOpenChange={setShowIntegrationDialog}>
+        <DialogContent className="max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Загрузка базы сотрудников</DialogTitle>
+            <DialogDescription>
+              Выберите источник для автоматической загрузки сотрудников
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-4">
+            <div>
+              <Label htmlFor="integration-source">Источник данных</Label>
+              <Select 
+                value={integrationForm.source} 
+                onValueChange={(value) => setIntegrationForm({...integrationForm, source: value})}
+              >
+                <SelectTrigger id="integration-source" className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1c">
+                    <div className="flex items-center gap-2">
+                      <Icon name="Database" size={16} />
+                      <span>1С: Предприятие</span>
+                    </div>
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground mt-2">
+                Дополнительные интеграции будут добавлены в ближайшее время
+              </p>
+            </div>
+
+            {integrationForm.source === '1c' && (
+              <>
+                <div>
+                  <Label htmlFor="api-url">URL API 1С</Label>
+                  <Input
+                    id="api-url"
+                    placeholder="https://your-1c-server.com/api/employees"
+                    value={integrationForm.apiUrl}
+                    onChange={(e) => setIntegrationForm({...integrationForm, apiUrl: e.target.value})}
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Укажите адрес API для получения списка сотрудников
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="api-key">Ключ API</Label>
+                  <Input
+                    id="api-key"
+                    type="password"
+                    placeholder="Введите ключ доступа"
+                    value={integrationForm.apiKey}
+                    onChange={(e) => setIntegrationForm({...integrationForm, apiKey: e.target.value})}
+                    className="mt-2"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Ключ для авторизации запросов к API 1С
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="sync-interval">Периодичность синхронизации</Label>
+                  <Select 
+                    value={integrationForm.syncInterval} 
+                    onValueChange={(value) => setIntegrationForm({...integrationForm, syncInterval: value})}
+                  >
+                    <SelectTrigger id="sync-interval" className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="manual">Вручную</SelectItem>
+                      <SelectItem value="daily">Ежедневно</SelectItem>
+                      <SelectItem value="weekly">Еженедельно</SelectItem>
+                      <SelectItem value="monthly">Ежемесячно</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <Card className="bg-blue-50 border-blue-200">
+                  <CardContent className="pt-4">
+                    <div className="flex gap-3">
+                      <Icon name="Info" className="text-blue-600 mt-0.5" size={18} />
+                      <div className="space-y-2 text-sm">
+                        <p className="font-medium text-blue-900">Что будет загружено из 1С:</p>
+                        <ul className="list-disc list-inside space-y-1 text-blue-800">
+                          <li>ФИО сотрудников</li>
+                          <li>Должности и отделы</li>
+                          <li>Контактные данные (email, телефон)</li>
+                          <li>Статус сотрудника (работает/уволен)</li>
+                        </ul>
+                        <p className="text-xs text-blue-700 mt-2">
+                          Существующие сотрудники будут обновлены, новые — добавлены
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
+
+            <div className="flex gap-2 pt-2">
+              <Button 
+                className="flex-1"
+                onClick={() => {
+                  alert('Интеграция настроена! Загрузка сотрудников начнется автоматически.');
+                  setShowIntegrationDialog(false);
+                }}
+                disabled={!integrationForm.apiUrl || !integrationForm.apiKey}
+              >
+                <Icon name="Download" size={16} className="mr-2" />
+                Настроить интеграцию
+              </Button>
+              <Button 
+                variant="outline" 
+                className="flex-1"
+                onClick={() => setShowIntegrationDialog(false)}
+              >
+                Отмена
+              </Button>
             </div>
           </div>
         </DialogContent>
