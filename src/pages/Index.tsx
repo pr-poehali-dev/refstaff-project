@@ -1930,11 +1930,7 @@ function Index() {
               </h2>
               <Dialog>
                   <DialogTrigger asChild>
-                    <Button disabled={isSubscriptionExpired} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                      <Icon name="Plus" className="mr-1 sm:mr-2" size={16} />
-                      <span className="hidden sm:inline">Добавить</span>
-                      <span className="sm:hidden">+</span> вакансию
-                    </Button>
+                    <Button disabled={isSubscriptionExpired} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">Создать вакансию</Button>
                   </DialogTrigger>
                 <DialogContent className="max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
