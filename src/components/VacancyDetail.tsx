@@ -22,15 +22,17 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRe
         <DialogHeader>
           <div className="flex items-start justify-between gap-4 mx-[17px]">
             <div className="flex-1">
-              <DialogTitle className="text-2xl mb-2">{vacancy.title}</DialogTitle>
+              <div className="flex items-center gap-3 mb-2">
+                <DialogTitle className="text-2xl">{vacancy.title}</DialogTitle>
+                <Badge variant={vacancy.status === 'active' ? 'default' : 'secondary'}>
+                  {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'В архиве' : 'Закрыта'}
+                </Badge>
+              </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Icon name="Building2" size={16} />
                 <span>{vacancy.department}</span>
               </div>
             </div>
-            <Badge variant={vacancy.status === 'active' ? 'default' : 'secondary'}>
-              {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'В архиве' : 'Закрыта'}
-            </Badge>
           </div>
         </DialogHeader>
 
