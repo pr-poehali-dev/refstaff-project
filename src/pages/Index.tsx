@@ -2064,8 +2064,8 @@ function Index() {
                 return searchMatch && statusMatch;
               }).map((vacancy) => (
                 <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3">
+                  <CardHeader className="p-3 sm:p-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-3">
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
                         onClick={() => {
@@ -2073,49 +2073,49 @@ function Index() {
                           setShowVacancyDetail(true);
                         }}
                       >
-                        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                        <CardTitle className="flex items-center gap-2 text-sm sm:text-lg">
                           {vacancy.title}
-                          <Icon name="ExternalLink" size={16} className="text-muted-foreground" />
+                          <Icon name="ExternalLink" size={14} className="text-muted-foreground" />
                         </CardTitle>
-                        <CardDescription>{vacancy.department}</CardDescription>
+                        <CardDescription className="text-xs sm:text-sm">{vacancy.department}</CardDescription>
                       </div>
-                      <div className="flex gap-2">
-                        <Badge variant="secondary">
+                      <div className="flex gap-1 sm:gap-2">
+                        <Badge variant="secondary" className="text-[10px] sm:text-xs px-1.5 sm:px-2">
                           {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'В архиве' : 'Закрыта'}
                         </Badge>
                         {vacancy.recommendations > 0 && (
-                          <Badge variant="outline">
-                            <Icon name="Users" size={12} className="mr-1" />
+                          <Badge variant="outline" className="text-[10px] sm:text-xs px-1.5 sm:px-2">
+                            <Icon name="Users" size={10} className="mr-0.5 sm:mr-1" />
                             {vacancy.recommendations}
                           </Badge>
                         )}
                       </div>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                        <div className="space-y-2 w-full sm:w-auto">
-                          <div className="flex items-center gap-2 text-xs sm:text-sm">
-                            <Icon name="Wallet" size={16} className="text-muted-foreground" />
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+                        <div className="space-y-1.5 sm:space-y-2 w-full sm:w-auto">
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm">
+                            <Icon name="Wallet" size={14} className="text-muted-foreground" />
                             <span className="truncate">{vacancy.salary}</span>
                           </div>
                           {vacancy.city && (
-                            <div className="flex items-center gap-2 text-xs sm:text-sm">
-                              <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={16} className="text-muted-foreground" />
+                            <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm">
+                              <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={14} className="text-muted-foreground" />
                               <span className="truncate">{vacancy.city}</span>
                             </div>
                           )}
-                          <div className="flex items-center gap-2 text-xs sm:text-sm">
-                            <Icon name="Users" size={16} className="text-muted-foreground" />
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm">
+                            <Icon name="Users" size={14} className="text-muted-foreground" />
                             <span>{vacancy.recommendations} {vacancy.recommendations === 1 ? 'рекомендация' : vacancy.recommendations < 5 ? 'рекомендации' : 'рекомендаций'}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs sm:text-sm text-primary">
-                            <Icon name="Award" size={16} />
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm text-primary">
+                            <Icon name="Award" size={14} />
                             <span className="font-medium">{vacancy.reward.toLocaleString()} ₽</span>
                           </div>
-                          <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
-                            <Icon name="Clock" size={16} />
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-sm text-muted-foreground">
+                            <Icon name="Clock" size={14} />
                             <span className="hidden sm:inline">Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'}</span>
                             <span className="sm:hidden">{vacancy.payoutDelayDays} дн.</span>
                           </div>
