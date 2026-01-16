@@ -2346,7 +2346,7 @@ function Index() {
                   }}
                 >
                   <CardHeader>
-                    <div className="flex items-start gap-3">
+                    <div className="flex items-start gap-3 mb-3">
                       <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
                         <AvatarImage src={employee.avatar} />
                         <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
@@ -2364,7 +2364,7 @@ function Index() {
                         <CardDescription className="text-xs sm:text-sm truncate">{employee.position} • {employee.department}</CardDescription>
                       </div>
                     </div>
-                    <div className="flex flex-wrap gap-1 sm:gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex flex-wrap gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -2459,7 +2459,6 @@ function Index() {
                         >
                           <Icon name="Trash2" size={16} className="text-destructive" />
                         </Button>
-                      </div>
                     </div>
                     <Badge variant="outline" className="mt-2">Уровень {employee.level}</Badge>
                   </CardHeader>
