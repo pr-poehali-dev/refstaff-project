@@ -41,6 +41,9 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
   const [showRecommendationsDialog, setShowRecommendationsDialog] = useState(false);
   const [employeeRecommendations, setEmployeeRecommendations] = useState<any[]>([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
+  const [showEmployeeProfile, setShowEmployeeProfile] = useState(false);
+  const [employeeData, setEmployeeData] = useState<any>(null);
+  const [loadingEmployee, setLoadingEmployee] = useState(false);
 
   const getStatusBadge = (status: string) => {
     const config: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
@@ -97,6 +100,26 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
     return <Badge variant={cfg.variant}>{cfg.label}</Badge>;
   };
 
+  const handleShowEmployeeProfile = async (request: PayoutRequest) => {
+    setSelectedRequest(request);
+    setShowEmployeeProfile(true);
+    setLoadingEmployee(true);
+    
+    try {
+      const employees = await api.getEmployees(1);
+      const employee = employees.find(emp => emp.id === request.userId);
+      if (employee) {
+        const recommendations = await api.getRecommendations(1, undefined, request.userId);
+        setEmployeeData({ ...employee, recommendations });
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки данных сотрудника:', error);
+      setEmployeeData(null);
+    } finally {
+      setLoadingEmployee(false);
+    }
+  };
+
   const pendingRequests = requests.filter(r => r.status === 'pending');
   const approvedRequests = requests.filter(r => r.status === 'approved');
   const paidRequests = requests.filter(r => r.status === 'paid');
@@ -107,7 +130,12 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
-            <CardTitle className="text-base">{request.userName}</CardTitle>
+            <CardTitle 
+              className="text-base cursor-pointer hover:text-primary transition-colors"
+              onClick={() => handleShowEmployeeProfile(request)}
+            >
+              {request.userName}
+            </CardTitle>
             <CardDescription>{request.userEmail}</CardDescription>
           </div>
           <div className="flex flex-col items-end gap-2">
@@ -398,6 +426,136 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showEmployeeProfile} onOpenChange={setShowEmployeeProfile}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Профиль сотрудника</DialogTitle>
+            <DialogDescription>
+              {selectedRequest && `Полная информация о ${selectedRequest.userName}`}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            {loadingEmployee ? (
+              <div className="flex items-center justify-center py-8">
+                <Icon name="Loader2" className="animate-spin text-primary" size={32} />
+              </div>
+            ) : employeeData ? (
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-start gap-4">
+                      {employeeData.avatar_url ? (
+                        <img src={employeeData.avatar_url} alt={employeeData.first_name} className="w-16 h-16 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon name="User" size={32} className="text-primary" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <CardTitle>{employeeData.first_name} {employeeData.last_name}</CardTitle>
+                        <CardDescription>{employeeData.position} • {employeeData.department}</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Уровень</p>
+                        <p className="text-2xl font-bold text-primary">{employeeData.level}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Опыт</p>
+                        <p className="text-2xl font-bold">{employeeData.experience_points} XP</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Рекомендаций</p>
+                        <p className="text-2xl font-bold text-blue-600">{employeeData.total_recommendations}</p>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-muted-foreground">Успешных наймов</p>
+                        <p className="text-2xl font-bold text-green-600">{employeeData.successful_hires}</p>
+                      </div>
+                      <div className="col-span-2">
+                        <p className="text-sm font-medium text-muted-foreground">Всего заработано</p>
+                        <p className="text-3xl font-bold text-green-600">{employeeData.total_earnings.toLocaleString('ru-RU')} ₽</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {employeeData.email && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">Контакты</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        {employeeData.email && (
+                          <div className="flex items-center gap-2">
+                            <Icon name="Mail" size={16} className="text-muted-foreground" />
+                            <span className="text-sm">{employeeData.email}</span>
+                          </div>
+                        )}
+                        {employeeData.phone && (
+                          <div className="flex items-center gap-2">
+                            <Icon name="Phone" size={16} className="text-muted-foreground" />
+                            <span className="text-sm">{employeeData.phone}</span>
+                          </div>
+                        )}
+                        {employeeData.telegram && (
+                          <div className="flex items-center gap-2">
+                            <Icon name="Send" size={16} className="text-muted-foreground" />
+                            <span className="text-sm">{employeeData.telegram}</span>
+                          </div>
+                        )}
+                        {employeeData.vk && (
+                          <div className="flex items-center gap-2">
+                            <Icon name="MessageCircle" size={16} className="text-muted-foreground" />
+                            <span className="text-sm">{employeeData.vk}</span>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {employeeData.recommendations && employeeData.recommendations.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-base">История рекомендаций</CardTitle>
+                      <CardDescription>{employeeData.recommendations.length} {employeeData.recommendations.length === 1 ? 'рекомендация' : 'рекомендаций'}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3 max-h-60 overflow-y-auto">
+                        {employeeData.recommendations.map((rec: any) => (
+                          <div key={rec.id} className="border rounded-lg p-3">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex-1">
+                                <p className="font-medium text-sm">{rec.candidate_name}</p>
+                                <p className="text-xs text-muted-foreground">{rec.vacancy_title}</p>
+                              </div>
+                              {getRecommendationStatusBadge(rec.status)}
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                              {new Date(rec.created_at).toLocaleDateString('ru-RU')}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground">
+                <Icon name="AlertCircle" size={48} className="mx-auto mb-3 opacity-50" />
+                <p>Не удалось загрузить данные сотрудника</p>
               </div>
             )}
           </div>
