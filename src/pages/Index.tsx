@@ -3576,65 +3576,76 @@ function Index() {
     <>
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Icon name="Rocket" className="text-primary" size={28} />
-            <span className="text-xl font-bold">iHUNT</span>
+            <Icon name="Rocket" className="text-primary" size={24} />
+            <span className="text-lg sm:text-xl font-bold">iHUNT</span>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
-              <Icon name="Bell" size={20} />
+              <Icon name="Bell" size={18} />
               {employeeNotifications.filter(n => !n.read).length > 0 && (
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 sm:h-5 sm:w-5 flex items-center justify-center text-[10px] sm:text-xs">
                   {employeeNotifications.filter(n => !n.read).length}
                 </span>
               )}
             </Button>
-            <Button variant="ghost" onClick={() => setShowCompanyProfileDialog(true)}>
-              <Icon name="Building2" className="mr-2" size={18} />
-              О компании
+            <Button variant="ghost" onClick={() => setShowCompanyProfileDialog(true)} size="icon" className="sm:hidden">
+              <Icon name="Building2" size={18} />
             </Button>
-            <Button variant="ghost" onClick={handleOpenChat} className="relative">
+            <Button variant="ghost" onClick={() => setShowCompanyProfileDialog(true)} size="sm" className="hidden sm:flex">
+              <Icon name="Building2" className="mr-2" size={18} />
+              <span className="hidden lg:inline">О компании</span>
+            </Button>
+            <Button variant="ghost" onClick={handleOpenChat} className="relative hidden sm:flex" size="sm">
               <Icon name="MessageCircle" className="mr-2" size={18} />
-              Чат с HR
+              <span className="hidden lg:inline">Чат с HR</span>
               {unreadMessagesCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                   {unreadMessagesCount}
                 </span>
               )}
             </Button>
-            <Button variant="ghost" onClick={handleLogout}>Выход</Button>
+            <Button variant="ghost" onClick={handleOpenChat} className="relative sm:hidden" size="icon">
+              <Icon name="MessageCircle" size={18} />
+              {unreadMessagesCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center text-[10px]">
+                  {unreadMessagesCount}
+                </span>
+              )}
+            </Button>
+            <Button variant="ghost" onClick={handleLogout} size="sm" className="text-xs sm:text-sm">Выход</Button>
           </div>
         </div>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="grid md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card className="md:col-span-2">
-            <CardHeader>
-              <div className="flex items-center gap-4">
-                <Avatar className="h-16 w-16">
+            <CardHeader className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
+                <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
                   <AvatarImage src={employees.find(e => e.id === currentEmployeeId)?.avatar} />
                   <AvatarFallback>
                     {currentUser?.first_name?.[0]}{currentUser?.last_name?.[0]}
                   </AvatarFallback>
                 </Avatar>
-                <div className="flex-1">
-                  <CardTitle className="text-2xl flex items-center gap-2">
-                    {currentUser?.first_name} {currentUser?.last_name}
-                    <Badge variant="secondary" className="text-xs">
+                <div className="flex-1 w-full">
+                  <CardTitle className="text-lg sm:text-2xl flex flex-col sm:flex-row items-start sm:items-center gap-2">
+                    <span>{currentUser?.first_name} {currentUser?.last_name}</span>
+                    <Badge variant="secondary" className="text-[10px] sm:text-xs">
                       🏆 #{calculateEmployeeRank(employees.find(e => e.id === currentEmployeeId) || employees[0])} в рейтинге
                     </Badge>
                   </CardTitle>
-                  <CardDescription className="flex items-center gap-2">
-                    {employees.find(e => e.id === currentEmployeeId)?.position || currentUser?.position} • {employees.find(e => e.id === currentEmployeeId)?.department || currentUser?.department}
+                  <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                    <span>{employees.find(e => e.id === currentEmployeeId)?.position || currentUser?.position} • {employees.find(e => e.id === currentEmployeeId)?.department || currentUser?.department}</span>
                     {(employees.find(e => e.id === currentEmployeeId)?.hired || 0) >= 5 && (
                       <span className="text-primary font-medium">• Мастер рекрутинга</span>
                     )}
                   </CardDescription>
                 </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" onClick={() => {
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-initial text-xs" onClick={() => {
                     const currentEmployee = employees.find(e => e.id === currentEmployeeId);
                     if (currentEmployee) {
                       const names = currentEmployee.name.split(' ');
@@ -3646,8 +3657,8 @@ function Index() {
                       });
                     }
                     setShowEditProfileDialog(true);
-                  }}>Редактировать</Button>
-                  <Button variant="outline" onClick={() => {
+                  }}><span className="hidden sm:inline">Редактировать</span><Icon name="Edit" size={14} className="sm:hidden" /></Button>
+                  <Button variant="outline" size="sm" className="flex-1 sm:flex-initial text-xs" onClick={() => {
                     const currentEmployee = employees.find(e => e.id === currentEmployeeId);
                     if (currentEmployee) {
                       setProfileForm({
@@ -3659,42 +3670,42 @@ function Index() {
                     }
                     setShowProfileEditDialog(true);
                   }}>
-                    <Icon name="User" size={16} className="mr-2" />
-                    Контакты
+                    <Icon name="User" size={14} className="mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Контакты</span>
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
+            <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <div className="flex justify-between text-sm mb-2">
+                  <div className="flex justify-between text-xs sm:text-sm mb-2">
                     <span className="font-medium">Уровень 5</span>
                     <span className="text-muted-foreground">250 / 500 XP</span>
                   </div>
                   <Progress value={50} className="h-2" />
                 </div>
-                <div className="grid grid-cols-3 gap-4 pt-4 border-t">
+                <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t">
                   <div className="text-center">
-                    <div className="text-3xl mb-1">🎯</div>
-                    <div className="text-2xl font-bold text-primary">
+                    <div className="text-2xl sm:text-3xl mb-1">🎯</div>
+                    <div className="text-xl sm:text-2xl font-bold text-primary">
                       {employees.find(e => e.id === currentEmployeeId)?.recommendations || 0}
                     </div>
-                    <div className="text-xs text-muted-foreground">Рекомендаций</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground">Рекомендаций</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl mb-1">✅</div>
-                    <div className="text-2xl font-bold text-green-600">
+                    <div className="text-2xl sm:text-3xl mb-1">✅</div>
+                    <div className="text-xl sm:text-2xl font-bold text-green-600">
                       {employees.find(e => e.id === currentEmployeeId)?.hired || 0}
                     </div>
-                    <div className="text-xs text-muted-foreground">Нанято</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground">Нанято</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-3xl mb-1">💸</div>
-                    <div className="text-2xl font-bold text-secondary">
+                    <div className="text-2xl sm:text-3xl mb-1">💸</div>
+                    <div className="text-xl sm:text-2xl font-bold text-secondary">
                       {(employees.find(e => e.id === currentEmployeeId)?.earnings || 0).toLocaleString()} ₽
                     </div>
-                    <div className="text-xs text-muted-foreground">Заработано</div>
+                    <div className="text-[10px] sm:text-xs text-muted-foreground">Заработано</div>
                   </div>
                 </div>
               </div>
@@ -3702,58 +3713,61 @@ function Index() {
           </Card>
 
           <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span className="text-2xl">💰</span>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
+                <span className="text-xl sm:text-2xl">💰</span>
                 Кошелек
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
               <div>
-                <div className="text-sm text-muted-foreground mb-1">Доступно для вывода</div>
-                <div className="text-3xl font-bold text-green-600">
+                <div className="text-xs sm:text-sm text-muted-foreground mb-1">Доступно для вывода</div>
+                <div className="text-2xl sm:text-3xl font-bold text-green-600">
                   {walletData?.wallet?.wallet_balance?.toLocaleString() || 0} ₽
                 </div>
               </div>
               <div>
-                <div className="text-sm text-muted-foreground mb-1">Ожидает разблокировки</div>
-                <div className="text-2xl font-bold text-muted-foreground">
+                <div className="text-xs sm:text-sm text-muted-foreground mb-1">Ожидает разблокировки</div>
+                <div className="text-xl sm:text-2xl font-bold text-muted-foreground">
                   {walletData?.wallet?.wallet_pending?.toLocaleString() || 0} ₽
                 </div>
                 {walletData?.pending_payouts && walletData.pending_payouts.length > 0 && (
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                     <Icon name="Clock" size={12} className="inline mr-1" />
                     Следующая: {new Date(walletData.pending_payouts[0].unlock_date).toLocaleDateString('ru-RU')}
                   </p>
                 )}
               </div>
               <Button 
-                className="w-full" 
+                className="w-full text-xs sm:text-sm" 
                 variant="outline"
+                size="sm"
                 onClick={() => setShowWithdrawDialog(true)}
                 disabled={(walletData?.wallet?.wallet_balance || 0) === 0}
               >
-                <Icon name="Download" className="mr-2" size={16} />
+                <Icon name="Download" className="mr-2" size={14} />
                 Вывести средства
               </Button>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="news" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="news">📢 Новости</TabsTrigger>
-            <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
-            <TabsTrigger value="my-recommendations">⭐ Мои рекомендации</TabsTrigger>
-            <TabsTrigger value="achievements">🏆 Достижения</TabsTrigger>
-            <TabsTrigger value="notifications">🔔 Уведомления</TabsTrigger>
-            <TabsTrigger value="wallet-history">💳 История кошелька</TabsTrigger>
-          </TabsList>
+        <Tabs defaultValue="news" className="space-y-4 sm:space-y-6">
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+            <TabsList className="inline-flex min-w-full sm:grid sm:w-full sm:grid-cols-6 gap-1">
+              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
+              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
+              <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">⭐ <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
+              <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🏆 <span className="hidden sm:inline">Достижения</span></TabsTrigger>
+              <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🔔 <span className="hidden sm:inline">Уведомления</span></TabsTrigger>
+              <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">💳 <span className="hidden sm:inline">История</span></TabsTrigger>
+            </TabsList>
+          </div>
 
           <TabsContent value="news" className="space-y-4">
-            <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
+            <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
               <span>📢</span>
-              Новости компании
+              <span className="hidden sm:inline">Новости компании</span>
             </h2>
             
             {newsPosts.length === 0 ? (
@@ -3767,32 +3781,32 @@ function Index() {
               <div className="grid gap-4">
                 {newsPosts.map((post) => (
                   <Card key={post.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader>
+                    <CardHeader className="p-3 sm:p-6">
                       <div className="flex items-center gap-2 mb-2">
                         <Badge variant={
                           post.category === 'news' ? 'default' :
                           post.category === 'achievement' ? 'secondary' :
                           post.category === 'announcement' ? 'outline' :
                           'default'
-                        }>
+                        } className="text-[10px] sm:text-xs">
                           {post.category === 'news' ? '📰 Новость' :
                            post.category === 'achievement' ? '🏆 Достижение' :
                            post.category === 'announcement' ? '📢 Объявление' :
                            '✍️ Блог'}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-[10px] sm:text-xs text-muted-foreground">
                           {new Date(post.date).toLocaleDateString('ru-RU')}
                         </span>
                       </div>
-                      <CardTitle className="text-xl">{post.title}</CardTitle>
-                      <CardDescription>Автор: {post.author}</CardDescription>
+                      <CardTitle className="text-base sm:text-xl">{post.title}</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm">Автор: {post.author}</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground whitespace-pre-wrap">{post.content}</p>
+                    <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                      <p className="text-xs sm:text-sm text-muted-foreground whitespace-pre-wrap">{post.content}</p>
                     </CardContent>
-                    <CardFooter className="border-t pt-4">
+                    <CardFooter className="border-t pt-3 sm:pt-4 p-3 sm:p-6">
                       <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-4">
                           <Button 
                             variant="ghost" 
                             size="sm"
@@ -3822,15 +3836,18 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="vacancies" className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-semibold">Открытые вакансии</h2>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
+              <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
+                <span>💼</span>
+                <span className="hidden sm:inline">Открытые вакансии</span>
+              </h2>
             </div>
             <div className="mb-4">
               <Input
-                placeholder="Поиск вакансий по названию или отделу..."
+                placeholder="Поиск..."
                 value={vacancySearchQuery}
                 onChange={(e) => setVacancySearchQuery(e.target.value)}
-                className="max-w-md"
+                className="w-full text-sm"
               />
             </div>
 
@@ -3848,20 +3865,21 @@ function Index() {
                     setShowVacancyDetail(true);
                   }}
                 >
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle>{vacancy.title}</CardTitle>
-                        <CardDescription>{vacancy.department}</CardDescription>
+                  <CardHeader className="p-3 sm:p-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
+                      <div className="flex-1">
+                        <CardTitle className="text-sm sm:text-lg">{vacancy.title}</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">{vacancy.department}</CardDescription>
                       </div>
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button onClick={(e) => {
+                          <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm" onClick={(e) => {
                             e.stopPropagation();
                             setActiveVacancy(vacancy);
                           }}>
-                            <Icon name="UserPlus" className="mr-2" size={18} />
-                            Рекомендовать
+                            <Icon name="UserPlus" className="mr-1 sm:mr-2" size={14} />
+                            <span className="hidden sm:inline">Рекомендовать</span>
+                            <span className="sm:hidden">Рекомендовать</span>
                           </Button>
                         </DialogTrigger>
                         <DialogContent onClick={(e) => e.stopPropagation()}>
@@ -3940,39 +3958,39 @@ function Index() {
                       </Dialog>
                     </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-6">
-                        <div className="flex items-center gap-2 text-sm">
-                          <Icon name="Wallet" size={16} className="text-muted-foreground" />
-                          <span>{vacancy.salary}</span>
+                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                    <div className="space-y-3 sm:space-y-4">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6">
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                          <Icon name="Wallet" size={14} className="text-muted-foreground" />
+                          <span className="truncate">{vacancy.salary}</span>
                         </div>
                         {vacancy.city && (
-                          <div className="flex items-center gap-2 text-sm">
-                            <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={16} className="text-muted-foreground" />
-                            <span>{vacancy.city}</span>
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
+                            <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={14} className="text-muted-foreground" />
+                            <span className="truncate">{vacancy.city}</span>
                           </div>
                         )}
-                        <div className="flex items-center gap-2 text-sm text-primary">
-                          <Icon name="Award" size={16} />
-                          <span className="font-medium">{vacancy.reward.toLocaleString()} ₽ за найм</span>
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-primary">
+                          <Icon name="Award" size={14} />
+                          <span className="font-medium">{vacancy.reward.toLocaleString()} ₽</span>
                         </div>
                       </div>
                       <Separator />
-                      <div className="space-y-3">
-                        <Label className="text-xs text-muted-foreground">Реферальная ссылка для рекомендаций</Label>
+                      <div className="space-y-2 sm:space-y-3">
+                        <Label className="text-[10px] sm:text-xs text-muted-foreground">Реферальная ссылка</Label>
                         <div className="flex gap-2">
                           <Input 
                             value={vacancy.referralLink} 
                             readOnly 
-                            className="text-xs flex-1" 
+                            className="text-[10px] sm:text-xs flex-1" 
                             onClick={(e) => e.stopPropagation()}
                           />
                           <Button size="sm" variant="outline" onClick={(e) => {
                             e.stopPropagation();
                             navigator.clipboard.writeText(vacancy.referralLink || '');
                           }}>
-                            <Icon name="Copy" size={16} />
+                            <Icon name="Copy" size={14} />
                           </Button>
                         </div>
                         <div className="flex gap-2">
@@ -4010,7 +4028,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="my-recommendations" className="space-y-4">
-            <h2 className="text-2xl font-semibold mb-4">Мои рекомендации</h2>
+            <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+              <span>⭐</span>
+              <span className="hidden sm:inline">Мои рекомендации</span>
+            </h2>
             <div className="grid gap-4">
               {recommendations.filter(r => r.employeeId === currentEmployeeId).map((rec) => (
                 <Card 
@@ -4064,17 +4085,20 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="achievements" className="space-y-4">
-            <h2 className="text-2xl font-semibold mb-4">Достижения и рейтинг</h2>
+            <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+              <span>🏆</span>
+              <span className="hidden sm:inline">Достижения и рейтинг</span>
+            </h2>
             
             <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Icon name="Trophy" size={24} className="text-primary" />
-                  Рейтинг сотрудников
+              <CardHeader className="p-3 sm:p-6">
+                <CardTitle className="flex items-center gap-2 text-base sm:text-xl">
+                  <Icon name="Trophy" size={20} className="text-primary" />
+                  <span className="hidden sm:inline">Рейтинг сотрудников</span>
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
+              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
+                <div className="space-y-2 sm:space-y-3">
                   {employees
                     .sort((a, b) => {
                       if (b.hired !== a.hired) return b.hired - a.hired;
@@ -4083,8 +4107,8 @@ function Index() {
                     })
                     .slice(0, 10)
                     .map((emp, idx) => (
-                      <div key={emp.id} className={`flex items-center gap-3 p-3 rounded-lg ${emp.id === currentEmployeeId ? 'bg-primary/20 border-2 border-primary' : 'bg-background'}`}>
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
+                      <div key={emp.id} className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${emp.id === currentEmployeeId ? 'bg-primary/20 border-2 border-primary' : 'bg-background'}`}>
+                        <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm ${
                           idx === 0 ? 'bg-yellow-500 text-white' :
                           idx === 1 ? 'bg-gray-400 text-white' :
                           idx === 2 ? 'bg-orange-600 text-white' :
@@ -4092,18 +4116,18 @@ function Index() {
                         }`}>
                           {idx + 1}
                         </div>
-                        <Avatar className="h-10 w-10">
+                        <Avatar className="h-8 w-8 sm:h-10 sm:w-10 hidden sm:flex">
                           <AvatarFallback>{emp.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                         </Avatar>
-                        <div className="flex-1">
-                          <div className="font-medium">{emp.name}</div>
-                          <div className="text-xs text-muted-foreground">
-                            {emp.hired} нанято • {emp.recommendations} рекомендаций
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-xs sm:text-sm truncate">{emp.name}</div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground">
+                            {emp.hired} нанято <span className="hidden sm:inline">• {emp.recommendations} рекомендаций</span>
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold text-green-600">{emp.earnings.toLocaleString()} ₽</div>
-                          <div className="text-xs text-muted-foreground">
+                          <div className="font-bold text-green-600 text-xs sm:text-sm">{emp.earnings.toLocaleString()} ₽</div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
                             {emp.hired >= 10 ? '👑 Легенда' :
                              emp.hired >= 5 ? '⭐ Мастер' :
                              emp.hired >= 3 ? '🎯 Профи' :
@@ -4117,57 +4141,57 @@ function Index() {
               </CardContent>
             </Card>
 
-            <h3 className="text-lg font-semibold mt-6">Мои достижения</h3>
-            <div className="grid md:grid-cols-2 gap-4">
+            <h3 className="text-base sm:text-lg font-semibold mt-4 sm:mt-6">Мои достижения</h3>
+            <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
               <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-yellow-100 flex items-center justify-center">
-                      <Icon name="Star" className="text-yellow-600" size={32} />
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                      <Icon name="Star" className="text-yellow-600" size={24} />
                     </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-lg">Первая рекомендация</div>
-                      <div className="text-sm text-muted-foreground">Получено 10.11.2025</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm sm:text-lg truncate">Первая рекомендация</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">Получено 10.11.2025</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
-                      <Icon name="Target" className="text-green-600" size={32} />
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <Icon name="Target" className="text-green-600" size={24} />
                     </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-lg">Меткий глаз</div>
-                      <div className="text-sm text-muted-foreground">3 успешных найма</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm sm:text-lg truncate">Меткий глаз</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">3 успешных найма</div>
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card className="opacity-50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-purple-100 flex items-center justify-center">
-                      <Icon name="Award" className="text-purple-600" size={32} />
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                      <Icon name="Award" className="text-purple-600" size={24} />
                     </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-lg">Рекрутер месяца</div>
-                      <div className="text-sm text-muted-foreground">2/5 наймов</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm sm:text-lg truncate">Рекрутер месяца</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">2/5 наймов</div>
                       <Progress value={40} className="h-1 mt-2" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
               <Card className="opacity-50">
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center">
-                      <Icon name="Crown" className="text-blue-600" size={32} />
+                <CardContent className="p-4 sm:p-6">
+                  <div className="flex items-center gap-3 sm:gap-4">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                      <Icon name="Crown" className="text-blue-600" size={24} />
                     </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-lg">Золотой рекрутер</div>
-                      <div className="text-sm text-muted-foreground">4/10 успешных наймов</div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm sm:text-lg truncate">Золотой рекрутер</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground">4/10 успешных наймов</div>
                       <Progress value={40} className="h-1 mt-2" />
                     </div>
                   </div>
@@ -4177,8 +4201,11 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="wallet-history" className="space-y-4">
-            <h2 className="text-2xl font-semibold">История кошелька</h2>
-            <div className="space-y-3">
+            <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
+              <span>💳</span>
+              <span className="hidden sm:inline">История кошелька</span>
+            </h2>
+            <div className="space-y-2 sm:space-y-3">
               {[
                 { id: 1, type: 'pending', amount: 30000, desc: 'Вознаграждение за рекомендацию Елены Новиковой', date: '08.11.2025', unlockDate: '08.12.2025' },
                 { id: 2, type: 'pending', amount: 30000, desc: 'Вознаграждение за рекомендацию Алексея Козлова', date: '10.11.2025', unlockDate: '10.12.2025' },
@@ -4186,25 +4213,25 @@ function Index() {
                 { id: 4, type: 'earned', amount: 30000, desc: 'Вознаграждение за рекомендацию Марии Сидоровой', date: '15.09.2025', unlockDate: '15.10.2025' },
               ].map((transaction) => (
                 <Card key={transaction.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  <CardContent className="p-3 sm:p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                           transaction.type === 'pending' ? 'bg-yellow-100' : 'bg-green-100'
                         }`}>
                           <Icon name={transaction.type === 'pending' ? 'Clock' : 'CheckCircle'} 
                                 className={transaction.type === 'pending' ? 'text-yellow-600' : 'text-green-600'} 
-                                size={20} />
+                                size={16} />
                         </div>
-                        <div>
-                          <div className="font-medium">{transaction.desc}</div>
-                          <div className="text-sm text-muted-foreground">
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-xs sm:text-sm truncate">{transaction.desc}</div>
+                          <div className="text-[10px] sm:text-xs text-muted-foreground">
                             {transaction.date} 
-                            {transaction.type === 'pending' && ` • Разблокировка ${transaction.unlockDate}`}
+                            {transaction.type === 'pending' && <span className="hidden sm:inline"> • Разблокировка {transaction.unlockDate}</span>}
                           </div>
                         </div>
                       </div>
-                      <div className={`text-lg font-bold ${
+                      <div className={`text-sm sm:text-lg font-bold flex-shrink-0 ${
                         transaction.type === 'pending' ? 'text-yellow-600' : 'text-green-600'
                       }`}>
                         +{transaction.amount.toLocaleString()} ₽
@@ -4217,8 +4244,11 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-4">
-            <h2 className="text-2xl font-semibold mb-4">Уведомления</h2>
-            <div className="space-y-3">
+            <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
+              <span>🔔</span>
+              <span className="hidden sm:inline">Уведомления</span>
+            </h2>
+            <div className="space-y-2 sm:space-y-3">
               {notifications
                 .filter(n => {
                   if (userRole === 'employee') {
@@ -4228,9 +4258,9 @@ function Index() {
                 })
                 .map((notif) => (
                   <Card key={notif.id} className={notif.read ? 'opacity-60' : ''}>
-                    <CardContent className="p-4">
-                      <div className="flex items-start gap-3">
-                        <div className={`p-2 rounded-full ${
+                    <CardContent className="p-3 sm:p-4">
+                      <div className="flex items-start gap-2 sm:gap-3">
+                        <div className={`p-1.5 sm:p-2 rounded-full flex-shrink-0 ${
                           notif.type === 'recommendation' ? 'bg-blue-100' :
                           notif.type === 'hire' ? 'bg-green-100' :
                           notif.type === 'payout' ? 'bg-yellow-100' :
@@ -4243,7 +4273,7 @@ function Index() {
                               notif.type === 'payout' ? 'DollarSign' :
                               'Bell'
                             }
-                            size={20}
+                            size={16}
                             className={
                               notif.type === 'recommendation' ? 'text-blue-600' :
                               notif.type === 'hire' ? 'text-green-600' :
@@ -4252,9 +4282,9 @@ function Index() {
                             }
                           />
                         </div>
-                        <div className="flex-1">
-                          <p className="font-medium">{notif.message}</p>
-                          <p className="text-xs text-muted-foreground mt-1">
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-xs sm:text-sm">{notif.message}</p>
+                          <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                             {new Date(notif.date).toLocaleDateString('ru-RU', {
                               year: 'numeric',
                               month: 'long',
@@ -4263,7 +4293,7 @@ function Index() {
                           </p>
                         </div>
                         {!notif.read && (
-                          <Badge variant="default" className="text-xs">Новое</Badge>
+                          <Badge variant="default" className="text-[10px] sm:text-xs flex-shrink-0">Новое</Badge>
                         )}
                       </div>
                     </CardContent>
