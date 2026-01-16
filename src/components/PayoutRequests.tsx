@@ -150,47 +150,47 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
   return (
     <>
       <div className="space-y-6">
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">На рассмотрении</CardTitle>
+            <CardHeader className="pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">На рассмотрении</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-yellow-600 mx-0 px-0 my-0">{pendingRequests.length}</div>
-              <p className="text-xs text-muted-foreground mx-0 my-[37px]">
+            <CardContent className="px-3 sm:px-6">
+              <div className="text-xl sm:text-2xl font-bold text-yellow-600">{pendingRequests.length}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 {pendingRequests.reduce((sum, r) => sum + r.amount, 0).toLocaleString('ru-RU')} ₽
               </p>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Одобрено</CardTitle>
+            <CardHeader className="pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Одобрено</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600 my-[33px]">{approvedRequests.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">
+            <CardContent className="px-3 sm:px-6">
+              <div className="text-xl sm:text-2xl font-bold text-blue-600">{approvedRequests.length}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 {approvedRequests.reduce((sum, r) => sum + r.amount, 0).toLocaleString('ru-RU')} ₽
               </p>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Выплачено</CardTitle>
+            <CardHeader className="pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Выплачено</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600 my-[30px]">{paidRequests.length}</div>
-              <p className="text-xs text-muted-foreground my-[34px]">
+            <CardContent className="px-3 sm:px-6">
+              <div className="text-xl sm:text-2xl font-bold text-green-600">{paidRequests.length}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 {paidRequests.reduce((sum, r) => sum + r.amount, 0).toLocaleString('ru-RU')} ₽
               </p>
             </CardContent>
           </Card>
           <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Отклонено</CardTitle>
+            <CardHeader className="pb-2 px-3 sm:px-6">
+              <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Отклонено</CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600 my-[25px]">{rejectedRequests.length}</div>
-              <p className="text-xs text-muted-foreground my-0">
+            <CardContent className="px-3 sm:px-6">
+              <div className="text-xl sm:text-2xl font-bold text-red-600">{rejectedRequests.length}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                 {rejectedRequests.reduce((sum, r) => sum + r.amount, 0).toLocaleString('ru-RU')} ₽
               </p>
             </CardContent>
