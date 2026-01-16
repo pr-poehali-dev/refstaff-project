@@ -19,6 +19,7 @@ import { EmployeeDetail } from '@/components/EmployeeDetail';
 import { PayoutRequests } from '@/components/PayoutRequests';
 import { VacancyDetail } from '@/components/VacancyDetail';
 import { CandidateDetail } from '@/components/CandidateDetail';
+import ChatBot from '@/components/ChatBot';
 
 function Index() {
   const [userRole, setUserRole] = useState<UserRole>(() => {
@@ -4816,6 +4817,8 @@ function Index() {
         onOpenChange={setShowEmployeeDetail}
         recommendations={recommendations}
       />
+      
+      <ChatBot />
     </>
   );
 }
