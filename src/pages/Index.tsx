@@ -2177,47 +2177,28 @@ function Index() {
                         )}
                       </div>
                       <div className="pt-1.5 sm:pt-2 border-t">
-                        <div className="grid grid-cols-3 gap-1 sm:gap-2">
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
-                              const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
-                              window.open(`https://t.me/share/url?url=${encodeURIComponent(vacancyUrl)}&text=${encodeURIComponent(text)}`, '_blank');
-                            }}
-                            className="text-[9px] sm:text-xs h-7 sm:h-9 px-1 sm:px-2"
-                          >
-                            <Icon name="Send" size={12} />
-                            <span className="hidden sm:inline ml-1">TG</span>
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}`;
-                              const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
-                              window.open(`https://vk.com/share.php?url=${encodeURIComponent(vacancyUrl)}&title=${encodeURIComponent(text)}`, '_blank');
-                            }}
-                            className="text-[9px] sm:text-xs h-7 sm:h-9 px-1 sm:px-2"
-                          >
-                            <Icon name="Share2" size={12} />
-                            <span className="hidden sm:inline ml-1">VK</span>
-                          </Button>
-                          <Button 
-                            size="sm" 
-                            variant="outline"
-                            onClick={() => {
-                              const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}`;
-                              const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
-                              window.open(`https://wa.me/?text=${encodeURIComponent(text + '\n' + vacancyUrl)}`, '_blank');
-                            }}
-                            className="text-[9px] sm:text-xs h-7 sm:h-9 px-1 sm:px-2"
-                          >
-                            <Icon name="MessageCircle" size={12} />
-                            <span className="hidden sm:inline ml-1">WA</span>
-                          </Button>
-                        </div>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => {
+                            const text = `${vacancy.title} — ${vacancy.department}\nЗарплата: ${vacancy.salary}\nВознаграждение: ${vacancy.reward.toLocaleString()} ₽`;
+                            const vacancyUrl = `${window.location.origin}/#vacancy-${vacancy.id}`;
+                            if (navigator.share) {
+                              navigator.share({
+                                title: vacancy.title,
+                                text: text,
+                                url: vacancyUrl
+                              }).catch(() => {});
+                            } else {
+                              navigator.clipboard.writeText(`${text}\n${vacancyUrl}`);
+                              alert('Ссылка скопирована в буфер обмена');
+                            }
+                          }}
+                          className="w-full text-[10px] sm:text-sm h-7 sm:h-9"
+                        >
+                          <Icon name="Share2" size={14} className="mr-1.5" />
+                          Поделиться вакансией
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
