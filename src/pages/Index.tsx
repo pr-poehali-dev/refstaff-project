@@ -3766,7 +3766,7 @@ function Index() {
 
           <TabsContent value="news" className="space-y-4">
             <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-              <span>📢</span>
+              <span>📢 Новости компании</span>
               <span className="hidden sm:inline">Новости компании</span>
             </h2>
             
