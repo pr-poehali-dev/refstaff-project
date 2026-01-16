@@ -2628,7 +2628,15 @@ function Index() {
                   <span className="hidden md:inline">Добавить сотрудника</span>
                   <span className="md:hidden">Добавить</span>
                 </Button>
-                <Button variant="outline" onClick={() => setShowIntegrationDialog(true)} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    console.log('Открытие диалога интеграции');
+                    setShowIntegrationDialog(true);
+                  }} 
+                  size="sm" 
+                  className="w-full sm:w-auto text-xs sm:text-sm"
+                >
                   <Icon name="Download" className="mr-1 sm:mr-2" size={16} />
                   <span className="hidden md:inline">Загрузить базу</span>
                   <span className="md:hidden">Загрузить</span>
