@@ -4572,13 +4572,6 @@ function Index() {
                         </div>
                         <p className="text-sm text-muted-foreground">{comment.comment}</p>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDeleteComment(comment.id)}
-                      >
-                        <Icon name="Trash2" size={14} className="text-destructive" />
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
