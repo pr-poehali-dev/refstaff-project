@@ -3838,7 +3838,7 @@ function Index() {
           <TabsContent value="vacancies" className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
               <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-                <span>💼</span>
+                <span>💼 Вакансии</span>
                 <span className="hidden sm:inline">Открытые вакансии</span>
               </h2>
             </div>
