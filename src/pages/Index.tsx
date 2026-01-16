@@ -2081,7 +2081,12 @@ function Index() {
                         <CardDescription className="text-[10px] sm:text-sm">{vacancy.department}</CardDescription>
                       </div>
                       <div className="flex gap-1">
-                        <Badge variant="secondary" className="text-[9px] sm:text-xs px-1 sm:px-2">
+                        <Badge 
+                          variant="secondary" 
+                          className={`text-[9px] sm:text-xs px-1 sm:px-2 ${
+                            vacancy.status === 'archived' ? 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400' : ''
+                          }`}
+                        >
                           {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'Архив' : 'Закрыта'}
                         </Badge>
                         {vacancy.recommendations > 0 && (
