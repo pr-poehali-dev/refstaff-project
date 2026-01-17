@@ -2630,12 +2630,15 @@ function Index() {
                 </Button>
                 <Button 
                   variant="outline" 
-                  onClick={() => {
-                    console.log('Открытие диалога интеграции');
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Клик по кнопке загрузки базы', showIntegrationDialog);
                     setShowIntegrationDialog(true);
+                    console.log('Состояние после установки:', true);
                   }} 
                   size="sm" 
-                  className="w-full sm:w-auto text-xs sm:text-sm"
+                  className="w-full sm:w-auto text-xs sm:text-sm relative z-10"
                 >
                   <Icon name="Download" className="mr-1 sm:mr-2" size={16} />
                   <span className="hidden md:inline">Загрузить базу</span>
