@@ -335,14 +335,12 @@ function Index() {
   };
 
   const handleLogout = () => {
-    if (window.confirm('Вы уверены, что хотите выйти из системы?')) {
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('authToken');
-      setUserRole('guest');
-      setAuthToken(null);
-      setCurrentUser(null);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('authToken');
+    setUserRole('guest');
+    setAuthToken(null);
+    setCurrentUser(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleSendMessage = () => {
