@@ -3529,6 +3529,49 @@ function Index() {
 
         </Tabs>
         )}
+
+        <footer className="border-t bg-gray-50 py-12 px-4 mt-12" role="contentinfo">
+          <div className="container mx-auto max-w-6xl">
+            <div className="grid md:grid-cols-4 gap-8">
+              <div>
+                <div className="flex items-center gap-2 mb-4">
+                  <Icon name="Rocket" className="text-primary" size={24} />
+                  <span className="text-lg font-bold">iHUNT</span>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Платформа реферального рекрутинга с геймификацией
+                </p>
+              </div>
+              <nav aria-label="Продукт">
+                <h4 className="font-semibold mb-4">Продукт</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><a href="#benefits" className="hover:text-primary">Возможности</a></li>
+                  <li><a href="#pricing" className="hover:text-primary">Тарифы</a></li>
+                  <li><a href="#contact" className="hover:text-primary">API документация</a></li>
+                </ul>
+              </nav>
+              <nav aria-label="Компания">
+                <h4 className="font-semibold mb-4">Компания</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
+                  <li><a href="#contact" className="hover:text-primary">Блог</a></li>
+                  <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
+                </ul>
+              </nav>
+              <nav aria-label="Правовая информация">
+                <h4 className="font-semibold mb-4">Правовая информация</h4>
+                <ul className="space-y-2 text-sm text-muted-foreground">
+                  <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary">Политика конфиденциальности</button></li>
+                  <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary">Пользовательское соглашение</button></li>
+                  <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary">Обработка персональных данных</button></li>
+                </ul>
+              </nav>
+            </div>
+            <div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
+              © 2025 iHUNT. Все права защищены.
+            </div>
+          </div>
+        </footer>
       </div>
 
       <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
