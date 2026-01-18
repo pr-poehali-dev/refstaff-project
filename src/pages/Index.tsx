@@ -3726,21 +3726,84 @@ function Index() {
                 <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
                   <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
                   <div className="text-sm">{msg.message}</div>
+                  {msg.attachments && msg.attachments.length > 0 && (
+                    <div className="mt-2 space-y-2">
+                      {msg.attachments.map((attachment, idx) => (
+                        <div key={idx}>
+                          {attachment.type === 'image' ? (
+                            <img 
+                              src={attachment.url} 
+                              alt={attachment.name}
+                              className="rounded max-w-full h-auto cursor-pointer hover:opacity-90"
+                              onClick={() => window.open(attachment.url, '_blank')}
+                            />
+                          ) : (
+                            <a 
+                              href={attachment.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className={`flex items-center gap-2 p-2 rounded ${msg.isOwn ? 'bg-primary-foreground/10' : 'bg-background'} hover:opacity-80 transition-opacity`}
+                            >
+                              <Icon name="FileText" size={16} />
+                              <div className="flex-1 min-w-0">
+                                <div className="text-xs font-medium truncate">{attachment.name}</div>
+                                <div className="text-xs opacity-70">{(attachment.size / 1024).toFixed(0)} KB</div>
+                              </div>
+                              <Icon name="Download" size={14} />
+                            </a>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   <div className="text-xs opacity-70 mt-1">{msg.timestamp}</div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="flex gap-2 pt-4 border-t">
-            <Input 
-              placeholder="Введите сообщение..." 
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            />
-            <Button onClick={handleSendMessage}>
-              <Icon name="Send" size={18} />
-            </Button>
+          <div className="space-y-2 pt-4 border-t">
+            {selectedFiles.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {selectedFiles.map((file, idx) => (
+                  <div key={idx} className="flex items-center gap-2 bg-muted rounded px-2 py-1 text-xs">
+                    <Icon name={file.type.startsWith('image/') ? 'Image' : 'FileText'} size={14} />
+                    <span className="max-w-[150px] truncate">{file.name}</span>
+                    <button 
+                      onClick={() => setSelectedFiles(selectedFiles.filter((_, i) => i !== idx))}
+                      className="hover:text-destructive"
+                    >
+                      <Icon name="X" size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div className="flex gap-2">
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                onChange={handleFileSelect} 
+                multiple 
+                className="hidden" 
+                accept="image/*,.pdf,.doc,.docx,.txt"
+              />
+              <Button 
+                variant="outline" 
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Icon name="Paperclip" size={18} />
+              </Button>
+              <Input 
+                placeholder="Введите сообщение..." 
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+              />
+              <Button onClick={handleSendMessage}>
+                <Icon name="Send" size={18} />
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
