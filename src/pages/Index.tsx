@@ -3545,17 +3545,17 @@ function Index() {
               <nav aria-label="Продукт">
                 <h4 className="font-semibold mb-4">Продукт</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><a href="#benefits" className="hover:text-primary">Возможности</a></li>
-                  <li><a href="#pricing" className="hover:text-primary">Тарифы</a></li>
-                  <li><a href="#contact" className="hover:text-primary">API документация</a></li>
+                  <li><button onClick={() => window.location.href = '/#benefits'} className="hover:text-primary text-left">Возможности</button></li>
+                  <li><button onClick={() => window.location.href = '/#pricing'} className="hover:text-primary text-left">Тарифы</button></li>
+                  <li><button onClick={() => window.location.href = '/#contact'} className="hover:text-primary text-left">API документация</button></li>
                 </ul>
               </nav>
               <nav aria-label="Компания">
                 <h4 className="font-semibold mb-4">Компания</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
-                  <li><a href="#contact" className="hover:text-primary">Блог</a></li>
-                  <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
+                  <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary text-left">О нас</button></li>
+                  <li><button onClick={() => window.location.href = '/#contact'} className="hover:text-primary text-left">Блог</button></li>
+                  <li><button onClick={() => window.location.href = '/#contact'} className="hover:text-primary text-left">Контакты</button></li>
                 </ul>
               </nav>
               <nav aria-label="Правовая информация">
