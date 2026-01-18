@@ -4178,7 +4178,7 @@ function Index() {
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
               <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">⭐ <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
-              <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🏆</TabsTrigger>
+              <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🏆Рейтинг</TabsTrigger>
               <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🔔 <span className="hidden sm:inline">Уведомления</span></TabsTrigger>
               <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">💳 <span className="hidden sm:inline">История</span></TabsTrigger>
             </TabsList>
