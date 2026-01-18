@@ -4511,7 +4511,7 @@ function Index() {
           <TabsContent value="achievements" className="space-y-4">
             <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
               <span>🏆 Достижения и рейтинг</span>
-              <span className="hidden sm:inline">Достижения и рейтинг</span>
+              <span className="hidden sm:inline"></span>
             </h2>
             
             <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
