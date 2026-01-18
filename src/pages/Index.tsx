@@ -4075,12 +4075,6 @@ function Index() {
                         position: currentEmployee.position || '',
                         department: currentEmployee.department || ''
                       });
-                    }
-                    setShowEditProfileDialog(true);
-                  }}><span className="hidden sm:inline">Редактировать</span><Icon name="Edit" size={14} className="sm:hidden" /></Button>
-                  <Button variant="outline" size="sm" className="flex-1 sm:flex-initial text-xs" onClick={() => {
-                    const currentEmployee = employees.find(e => e.id === currentEmployeeId);
-                    if (currentEmployee) {
                       setProfileForm({
                         phone: currentEmployee.phone || '',
                         telegram: currentEmployee.telegram || '',
@@ -4088,10 +4082,11 @@ function Index() {
                         avatar: currentEmployee.avatar || ''
                       });
                     }
-                    setShowProfileEditDialog(true);
+                    setShowEditProfileDialog(true);
                   }}>
-                    <Icon name="User" size={14} className="mr-1 sm:mr-2" />
-                    <span className="hidden sm:inline">Контакты</span>
+                    <Icon name="Edit" size={14} className="mr-1 sm:mr-2" />
+                    <span className="hidden sm:inline">Редактировать профиль</span>
+                    <span className="sm:hidden">Редактировать</span>
                   </Button>
                 </div>
               </div>
@@ -5066,11 +5061,11 @@ function Index() {
     </div>
 
       <Dialog open={showEditProfileDialog} onOpenChange={setShowEditProfileDialog}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Редактировать профиль</DialogTitle>
             <DialogDescription>
-              Обновите информацию о вашем профиле
+              Обновите информацию о вашем профиле и контакты
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
@@ -5106,6 +5101,64 @@ function Index() {
                 onChange={(e) => setEditProfileForm({...editProfileForm, department: e.target.value})}
               />
             </div>
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-medium mb-3">Контактная информация</h3>
+              <div className="space-y-4">
+                <div>
+                  <Label>Телефон</Label>
+                  <Input
+                    placeholder="+7 (900) 123-45-67"
+                    value={profileForm.phone}
+                    onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Telegram</Label>
+                  <Input
+                    placeholder="@username"
+                    value={profileForm.telegram}
+                    onChange={(e) => setProfileForm({...profileForm, telegram: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>ВКонтакте</Label>
+                  <Input
+                    placeholder="vk.com/username"
+                    value={profileForm.vk}
+                    onChange={(e) => setProfileForm({...profileForm, vk: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Фото профиля</Label>
+                  <div className="flex items-center gap-3">
+                    {profileForm.avatar && (
+                      <Avatar className="h-16 w-16">
+                        <AvatarImage src={profileForm.avatar} />
+                        <AvatarFallback>{editProfileForm.firstName?.[0]}{editProfileForm.lastName?.[0]}</AvatarFallback>
+                      </Avatar>
+                    )}
+                    <div className="flex-1">
+                      <Input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                              setProfileForm({...profileForm, avatar: reader.result as string});
+                            };
+                            reader.readAsDataURL(file);
+                          }
+                        }}
+                        className="cursor-pointer"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Выберите изображение</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="flex gap-2 pt-4">
               <Button 
                 className="flex-1"
@@ -5115,7 +5168,11 @@ function Index() {
                       first_name: editProfileForm.firstName,
                       last_name: editProfileForm.lastName,
                       position: editProfileForm.position,
-                      department: editProfileForm.department
+                      department: editProfileForm.department,
+                      phone: profileForm.phone,
+                      telegram: profileForm.telegram,
+                      vk: profileForm.vk,
+                      avatar: profileForm.avatar
                     });
                     await loadData();
                     setShowEditProfileDialog(false);
@@ -5343,74 +5400,7 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showProfileEditDialog} onOpenChange={setShowProfileEditDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Редактировать профиль</DialogTitle>
-            <DialogDescription>
-              Обновите свои контактные данные и фото
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Телефон</Label>
-              <Input
-                placeholder="+7 (900) 123-45-67"
-                value={profileForm.phone}
-                onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label>Telegram</Label>
-              <Input
-                placeholder="@username"
-                value={profileForm.telegram}
-                onChange={(e) => setProfileForm({...profileForm, telegram: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label>ВКонтакте</Label>
-              <Input
-                placeholder="vk.com/username"
-                value={profileForm.vk}
-                onChange={(e) => setProfileForm({...profileForm, vk: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label>Фото профиля</Label>
-              <div className="flex items-center gap-3">
-                {profileForm.avatar && (
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage src={profileForm.avatar} />
-                    <AvatarFallback>{currentEmployee?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                  </Avatar>
-                )}
-                <div className="flex-1">
-                  <Input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setProfileForm({...profileForm, avatar: reader.result as string});
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                    className="cursor-pointer"
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Выберите изображение</p>
-                </div>
-              </div>
-            </div>
-            <Button className="w-full" onClick={handleUpdateProfile}>
-              Сохранить
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+
     </>
     );
   };
