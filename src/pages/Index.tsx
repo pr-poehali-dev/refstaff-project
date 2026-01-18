@@ -4453,8 +4453,8 @@ function Index() {
 
           <TabsContent value="my-recommendations" className="space-y-4">
             <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-              <span>⭐ Рекомендации</span>
-              <span className="hidden sm:inline">Мои рекомендации</span>
+              <span>⭐ Мои рекомендации</span>
+              <span className="hidden sm:inline"></span>
             </h2>
             <div className="grid gap-4">
               {recommendations.filter(r => r.employeeId === currentEmployeeId).map((rec) => (
