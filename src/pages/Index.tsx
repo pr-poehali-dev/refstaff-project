@@ -5389,12 +5389,33 @@ function Index() {
               />
             </div>
             <div>
-              <Label>Фото профиля (URL)</Label>
-              <Input
-                placeholder="https://..."
-                value={profileForm.avatar}
-                onChange={(e) => setProfileForm({...profileForm, avatar: e.target.value})}
-              />
+              <Label>Фото профиля</Label>
+              <div className="flex items-center gap-3">
+                {profileForm.avatar && (
+                  <Avatar className="h-16 w-16">
+                    <AvatarImage src={profileForm.avatar} />
+                    <AvatarFallback>{currentEmployee?.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  </Avatar>
+                )}
+                <div className="flex-1">
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          setProfileForm({...profileForm, avatar: reader.result as string});
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                    className="cursor-pointer"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Выберите изображение</p>
+                </div>
+              </div>
             </div>
             <Button className="w-full" onClick={handleUpdateProfile}>
               Сохранить
