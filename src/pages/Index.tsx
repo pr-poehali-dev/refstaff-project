@@ -2688,7 +2688,7 @@ function Index() {
                         </div>
                         <CardDescription className="text-xs sm:text-sm truncate">{employee.position} • {employee.department}</CardDescription>
                       </div>
-                      <div className="hidden sm:flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                      <div className="hidden sm:flex flex-row gap-2" onClick={(e) => e.stopPropagation()}>
                         <Button 
                           variant="outline" 
                           size="sm"
