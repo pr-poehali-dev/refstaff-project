@@ -3559,11 +3559,11 @@ function Index() {
                 </ul>
               </nav>
               <nav aria-label="Правовая информация">
-                <h4 className="font-semibold mb-4">Правовая информация</h4>
+                <h4 className="font-semibold mb-4 px-[45px] text-center">Правовая  информация</h4>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary">Политика конфиденциальности</button></li>
-                  <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary">Пользовательское соглашение</button></li>
-                  <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary">Обработка персональных данных</button></li>
+                  <li><button className="hover:text-primary text-xs" onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary">Политика конфиденциальности</button></li>
+                  <li><button className="hover:text-primary text-xs" onClick={() => setShowTermsDialog(true)} className="hover:text-primary">Пользовательское соглашение</button></li>
+                  <li><button className="hover:text-primary text-xs" onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary">Обработка персональных данных</button></li>
                 </ul>
               </nav>
             </div>
