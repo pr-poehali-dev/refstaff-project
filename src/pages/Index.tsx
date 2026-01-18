@@ -21,6 +21,7 @@ import { PayoutRequests } from '@/components/PayoutRequests';
 import { VacancyDetail } from '@/components/VacancyDetail';
 import { CandidateDetail } from '@/components/CandidateDetail';
 import ChatBot from '@/components/ChatBot';
+import { MessengerDialog } from '@/components/MessengerDialog';
 
 function Index() {
   const navigate = useNavigate();
@@ -47,13 +48,7 @@ function Index() {
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showPersonalDataDialog, setShowPersonalDataDialog] = useState(false);
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { id: 1, senderId: 1, senderName: 'HR Manager', message: 'Здравствуйте! Как дела с рекомендациями?', timestamp: '10:30', isOwn: false },
-    { id: 2, senderId: 2, senderName: 'Вы', message: 'Отлично! У меня есть кандидат на вакансию Frontend Developer', timestamp: '10:32', isOwn: true },
-    { id: 3, senderId: 1, senderName: 'HR Manager', message: 'Отлично! Отправьте резюме пожалуйста', timestamp: '10:35', isOwn: false },
-    { id: 4, senderId: 2, senderName: 'Вы', message: 'Вот резюме кандидата', timestamp: '10:37', isOwn: true, attachments: [{ type: 'file', url: '#', name: 'resume_ivan_petrov.pdf', size: 245000 }] },
-    { id: 5, senderId: 2, senderName: 'Вы', message: 'И фото с последнего проекта', timestamp: '10:38', isOwn: true, attachments: [{ type: 'image', url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085', name: 'project_screenshot.png', size: 892000 }] },
-  ]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -99,6 +94,9 @@ function Index() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [showEmployeeDetail, setShowEmployeeDetail] = useState(false);
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
+  const [chatSearchQuery, setChatSearchQuery] = useState('');
+  const [employeeStatuses, setEmployeeStatuses] = useState<{[key: number]: {online: boolean; lastSeen?: string; typing?: boolean}}>({});
+  const [chatHistories, setChatHistories] = useState<{[key: number]: ChatMessage[]}>({});
   const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
   const [showVacancyDetail, setShowVacancyDetail] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<Recommendation | null>(null);
@@ -3714,99 +3712,13 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
-        <DialogContent className="max-w-2xl h-[600px] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Чат с {activeChatEmployee?.name}</DialogTitle>
-            <DialogDescription>{activeChatEmployee?.position}</DialogDescription>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto space-y-3 py-4">
-            {chatMessages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
-                  <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
-                  <div className="text-sm">{msg.message}</div>
-                  {msg.attachments && msg.attachments.length > 0 && (
-                    <div className="mt-2 space-y-2">
-                      {msg.attachments.map((attachment, idx) => (
-                        <div key={idx}>
-                          {attachment.type === 'image' ? (
-                            <img 
-                              src={attachment.url} 
-                              alt={attachment.name}
-                              className="rounded max-w-full h-auto cursor-pointer hover:opacity-90"
-                              onClick={() => window.open(attachment.url, '_blank')}
-                            />
-                          ) : (
-                            <a 
-                              href={attachment.url} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className={`flex items-center gap-2 p-2 rounded ${msg.isOwn ? 'bg-primary-foreground/10' : 'bg-background'} hover:opacity-80 transition-opacity`}
-                            >
-                              <Icon name="FileText" size={16} />
-                              <div className="flex-1 min-w-0">
-                                <div className="text-xs font-medium truncate">{attachment.name}</div>
-                                <div className="text-xs opacity-70">{(attachment.size / 1024).toFixed(0)} KB</div>
-                              </div>
-                              <Icon name="Download" size={14} />
-                            </a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="text-xs opacity-70 mt-1">{msg.timestamp}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="space-y-2 pt-4 border-t">
-            {selectedFiles.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {selectedFiles.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-muted rounded px-2 py-1 text-xs">
-                    <Icon name={file.type.startsWith('image/') ? 'Image' : 'FileText'} size={14} />
-                    <span className="max-w-[150px] truncate">{file.name}</span>
-                    <button 
-                      onClick={() => setSelectedFiles(selectedFiles.filter((_, i) => i !== idx))}
-                      className="hover:text-destructive"
-                    >
-                      <Icon name="X" size={14} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="flex gap-2">
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileSelect} 
-                multiple 
-                className="hidden" 
-                accept="image/*,.pdf,.doc,.docx,.txt"
-              />
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => fileInputRef.current?.click()}
-              >
-                <Icon name="Paperclip" size={18} />
-              </Button>
-              <Input 
-                placeholder="Введите сообщение..." 
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-              />
-              <Button onClick={handleSendMessage}>
-                <Icon name="Send" size={18} />
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <MessengerDialog 
+        open={showChatDialog} 
+        onOpenChange={setShowChatDialog}
+        employees={employees}
+        currentUserId={currentEmployeeId}
+        userRole={userRole}
+      />
 
       <Dialog open={showEditEmployeeDialog} onOpenChange={setShowEditEmployeeDialog}>
         <DialogContent>
