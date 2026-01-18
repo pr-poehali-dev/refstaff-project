@@ -2405,7 +2405,10 @@ function Index() {
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-1.5 sm:gap-3">
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
-                        onClick={() => navigate(`/vacancy/${vacancy.id}`)}
+                        onClick={() => {
+                          setSelectedVacancyDetail(vacancy);
+                          setShowVacancyDetail(true);
+                        }}
                       >
                         <CardTitle className="flex items-center gap-1.5 text-xs sm:text-lg">
                           {vacancy.title}
@@ -5530,6 +5533,19 @@ function Index() {
         open={showEmployeeDetail}
         onOpenChange={setShowEmployeeDetail}
         recommendations={recommendations}
+      />
+
+      <VacancyDetail
+        vacancy={selectedVacancyDetail}
+        open={showVacancyDetail}
+        onOpenChange={setShowVacancyDetail}
+        showRecommendButton={userRole === 'employee'}
+        onRecommend={() => {
+          if (selectedVacancyDetail) {
+            setActiveVacancy(selectedVacancyDetail);
+            setShowVacancyDetail(false);
+          }
+        }}
       />
       
       {(userRole === 'employer' || userRole === 'employee') && (
