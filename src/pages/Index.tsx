@@ -2408,8 +2408,9 @@ function Index() {
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
                         onClick={() => {
-                          setSelectedVacancyDetail(vacancy);
-                          setShowVacancyDetail(true);
+                          if (vacancy.referral_token) {
+                            window.open(`/r/${vacancy.referral_token}`, '_blank');
+                          }
                         }}
                       >
                         <CardTitle className="flex items-center gap-1.5 text-xs sm:text-lg">
