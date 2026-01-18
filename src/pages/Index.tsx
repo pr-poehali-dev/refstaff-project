@@ -2688,8 +2688,104 @@ function Index() {
                         </div>
                         <CardDescription className="text-xs sm:text-sm truncate">{employee.position} • {employee.department}</CardDescription>
                       </div>
+                      <div className="hidden sm:flex flex-col gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveChatEmployee(employee);
+                            setShowChatDialog(true);
+                          }}
+                          className="flex-1 sm:flex-none text-xs sm:text-sm"
+                        >
+                          <Icon name="MessageCircle" className="sm:mr-1" size={16} />
+                          <span className="hidden sm:inline">Написать</span>
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEmployeeToEdit(employee);
+                            const [firstName, ...lastNameParts] = employee.name.split(' ');
+                            setEmployeeEditForm({
+                              firstName: firstName,
+                              lastName: lastNameParts.join(' '),
+                              position: employee.position,
+                              department: employee.department
+                            });
+                            setShowEditEmployeeDialog(true);
+                          }}
+                          className="flex-1 sm:flex-none text-xs sm:text-sm"
+                        >
+                          <Icon name="Edit" size={16} />
+                        </Button>
+                        <Dialog open={showEditRolesDialog && employeeToEditRoles?.id === employee.id} onOpenChange={(open) => {
+                          if (!open) {
+                            setShowEditRolesDialog(false);
+                            setEmployeeToEditRoles(null);
+                          }
+                        }}>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm" onClick={(e) => {
+                              e.stopPropagation();
+                              setEmployeeToEditRoles(employee);
+                              setRolesForm({
+                                isHrManager: employee.isHrManager || false,
+                                isAdmin: employee.isAdmin || false
+                              });
+                              setShowEditRolesDialog(true);
+                            }} className="flex-1 sm:flex-none text-xs sm:text-sm">
+                              <Icon name="Shield" size={16} />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Управление ролями: {employee.name}</DialogTitle>
+                              <DialogDescription>Назначьте права доступа сотруднику</DialogDescription>
+                            </DialogHeader>
+                            <div className="space-y-4 pt-4">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <Label>HR Manager</Label>
+                                  <p className="text-xs text-muted-foreground">Управление вакансиями и рекомендациями</p>
+                                </div>
+                                <Checkbox
+                                  checked={rolesForm.isHrManager}
+                                  onCheckedChange={(checked) => setRolesForm({...rolesForm, isHrManager: checked as boolean})}
+                                />
+                              </div>
+                              <Separator />
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <Label>Администратор</Label>
+                                  <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
+                                </div>
+                                <Checkbox
+                                  checked={rolesForm.isAdmin}
+                                  onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
+                                />
+                              </div>
+                              <Button className="w-full" onClick={handleUpdateEmployeeRoles}>Сохранить</Button>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEmployeeToDelete(employee);
+                            setShowDeleteDialog(true);
+                          }}
+                          className="flex-1 sm:flex-none text-xs sm:text-sm"
+                        >
+                          <Icon name="Trash2" size={16} className="text-destructive" />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="flex flex-wrap gap-1 sm:gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex sm:hidden flex-wrap gap-1 sm:gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
                         <Button 
                           variant="outline" 
                           size="sm"
