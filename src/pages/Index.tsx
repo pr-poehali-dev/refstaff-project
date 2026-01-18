@@ -5649,7 +5649,7 @@ function Index() {
                 <div>
                   <Label>Получатель</Label>
                   <Input
-                    placeholder="ООО Ромашка"
+                    placeholder="Иванов Иван Иванович"
                     value={withdrawForm.accountRecipient}
                     onChange={(e) => setWithdrawForm({...withdrawForm, accountRecipient: e.target.value})}
                   />
