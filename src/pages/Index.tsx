@@ -4550,8 +4550,7 @@ function Index() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <div className="font-bold text-green-600 text-xs sm:text-sm">{emp.earnings.toLocaleString()} ₽</div>
-                          <div className="text-[10px] sm:text-xs text-muted-foreground hidden sm:block">
+                          <div className="font-bold text-primary text-xs sm:text-sm">
                             {emp.hired >= 10 ? '👑 Легенда' :
                              emp.hired >= 5 ? '⭐ Мастер' :
                              emp.hired >= 3 ? '🎯 Профи' :
