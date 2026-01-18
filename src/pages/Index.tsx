@@ -2172,7 +2172,7 @@ function Index() {
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => {
-            if (isAuthenticated) {
+            if (authToken && userRole !== 'guest') {
               window.location.href = '/';
             } else {
               window.scrollTo({ top: 0, behavior: 'smooth' });
