@@ -108,7 +108,12 @@ function Index() {
   const [withdrawForm, setWithdrawForm] = useState({
     amount: '',
     paymentMethod: 'card',
-    paymentDetails: ''
+    paymentDetails: '',
+    accountRecipient: '',
+    accountBankName: '',
+    accountNumber: '',
+    accountBik: '',
+    accountCorrNumber: ''
   });
   const [showProfileEditDialog, setShowProfileEditDialog] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -5639,14 +5644,59 @@ function Index() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Реквизиты</Label>
-              <Input
-                placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
-                value={withdrawForm.paymentDetails}
-                onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
-              />
-            </div>
+            {withdrawForm.paymentMethod === 'account' ? (
+              <>
+                <div>
+                  <Label>Получатель</Label>
+                  <Input
+                    placeholder="ООО Ромашка"
+                    value={withdrawForm.accountRecipient}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountRecipient: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Наименование банка получателя</Label>
+                  <Input
+                    placeholder="ПАО Сбербанк"
+                    value={withdrawForm.accountBankName}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountBankName: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Расчетный счет</Label>
+                  <Input
+                    placeholder="40817810099910004312"
+                    value={withdrawForm.accountNumber}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountNumber: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>БИК</Label>
+                  <Input
+                    placeholder="044525225"
+                    value={withdrawForm.accountBik}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountBik: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Корреспондентский счет</Label>
+                  <Input
+                    placeholder="30101810400000000225"
+                    value={withdrawForm.accountCorrNumber}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountCorrNumber: e.target.value})}
+                  />
+                </div>
+              </>
+            ) : (
+              <div>
+                <Label>Реквизиты</Label>
+                <Input
+                  placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
+                  value={withdrawForm.paymentDetails}
+                  onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
+                />
+              </div>
+            )}
             <Button 
               className="w-full"
               onClick={async () => {
