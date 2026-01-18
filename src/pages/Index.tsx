@@ -4414,35 +4414,23 @@ function Index() {
                             <Icon name="Copy" size={14} />
                           </Button>
                         </div>
-                        <div className="grid grid-cols-3 gap-1 sm:gap-2">
-                          <Button size="sm" variant="outline" className="text-[10px] sm:text-xs px-1 sm:px-3" onClick={(e) => {
-                            e.stopPropagation();
-                            const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
-                            const url = `https://t.me/share/url?url=${encodeURIComponent(vacancy.referralLink || '')}&text=${encodeURIComponent(text)}`;
-                            window.open(url, '_blank');
-                          }}>
-                            <Icon name="Send" size={14} className="sm:mr-1" />
-                            <span className="hidden sm:inline">Telegram</span>
-                          </Button>
-                          <Button size="sm" variant="outline" className="text-[10px] sm:text-xs px-1 sm:px-3" onClick={(e) => {
-                            e.stopPropagation();
-                            const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
-                            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-                            window.open(url, '_blank');
-                          }}>
-                            <Icon name="MessageCircle" size={14} className="sm:mr-1" />
-                            <span className="hidden sm:inline">WhatsApp</span>
-                          </Button>
-                          <Button size="sm" variant="outline" className="text-[10px] sm:text-xs px-1 sm:px-3" onClick={(e) => {
-                            e.stopPropagation();
-                            const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
+                        <Button size="sm" variant="outline" className="w-full text-xs" onClick={(e) => {
+                          e.stopPropagation();
+                          const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
+                          if (navigator.share) {
+                            navigator.share({
+                              title: vacancy.title,
+                              text: text,
+                              url: vacancy.referralLink
+                            }).catch(() => {});
+                          } else {
                             navigator.clipboard.writeText(text);
                             alert('Текст скопирован');
-                          }}>
-                            <Icon name="Share2" size={14} className="sm:mr-1" />
-                            <span className="hidden sm:inline">Текст</span>
-                          </Button>
-                        </div>
+                          }
+                        }}>
+                          <Icon name="Share2" size={14} className="mr-2" />
+                          Поделиться вакансией
+                        </Button>
                       </div>
                     </div>
                   </CardContent>
