@@ -2248,7 +2248,7 @@ function Index() {
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex min-w-full sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-7 gap-1">
+            <TabsList className="inline-flex min-w-full sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-8 gap-1">
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
               <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3">👥 <span className="hidden sm:inline">Сотрудники</span></TabsTrigger>
               <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3">🎯 <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
@@ -2256,6 +2256,7 @@ function Index() {
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
               <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3">💬 <span className="hidden sm:inline">Чаты</span></TabsTrigger>
               <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3">📊 <span className="hidden sm:inline">Статистика</span></TabsTrigger>
+              <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3">❓ <span className="hidden sm:inline">Помощь</span></TabsTrigger>
             </TabsList>
           </div>
 
@@ -3281,6 +3282,250 @@ function Index() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="help" className="space-y-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
+                <span>❓ Помощь</span>
+              </h2>
+              <p className="text-muted-foreground">Узнайте, как использовать все возможности платформы для эффективного поиска талантов</p>
+            </div>
+
+            <div className="grid gap-6">
+              <Card className="border-2">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Icon name="Briefcase" className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Управление вакансиями</CardTitle>
+                      <CardDescription className="mt-1">Создавайте и публикуйте вакансии для поиска лучших кандидатов</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex gap-2">
+                    <Icon name="Plus" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Создание вакансии:</strong> Нажмите "Создать вакансию" во вкладке Вакансии, заполните детали позиции и укажите вознаграждение за успешную рекомендацию</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="Eye" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Просмотр кандидатов:</strong> Кликните на любую вакансию, чтобы увидеть всех рекомендованных кандидатов и их статусы</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="Archive" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Архивация:</strong> Закрытые вакансии можно перенести в архив для сохранения истории подбора</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Icon name="Users" className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Работа с сотрудниками</CardTitle>
+                      <CardDescription className="mt-1">Пригласите команду для совместного поиска талантов</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex gap-2">
+                    <Icon name="UserPlus" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Приглашение сотрудников:</strong> Во вкладке Сотрудники добавьте коллег по email — они получат приглашение на платформу</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="Target" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Рекомендации от команды:</strong> Ваши сотрудники смогут рекомендовать кандидатов на открытые вакансии и зарабатывать вознаграждения</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="BarChart3" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Статистика активности:</strong> Отслеживайте количество рекомендаций и успешных наймов от каждого сотрудника</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Icon name="Star" className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Обработка рекомендаций</CardTitle>
+                      <CardDescription className="mt-1">Управляйте входящими рекомендациями от вашей команды</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex gap-2">
+                    <Icon name="UserCheck" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Просмотр кандидатов:</strong> Все рекомендации от сотрудников появляются во вкладке Рекомендации с полной информацией о кандидате</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="MessageSquare" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Обратная связь:</strong> Обновляйте статус рекомендации (Интервью, Принят, Отклонён), чтобы держать сотрудников в курсе</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="CheckCircle2" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Подтверждение найма:</strong> При успешном найме измените статус на "Принят" — вознаграждение автоматически начислится сотруднику</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Icon name="Wallet" className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Выплаты и финансы</CardTitle>
+                      <CardDescription className="mt-1">Управляйте вознаграждениями за успешные рекомендации</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex gap-2">
+                    <Icon name="DollarSign" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Автоматические начисления:</strong> При найме рекомендованного кандидата вознаграждение автоматически зачисляется на счёт сотрудника</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="FileText" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Запросы на выплату:</strong> Во вкладке Выплаты просматривайте и одобряйте заявки сотрудников на вывод средств</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="History" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>История операций:</strong> Отслеживайте все выплаты и начисления в разрезе по сотрудникам и периодам</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Icon name="Newspaper" className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Новости компании</CardTitle>
+                      <CardDescription className="mt-1">Делитесь важной информацией с вашей командой</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex gap-2">
+                    <Icon name="PenSquare" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Публикация новостей:</strong> Создавайте посты о достижениях компании, новых вакансиях или изменениях в процессах</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="Image" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Мультимедиа:</strong> Добавляйте изображения и форматируйте текст для более привлекательных постов</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="MessageCircle" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Обратная связь:</strong> Сотрудники могут комментировать новости и задавать вопросы</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Icon name="MessageSquare" className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Чаты и коммуникация</CardTitle>
+                      <CardDescription className="mt-1">Общайтесь с сотрудниками напрямую</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex gap-2">
+                    <Icon name="Send" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Личные сообщения:</strong> Открывайте чаты с сотрудниками для обсуждения деталей рекомендаций</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="Paperclip" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Обмен файлами:</strong> Отправляйте резюме, портфолио и другие документы прямо в чате</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="Bell" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Уведомления:</strong> Получайте оповещения о новых сообщениях и важных событиях</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2">
+                <CardHeader className="pb-3">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Icon name="BarChart" className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Аналитика и статистика</CardTitle>
+                      <CardDescription className="mt-1">Отслеживайте эффективность реферальной программы</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-2 text-sm">
+                  <div className="flex gap-2">
+                    <Icon name="TrendingUp" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Общая статистика:</strong> Просматривайте количество активных вакансий, рекомендаций и успешных наймов</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="PieChart" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Рейтинг сотрудников:</strong> Узнайте, кто из команды наиболее активен в рекомендациях</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Icon name="Calendar" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                    <p><strong>Динамика по периодам:</strong> Анализируйте эффективность программы помесячно и выявляйте тренды</p>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-2 bg-muted/30">
+                <CardHeader>
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Icon name="HelpCircle" className="w-6 h-6 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="text-lg">Нужна дополнительная помощь?</CardTitle>
+                      <CardDescription className="mt-1">Мы всегда готовы помочь вам</CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex gap-3 items-start">
+                    <Icon name="Mail" className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="font-medium text-sm">Email поддержка</p>
+                      <p className="text-sm text-muted-foreground">support@referral-platform.com</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 items-start">
+                    <Icon name="MessageCircle" className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="font-medium text-sm">Онлайн чат</p>
+                      <p className="text-sm text-muted-foreground">Доступен с 9:00 до 18:00 по МСК</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 items-start">
+                    <Icon name="BookOpen" className="w-5 h-5 text-muted-foreground mt-0.5" />
+                    <div>
+                      <p className="font-medium text-sm">База знаний</p>
+                      <p className="text-sm text-muted-foreground">Подробные инструкции и ответы на частые вопросы</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
 
 
