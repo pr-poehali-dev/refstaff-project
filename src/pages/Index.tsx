@@ -310,40 +310,53 @@ function Index() {
   }, [userRole]);
 
   useEffect(() => {
-    if (authToken && userRole !== 'guest') {
-      verifyToken();
+    const token = localStorage.getItem('authToken');
+    const savedRole = localStorage.getItem('userRole');
+    
+    if (token && savedRole && savedRole !== 'guest') {
+      setAuthToken(token);
+      setUserRole(savedRole as UserRole);
+      verifyToken(token);
     }
   }, []);
 
-  const verifyToken = async () => {
+  const verifyToken = async (token: string) => {
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'X-Auth-Token': authToken || ''
+          'X-Auth-Token': token
         }
       });
       
       if (response.ok) {
         const data = await response.json();
         setCurrentUser(data.user);
+        const role = data.user.role === 'admin' ? 'employer' : 'employee';
+        setUserRole(role);
+        localStorage.setItem('userRole', role);
       } else {
-        handleLogout();
+        console.log('Token verification failed, logging out');
+        silentLogout();
       }
     } catch (error) {
       console.error('Ошибка проверки токена:', error);
-      handleLogout();
+      silentLogout();
     }
+  };
+
+  const silentLogout = () => {
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('authToken');
+    setUserRole('guest');
+    setAuthToken(null);
+    setCurrentUser(null);
   };
 
   const handleLogout = () => {
     if (window.confirm('Вы уверены, что хотите выйти из системы?')) {
-      localStorage.removeItem('userRole');
-      localStorage.removeItem('authToken');
-      setUserRole('guest');
-      setAuthToken(null);
-      setCurrentUser(null);
+      silentLogout();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -419,6 +432,8 @@ function Index() {
         recommendations: v.recommendations_count || 0,
         reward: v.reward_amount,
         payoutDelayDays: v.payout_delay_days || 30,
+        city: v.city || '',
+        isRemote: v.is_remote || false,
         referralLink: v.referral_token && userRole === 'employee' ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
 
