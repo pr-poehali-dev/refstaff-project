@@ -153,7 +153,14 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRe
           )}
 
           {showRecommendButton && vacancy.status === 'active' && onRecommend && (
-            <Button className="w-full" size="lg" onClick={onRecommend}>
+            <Button 
+              className="w-full" 
+              size="lg" 
+              onClick={() => {
+                onRecommend();
+                onOpenChange(false);
+              }}
+            >
               <Icon name="UserPlus" size={18} className="mr-2" />
               Рекомендовать кандидата
             </Button>
