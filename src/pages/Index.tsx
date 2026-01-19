@@ -47,6 +47,7 @@ function Index() {
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showPersonalDataDialog, setShowPersonalDataDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -331,21 +332,26 @@ function Index() {
         const data = await response.json();
         setCurrentUser(data.user);
       } else {
-        handleLogout();
+        confirmLogout();
       }
     } catch (error) {
       console.error('Ошибка проверки токена:', error);
-      handleLogout();
+      confirmLogout();
     }
   };
 
-  const handleLogout = () => {
+  const confirmLogout = () => {
     localStorage.removeItem('userRole');
     localStorage.removeItem('authToken');
     setUserRole('guest');
     setAuthToken(null);
     setCurrentUser(null);
+    setShowLogoutDialog(false);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleLogout = () => {
+    setShowLogoutDialog(true);
   };
 
   const handleSendMessage = () => {
@@ -5750,6 +5756,28 @@ function Index() {
         </DialogContent>
       </Dialog>
 
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Icon name="LogOut" className="text-orange-500" size={24} />
+              Выход из личного кабинета
+            </DialogTitle>
+            <DialogDescription>
+              Вы уверены, что хотите выйти из личного кабинета? Вам потребуется снова войти для доступа к функциям платформы.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex gap-3 justify-end pt-4">
+            <Button variant="outline" onClick={() => setShowLogoutDialog(false)}>
+              Отмена
+            </Button>
+            <Button variant="destructive" onClick={confirmLogout}>
+              <Icon name="LogOut" className="mr-2" size={18} />
+              Выйти
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </>
     );
