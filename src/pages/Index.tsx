@@ -25,14 +25,7 @@ import { MessengerDialog } from '@/components/MessengerDialog';
 
 function Index() {
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState<UserRole>(() => {
-    const token = localStorage.getItem('authToken');
-    if (token) {
-      const saved = localStorage.getItem('userRole');
-      return (saved as UserRole) || 'guest';
-    }
-    return 'guest';
-  });
+  const [userRole, setUserRole] = useState<UserRole>('guest');
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem('authToken'));
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
@@ -307,30 +300,43 @@ function Index() {
   const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
-    if (userRole !== 'guest') {
+    if (userRole !== 'guest' && authToken) {
       localStorage.setItem('userRole', userRole);
     }
-  }, [userRole]);
+  }, [userRole, authToken]);
 
   useEffect(() => {
-    if (authToken && userRole !== 'guest') {
+    const token = localStorage.getItem('authToken');
+    const savedRole = localStorage.getItem('userRole');
+    
+    if (token && savedRole && savedRole !== 'guest') {
+      setAuthToken(token);
       verifyToken();
     }
   }, []);
 
   const verifyToken = async () => {
+    const token = authToken || localStorage.getItem('authToken');
+    if (!token) {
+      confirmLogout();
+      return;
+    }
+    
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'X-Auth-Token': authToken || ''
+          'X-Auth-Token': token
         }
       });
       
       if (response.ok) {
         const data = await response.json();
         setCurrentUser(data.user);
+        const role = data.user.role === 'admin' ? 'employer' : 'employee';
+        setUserRole(role);
+        localStorage.setItem('userRole', role);
       } else {
         confirmLogout();
       }
