@@ -5840,7 +5840,7 @@ function Index() {
                 
                 try {
                   const paymentDetails = withdrawForm.paymentMethod === 'account'
-                    ? `ФИО: ${withdrawForm.accountFullName}\nБанк: ${withdrawForm.accountBank}\nСчёт: ${withdrawForm.accountNumber}\nБИК: ${withdrawForm.accountBik}`
+                    ? `ФИО: ${withdrawForm.accountFullName}\nБанк: ${withdrawForm.accountBank}\nРасчётный счёт: ${withdrawForm.accountNumber}\nБИК: ${withdrawForm.accountBik}`
                     : withdrawForm.paymentDetails;
                   
                   const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
