@@ -4603,15 +4603,16 @@ function Index() {
               ).map((vacancy) => (
                 <Card 
                   key={vacancy.id} 
-                  className="hover:shadow-md transition-shadow cursor-pointer"
-                  onClick={() => {
-                    setSelectedVacancyDetail(vacancy);
-                    setShowVacancyDetail(true);
-                  }}
+                  className="hover:shadow-md transition-shadow"
                 >
                   <CardHeader className="p-3 sm:p-6">
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
-                      <div className="flex-1">
+                      <div 
+                        className="flex-1 cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => {
+                          navigate(`/vacancy/${vacancy.id}`);
+                        }}
+                      >
                         <CardTitle className="text-sm sm:text-lg">{vacancy.title}</CardTitle>
                         <CardDescription className="text-xs sm:text-sm">{vacancy.department}</CardDescription>
                       </div>
