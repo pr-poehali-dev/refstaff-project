@@ -2271,7 +2271,14 @@ function Index() {
                   </Badge>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3">💰 <span className="hidden sm:inline">Выплаты</span></TabsTrigger>
+              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3 relative">
+                💰 <span className="hidden sm:inline">Выплаты</span>
+                {payoutRequests.filter(p => p.status === 'pending').length > 0 && (
+                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
+                    {payoutRequests.filter(p => p.status === 'pending').length}
+                  </Badge>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 relative">
                 📢 <span className="hidden sm:inline">Новости</span>
                 {newsPosts.filter(n => new Date(n.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length > 0 && (
