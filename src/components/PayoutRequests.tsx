@@ -489,6 +489,31 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
                   </CardContent>
                 </Card>
 
+                {selectedRequest && (
+                  <Card className="border-primary/20 bg-primary/5">
+                    <CardHeader>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Icon name="Wallet" size={18} className="text-primary" />
+                        Детали выплаты
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Способ выплаты</p>
+                          <p className="text-sm font-semibold">{selectedRequest.paymentMethod}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">Реквизиты</p>
+                          <div className="text-sm whitespace-pre-line bg-background p-3 rounded-md border">
+                            {selectedRequest.paymentDetails}
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {employeeData.email && (
                   <Card>
                     <CardHeader>
