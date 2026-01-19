@@ -41,7 +41,7 @@ function VacancyReferral() {
       document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
       
       updateMetaTag('og:title', `${vacancy.title} — ${vacancy.department}`);
-      updateMetaTag('og:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title} в компании. Заработная плата: ${vacancy.salary_display}`);
+      updateMetaTag('og:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title} в компании. Заработная плата: ${vacancy.salary_display}. Вознаграждение за рекомендацию: ${vacancy.reward_amount.toLocaleString()} ₽`);
       updateMetaTag('og:image', ogImageUrl);
       updateMetaTag('og:url', vacancyUrl);
       updateMetaTag('og:type', 'website');
@@ -76,7 +76,7 @@ function VacancyReferral() {
     try {
       setIsLoading(true);
       
-      const vacanciesData = await api.getVacancies(1, 'all');
+      const vacanciesData = await api.getVacancies(1, 'active');
       const foundVacancy = vacanciesData.find(v => v.referral_token === token);
       
       if (foundVacancy) {

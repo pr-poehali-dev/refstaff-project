@@ -58,7 +58,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             query = f"""
                 SELECT v.id, v.title, v.department, v.salary_display, v.status, 
                        v.reward_amount, v.payout_delay_days, v.requirements, v.description,
-                       v.referral_token, v.created_at, v.company_id,
+                       v.referral_token, v.created_at,
                        COUNT(r.id) as recommendations_count,
                        u.first_name || ' ' || u.last_name as created_by_name
                 FROM t_p65890965_refstaff_project.vacancies v

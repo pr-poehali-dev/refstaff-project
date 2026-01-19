@@ -25,7 +25,14 @@ import { MessengerDialog } from '@/components/MessengerDialog';
 
 function Index() {
   const navigate = useNavigate();
-  const [userRole, setUserRole] = useState<UserRole>('guest');
+  const [userRole, setUserRole] = useState<UserRole>(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      const saved = localStorage.getItem('userRole');
+      return (saved as UserRole) || 'guest';
+    }
+    return 'guest';
+  });
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem('authToken'));
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
@@ -40,7 +47,6 @@ function Index() {
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showPersonalDataDialog, setShowPersonalDataDialog] = useState(false);
-  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -102,12 +108,7 @@ function Index() {
   const [withdrawForm, setWithdrawForm] = useState({
     amount: '',
     paymentMethod: 'card',
-    paymentDetails: '',
-    accountRecipient: '',
-    accountBankName: '',
-    accountNumber: '',
-    accountBik: '',
-    accountCorrNumber: ''
+    paymentDetails: ''
   });
   const [showProfileEditDialog, setShowProfileEditDialog] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -300,64 +301,48 @@ function Index() {
   const [newComment, setNewComment] = useState('');
 
   useEffect(() => {
-    if (userRole !== 'guest' && authToken) {
+    if (userRole !== 'guest') {
       localStorage.setItem('userRole', userRole);
     }
-  }, [userRole, authToken]);
+  }, [userRole]);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const savedRole = localStorage.getItem('userRole');
-    
-    if (token && savedRole && savedRole !== 'guest') {
-      setAuthToken(token);
+    if (authToken && userRole !== 'guest') {
       verifyToken();
     }
   }, []);
 
   const verifyToken = async () => {
-    const token = authToken || localStorage.getItem('authToken');
-    if (!token) {
-      confirmLogout();
-      return;
-    }
-    
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'X-Auth-Token': token
+          'X-Auth-Token': authToken || ''
         }
       });
       
       if (response.ok) {
         const data = await response.json();
         setCurrentUser(data.user);
-        const role = data.user.role === 'admin' ? 'employer' : 'employee';
-        setUserRole(role);
-        localStorage.setItem('userRole', role);
       } else {
-        confirmLogout();
+        handleLogout();
       }
     } catch (error) {
       console.error('Ошибка проверки токена:', error);
-      confirmLogout();
+      handleLogout();
     }
   };
 
-  const confirmLogout = () => {
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('authToken');
-    setUserRole('guest');
-    setAuthToken(null);
-    setCurrentUser(null);
-    setShowLogoutDialog(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   const handleLogout = () => {
-    setShowLogoutDialog(true);
+    if (window.confirm('Вы уверены, что хотите выйти из системы?')) {
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('authToken');
+      setUserRole('guest');
+      setAuthToken(null);
+      setCurrentUser(null);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const handleSendMessage = () => {
@@ -1095,7 +1080,7 @@ function Index() {
               <h2 id="how-title" className="text-4xl font-bold mb-4">Как это работает</h2>
               <p className="text-xl text-muted-foreground">Запустите реферальную программу за 4 простых шага</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mx-0 my-2 py-[1px] px-0 rounded-none">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
               {[
                 { icon: 'Building2', emoji: '🏢', title: 'Регистрация', desc: 'Зарегистрируйте компанию и добавьте вакансии', color: 'bg-blue-500' },
                 { icon: 'Users', emoji: '👥', title: 'Приглашение', desc: 'Пригласите сотрудников в систему', color: 'bg-green-500' },
@@ -1114,7 +1099,7 @@ function Index() {
                       <CardTitle as="h3" className="text-xl">{step.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground text-center">{step.desc}</p>
+                      <p className="text-muted-foreground">{step.desc}</p>
                     </CardContent>
                   </Card>
                   {i < 3 && (
@@ -2186,9 +2171,9 @@ function Index() {
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={24} />
-            <span className="text-lg sm:text-xl font-bold text-sky-500">iHUNT</span>
+            <span className="text-lg sm:text-xl font-bold">iHUNT</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
@@ -2420,7 +2405,8 @@ function Index() {
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
                         onClick={() => {
-                          window.open(`/r/${vacancy.referral_token}`, '_blank');
+                          setSelectedVacancyDetail(vacancy);
+                          setShowVacancyDetail(true);
                         }}
                       >
                         <CardTitle className="flex items-center gap-1.5 text-xs sm:text-lg">
@@ -2643,6 +2629,22 @@ function Index() {
                   <Icon name="UserPlus" className="mr-1 sm:mr-2" size={16} />
                   <span className="hidden md:inline">Добавить сотрудника</span>
                   <span className="md:hidden">Добавить</span>
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('Клик по кнопке загрузки базы', showIntegrationDialog);
+                    setShowIntegrationDialog(true);
+                    console.log('Состояние после установки:', true);
+                  }} 
+                  size="sm" 
+                  className="w-full sm:w-auto text-xs sm:text-sm relative z-10"
+                >
+                  <Icon name="Download" className="mr-1 sm:mr-2" size={16} />
+                  <span className="hidden md:inline">Загрузить базу</span>
+                  <span className="md:hidden">Загрузить</span>
                 </Button>
               </div>
             </div>
@@ -4314,7 +4316,7 @@ function Index() {
     <div className="min-h-screen bg-gray-50">
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={24} />
             <span className="text-lg sm:text-xl font-bold">iHUNT</span>
           </div>
@@ -5655,59 +5657,14 @@ function Index() {
                 </SelectContent>
               </Select>
             </div>
-            {withdrawForm.paymentMethod === 'account' ? (
-              <>
-                <div>
-                  <Label>Получатель</Label>
-                  <Input
-                    placeholder="Иванов Иван Иванович"
-                    value={withdrawForm.accountRecipient}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountRecipient: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label>Наименование банка получателя</Label>
-                  <Input
-                    placeholder="ПАО Сбербанк"
-                    value={withdrawForm.accountBankName}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountBankName: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label>Расчетный счет</Label>
-                  <Input
-                    placeholder="40817810099910004312"
-                    value={withdrawForm.accountNumber}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountNumber: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label>БИК</Label>
-                  <Input
-                    placeholder="044525225"
-                    value={withdrawForm.accountBik}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountBik: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label>Корреспондентский счет</Label>
-                  <Input
-                    placeholder="30101810400000000225"
-                    value={withdrawForm.accountCorrNumber}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountCorrNumber: e.target.value})}
-                  />
-                </div>
-              </>
-            ) : (
-              <div>
-                <Label>Реквизиты</Label>
-                <Input
-                  placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
-                  value={withdrawForm.paymentDetails}
-                  onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
-                />
-              </div>
-            )}
+            <div>
+              <Label>Реквизиты</Label>
+              <Input
+                placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
+                value={withdrawForm.paymentDetails}
+                onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
+              />
+            </div>
             <Button 
               className="w-full"
               onClick={async () => {
@@ -5762,28 +5719,6 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Icon name="LogOut" className="text-orange-500" size={24} />
-              Выход из личного кабинета
-            </DialogTitle>
-            <DialogDescription>
-              Вы уверены, что хотите выйти из личного кабинета? Вам потребуется снова войти для доступа к функциям платформы.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex gap-3 justify-end pt-4">
-            <Button variant="outline" onClick={() => setShowLogoutDialog(false)}>
-              Отмена
-            </Button>
-            <Button variant="destructive" onClick={confirmLogout}>
-              <Icon name="LogOut" className="mr-2" size={18} />
-              Выйти
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
     </>
     );

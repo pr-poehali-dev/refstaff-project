@@ -36,32 +36,12 @@ def handler(event: dict, context) -> dict:
             title_font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 60)
             dept_font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 36)
             brand_font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 48)
-            vacancy_badge_font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 32)
         except Exception:
             title_font = ImageFont.load_default()
             dept_font = ImageFont.load_default()
             brand_font = ImageFont.load_default()
-            vacancy_badge_font = ImageFont.load_default()
         
         draw.text((80, 80), 'iHUNT', font=brand_font, fill='#3b82f6')
-        badge_text = 'ВАКАНСИЯ'
-        badge_bbox = draw.textbbox((0, 0), badge_text, font=vacancy_badge_font)
-        badge_width = badge_bbox[2] - badge_bbox[0] + 40
-        badge_height = badge_bbox[3] - badge_bbox[1] + 20
-        badge_x = 1160 - badge_width - 20
-        badge_y = 80
-        
-        draw.rectangle(
-            [(badge_x, badge_y), (badge_x + badge_width, badge_y + badge_height)],
-            fill='#3b82f6',
-            outline='#3b82f6'
-        )
-        draw.text(
-            (badge_x + 20, badge_y + 10),
-            badge_text,
-            font=vacancy_badge_font,
-            fill='#ffffff'
-        )
         
         title_lines = []
         words = vacancy_title.split()
