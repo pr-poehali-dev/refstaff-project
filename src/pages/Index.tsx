@@ -3704,32 +3704,143 @@ function Index() {
       </Dialog>
 
       <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
-        <DialogContent className="max-w-2xl h-[600px] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Чат с {activeChatEmployee?.name}</DialogTitle>
-            <DialogDescription>{activeChatEmployee?.position}</DialogDescription>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto space-y-3 py-4">
-            {chatMessages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
-                  <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
-                  <div className="text-sm">{msg.message}</div>
-                  <div className="text-xs opacity-70 mt-1">{msg.timestamp}</div>
-                </div>
+        <DialogContent className="max-w-4xl h-[600px] flex flex-col p-0">
+          <div className="flex h-full">
+            <div className="w-72 border-r flex flex-col">
+              <div className="p-4 border-b">
+                <h3 className="font-semibold">Сотрудники</h3>
+                <p className="text-xs text-muted-foreground mt-1">Выберите сотрудника для диалога</p>
               </div>
-            ))}
-          </div>
-          <div className="flex gap-2 pt-4 border-t">
-            <Input 
-              placeholder="Введите сообщение..." 
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-            />
-            <Button onClick={handleSendMessage}>
-              <Icon name="Send" size={18} />
-            </Button>
+              <div className="flex-1 overflow-y-auto">
+                {employees.map((emp) => (
+                  <div
+                    key={emp.id}
+                    className={`p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
+                      activeChatEmployee?.id === emp.id ? 'bg-muted' : ''
+                    }`}
+                    onClick={() => setActiveChatEmployee(emp)}
+                  >
+                    <div className="flex items-center gap-3">
+                      {emp.avatar ? (
+                        <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon name="User" size={20} className="text-primary" />
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm truncate">{emp.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{emp.position}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1 flex flex-col">
+              {activeChatEmployee ? (
+                <>
+                  <div className="p-4 border-b">
+                    <div className="flex items-center gap-3">
+                      {activeChatEmployee.avatar ? (
+                        <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-12 h-12 rounded-full object-cover" />
+                      ) : (
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon name="User" size={24} className="text-primary" />
+                        </div>
+                      )}
+                      <div>
+                        <h3 className="font-semibold">{activeChatEmployee.name}</h3>
+                        <p className="text-sm text-muted-foreground">{activeChatEmployee.position}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                    {chatMessages.map((msg) => (
+                      <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
+                          <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
+                          {msg.message && <div className="text-sm">{msg.message}</div>}
+                          {msg.attachments && msg.attachments.map((att, idx) => (
+                            <div key={idx} className="mt-2">
+                              {att.type === 'image' ? (
+                                <img src={att.url} alt={att.name} className="rounded max-w-full max-h-48 object-contain" />
+                              ) : (
+                                <div className="flex items-center gap-2 p-2 bg-background/10 rounded">
+                                  <Icon name="FileText" size={16} />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-xs font-medium truncate">{att.name}</p>
+                                    <p className="text-xs opacity-70">{(att.size / 1024).toFixed(1)} KB</p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                          <div className="text-xs opacity-70 mt-1">{msg.timestamp}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="p-4 border-t">
+                    {selectedFiles.length > 0 && (
+                      <div className="mb-3 flex flex-wrap gap-2">
+                        {selectedFiles.map((file, idx) => (
+                          <div key={idx} className="relative bg-muted rounded-lg p-2 pr-8">
+                            <div className="flex items-center gap-2">
+                              <Icon name={file.type.startsWith('image/') ? 'Image' : 'FileText'} size={16} />
+                              <span className="text-xs max-w-[120px] truncate">{file.name}</span>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              className="absolute top-1 right-1 h-6 w-6 p-0"
+                              onClick={() => removeFile(idx)}
+                            >
+                              <Icon name="X" size={14} />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileSelect}
+                        multiple
+                        className="hidden"
+                        accept="image/*,.pdf,.doc,.docx"
+                      />
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Icon name="Paperclip" size={18} />
+                      </Button>
+                      <Input 
+                        placeholder="Введите сообщение..." 
+                        value={newMessage}
+                        onChange={(e) => setNewMessage(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                        className="flex-1"
+                      />
+                      <Button onClick={handleSendMessage}>
+                        <Icon name="Send" size={18} />
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <Icon name="MessageSquare" size={48} className="mx-auto mb-3 opacity-50" />
+                    <p>Выберите сотрудника для начала диалога</p>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
