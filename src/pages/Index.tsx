@@ -19,6 +19,7 @@ import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost
 import { EmployeeDetail } from '@/components/EmployeeDetail';
 import { PayoutRequests } from '@/components/PayoutRequests';
 import { VacancyDetail } from '@/components/VacancyDetail';
+import { VacancyPublicView } from '@/components/VacancyPublicView';
 import { CandidateDetail } from '@/components/CandidateDetail';
 import ChatBot from '@/components/ChatBot';
 import { MessengerDialog } from '@/components/MessengerDialog';
@@ -99,6 +100,8 @@ function Index() {
   const [chatHistories, setChatHistories] = useState<{[key: number]: ChatMessage[]}>({});
   const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
   const [showVacancyDetail, setShowVacancyDetail] = useState(false);
+  const [selectedVacancyPublic, setSelectedVacancyPublic] = useState<Vacancy | null>(null);
+  const [showVacancyPublic, setShowVacancyPublic] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<Recommendation | null>(null);
   const [showCandidateDetail, setShowCandidateDetail] = useState(false);
   const [vacancySearchQuery, setVacancySearchQuery] = useState('');
@@ -2405,8 +2408,8 @@ function Index() {
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
                         onClick={() => {
-                          setSelectedVacancyDetail(vacancy);
-                          setShowVacancyDetail(true);
+                          setSelectedVacancyPublic(vacancy);
+                          setShowVacancyPublic(true);
                         }}
                       >
                         <CardTitle className="flex items-center gap-1.5 text-xs sm:text-lg">
@@ -5587,6 +5590,12 @@ function Index() {
             setShowVacancyDetail(false);
           }
         }}
+      />
+
+      <VacancyPublicView
+        vacancy={selectedVacancyPublic}
+        open={showVacancyPublic}
+        onOpenChange={setShowVacancyPublic}
       />
 
       <CandidateDetail
