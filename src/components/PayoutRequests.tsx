@@ -1,13 +1,11 @@
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { api } from '@/lib/api';
+import { PayoutRequestCard } from './payout/PayoutRequestCard';
+import { PayoutReviewDialog } from './payout/PayoutReviewDialog';
+import { EmployeeRecommendationsDialog } from './payout/EmployeeRecommendationsDialog';
+import { EmployeeProfileDialog } from './payout/EmployeeProfileDialog';
 
 export interface PayoutRequest {
   id: number;
@@ -36,8 +34,6 @@ interface PayoutRequestsProps {
 export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps) {
   const [selectedRequest, setSelectedRequest] = useState<PayoutRequest | null>(null);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
-  const [reviewStatus, setReviewStatus] = useState<'approved' | 'rejected' | 'paid'>('approved');
-  const [reviewComment, setReviewComment] = useState('');
   const [showRecommendationsDialog, setShowRecommendationsDialog] = useState(false);
   const [employeeRecommendations, setEmployeeRecommendations] = useState<any[]>([]);
   const [loadingRecommendations, setLoadingRecommendations] = useState(false);
@@ -45,30 +41,16 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
   const [employeeData, setEmployeeData] = useState<any>(null);
   const [loadingEmployee, setLoadingEmployee] = useState(false);
 
-  const getStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
-      pending: { label: 'На рассмотрении', variant: 'secondary' },
-      approved: { label: 'Одобрено', variant: 'default' },
-      rejected: { label: 'Отклонено', variant: 'destructive' },
-      paid: { label: 'Выплачено', variant: 'outline' },
-    };
-    const cfg = config[status] || config.pending;
-    return <Badge variant={cfg.variant}>{cfg.label}</Badge>;
-  };
-
   const handleReview = (request: PayoutRequest) => {
     setSelectedRequest(request);
-    setReviewStatus('approved');
-    setReviewComment('');
     setShowReviewDialog(true);
   };
 
-  const handleSubmitReview = () => {
+  const handleSubmitReview = (status: 'approved' | 'rejected' | 'paid', comment: string) => {
     if (selectedRequest) {
-      onUpdateStatus(selectedRequest.id, reviewStatus, reviewComment);
+      onUpdateStatus(selectedRequest.id, status, comment);
       setShowReviewDialog(false);
       setSelectedRequest(null);
-      setReviewComment('');
     }
   };
 
@@ -86,18 +68,6 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
     } finally {
       setLoadingRecommendations(false);
     }
-  };
-
-  const getRecommendationStatusBadge = (status: string) => {
-    const config: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
-      pending: { label: 'На рассмотрении', variant: 'secondary' },
-      accepted: { label: 'Принято', variant: 'default' },
-      rejected: { label: 'Отклонено', variant: 'destructive' },
-      interview: { label: 'Интервью', variant: 'outline' },
-      hired: { label: 'Нанят', variant: 'default' },
-    };
-    const cfg = config[status] || config.pending;
-    return <Badge variant={cfg.variant}>{cfg.label}</Badge>;
   };
 
   const handleShowEmployeeProfile = async (request: PayoutRequest) => {
@@ -124,94 +94,6 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
   const approvedRequests = requests.filter(r => r.status === 'approved');
   const paidRequests = requests.filter(r => r.status === 'paid');
   const rejectedRequests = requests.filter(r => r.status === 'rejected');
-
-  const renderRequestCard = (request: PayoutRequest) => (
-    <Card key={request.id}>
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle 
-              className="text-base cursor-pointer hover:text-primary transition-colors"
-              onClick={() => handleShowEmployeeProfile(request)}
-            >
-              {request.userName}
-            </CardTitle>
-            <CardDescription>{request.userEmail}</CardDescription>
-          </div>
-          <div className="flex flex-col items-end gap-2">
-            {getStatusBadge(request.status)}
-            <div className="text-lg font-bold text-green-600">
-              {request.amount.toLocaleString('ru-RU')} ₽
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-3">
-          {request.candidateName && (
-            <div className="bg-blue-50 p-3 rounded-md border border-blue-200">
-              <p className="text-sm font-medium text-blue-900 mb-1">Кандидат</p>
-              <div className="space-y-1">
-                <p className="text-sm font-semibold text-blue-800">{request.candidateName}</p>
-                {request.candidateEmail && (
-                  <p className="text-xs text-blue-600">{request.candidateEmail}</p>
-                )}
-                {request.vacancyTitle && (
-                  <p className="text-xs text-blue-600">Вакансия: {request.vacancyTitle}</p>
-                )}
-              </div>
-            </div>
-          )}
-          <div>
-            <p className="text-sm font-medium text-muted-foreground">Дата запроса</p>
-            <p className="text-sm">{new Date(request.createdAt).toLocaleString('ru-RU')}</p>
-          </div>
-          {request.paymentMethod && (
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Способ выплаты</p>
-              <p className="text-sm">{request.paymentMethod}</p>
-            </div>
-          )}
-          {request.paymentDetails && (
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Детали выплаты</p>
-              <p className="text-sm">{request.paymentDetails}</p>
-            </div>
-          )}
-          {request.adminComment && (
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Комментарий администратора</p>
-              <p className="text-sm">{request.adminComment}</p>
-            </div>
-          )}
-          {request.reviewedAt && (
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Дата рассмотрения</p>
-              <p className="text-sm">{new Date(request.reviewedAt).toLocaleString('ru-RU')}</p>
-            </div>
-          )}
-          <div className="flex flex-col gap-2 mt-2">
-            <Button onClick={() => handleShowRecommendations(request)} variant="outline" className="w-full">
-              <Icon name="Users" size={16} className="mr-2" />
-              Показать рекомендации
-            </Button>
-            {request.status === 'pending' && (
-              <Button onClick={() => handleReview(request)} className="w-full">
-                <Icon name="CheckCircle" size={16} className="mr-2" />
-                Рассмотреть запрос
-              </Button>
-            )}
-            {request.status === 'approved' && (
-              <Button onClick={() => onUpdateStatus(request.id, 'paid')} className="w-full" variant="outline">
-                <Icon name="DollarSign" size={16} className="mr-2" />
-                Отметить как выплачено
-              </Button>
-            )}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <>
@@ -278,7 +160,16 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <div>
                 <h3 className="text-lg font-semibold mb-3">На рассмотрении ({pendingRequests.length})</h3>
                 <div className="space-y-3">
-                  {pendingRequests.map(renderRequestCard)}
+                  {pendingRequests.map(request => (
+                    <PayoutRequestCard
+                      key={request.id}
+                      request={request}
+                      onShowRecommendations={handleShowRecommendations}
+                      onReview={handleReview}
+                      onShowEmployeeProfile={handleShowEmployeeProfile}
+                      onUpdateStatus={onUpdateStatus}
+                    />
+                  ))}
                 </div>
               </div>
             )}
@@ -286,7 +177,16 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <div>
                 <h3 className="text-lg font-semibold mb-3">Одобренные ({approvedRequests.length})</h3>
                 <div className="space-y-3">
-                  {approvedRequests.map(renderRequestCard)}
+                  {approvedRequests.map(request => (
+                    <PayoutRequestCard
+                      key={request.id}
+                      request={request}
+                      onShowRecommendations={handleShowRecommendations}
+                      onReview={handleReview}
+                      onShowEmployeeProfile={handleShowEmployeeProfile}
+                      onUpdateStatus={onUpdateStatus}
+                    />
+                  ))}
                 </div>
               </div>
             )}
@@ -294,7 +194,16 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <div>
                 <h3 className="text-lg font-semibold mb-3">Выплаченные ({paidRequests.length})</h3>
                 <div className="space-y-3">
-                  {paidRequests.map(renderRequestCard)}
+                  {paidRequests.map(request => (
+                    <PayoutRequestCard
+                      key={request.id}
+                      request={request}
+                      onShowRecommendations={handleShowRecommendations}
+                      onReview={handleReview}
+                      onShowEmployeeProfile={handleShowEmployeeProfile}
+                      onUpdateStatus={onUpdateStatus}
+                    />
+                  ))}
                 </div>
               </div>
             )}
@@ -302,7 +211,16 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
               <div>
                 <h3 className="text-lg font-semibold mb-3">Отклонённые ({rejectedRequests.length})</h3>
                 <div className="space-y-3">
-                  {rejectedRequests.map(renderRequestCard)}
+                  {rejectedRequests.map(request => (
+                    <PayoutRequestCard
+                      key={request.id}
+                      request={request}
+                      onShowRecommendations={handleShowRecommendations}
+                      onReview={handleReview}
+                      onShowEmployeeProfile={handleShowEmployeeProfile}
+                      onUpdateStatus={onUpdateStatus}
+                    />
+                  ))}
                 </div>
               </div>
             )}
@@ -310,257 +228,28 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
         )}
       </div>
 
-      <Dialog open={showReviewDialog} onOpenChange={setShowReviewDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Рассмотрение запроса на выплату</DialogTitle>
-            <DialogDescription>
-              {selectedRequest && (
-                <>
-                  Запрос от {selectedRequest.userName} на сумму{' '}
-                  <span className="font-semibold">{selectedRequest.amount.toLocaleString('ru-RU')} ₽</span>
-                </>
-              )}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label>Решение</Label>
-              <Select value={reviewStatus} onValueChange={(v) => setReviewStatus(v as any)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="approved">Одобрить</SelectItem>
-                  <SelectItem value="rejected">Отклонить</SelectItem>
-                  <SelectItem value="paid">Выплачено</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label>Комментарий (опционально)</Label>
-              <Textarea
-                value={reviewComment}
-                onChange={(e) => setReviewComment(e.target.value)}
-                placeholder="Добавьте комментарий к решению..."
-                rows={3}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={handleSubmitReview} className="flex-1">
-                <Icon name="Check" size={16} className="mr-2" />
-                Подтвердить
-              </Button>
-              <Button onClick={() => setShowReviewDialog(false)} variant="outline">
-                Отмена
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PayoutReviewDialog
+        open={showReviewDialog}
+        onOpenChange={setShowReviewDialog}
+        request={selectedRequest}
+        onSubmit={handleSubmitReview}
+      />
 
-      <Dialog open={showRecommendationsDialog} onOpenChange={setShowRecommendationsDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Рекомендации сотрудника</DialogTitle>
-            <DialogDescription>
-              {selectedRequest && `${selectedRequest.userName} — все рекомендации кандидатов`}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            {loadingRecommendations ? (
-              <div className="flex items-center justify-center py-8">
-                <Icon name="Loader2" className="animate-spin text-primary" size={32} />
-              </div>
-            ) : employeeRecommendations.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <Icon name="Users" size={48} className="mx-auto mb-3 opacity-50" />
-                <p>У этого сотрудника пока нет рекомендаций</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {employeeRecommendations.map((rec) => (
-                  <Card key={rec.id}>
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-base">{rec.candidate_name}</CardTitle>
-                          <CardDescription className="text-xs">{rec.candidate_email}</CardDescription>
-                        </div>
-                        {getRecommendationStatusBadge(rec.status)}
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2 text-sm">
-                        {rec.vacancy_title && (
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground">Вакансия</p>
-                            <p className="font-medium">{rec.vacancy_title}</p>
-                          </div>
-                        )}
-                        {rec.candidate_phone && (
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground">Телефон</p>
-                            <p>{rec.candidate_phone}</p>
-                          </div>
-                        )}
-                        {rec.comment && (
-                          <div>
-                            <p className="text-xs font-medium text-muted-foreground">Комментарий</p>
-                            <p className="text-xs">{rec.comment}</p>
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-xs font-medium text-muted-foreground">Дата рекомендации</p>
-                          <p className="text-xs">{new Date(rec.created_at).toLocaleString('ru-RU')}</p>
-                        </div>
-                        {rec.status === 'hired' && (
-                          <div className="bg-green-50 p-2 rounded-md border border-green-200">
-                            <p className="text-xs font-medium text-green-800">
-                              <Icon name="CheckCircle" size={14} className="inline mr-1" />
-                              Вознаграждение: {rec.reward_amount.toLocaleString('ru-RU')} ₽
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EmployeeRecommendationsDialog
+        open={showRecommendationsDialog}
+        onOpenChange={setShowRecommendationsDialog}
+        request={selectedRequest}
+        recommendations={employeeRecommendations}
+        loading={loadingRecommendations}
+      />
 
-      <Dialog open={showEmployeeProfile} onOpenChange={setShowEmployeeProfile}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Профиль сотрудника</DialogTitle>
-            <DialogDescription>
-              {selectedRequest && `Полная информация о ${selectedRequest.userName}`}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            {loadingEmployee ? (
-              <div className="flex items-center justify-center py-8">
-                <Icon name="Loader2" className="animate-spin text-primary" size={32} />
-              </div>
-            ) : employeeData ? (
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader>
-                    <div className="flex items-start gap-4">
-                      {employeeData.avatar_url ? (
-                        <img src={employeeData.avatar_url} alt={employeeData.first_name} className="w-16 h-16 rounded-full object-cover" />
-                      ) : (
-                        <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon name="User" size={32} className="text-primary" />
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <CardTitle>{employeeData.first_name} {employeeData.last_name}</CardTitle>
-                        <CardDescription>{employeeData.position} • {employeeData.department}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Уровень</p>
-                        <p className="text-2xl font-bold text-primary">{employeeData.level}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Опыт</p>
-                        <p className="text-2xl font-bold">{employeeData.experience_points} XP</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Рекомендаций</p>
-                        <p className="text-2xl font-bold text-blue-600">{employeeData.total_recommendations}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-muted-foreground">Успешных наймов</p>
-                        <p className="text-2xl font-bold text-green-600">{employeeData.successful_hires}</p>
-                      </div>
-                      <div className="col-span-2">
-                        <p className="text-sm font-medium text-muted-foreground">Всего заработано</p>
-                        <p className="text-3xl font-bold text-green-600">{employeeData.total_earnings.toLocaleString('ru-RU')} ₽</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {employeeData.email && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">Контакты</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-2">
-                        {employeeData.email && (
-                          <div className="flex items-center gap-2">
-                            <Icon name="Mail" size={16} className="text-muted-foreground" />
-                            <span className="text-sm">{employeeData.email}</span>
-                          </div>
-                        )}
-                        {employeeData.phone && (
-                          <div className="flex items-center gap-2">
-                            <Icon name="Phone" size={16} className="text-muted-foreground" />
-                            <span className="text-sm">{employeeData.phone}</span>
-                          </div>
-                        )}
-                        {employeeData.telegram && (
-                          <div className="flex items-center gap-2">
-                            <Icon name="Send" size={16} className="text-muted-foreground" />
-                            <span className="text-sm">{employeeData.telegram}</span>
-                          </div>
-                        )}
-                        {employeeData.vk && (
-                          <div className="flex items-center gap-2">
-                            <Icon name="MessageCircle" size={16} className="text-muted-foreground" />
-                            <span className="text-sm">{employeeData.vk}</span>
-                          </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {employeeData.recommendations && employeeData.recommendations.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="text-base">История рекомендаций</CardTitle>
-                      <CardDescription>{employeeData.recommendations.length} {employeeData.recommendations.length === 1 ? 'рекомендация' : 'рекомендаций'}</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3 max-h-60 overflow-y-auto">
-                        {employeeData.recommendations.map((rec: any) => (
-                          <div key={rec.id} className="border rounded-lg p-3">
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex-1">
-                                <p className="font-medium text-sm">{rec.candidate_name}</p>
-                                <p className="text-xs text-muted-foreground">{rec.vacancy_title}</p>
-                              </div>
-                              {getRecommendationStatusBadge(rec.status)}
-                            </div>
-                            <p className="text-xs text-muted-foreground">
-                              {new Date(rec.created_at).toLocaleDateString('ru-RU')}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Icon name="AlertCircle" size={48} className="mx-auto mb-3 opacity-50" />
-                <p>Не удалось загрузить данные сотрудника</p>
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EmployeeProfileDialog
+        open={showEmployeeProfile}
+        onOpenChange={setShowEmployeeProfile}
+        request={selectedRequest}
+        employeeData={employeeData}
+        loading={loadingEmployee}
+      />
     </>
   );
 }
