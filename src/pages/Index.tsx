@@ -101,6 +101,7 @@ function Index() {
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
   const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
   const [showVacancyDetail, setShowVacancyDetail] = useState(false);
+  const [showRecommendDialog, setShowRecommendDialog] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<Recommendation | null>(null);
   const [showCandidateDetail, setShowCandidateDetail] = useState(false);
   const [vacancySearchQuery, setVacancySearchQuery] = useState('');
@@ -5592,11 +5593,89 @@ function Index() {
         showRecommendButton={userRole === 'employee'}
         onRecommend={() => {
           if (selectedVacancyDetail) {
-            setActiveVacancy(selectedVacancyDetail);
-            setShowVacancyDetail(false);
+            setShowRecommendDialog(true);
           }
         }}
       />
+
+      <Dialog open={showRecommendDialog} onOpenChange={setShowRecommendDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Рекомендовать кандидата</DialogTitle>
+            <DialogDescription>
+              Заполните информацию о кандидате на вакансию{' '}
+              <strong>{selectedVacancyDetail?.title}</strong>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="recommend-name">ФИО кандидата *</Label>
+              <Input
+                id="recommend-name"
+                placeholder="Иван Иванов"
+                value={recommendationForm.name}
+                onChange={(e) =>
+                  setRecommendationForm({ ...recommendationForm, name: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="recommend-email">Email *</Label>
+              <Input
+                id="recommend-email"
+                type="email"
+                placeholder="ivan@example.com"
+                value={recommendationForm.email}
+                onChange={(e) =>
+                  setRecommendationForm({ ...recommendationForm, email: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="recommend-phone">Телефон</Label>
+              <Input
+                id="recommend-phone"
+                type="tel"
+                placeholder="+7 (999) 123-45-67"
+                value={recommendationForm.phone}
+                onChange={(e) =>
+                  setRecommendationForm({ ...recommendationForm, phone: e.target.value })
+                }
+              />
+            </div>
+            <div>
+              <Label htmlFor="recommend-comment">Комментарий</Label>
+              <Textarea
+                id="recommend-comment"
+                placeholder="Расскажите о кандидате и почему он подходит на эту позицию..."
+                rows={4}
+                value={recommendationForm.comment}
+                onChange={(e) =>
+                  setRecommendationForm({ ...recommendationForm, comment: e.target.value })
+                }
+              />
+            </div>
+            <Button
+              className="w-full"
+              onClick={async () => {
+                if (!selectedVacancyDetail) return;
+                await handleCreateRecommendation({
+                  vacancyId: selectedVacancyDetail.id,
+                  name: recommendationForm.name,
+                  email: recommendationForm.email,
+                  phone: recommendationForm.phone,
+                  comment: recommendationForm.comment,
+                });
+                setShowRecommendDialog(false);
+                setShowVacancyDetail(false);
+              }}
+            >
+              <Icon name="Send" className="mr-2" size={18} />
+              Отправить рекомендацию
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <CandidateDetail
         recommendation={selectedCandidate}
