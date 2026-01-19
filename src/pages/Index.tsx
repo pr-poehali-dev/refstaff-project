@@ -2407,7 +2407,8 @@ function Index() {
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-1.5 sm:gap-3">
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedVacancyPublic(vacancy);
                           setShowVacancyPublic(true);
                         }}
@@ -2463,7 +2464,8 @@ function Index() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setActiveVacancy(vacancy);
                               setVacancyForm({
                                 title: vacancy.title,
@@ -2486,7 +2488,10 @@ function Index() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={() => handleArchiveVacancy(vacancy.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleArchiveVacancy(vacancy.id);
+                            }}
                             className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                           >
                             <Icon name="Archive" size={12} className="sm:mr-1" />
@@ -2498,7 +2503,10 @@ function Index() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={() => handleRestoreVacancy(vacancy.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRestoreVacancy(vacancy.id);
+                              }}
                               className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
                               <Icon name="RotateCcw" size={12} />
@@ -2506,7 +2514,10 @@ function Index() {
                             <Button 
                               variant="destructive" 
                               size="sm"
-                              onClick={() => handleDeleteVacancy(vacancy.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteVacancy(vacancy.id);
+                              }}
                               className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
                               <Icon name="Trash2" size={12} />
