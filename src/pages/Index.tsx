@@ -1083,7 +1083,7 @@ function Index() {
               <h2 id="how-title" className="text-4xl font-bold mb-4">Как это работает</h2>
               <p className="text-xl text-muted-foreground">Запустите реферальную программу за 4 простых шага</p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mx-0 my-2 py-[1px] px-0 rounded-none">
               {[
                 { icon: 'Building2', emoji: '🏢', title: 'Регистрация', desc: 'Зарегистрируйте компанию и добавьте вакансии', color: 'bg-blue-500' },
                 { icon: 'Users', emoji: '👥', title: 'Приглашение', desc: 'Пригласите сотрудников в систему', color: 'bg-green-500' },
@@ -1102,7 +1102,7 @@ function Index() {
                       <CardTitle as="h3" className="text-xl">{step.title}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <p className="text-muted-foreground">{step.desc}</p>
+                      <p className="text-muted-foreground text-center">{step.desc}</p>
                     </CardContent>
                   </Card>
                   {i < 3 && (
