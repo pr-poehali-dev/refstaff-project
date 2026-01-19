@@ -119,6 +119,36 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRe
             </ul>
           </div>
 
+          <Separator />
+          
+          <div className="space-y-3 bg-muted/50 p-4 rounded-lg">
+            <h3 className="font-semibold flex items-center gap-2">
+              <Icon name="ExternalLink" size={18} />
+              Ссылка на вакансию
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              Поделитесь этой ссылкой для просмотра вакансии в свободном доступе
+            </p>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={`${window.location.origin}/vacancy/${vacancy.id}`}
+                readOnly
+                className="flex-1 px-3 py-2 text-sm border rounded-md bg-background"
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/vacancy/${vacancy.id}`);
+                }}
+              >
+                <Icon name="Copy" size={16} className="mr-2" />
+                Копировать
+              </Button>
+            </div>
+          </div>
+
           {vacancy.referralLink && (
             <>
               <Separator />
@@ -153,14 +183,7 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRe
           )}
 
           {showRecommendButton && vacancy.status === 'active' && onRecommend && (
-            <Button 
-              className="w-full" 
-              size="lg" 
-              onClick={() => {
-                onRecommend();
-                onOpenChange(false);
-              }}
-            >
+            <Button className="w-full" size="lg" onClick={onRecommend}>
               <Icon name="UserPlus" size={18} className="mr-2" />
               Рекомендовать кандидата
             </Button>

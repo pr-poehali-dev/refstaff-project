@@ -101,8 +101,6 @@ function Index() {
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
   const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
   const [showVacancyDetail, setShowVacancyDetail] = useState(false);
-  const [showRecommendDialog, setShowRecommendDialog] = useState(false);
-  const [vacancyToRecommend, setVacancyToRecommend] = useState<Vacancy | null>(null);
   const [selectedCandidate, setSelectedCandidate] = useState<Recommendation | null>(null);
   const [showCandidateDetail, setShowCandidateDetail] = useState(false);
   const [vacancySearchQuery, setVacancySearchQuery] = useState('');
@@ -4249,90 +4247,8 @@ function Index() {
         vacancy={selectedVacancyDetail}
         open={showVacancyDetail}
         onOpenChange={setShowVacancyDetail}
-        showRecommendButton={true}
-        onRecommend={() => {
-          setVacancyToRecommend(selectedVacancyDetail);
-          setShowRecommendDialog(true);
-        }}
+        showRecommendButton={false}
       />
-
-      <Dialog open={showRecommendDialog} onOpenChange={setShowRecommendDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Рекомендовать кандидата</DialogTitle>
-            <DialogDescription>
-              Заполните информацию о кандидате на вакансию{' '}
-              {vacancyToRecommend?.title}
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <Label htmlFor="recommend-name">ФИО кандидата *</Label>
-              <Input
-                id="recommend-name"
-                placeholder="Иван Иванов"
-                value={recommendationForm.name}
-                onChange={(e) =>
-                  setRecommendationForm({ ...recommendationForm, name: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label htmlFor="recommend-email">Email *</Label>
-              <Input
-                id="recommend-email"
-                type="email"
-                placeholder="ivan@example.com"
-                value={recommendationForm.email}
-                onChange={(e) =>
-                  setRecommendationForm({ ...recommendationForm, email: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label htmlFor="recommend-phone">Телефон</Label>
-              <Input
-                id="recommend-phone"
-                type="tel"
-                placeholder="+7 (999) 123-45-67"
-                value={recommendationForm.phone}
-                onChange={(e) =>
-                  setRecommendationForm({ ...recommendationForm, phone: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label htmlFor="recommend-comment">Комментарий</Label>
-              <Textarea
-                id="recommend-comment"
-                placeholder="Расскажите о кандидате и почему он подходит..."
-                rows={4}
-                value={recommendationForm.comment}
-                onChange={(e) =>
-                  setRecommendationForm({ ...recommendationForm, comment: e.target.value })
-                }
-              />
-            </div>
-            <Button
-              className="w-full"
-              onClick={async () => {
-                if (!vacancyToRecommend) return;
-                await handleCreateRecommendation({
-                  vacancyId: vacancyToRecommend.id,
-                  name: recommendationForm.name,
-                  email: recommendationForm.email,
-                  phone: recommendationForm.phone,
-                  comment: recommendationForm.comment,
-                });
-                setShowRecommendDialog(false);
-              }}
-            >
-              <Icon name="Send" className="mr-2" size={18} />
-              Отправить рекомендацию
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
