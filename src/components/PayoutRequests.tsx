@@ -173,9 +173,21 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
             </div>
           )}
           {request.paymentDetails && (
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Детали выплаты</p>
-              <p className="text-sm">{request.paymentDetails}</p>
+            <div className="col-span-2">
+              <p className="text-sm font-medium text-muted-foreground mb-2">Детали выплаты</p>
+              <div className="grid grid-cols-2 gap-3 bg-muted/30 p-3 rounded-md text-sm">
+                {request.paymentDetails.split('\n').map((line, idx) => {
+                  const [label, value] = line.split(':').map(s => s.trim());
+                  return value ? (
+                    <div key={idx}>
+                      <span className="text-muted-foreground text-xs">{label}:</span>
+                      <p className="font-medium">{value}</p>
+                    </div>
+                  ) : (
+                    <p key={idx} className="col-span-2 font-medium">{line}</p>
+                  );
+                })}
+              </div>
             </div>
           )}
           {request.adminComment && (
