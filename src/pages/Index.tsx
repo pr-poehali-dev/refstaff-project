@@ -111,7 +111,11 @@ function Index() {
   const [withdrawForm, setWithdrawForm] = useState({
     amount: '',
     paymentMethod: 'card',
-    paymentDetails: ''
+    paymentDetails: '',
+    accountFullName: '',
+    accountBank: '',
+    accountNumber: '',
+    accountBik: ''
   });
   const [showProfileEditDialog, setShowProfileEditDialog] = useState(false);
   const [profileForm, setProfileForm] = useState({
@@ -5750,14 +5754,53 @@ function Index() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label>Реквизиты</Label>
-              <Input
-                placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
-                value={withdrawForm.paymentDetails}
-                onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
-              />
-            </div>
+            {withdrawForm.paymentMethod === 'account' ? (
+              <>
+                <div>
+                  <Label>ФИО получателя</Label>
+                  <Input
+                    placeholder="Иванов Иван Иванович"
+                    value={withdrawForm.accountFullName}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountFullName: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Банк получателя</Label>
+                  <Input
+                    placeholder="ПАО Сбербанк"
+                    value={withdrawForm.accountBank}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountBank: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Расчётный счёт</Label>
+                  <Input
+                    placeholder="40817810099910004312"
+                    value={withdrawForm.accountNumber}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountNumber: e.target.value})}
+                    maxLength={20}
+                  />
+                </div>
+                <div>
+                  <Label>БИК</Label>
+                  <Input
+                    placeholder="044525225"
+                    value={withdrawForm.accountBik}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountBik: e.target.value})}
+                    maxLength={9}
+                  />
+                </div>
+              </>
+            ) : (
+              <div>
+                <Label>Реквизиты</Label>
+                <Input
+                  placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
+                  value={withdrawForm.paymentDetails}
+                  onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
+                />
+              </div>
+            )}
             <Button 
               className="w-full"
               onClick={async () => {
@@ -5774,12 +5817,32 @@ function Index() {
                   return;
                 }
                 
-                if (!withdrawForm.paymentDetails.trim()) {
-                  alert('Укажите реквизиты для выплаты');
-                  return;
+                if (withdrawForm.paymentMethod === 'account') {
+                  if (!withdrawForm.accountFullName.trim() || !withdrawForm.accountBank.trim() || 
+                      !withdrawForm.accountNumber.trim() || !withdrawForm.accountBik.trim()) {
+                    alert('Заполните все поля для расчётного счёта');
+                    return;
+                  }
+                  if (withdrawForm.accountBik.length !== 9) {
+                    alert('БИК должен содержать 9 цифр');
+                    return;
+                  }
+                  if (withdrawForm.accountNumber.length !== 20) {
+                    alert('Расчётный счёт должен содержать 20 цифр');
+                    return;
+                  }
+                } else {
+                  if (!withdrawForm.paymentDetails.trim()) {
+                    alert('Укажите реквизиты для выплаты');
+                    return;
+                  }
                 }
                 
                 try {
+                  const paymentDetails = withdrawForm.paymentMethod === 'account'
+                    ? `ФИО: ${withdrawForm.accountFullName}\nБанк: ${withdrawForm.accountBank}\nСчёт: ${withdrawForm.accountNumber}\nБИК: ${withdrawForm.accountBik}`
+                    : withdrawForm.paymentDetails;
+                  
                   const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -5788,14 +5851,22 @@ function Index() {
                       amount: requestedAmount,
                       payment_method: withdrawForm.paymentMethod === 'card' ? 'Банковская карта' : 
                                       withdrawForm.paymentMethod === 'sbp' ? 'СБП' : 'Расчётный счёт',
-                      payment_details: withdrawForm.paymentDetails
+                      payment_details: paymentDetails
                     })
                   });
                   
                   if (response.ok) {
                     alert('Запрос на выплату успешно отправлен!');
                     setShowWithdrawDialog(false);
-                    setWithdrawForm({ amount: '', paymentMethod: 'card', paymentDetails: '' });
+                    setWithdrawForm({ 
+                      amount: '', 
+                      paymentMethod: 'card', 
+                      paymentDetails: '',
+                      accountFullName: '',
+                      accountBank: '',
+                      accountNumber: '',
+                      accountBik: ''
+                    });
                     await loadData();
                   } else {
                     alert('Ошибка при отправке запроса');
