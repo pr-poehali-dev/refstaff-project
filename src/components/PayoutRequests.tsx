@@ -180,7 +180,7 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
                   const [label, value] = line.split(':').map(s => s.trim());
                   return value ? (
                     <div key={idx}>
-                      <span className="text-muted-foreground text-xs">{label}:</span>
+                      <span className="text-muted-foreground text-xs">Расчетный счёт</span>
                       <p className="font-medium">{value}</p>
                     </div>
                   ) : (
