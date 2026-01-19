@@ -12,8 +12,6 @@ export interface Vacancy {
   payout_delay_days?: number;
   referral_token?: string;
   recommendations_count?: number;
-  city?: string;
-  is_remote?: boolean;
   created_at: string;
 }
 

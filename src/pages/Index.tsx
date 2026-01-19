@@ -19,10 +19,8 @@ import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost
 import { EmployeeDetail } from '@/components/EmployeeDetail';
 import { PayoutRequests } from '@/components/PayoutRequests';
 import { VacancyDetail } from '@/components/VacancyDetail';
-import { VacancyPublicView } from '@/components/VacancyPublicView';
 import { CandidateDetail } from '@/components/CandidateDetail';
 import ChatBot from '@/components/ChatBot';
-import { MessengerDialog } from '@/components/MessengerDialog';
 
 function Index() {
   const navigate = useNavigate();
@@ -49,7 +47,13 @@ function Index() {
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showPersonalDataDialog, setShowPersonalDataDialog] = useState(false);
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    { id: 1, senderId: 1, senderName: 'HR Manager', message: 'Здравствуйте! Как дела с рекомендациями?', timestamp: '10:30', isOwn: false },
+    { id: 2, senderId: 2, senderName: 'Вы', message: 'Отлично! У меня есть кандидат на вакансию Frontend Developer', timestamp: '10:32', isOwn: true },
+    { id: 3, senderId: 1, senderName: 'HR Manager', message: 'Отлично! Отправьте резюме пожалуйста', timestamp: '10:35', isOwn: false },
+    { id: 4, senderId: 2, senderName: 'Вы', message: 'Вот резюме кандидата', timestamp: '10:37', isOwn: true, attachments: [{ type: 'file', url: '#', name: 'resume_ivan_petrov.pdf', size: 245000 }] },
+    { id: 5, senderId: 2, senderName: 'Вы', message: 'И фото с последнего проекта', timestamp: '10:38', isOwn: true, attachments: [{ type: 'image', url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085', name: 'project_screenshot.png', size: 892000 }] },
+  ]);
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -95,13 +99,8 @@ function Index() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [showEmployeeDetail, setShowEmployeeDetail] = useState(false);
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
-  const [chatSearchQuery, setChatSearchQuery] = useState('');
-  const [employeeStatuses, setEmployeeStatuses] = useState<{[key: number]: {online: boolean; lastSeen?: string; typing?: boolean}}>({});
-  const [chatHistories, setChatHistories] = useState<{[key: number]: ChatMessage[]}>({});
   const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
   const [showVacancyDetail, setShowVacancyDetail] = useState(false);
-  const [selectedVacancyPublic, setSelectedVacancyPublic] = useState<Vacancy | null>(null);
-  const [showVacancyPublic, setShowVacancyPublic] = useState(false);
   const [selectedCandidate, setSelectedCandidate] = useState<Recommendation | null>(null);
   const [showCandidateDetail, setShowCandidateDetail] = useState(false);
   const [vacancySearchQuery, setVacancySearchQuery] = useState('');
@@ -310,53 +309,40 @@ function Index() {
   }, [userRole]);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const savedRole = localStorage.getItem('userRole');
-    
-    if (token && savedRole && savedRole !== 'guest') {
-      setAuthToken(token);
-      setUserRole(savedRole as UserRole);
-      verifyToken(token);
+    if (authToken && userRole !== 'guest') {
+      verifyToken();
     }
   }, []);
 
-  const verifyToken = async (token: string) => {
+  const verifyToken = async () => {
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'GET',
         mode: 'cors',
         headers: {
-          'X-Auth-Token': token
+          'X-Auth-Token': authToken || ''
         }
       });
       
       if (response.ok) {
         const data = await response.json();
         setCurrentUser(data.user);
-        const role = data.user.role === 'admin' ? 'employer' : 'employee';
-        setUserRole(role);
-        localStorage.setItem('userRole', role);
       } else {
-        console.log('Token verification failed, logging out');
-        silentLogout();
+        handleLogout();
       }
     } catch (error) {
       console.error('Ошибка проверки токена:', error);
-      silentLogout();
+      handleLogout();
     }
-  };
-
-  const silentLogout = () => {
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('authToken');
-    setUserRole('guest');
-    setAuthToken(null);
-    setCurrentUser(null);
   };
 
   const handleLogout = () => {
     if (window.confirm('Вы уверены, что хотите выйти из системы?')) {
-      silentLogout();
+      localStorage.removeItem('userRole');
+      localStorage.removeItem('authToken');
+      setUserRole('guest');
+      setAuthToken(null);
+      setCurrentUser(null);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -432,8 +418,6 @@ function Index() {
         recommendations: v.recommendations_count || 0,
         reward: v.reward_amount,
         payoutDelayDays: v.payout_delay_days || 30,
-        city: v.city || '',
-        isRemote: v.is_remote || false,
         referralLink: v.referral_token && userRole === 'employee' ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
 
@@ -2191,7 +2175,7 @@ function Index() {
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={24} />
-            <span className="text-lg sm:text-xl font-bold text-cyan-500">iHUNT</span>
+            <span className="text-lg sm:text-xl font-bold">iHUNT</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
@@ -2422,10 +2406,9 @@ function Index() {
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-1.5 sm:gap-3">
                       <div 
                         className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedVacancyPublic(vacancy);
-                          setShowVacancyPublic(true);
+                        onClick={() => {
+                          setSelectedVacancyDetail(vacancy);
+                          setShowVacancyDetail(true);
                         }}
                       >
                         <CardTitle className="flex items-center gap-1.5 text-xs sm:text-lg">
@@ -2479,8 +2462,7 @@ function Index() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
+                            onClick={() => {
                               setActiveVacancy(vacancy);
                               setVacancyForm({
                                 title: vacancy.title,
@@ -2503,10 +2485,7 @@ function Index() {
                           <Button 
                             variant="outline" 
                             size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleArchiveVacancy(vacancy.id);
-                            }}
+                            onClick={() => handleArchiveVacancy(vacancy.id)}
                             className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                           >
                             <Icon name="Archive" size={12} className="sm:mr-1" />
@@ -2518,10 +2497,7 @@ function Index() {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRestoreVacancy(vacancy.id);
-                              }}
+                              onClick={() => handleRestoreVacancy(vacancy.id)}
                               className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
                               <Icon name="RotateCcw" size={12} />
@@ -2529,10 +2505,7 @@ function Index() {
                             <Button 
                               variant="destructive" 
                               size="sm"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDeleteVacancy(vacancy.id);
-                              }}
+                              onClick={() => handleDeleteVacancy(vacancy.id)}
                               className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
                               <Icon name="Trash2" size={12} />
@@ -3741,13 +3714,36 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <MessengerDialog 
-        open={showChatDialog} 
-        onOpenChange={setShowChatDialog}
-        employees={employees}
-        currentUserId={currentEmployeeId}
-        userRole={userRole}
-      />
+      <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+        <DialogContent className="max-w-2xl h-[600px] flex flex-col">
+          <DialogHeader>
+            <DialogTitle>Чат с {activeChatEmployee?.name}</DialogTitle>
+            <DialogDescription>{activeChatEmployee?.position}</DialogDescription>
+          </DialogHeader>
+          <div className="flex-1 overflow-y-auto space-y-3 py-4">
+            {chatMessages.map((msg) => (
+              <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
+                  <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
+                  <div className="text-sm">{msg.message}</div>
+                  <div className="text-xs opacity-70 mt-1">{msg.timestamp}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 pt-4 border-t">
+            <Input 
+              placeholder="Введите сообщение..." 
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+            />
+            <Button onClick={handleSendMessage}>
+              <Icon name="Send" size={18} />
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showEditEmployeeDialog} onOpenChange={setShowEditEmployeeDialog}>
         <DialogContent>
@@ -5616,12 +5612,6 @@ function Index() {
             setShowVacancyDetail(false);
           }
         }}
-      />
-
-      <VacancyPublicView
-        vacancy={selectedVacancyPublic}
-        open={showVacancyPublic}
-        onOpenChange={setShowVacancyPublic}
       />
 
       <CandidateDetail
