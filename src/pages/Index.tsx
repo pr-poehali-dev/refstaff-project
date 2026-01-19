@@ -5591,6 +5591,7 @@ function Index() {
         open={showVacancyDetail}
         onOpenChange={setShowVacancyDetail}
         showRecommendButton={userRole === 'employee'}
+        showPublicLink={userRole === 'employer'}
         onRecommend={() => {
           if (selectedVacancyDetail) {
             setShowRecommendDialog(true);
