@@ -76,7 +76,7 @@ function VacancyReferral() {
     try {
       setIsLoading(true);
       
-      const vacanciesData = await api.getVacancies(1, 'active');
+      const vacanciesData = await api.getVacancies(1, 'all');
       const foundVacancy = vacanciesData.find(v => v.referral_token === token);
       
       if (foundVacancy) {
