@@ -4610,7 +4610,10 @@ function Index() {
                       <div 
                         className="flex-1 cursor-pointer hover:text-primary transition-colors"
                         onClick={() => {
-                          navigate(`/vacancy/${vacancy.id}`);
+                          if (vacancy.referralLink) {
+                            const path = vacancy.referralLink.replace(window.location.origin, '');
+                            navigate(path);
+                          }
                         }}
                       >
                         <CardTitle className="text-sm sm:text-lg">{vacancy.title}</CardTitle>
