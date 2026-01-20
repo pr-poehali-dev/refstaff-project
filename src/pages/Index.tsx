@@ -1096,17 +1096,19 @@ function Index() {
               ].map((step, i) => (
                 <article key={i} className="relative">
                   <Card className="h-full border-2 hover:border-primary hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                    <CardHeader>
-                      <div className={`mx-auto mb-4 w-16 h-16 rounded-2xl ${step.color} flex items-center justify-center shadow-lg`}>
-                        <span className="text-3xl">{step.emoji}</span>
+                    <CardHeader className="text-center">
+                      <div className="relative mb-6">
+                        <div className={`mx-auto w-16 h-16 rounded-2xl ${step.color} flex items-center justify-center shadow-lg`}>
+                          <span className="text-3xl">{step.emoji}</span>
+                        </div>
+                        <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-md">
+                          {i + 1}
+                        </div>
                       </div>
-                      <div className="absolute top-4 right-4 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-                        {i + 1}
-                      </div>
-                      <CardTitle as="h3" className="text-xl">{step.title}</CardTitle>
+                      <CardTitle as="h3" className="text-xl mb-2">{step.title}</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">{step.desc}</p>
+                    <CardContent className="text-center">
+                      <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
                     </CardContent>
                   </Card>
                   {i < 3 && (
