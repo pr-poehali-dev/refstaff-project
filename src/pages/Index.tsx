@@ -1258,7 +1258,7 @@ function Index() {
                 <Badge className="ml-2 bg-green-500 text-white">-20%</Badge>
               </Button>
             </div>
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="group">
               <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gray-400 to-gray-500"></div>
@@ -1403,6 +1403,58 @@ function Index() {
                   </ul>
                   
                   <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="group">
+              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 to-red-500"></div>
+                
+                <div className="p-8">
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold mb-2">До 1000 сотрудников</h3>
+                    <p className="text-sm text-muted-foreground">Для корпораций</p>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="text-5xl font-bold mb-2">
+                      {pricingPeriod === 'monthly' ? '97 000 ₽' : '77 600 ₽'}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">в месяц</p>
+                    {pricingPeriod === 'yearly' && (
+                      <p className="text-sm text-green-600 font-medium">931 200 ₽/год (экономия 232 800 ₽)</p>
+                    )}
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">До 1000 сотрудников</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">VIP поддержка 24/7</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Выделенный менеджер</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Индивидуальная разработка</span>
+                    </li>
+                  </ul>
+                  
+                  <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
                 </div>
               </div>
             </div>
