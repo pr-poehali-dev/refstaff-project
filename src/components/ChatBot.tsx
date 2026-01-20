@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface Message {
   id: string;
@@ -221,84 +220,6 @@ export default function ChatBot({ userRole = 'guest' }: ChatBotProps) {
           </div>
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/20">
-            {messages.length === 0 && (
-              <div className="space-y-3">
-                <div className="text-sm font-semibold text-muted-foreground mb-3">Примеры вопросов:</div>
-                
-                <Collapsible>
-                  <CollapsibleTrigger className="w-full text-left">
-                    <div className="bg-background border rounded-lg p-3 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">Как рекомендовать кандидата?</p>
-                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
-                      </div>
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="mt-2 bg-primary/5 border rounded-lg p-3">
-                      <p className="text-xs text-muted-foreground">
-                        Чтобы рекомендовать кандидата: откройте вакансию, нажмите "Рекомендовать кандидата", заполните информацию о нём (ФИО, контакты, резюме) и отправьте. HR-отдел рассмотрит рекомендацию.
-                      </p>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <Collapsible>
-                  <CollapsibleTrigger className="w-full text-left">
-                    <div className="bg-background border rounded-lg p-3 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">Когда я получу вознаграждение?</p>
-                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
-                      </div>
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="mt-2 bg-primary/5 border rounded-lg p-3">
-                      <p className="text-xs text-muted-foreground">
-                        Размер вознаграждения указан на каждой вакансии. Вы получите выплату после того, как ваш кандидат успешно пройдёт собеседование и выйдет на работу. Срок выплаты также указан в вакансии.
-                      </p>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <Collapsible>
-                  <CollapsibleTrigger className="w-full text-left">
-                    <div className="bg-background border rounded-lg p-3 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">Как вывести деньги?</p>
-                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
-                      </div>
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="mt-2 bg-primary/5 border rounded-lg p-3">
-                      <p className="text-xs text-muted-foreground">
-                        Перейдите в раздел "Кошелёк", нажмите "Вывести средства", укажите сумму и реквизиты (карта, СБП или расчётный счёт). Запрос будет обработан в течение 3-5 рабочих дней.
-                      </p>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-
-                <Collapsible>
-                  <CollapsibleTrigger className="w-full text-left">
-                    <div className="bg-background border rounded-lg p-3 hover:bg-muted/50 transition-colors">
-                      <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium">Как пригласить коллегу?</p>
-                        <Icon name="ChevronDown" size={16} className="text-muted-foreground" />
-                      </div>
-                    </div>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <div className="mt-2 bg-primary/5 border rounded-lg p-3">
-                      <p className="text-xs text-muted-foreground">
-                        В разделе "Сотрудники" нажмите "Пригласить сотрудника". Скопируйте ссылку-приглашение и отправьте её коллеге. Он сможет зарегистрироваться и начать рекомендовать кандидатов.
-                      </p>
-                    </div>
-                  </CollapsibleContent>
-                </Collapsible>
-              </div>
-            )}
-            
             {messages.map((message) => (
               <div
                 key={message.id}
