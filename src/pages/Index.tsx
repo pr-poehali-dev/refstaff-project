@@ -4554,8 +4554,10 @@ function Index() {
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Icon name="Rocket" className="text-primary" size={24} />
-            <span className="sm:text-xl font-bold text-xl text-sky-500">iHUNT</span>
+            <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
+              <Icon name="Rocket" className="text-white" size={20} />
+            </div>
+            <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
