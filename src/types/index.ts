@@ -41,6 +41,7 @@ export interface Recommendation {
   vacancyTitle?: string;
   status: 'pending' | 'interview' | 'hired' | 'rejected' | 'accepted';
   date: string;
+  acceptedDate?: string;
   reward: number;
   recommendedBy?: string;
   employeeId?: number;

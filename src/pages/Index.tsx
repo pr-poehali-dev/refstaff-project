@@ -452,6 +452,7 @@ function Index() {
           vacancyTitle: r.vacancy_title || '',
           status: r.status as 'pending' | 'interview' | 'hired' | 'rejected' | 'accepted',
           date: new Date(r.created_at).toISOString().split('T')[0],
+          acceptedDate: r.accepted_at ? new Date(r.accepted_at).toISOString().split('T')[0] : undefined,
           reward: r.reward_amount,
           recommendedBy: r.recommended_by_name,
           employeeId: r.recommended_by,
@@ -5034,12 +5035,24 @@ function Index() {
                         <Icon name="Award" size={16} />
                         <span>{rec.reward.toLocaleString()} ₽</span>
                       </div>
-                      {rec.status === 'accepted' && (
-                        <div className="flex items-center gap-1 text-green-600">
-                          <Icon name="Clock" size={16} />
-                          <span>Разблокировка через 25 дней</span>
-                        </div>
-                      )}
+                      {rec.status === 'accepted' && rec.acceptedDate && (() => {
+                        const acceptedDate = new Date(rec.acceptedDate);
+                        const today = new Date();
+                        const daysPassed = Math.floor((today.getTime() - acceptedDate.getTime()) / (1000 * 60 * 60 * 24));
+                        const daysRemaining = Math.max(0, 30 - daysPassed);
+                        
+                        return (
+                          <div className="flex items-center gap-1 text-green-600">
+                            <Icon name="Clock" size={16} />
+                            <span>
+                              {daysRemaining > 0 
+                                ? `Разблокировка через ${daysRemaining} ${daysRemaining === 1 ? 'день' : daysRemaining < 5 ? 'дня' : 'дней'}`
+                                : 'Средства разблокированы'
+                              }
+                            </span>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </CardContent>
                 </Card>

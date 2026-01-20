@@ -46,6 +46,7 @@ export interface Recommendation {
   recommended_by?: number;
   recommended_by_name?: string;
   created_at: string;
+  accepted_at?: string;
 }
 
 export interface CompanyStats {
