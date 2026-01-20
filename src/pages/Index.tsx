@@ -20,7 +20,6 @@ import { EmployeeDetail } from '@/components/EmployeeDetail';
 import { PayoutRequests } from '@/components/PayoutRequests';
 import { VacancyDetail } from '@/components/VacancyDetail';
 import { CandidateDetail } from '@/components/CandidateDetail';
-import ChatBot from '@/components/ChatBot';
 
 function Index() {
   const navigate = useNavigate();
@@ -6219,10 +6218,6 @@ function Index() {
           }
         }}
       />
-      
-      {(userRole === 'employer' || userRole === 'employee') && (
-        <ChatBot userRole={userRole} />
-      )}
     </>
   );
 }
