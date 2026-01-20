@@ -2290,7 +2290,7 @@ function Index() {
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Icon name="Rocket" className="text-primary" size={24} />
-            <span className="text-lg sm:text-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">iHUNT</span>
+            <span className="sm:text-xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent text-3xl">iHUNT</span>
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
