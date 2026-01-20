@@ -1080,44 +1080,60 @@ function Index() {
           </div>
         </section>
 
-        <section id="how" className="py-20 px-4 bg-gradient-to-b from-white to-gray-50" aria-labelledby="how-title">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <Badge className="mb-4">⚡ Простой процесс</Badge>
-              <h2 id="how-title" className="text-4xl font-bold mb-4">Как это работает</h2>
-              <p className="text-xl text-muted-foreground">Запустите реферальную программу за 4 простых шага</p>
+        <section id="how" className="py-20 px-4 bg-gradient-to-br from-primary/5 via-white to-purple-50 relative overflow-hidden" aria-labelledby="how-title">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="container mx-auto max-w-7xl relative z-10">
+            <div className="text-center mb-20">
+              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">⚡ Простой процесс</Badge>
+              <h2 id="how-title" className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                Как это работает
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Запустите реферальную программу за 4 простых шага и начните получать рекомендации
+              </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {[
-                { icon: 'Building2', emoji: '🏢', title: 'Регистрация', desc: 'Зарегистрируйте компанию и добавьте вакансии', color: 'bg-blue-500' },
-                { icon: 'Users', emoji: '👥', title: 'Приглашение', desc: 'Пригласите сотрудников в систему', color: 'bg-green-500' },
-                { icon: 'UserPlus', emoji: '🎯', title: 'Рекомендации', desc: 'Сотрудники рекомендуют кандидатов', color: 'bg-purple-500' },
-                { icon: 'TrendingUp', emoji: '💰', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за успешный найм', color: 'bg-orange-500' },
-              ].map((step, i) => (
-                <article key={i} className="relative">
-                  <Card className="h-full border-2 hover:border-primary hover:shadow-xl transition-all duration-300 hover:-translate-y-2">
-                    <CardHeader className="text-center">
-                      <div className="relative mb-6">
-                        <div className={`mx-auto w-16 h-16 rounded-2xl ${step.color} flex items-center justify-center shadow-lg`}>
-                          <span className="text-3xl">{step.emoji}</span>
+            
+            <div className="relative max-w-5xl mx-auto">
+              <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-green-500 via-purple-500 to-orange-500 transform -translate-y-1/2 opacity-20"></div>
+              
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
+                {[
+                  { emoji: '🏢', title: 'Регистрация', desc: 'Создайте аккаунт компании и разместите открытые вакансии', color: 'from-blue-500 to-blue-600' },
+                  { emoji: '👥', title: 'Приглашение', desc: 'Добавьте своих сотрудников в систему одним кликом', color: 'from-green-500 to-green-600' },
+                  { emoji: '🎯', title: 'Рекомендации', desc: 'Получайте качественные кандидатуры от вашей команды', color: 'from-purple-500 to-purple-600' },
+                  { emoji: '💰', title: 'Вознаграждение', desc: 'Автоматически выплачивайте бонусы за найм', color: 'from-orange-500 to-orange-600' },
+                ].map((step, i) => (
+                  <div key={i} className="relative group">
+                    <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
+                      <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${step.color}`}></div>
+                      
+                      <div className="p-6 pt-8">
+                        <div className="flex items-start gap-4 mb-4">
+                          <div className={`flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                            <span className="text-2xl">{step.emoji}</span>
+                          </div>
+                          <div className={`flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br ${step.color} text-white flex items-center justify-center font-bold text-lg shadow-md`}>
+                            {i + 1}
+                          </div>
                         </div>
-                        <div className="absolute -top-2 -right-2 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-md">
-                          {i + 1}
+                        
+                        <h3 className="text-xl font-bold mb-3 text-gray-900">{step.title}</h3>
+                        <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+                      </div>
+                      
+                      <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${step.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
+                    </div>
+                    
+                    {i < 3 && (
+                      <div className="hidden lg:flex absolute top-1/2 -right-2 transform -translate-y-1/2 z-20 w-8 h-8 items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center border-2 border-primary/20">
+                          <Icon name="ChevronRight" className="text-primary" size={18} />
                         </div>
                       </div>
-                      <CardTitle as="h3" className="text-xl mb-2">{step.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-center">
-                      <p className="text-muted-foreground leading-relaxed">{step.desc}</p>
-                    </CardContent>
-                  </Card>
-                  {i < 3 && (
-                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
-                      <Icon name="ArrowRight" className="text-primary" size={24} />
-                    </div>
-                  )}
-                </article>
-              ))}
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </section>
