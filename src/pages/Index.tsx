@@ -1003,8 +1003,10 @@ function Index() {
       <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <Icon name="Rocket" className="text-primary" size={24} aria-hidden="true" />
-            <span className="text-xl sm:text-2xl text-sky-500 px-0 py-0 my-0 font-bold">iHUNT</span>
+            <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
+              <Icon name="Rocket" className="text-white" size={20} aria-hidden="true" />
+            </div>
+            <span className="text-xl sm:text-2xl px-0 py-0 my-0 font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
           </div>
           <nav className="hidden md:flex items-center gap-4 lg:gap-8" role="navigation" aria-label="Основная навигация">
             <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Как работает</button>
