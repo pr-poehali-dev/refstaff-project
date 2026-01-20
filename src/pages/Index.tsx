@@ -1270,7 +1270,7 @@ function Index() {
                   </div>
                   
                   <div className="mb-6">
-                    <div className="text-5xl font-bold mb-2">0 ₽</div>
+                    <div className="text-3xl sm:text-4xl font-bold mb-2">0 ₽</div>
                     <p className="text-sm text-muted-foreground">14 дней бесплатно</p>
                   </div>
                   
@@ -1314,7 +1314,7 @@ function Index() {
                   </div>
                   
                   <div className="mb-6">
-                    <div className="text-5xl font-bold mb-2">
+                    <div className="text-3xl sm:text-4xl font-bold mb-2">
                       {pricingPeriod === 'monthly' ? '19 900 ₽' : '15 920 ₽'}
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">в месяц</p>
@@ -1366,7 +1366,7 @@ function Index() {
                   </div>
                   
                   <div className="mb-6">
-                    <div className="text-5xl font-bold mb-2">
+                    <div className="text-3xl sm:text-4xl font-bold mb-2">
                       {pricingPeriod === 'monthly' ? '48 900 ₽' : '39 120 ₽'}
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">в месяц</p>
@@ -1418,7 +1418,7 @@ function Index() {
                   </div>
                   
                   <div className="mb-6">
-                    <div className="text-5xl font-bold mb-2">
+                    <div className="text-3xl sm:text-4xl font-bold mb-2">
                       {pricingPeriod === 'monthly' ? '97 000 ₽' : '77 600 ₽'}
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">в месяц</p>
