@@ -1361,7 +1361,7 @@ function Index() {
                 
                 <div className="p-8">
                   <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-2">Свыше 300 сотрудников</h3>
+                    <h3 className="text-2xl font-bold mb-2">До 500 сотрудников</h3>
                     <p className="text-sm text-muted-foreground">Для крупных компаний</p>
                   </div>
                   
@@ -1380,7 +1380,7 @@ function Index() {
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
                         <Icon name="Check" className="text-green-600" size={14} />
                       </div>
-                      <span className="text-sm">Неограниченное количество</span>
+                      <span className="text-sm">До 500 сотрудников</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
