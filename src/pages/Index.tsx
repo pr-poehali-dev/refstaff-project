@@ -1138,35 +1138,45 @@ function Index() {
           </div>
         </section>
 
-        <section id="benefits" className="py-20 px-4 bg-gradient-to-b from-gray-50 to-white" aria-labelledby="benefits-title">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-16">
-              <Badge className="mb-4">✨ Почему iHUNT</Badge>
-              <h2 id="benefits-title" className="text-4xl font-bold mb-4">Преимущества платформы</h2>
-              <p className="text-xl text-muted-foreground">Все инструменты для эффективного реферального найма</p>
+        <section id="benefits" className="py-20 px-4 bg-gradient-to-br from-purple-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="benefits-title">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="container mx-auto max-w-7xl relative z-10">
+            <div className="text-center mb-20">
+              <Badge className="mb-4 bg-purple-500/10 text-purple-600 border-purple-500/20">✨ Почему iHUNT</Badge>
+              <h2 id="benefits-title" className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                Преимущества платформы
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Все инструменты для эффективного реферального найма в одной системе
+              </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
               {[
-                { icon: 'Wallet', emoji: '💵', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%', gradient: 'from-green-500 to-emerald-500' },
-                { icon: 'Zap', emoji: '⚡', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза', gradient: 'from-yellow-500 to-orange-500' },
-                { icon: 'Shield', emoji: '🛡️', title: 'Качество кандидатов', desc: 'Рекомендации от проверенных сотрудников', gradient: 'from-blue-500 to-cyan-500' },
-                { icon: 'Trophy', emoji: '🏆', title: 'Геймификация', desc: 'Вовлечение сотрудников через достижения', gradient: 'from-purple-500 to-pink-500' },
-                { icon: 'BarChart3', emoji: '📊', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса', gradient: 'from-indigo-500 to-purple-500' },
-                { icon: 'Link', emoji: '🔗', title: 'Интеграция', desc: 'API для подключения к вашим системам', gradient: 'from-red-500 to-pink-500' },
+                { emoji: '💵', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%', gradient: 'from-green-500 to-emerald-500' },
+                { emoji: '⚡', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза', gradient: 'from-yellow-500 to-orange-500' },
+                { emoji: '🛡️', title: 'Качество кандидатов', desc: 'Рекомендации от проверенных сотрудников', gradient: 'from-blue-500 to-cyan-500' },
+                { emoji: '🏆', title: 'Геймификация', desc: 'Вовлечение сотрудников через достижения', gradient: 'from-purple-500 to-pink-500' },
+                { emoji: '📊', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса', gradient: 'from-indigo-500 to-purple-500' },
+                { emoji: '🔗', title: 'Интеграция', desc: 'API для подключения к вашим системам', gradient: 'from-red-500 to-pink-500' },
               ].map((benefit, i) => (
-                <article key={i}>
-                  <Card className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 h-full border-2 group">
-                    <CardHeader>
-                      <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg`}>
-                        <span className="text-3xl">{benefit.emoji}</span>
+                <div key={i} className="group">
+                  <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
+                    <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${benefit.gradient}`}></div>
+                    
+                    <div className="p-6 pt-8">
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className={`flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                          <span className="text-2xl">{benefit.emoji}</span>
+                        </div>
                       </div>
-                      <CardTitle as="h3" className="text-xl">{benefit.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">{benefit.desc}</p>
-                    </CardContent>
-                  </Card>
-                </article>
+                      
+                      <h3 className="text-xl font-bold mb-3 text-gray-900">{benefit.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
+                    </div>
+                    
+                    <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${benefit.gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
+                  </div>
+                </div>
               ))}
             </div>
             <div className="mt-16">
@@ -1219,10 +1229,14 @@ function Index() {
           </div>
         </section>
 
-        <section id="pricing" className="py-20 px-4 bg-white" aria-labelledby="pricing-title">
-          <div className="container mx-auto max-w-6xl">
-            <h2 id="pricing-title" className="text-4xl font-bold text-center mb-4">Тарифы</h2>
-            <p className="text-center text-muted-foreground mb-8">14 дней бесплатно для всех новых клиентов</p>
+        <section id="pricing" className="py-20 px-4 bg-gradient-to-br from-blue-50 via-white to-green-50 relative overflow-hidden" aria-labelledby="pricing-title">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="container mx-auto max-w-6xl relative z-10">
+            <div className="text-center mb-16">
+              <Badge className="mb-4 bg-blue-500/10 text-blue-600 border-blue-500/20">💎 Прозрачное ценообразование</Badge>
+              <h2 id="pricing-title" className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Тарифы</h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">14 дней бесплатно для всех новых клиентов</p>
+            </div>
             
             <div className="flex items-center justify-center gap-3 mb-12">
               <Button 
@@ -1241,142 +1255,217 @@ function Index() {
                 <Badge className="ml-2 bg-green-500 text-white">-20%</Badge>
               </Button>
             </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle>Пробный период</CardTitle>
-                <CardDescription>Протестируйте платформу</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold mb-4">0 ₽</div>
-                <p className="text-sm text-muted-foreground mb-6">14 дней бесплатно</p>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">До 300 сотрудников</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">Все функции платформы</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">Поддержка 24/7</span>
-                  </li>
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Попробовать</Button>
-              </CardFooter>
-            </Card>
-
-            <Card className="border-2 border-primary shadow-xl scale-105 relative">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <Badge className="bg-secondary">Популярный</Badge>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="group">
+              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gray-400 to-gray-500"></div>
+                
+                <div className="p-8">
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold mb-2">Пробный период</h3>
+                    <p className="text-sm text-muted-foreground">Протестируйте платформу</p>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="text-5xl font-bold mb-2">0 ₽</div>
+                    <p className="text-sm text-muted-foreground">14 дней бесплатно</p>
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">До 300 сотрудников</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Все функции платформы</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Поддержка 24/7</span>
+                    </li>
+                  </ul>
+                  
+                  <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Попробовать</Button>
+                </div>
               </div>
-              <CardHeader>
-                <CardTitle>До 300 сотрудников</CardTitle>
-                <CardDescription>Для растущих компаний</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold mb-1">
-                  {pricingPeriod === 'monthly' ? '19 900 ₽' : '15 920 ₽'}
-                </div>
-                <p className="text-sm text-muted-foreground mb-2">в месяц</p>
-                {pricingPeriod === 'yearly' && (
-                  <p className="text-sm text-green-600 font-medium mb-6">190 800 ₽/год (экономия 47 880 ₽)</p>
-                )}
-                {pricingPeriod === 'monthly' && <div className="mb-6"></div>}
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">До 300 сотрудников</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">Неограниченные вакансии</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">API интеграция</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">Аналитика и отчёты</span>
-                  </li>
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
-              </CardFooter>
-            </Card>
+            </div>
 
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle>Свыше 300 сотрудников</CardTitle>
-                <CardDescription>Для крупных компаний</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="text-4xl font-bold mb-1">
-                  {pricingPeriod === 'monthly' ? '48 900 ₽' : '39 120 ₽'}
+            <div className="group md:-mt-4">
+              <div className="relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-2 border-primary overflow-hidden h-full">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 to-green-500"></div>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-lg">⭐ Популярный</Badge>
                 </div>
-                <p className="text-sm text-muted-foreground mb-2">в месяц</p>
-                {pricingPeriod === 'yearly' && (
-                  <p className="text-sm text-green-600 font-medium mb-6">469 440 ₽/год (экономия 117 360 ₽)</p>
-                )}
-                {pricingPeriod === 'monthly' && <div className="mb-6"></div>}
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">Неограниченное количество</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">Приоритетная поддержка</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">Персональный менеджер</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Icon name="Check" className="text-green-600 mt-1" size={18} />
-                    <span className="text-sm">Кастомизация системы</span>
-                  </li>
-                </ul>
-              </CardContent>
-              <CardFooter>
-                <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
-              </CardFooter>
-            </Card>
+                
+                <div className="p-8 pt-10">
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold mb-2">До 300 сотрудников</h3>
+                    <p className="text-sm text-muted-foreground">Для растущих компаний</p>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="text-5xl font-bold mb-2">
+                      {pricingPeriod === 'monthly' ? '19 900 ₽' : '15 920 ₽'}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">в месяц</p>
+                    {pricingPeriod === 'yearly' && (
+                      <p className="text-sm text-green-600 font-medium">190 800 ₽/год (экономия 47 880 ₽)</p>
+                    )}
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">До 300 сотрудников</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Неограниченные вакансии</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">API интеграция</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Аналитика и отчёты</span>
+                    </li>
+                  </ul>
+                  
+                  <Button className="w-full bg-gradient-to-r from-primary to-blue-600" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="group">
+              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                
+                <div className="p-8">
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold mb-2">Свыше 300 сотрудников</h3>
+                    <p className="text-sm text-muted-foreground">Для крупных компаний</p>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="text-5xl font-bold mb-2">
+                      {pricingPeriod === 'monthly' ? '48 900 ₽' : '39 120 ₽'}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">в месяц</p>
+                    {pricingPeriod === 'yearly' && (
+                      <p className="text-sm text-green-600 font-medium">469 440 ₽/год (экономия 117 360 ₽)</p>
+                    )}
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Неограниченное количество</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Приоритетная поддержка</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Персональный менеджер</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Кастомизация системы</span>
+                    </li>
+                  </ul>
+                  
+                  <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         </section>
 
-        <section id="contact" className="py-20 px-4" aria-labelledby="contact-title">
-          <div className="container mx-auto max-w-2xl">
-            <Card>
-              <CardHeader>
-                <CardTitle as="h2" id="contact-title" className="text-2xl">Остались вопросы?</CardTitle>
-                <CardDescription>Свяжитесь с нами, и мы с радостью ответим</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4" aria-label="Форма обратной связи">
+        <section id="contact" className="py-20 px-4 bg-gradient-to-br from-green-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="contact-title">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="container mx-auto max-w-3xl relative z-10">
+            <div className="text-center mb-12">
+              <Badge className="mb-4 bg-green-500/10 text-green-600 border-green-500/20">💬 Контакты</Badge>
+              <h2 id="contact-title" className="text-5xl font-bold mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+                Остались вопросы?
+              </h2>
+              <p className="text-xl text-muted-foreground">
+                Свяжитесь с нами, и мы с радостью ответим на все ваши вопросы
+              </p>
+            </div>
+            
+            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-green-500 to-blue-500"></div>
+              
+              <div className="p-8 md:p-10">
+                <form className="space-y-6" aria-label="Форма обратной связи">
                   <div>
-                    <Label htmlFor="name">Имя</Label>
-                    <Input id="name" name="name" placeholder="Иван Иванов" autoComplete="name" required />
+                    <Label htmlFor="name" className="text-base font-medium">Имя</Label>
+                    <Input 
+                      id="name" 
+                      name="name" 
+                      placeholder="Иван Иванов" 
+                      autoComplete="name" 
+                      required 
+                      className="mt-2 h-12"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
-                    <Input id="email" name="email" type="email" placeholder="ivan@company.ru" autoComplete="email" required />
+                    <Label htmlFor="email" className="text-base font-medium">Email</Label>
+                    <Input 
+                      id="email" 
+                      name="email" 
+                      type="email" 
+                      placeholder="ivan@company.ru" 
+                      autoComplete="email" 
+                      required 
+                      className="mt-2 h-12"
+                    />
                   </div>
                   <div>
-                    <Label htmlFor="message">Сообщение</Label>
-                    <Textarea id="message" name="message" placeholder="Расскажите о вашем проекте..." rows={4} required />
+                    <Label htmlFor="message" className="text-base font-medium">Сообщение</Label>
+                    <Textarea 
+                      id="message" 
+                      name="message" 
+                      placeholder="Расскажите о вашем проекте..." 
+                      rows={5} 
+                      required 
+                      className="mt-2"
+                    />
                   </div>
-                  <Button type="submit" className="w-full">Отправить</Button>
+                  <Button type="submit" className="w-full h-12 text-base bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700">
+                    <Icon name="Send" className="mr-2" size={18} />
+                    Отправить сообщение
+                  </Button>
                 </form>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </section>
       </main>
