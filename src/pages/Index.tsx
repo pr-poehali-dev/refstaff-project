@@ -4835,8 +4835,7 @@ function Index() {
                         className="flex-1 cursor-pointer hover:text-primary transition-colors"
                         onClick={() => {
                           if (vacancy.referralLink) {
-                            const path = vacancy.referralLink.replace(window.location.origin, '');
-                            navigate(path);
+                            window.open(vacancy.referralLink, '_blank');
                           }
                         }}
                       >
