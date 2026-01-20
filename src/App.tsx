@@ -10,7 +10,6 @@ import VacancyApply from "./pages/VacancyApply";
 import EmployeeInvite from "./pages/EmployeeInvite";
 import EmployeeRegister from "./pages/EmployeeRegister";
 import NotFound from "./pages/NotFound";
-import { ChatGPTPlaygroundPage } from "@/components/extensions/chatgpt-polza/ChatGPTPlaygroundPage";
 
 const queryClient = new QueryClient();
 
@@ -26,7 +25,6 @@ const App = () => (
           <Route path="/vacancy/:vacancyId" element={<VacancyApply />} />
           <Route path="/invite/:token" element={<EmployeeInvite />} />
           <Route path="/employee-register" element={<EmployeeRegister />} />
-          <Route path="/chatgpt" element={<ChatGPTPlaygroundPage apiUrl="https://functions.poehali.dev/05161540-8bd2-4390-a676-2d52a955df60" defaultModel="openai/gpt-4o-mini" />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
