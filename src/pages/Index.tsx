@@ -2254,47 +2254,12 @@ function Index() {
         <Tabs defaultValue="vacancies" className="space-y-6">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
             <TabsList className="inline-flex min-w-full sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-8 gap-1">
-              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 relative">
-                💼 <span className="hidden sm:inline">Вакансии</span>
-                {vacancies.filter(v => v.status === 'active').length > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {vacancies.filter(v => v.status === 'active').length}
-                  </Badge>
-                )}
-              </TabsTrigger>
+              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
               <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3">👥 <span className="hidden sm:inline">Сотрудники</span></TabsTrigger>
-              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 relative">
-                🎯 <span className="hidden sm:inline">Рекомендации</span>
-                {recommendations.filter(r => r.status === 'pending').length > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {recommendations.filter(r => r.status === 'pending').length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3 relative">
-                💰 <span className="hidden sm:inline">Выплаты</span>
-                {payoutRequests.filter(p => p.status === 'pending').length > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {payoutRequests.filter(p => p.status === 'pending').length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 relative">
-                📢 <span className="hidden sm:inline">Новости</span>
-                {newsPosts.filter(n => new Date(n.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length > 0 && (
-                  <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {newsPosts.filter(n => new Date(n.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3 relative">
-                💬 <span className="hidden sm:inline">Чаты</span>
-                {unreadMessagesCount > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {unreadMessagesCount}
-                  </Badge>
-                )}
-              </TabsTrigger>
+              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3">🎯 <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
+              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3">💰 <span className="hidden sm:inline">Выплаты</span></TabsTrigger>
+              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
+              <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3">💬 <span className="hidden sm:inline">Чаты</span></TabsTrigger>
               <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3">📊 <span className="hidden sm:inline">Статистика</span></TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3">❓ <span className="hidden sm:inline">Помощь</span></TabsTrigger>
             </TabsList>
@@ -4649,47 +4614,12 @@ function Index() {
         <Tabs defaultValue="news" className="space-y-4 sm:space-y-6">
           <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
             <TabsList className="inline-flex min-w-full sm:grid sm:w-full sm:grid-cols-6 gap-1">
-              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3 relative">
-                📢 <span className="hidden sm:inline">Новости</span>
-                {newsPosts.filter(n => new Date(n.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length > 0 && (
-                  <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {newsPosts.filter(n => new Date(n.date) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)).length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3 relative">
-                💼 <span className="hidden sm:inline">Вакансии</span>
-                {vacancies.filter(v => v.status === 'active').length > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {vacancies.filter(v => v.status === 'active').length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3 relative">
-                ⭐ <span className="hidden sm:inline">Рекомендации</span>
-                {recommendations.filter(r => r.employeeId === currentEmployeeId && (r.status === 'interview' || r.status === 'hired')).length > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {recommendations.filter(r => r.employeeId === currentEmployeeId && (r.status === 'interview' || r.status === 'hired')).length}
-                  </Badge>
-                )}
-              </TabsTrigger>
+              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
+              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
+              <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">⭐ <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
               <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🏆 <span className="hidden sm:inline">Рейтинг</span></TabsTrigger>
-              <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3 relative">
-                🔔 <span className="hidden sm:inline">Уведомления</span>
-                {employeeNotifications.filter(n => !n.read).length > 0 && (
-                  <Badge variant="destructive" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    {employeeNotifications.filter(n => !n.read).length}
-                  </Badge>
-                )}
-              </TabsTrigger>
-              <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3 relative">
-                💳 <span className="hidden sm:inline">История</span>
-                {(walletData?.wallet?.wallet_balance || 0) > 0 && (
-                  <Badge variant="secondary" className="absolute -top-1 -right-1 h-5 min-w-[20px] px-1 text-[10px] flex items-center justify-center">
-                    ₽
-                  </Badge>
-                )}
-              </TabsTrigger>
+              <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🔔 <span className="hidden sm:inline">Уведомления</span></TabsTrigger>
+              <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">💳 <span className="hidden sm:inline">История</span></TabsTrigger>
             </TabsList>
           </div>
 
