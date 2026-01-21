@@ -831,13 +831,18 @@ function Index() {
   };
 
   const handleRegister = async () => {
-    if (!registerForm.companyName || !registerForm.firstName || !registerForm.lastName || !registerForm.email || !registerForm.password) {
+    if (!registerForm.companyName || !registerForm.firstName || !registerForm.lastName || !registerForm.email || !registerForm.password || !registerForm.inn) {
       alert('Заполните все обязательные поля');
       return;
     }
 
     if (registerForm.password.length < 8) {
       alert('Пароль должен быть минимум 8 символов');
+      return;
+    }
+
+    if (!innVerificationState.isVerified) {
+      alert('Пожалуйста, проверьте ИНН компании перед регистрацией');
       return;
     }
 
@@ -1695,7 +1700,7 @@ function Index() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company-inn">ИНН компании (необязательно)</Label>
+              <Label htmlFor="company-inn">ИНН компании <span className="text-red-500">*</span></Label>
               <div className="flex gap-2">
                 <Input 
                   id="company-inn" 
