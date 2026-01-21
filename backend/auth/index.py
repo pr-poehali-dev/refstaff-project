@@ -159,16 +159,48 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """, (company_id, email, f"{pwd_hash}:{salt}", first_name, last_name, role, role == 'admin'))
                 
                 user_id = cursor.fetchone()['id']
+                
+                verification_token = os.urandom(32).hex()
+                expires_at = datetime.utcnow() + timedelta(hours=24)
+                
+                cursor.execute("""
+                    INSERT INTO t_p65890965_refstaff_project.email_verification_tokens 
+                    (user_id, token, expires_at, created_at)
+                    VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+                """, (user_id, verification_token, expires_at))
+                
                 conn.commit()
                 
-                token = create_jwt(user_id, email, company_id, role)
+                import urllib.request
+                import urllib.parse
+                
+                send_email_url = 'https://functions.poehali.dev/f3ec5cfe-f5d1-4d21-9161-70bd08bed000'
+                email_data = {
+                    'to_email': email,
+                    'user_name': f"{first_name} {last_name}",
+                    'verification_token': verification_token,
+                    'base_url': 'https://project.poehali.dev'
+                }
+                
+                try:
+                    req = urllib.request.Request(
+                        send_email_url,
+                        data=json.dumps(email_data).encode('utf-8'),
+                        headers={'Content-Type': 'application/json'},
+                        method='POST'
+                    )
+                    with urllib.request.urlopen(req, timeout=10) as response:
+                        response.read()
+                except Exception as e:
+                    print(f"Failed to send verification email: {str(e)}")
                 
                 return {
                     'statusCode': 201,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                     'body': json.dumps({
-                        'message': 'Registration successful',
-                        'token': token,
+                        'message': 'Registration successful. Please check your email to verify your account.',
+                        'email': email,
+                        'email_verified': False,
                         'user': {
                             'id': user_id,
                             'email': email,
@@ -254,6 +286,90 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'body': json.dumps({
                         'message': 'Employee invited successfully',
                         'user_id': user_id
+                    }),
+                    'isBase64Encoded': False
+                }
+            
+            elif action == 'verify_email':
+                token = body_data.get('token', '')
+                
+                if not token:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Verification token required'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cursor.execute("""
+                    SELECT user_id, expires_at, verified_at
+                    FROM t_p65890965_refstaff_project.email_verification_tokens
+                    WHERE token = %s
+                """, (token,))
+                
+                token_record = cursor.fetchone()
+                if not token_record:
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Invalid verification token'}),
+                        'isBase64Encoded': False
+                    }
+                
+                if token_record['verified_at']:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Email already verified'}),
+                        'isBase64Encoded': False
+                    }
+                
+                if datetime.utcnow() > token_record['expires_at']:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Verification token expired'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cursor.execute("""
+                    UPDATE t_p65890965_refstaff_project.users
+                    SET email_verified = TRUE, updated_at = CURRENT_TIMESTAMP
+                    WHERE id = %s
+                """, (token_record['user_id'],))
+                
+                cursor.execute("""
+                    UPDATE t_p65890965_refstaff_project.email_verification_tokens
+                    SET verified_at = CURRENT_TIMESTAMP
+                    WHERE token = %s
+                """, (token,))
+                
+                cursor.execute("""
+                    SELECT id, company_id, email, first_name, last_name, role
+                    FROM t_p65890965_refstaff_project.users
+                    WHERE id = %s
+                """, (token_record['user_id'],))
+                
+                user = cursor.fetchone()
+                conn.commit()
+                
+                jwt_token = create_jwt(user['id'], user['email'], user['company_id'], user['role'])
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'message': 'Email verified successfully',
+                        'token': jwt_token,
+                        'user': {
+                            'id': user['id'],
+                            'email': user['email'],
+                            'first_name': user['first_name'],
+                            'last_name': user['last_name'],
+                            'company_id': user['company_id'],
+                            'role': user['role'],
+                            'email_verified': True
+                        }
                     }),
                     'isBase64Encoded': False
                 }

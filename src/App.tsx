@@ -9,6 +9,7 @@ import VacancyReferral from "./pages/VacancyReferral";
 import VacancyApply from "./pages/VacancyApply";
 import EmployeeInvite from "./pages/EmployeeInvite";
 import EmployeeRegister from "./pages/EmployeeRegister";
+import VerifyEmail from "./pages/VerifyEmail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/vacancy/:vacancyId" element={<VacancyApply />} />
           <Route path="/invite/:token" element={<EmployeeInvite />} />
           <Route path="/employee-register" element={<EmployeeRegister />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

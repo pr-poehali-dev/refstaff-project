@@ -867,14 +867,10 @@ function Index() {
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userRole', 'employer');
-        setAuthToken(data.token);
-        setCurrentUser(data.user);
-        setUserRole('employer');
         setShowRegisterDialog(false);
         setRegisterForm({ companyName: '', firstName: '', lastName: '', email: '', password: '', inn: '', employeeCount: '50' });
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        alert(`✅ Регистрация успешна!\n\nМы отправили письмо с подтверждением на ${registerForm.email}.\nПожалуйста, проверьте вашу почту и перейдите по ссылке в письме для активации аккаунта.`);
       } else {
         alert(data.error || 'Ошибка регистрации');
       }
