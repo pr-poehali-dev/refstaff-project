@@ -20,6 +20,7 @@ import { EmployeeDetail } from '@/components/EmployeeDetail';
 import { PayoutRequests } from '@/components/PayoutRequests';
 import { VacancyDetail } from '@/components/VacancyDetail';
 import { CandidateDetail } from '@/components/CandidateDetail';
+import { SubscriptionExpiredBlock } from '@/components/SubscriptionExpiredBlock';
 
 function Index() {
   const navigate = useNavigate();
@@ -72,6 +73,8 @@ function Index() {
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const [showNotificationsDialog, setShowNotificationsDialog] = useState(false);
   const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState(12);
+  
+  const isSubscriptionExpired = subscriptionDaysLeft <= 0;
   const [notifications, setNotifications] = useState<Array<{id: number; type: string; message: string; date: string; read: boolean}>>([
     { id: 1, type: 'recommendation', message: 'Новая рекомендация от Анны Смирновой', date: '2026-01-16', read: false },
     { id: 2, type: 'subscription', message: 'Подписка заканчивается через 12 дней', date: '2026-01-16', read: false },
@@ -2519,6 +2522,10 @@ function Index() {
           </div>
 
           <TabsContent value="vacancies" className="space-y-4">
+            {isSubscriptionExpired ? (
+              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+            ) : (
+              <>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
               <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
                 <span>💼 Вакансии</span>
@@ -2865,9 +2872,15 @@ function Index() {
                 </div>
               </DialogContent>
             </Dialog>
+            </>
+            )}
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-4">
+            {isSubscriptionExpired ? (
+              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+            ) : (
+              <>
             <div className="flex flex-col gap-4 mb-6">
               <div>
                 <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
@@ -3148,9 +3161,15 @@ function Index() {
                 </Card>
               ))}
             </div>
+            </>
+            )}
           </TabsContent>
 
           <TabsContent value="recommendations" className="space-y-4">
+            {isSubscriptionExpired ? (
+              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+            ) : (
+              <>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
               <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
                 <span>🎯</span>
@@ -3284,6 +3303,8 @@ function Index() {
                 </Card>
               ))}
             </div>
+            </>
+            )}
           </TabsContent>
 
           <TabsContent value="payouts" className="space-y-4">
@@ -3426,6 +3447,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="chats" className="space-y-4">
+            {isSubscriptionExpired ? (
+              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+            ) : (
+              <>
             <h2 className="text-xl sm:text-2xl font-semibold mb-4 flex items-center gap-2">
               <span>💬</span>
               <span className="hidden sm:inline">Чаты с сотрудниками</span>
@@ -3452,6 +3477,8 @@ function Index() {
                 </Card>
               ))}
             </div>
+            </>
+            )}
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">
@@ -4512,15 +4539,41 @@ function Index() {
             </Card>
 
             <div className="space-y-3">
-              <Button className="w-full" size="lg">
+              <Button 
+                className="w-full" 
+                size="lg"
+                onClick={() => {
+                  setSubscriptionDaysLeft(30);
+                  alert('✅ Подписка продлена на 30 дней!');
+                  setShowSubscriptionDialog(false);
+                }}
+              >
                 <Icon name="CreditCard" className="mr-2" size={18} />
                 Продлить подписку
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => {
+                  window.scrollTo({ top: document.getElementById('pricing')?.offsetTop || 0, behavior: 'smooth' });
+                  setShowSubscriptionDialog(false);
+                }}
+              >
                 Изменить тарифный план
               </Button>
               <Button variant="ghost" className="w-full text-muted-foreground">
                 История платежей
+              </Button>
+              
+              <Button 
+                variant="destructive" 
+                className="w-full text-xs"
+                onClick={() => {
+                  setSubscriptionDaysLeft(0);
+                  alert('⚠️ Подписка истекла! (тестовый режим)');
+                }}
+              >
+                🧪 Тест: Истечь подписку
               </Button>
             </div>
 
