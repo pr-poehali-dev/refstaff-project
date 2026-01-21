@@ -166,6 +166,18 @@ function Index() {
     employeeCount: '50'
   });
 
+  const [innVerificationState, setInnVerificationState] = useState<{
+    isChecking: boolean;
+    isVerified: boolean;
+    error: string | null;
+    companyData: any | null;
+  }>({
+    isChecking: false,
+    isVerified: false,
+    error: null,
+    companyData: null
+  });
+
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: ''
@@ -754,6 +766,67 @@ function Index() {
       alert('Не удалось создать аккаунт сотрудника');
     } finally {
       setIsAuthLoading(false);
+    }
+  };
+
+  const handleVerifyInn = async (inn: string) => {
+    if (!inn || inn.length < 10) {
+      setInnVerificationState({
+        isChecking: false,
+        isVerified: false,
+        error: 'ИНН должен содержать 10 или 12 цифр',
+        companyData: null
+      });
+      return;
+    }
+
+    setInnVerificationState({
+      isChecking: true,
+      isVerified: false,
+      error: null,
+      companyData: null
+    });
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/822a1d32-f349-4962-9727-e0f529a73b8e', {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inn })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setInnVerificationState({
+          isChecking: false,
+          isVerified: true,
+          error: null,
+          companyData: data
+        });
+
+        if (data.name?.short && !registerForm.companyName) {
+          setRegisterForm({
+            ...registerForm,
+            companyName: data.name.short
+          });
+        }
+      } else {
+        setInnVerificationState({
+          isChecking: false,
+          isVerified: false,
+          error: data.error || 'Не удалось проверить ИНН',
+          companyData: null
+        });
+      }
+    } catch (error) {
+      console.error('Ошибка проверки ИНН:', error);
+      setInnVerificationState({
+        isChecking: false,
+        isVerified: false,
+        error: 'Ошибка соединения с сервисом проверки',
+        companyData: null
+      });
     }
   };
 
@@ -1621,15 +1694,83 @@ function Index() {
                 onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
               />
             </div>
-            <div>
+            <div className="space-y-2">
               <Label htmlFor="company-inn">ИНН компании (необязательно)</Label>
-              <Input 
-                id="company-inn" 
-                placeholder="1234567890" 
-                maxLength={12} 
-                value={registerForm.inn}
-                onChange={(e) => setRegisterForm({...registerForm, inn: e.target.value})}
-              />
+              <div className="flex gap-2">
+                <Input 
+                  id="company-inn" 
+                  placeholder="1234567890" 
+                  maxLength={12} 
+                  value={registerForm.inn}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, '');
+                    setRegisterForm({...registerForm, inn: value});
+                    if (innVerificationState.isVerified || innVerificationState.error) {
+                      setInnVerificationState({
+                        isChecking: false,
+                        isVerified: false,
+                        error: null,
+                        companyData: null
+                      });
+                    }
+                  }}
+                  className={innVerificationState.isVerified ? 'border-green-500' : innVerificationState.error ? 'border-red-500' : ''}
+                />
+                <Button 
+                  type="button"
+                  variant="outline" 
+                  onClick={() => handleVerifyInn(registerForm.inn)}
+                  disabled={innVerificationState.isChecking || !registerForm.inn || registerForm.inn.length < 10}
+                >
+                  {innVerificationState.isChecking ? (
+                    <>
+                      <Icon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
+                      Проверка...
+                    </>
+                  ) : innVerificationState.isVerified ? (
+                    <>
+                      <Icon name="CheckCircle2" className="w-4 h-4 mr-2 text-green-600" />
+                      Проверено
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="Search" className="w-4 h-4 mr-2" />
+                      Проверить
+                    </>
+                  )}
+                </Button>
+              </div>
+              {innVerificationState.error && (
+                <p className="text-sm text-red-500 flex items-center gap-1">
+                  <Icon name="AlertCircle" className="w-4 h-4" />
+                  {innVerificationState.error}
+                </p>
+              )}
+              {innVerificationState.isVerified && innVerificationState.companyData && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg space-y-1">
+                  <p className="text-sm font-medium text-green-900 flex items-center gap-1">
+                    <Icon name="CheckCircle2" className="w-4 h-4" />
+                    Компания найдена в ЕГРЮЛ
+                  </p>
+                  <p className="text-sm text-green-700">
+                    <strong>Название:</strong> {innVerificationState.companyData.name?.short || innVerificationState.companyData.name?.full}
+                  </p>
+                  {innVerificationState.companyData.address?.full && (
+                    <p className="text-sm text-green-700">
+                      <strong>Адрес:</strong> {innVerificationState.companyData.address.full}
+                    </p>
+                  )}
+                  <p className="text-sm text-green-700">
+                    <strong>Статус:</strong> {innVerificationState.companyData.status?.text || 'Не указан'}
+                  </p>
+                  {!innVerificationState.companyData.status?.isActive && (
+                    <p className="text-sm text-orange-600 flex items-center gap-1 mt-2">
+                      <Icon name="AlertTriangle" className="w-4 h-4" />
+                      Внимание: компания не является действующей
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <Label htmlFor="employee-count">Количество сотрудников</Label>
