@@ -1331,7 +1331,7 @@ function Index() {
                 <Badge className="ml-2 bg-green-500 text-white">-20%</Badge>
               </Button>
             </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="group">
               <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gray-400 to-gray-500"></div>
@@ -1375,64 +1375,12 @@ function Index() {
 
             <div className="group md:-mt-4">
               <div className="relative bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-2 border-primary overflow-hidden h-full">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 to-green-500"></div>
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-500 to-pink-500"></div>
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-gradient-to-r from-orange-500 to-red-500 text-white border-0 shadow-lg">⭐ Популярный</Badge>
                 </div>
                 
                 <div className="p-8 pt-10">
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-2">До 300 сотрудников</h3>
-                    <p className="text-sm text-muted-foreground">Для растущих компаний</p>
-                  </div>
-                  
-                  <div className="mb-6">
-                    <div className="text-3xl sm:text-4xl font-bold mb-2">
-                      {pricingPeriod === 'monthly' ? '19 900 ₽' : '15 920 ₽'}
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-1">в месяц</p>
-                    {pricingPeriod === 'yearly' && (
-                      <p className="text-sm text-green-600 font-medium">190 800 ₽/год (экономия 47 880 ₽)</p>
-                    )}
-                  </div>
-                  
-                  <ul className="space-y-3 mb-8">
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">До 300 сотрудников</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Неограниченные вакансии</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">API интеграция</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Аналитика и отчёты</span>
-                    </li>
-                  </ul>
-                  
-                  <Button className="w-full bg-gradient-to-r from-primary to-blue-600" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
-                </div>
-              </div>
-            </div>
-
-            <div className="group">
-              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-purple-500 to-pink-500"></div>
-                
-                <div className="p-8">
                   <div className="mb-6">
                     <h3 className="text-2xl font-bold mb-2">До 500 сотрудников</h3>
                     <p className="text-sm text-muted-foreground">Для крупных компаний</p>
@@ -1475,7 +1423,7 @@ function Index() {
                     </li>
                   </ul>
                   
-                  <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
+                  <Button className="w-full bg-gradient-to-r from-primary to-blue-600" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
                 </div>
               </div>
             </div>
