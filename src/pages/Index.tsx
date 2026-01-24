@@ -1383,7 +1383,7 @@ function Index() {
                 <div className="p-8">
                   <div className="mb-6">
                     <h3 className="text-2xl font-bold mb-2">До 1000 сотрудников</h3>
-                    <p className="text-sm text-muted-foreground">Для корпораций</p>
+                    <p className="text-sm text-muted-foreground">Для растущих компаний</p>
                   </div>
                   
                   <div className="mb-6">
@@ -1407,7 +1407,8 @@ function Index() {
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
                         <Icon name="Check" className="text-green-600" size={14} />
                       </div>
-                      <span className="text-sm">VIP поддержка 24/7</span>
+                      <span className="text-sm">Все функции платформы
+</span>
                     </li>
                     <li className="flex items-start gap-3">
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
@@ -1419,7 +1420,7 @@ function Index() {
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
                         <Icon name="Check" className="text-green-600" size={14} />
                       </div>
-                      <span className="text-sm">Индивидуальная разработка</span>
+                      <span className="text-sm">Геймификация</span>
                     </li>
                   </ul>
                   
