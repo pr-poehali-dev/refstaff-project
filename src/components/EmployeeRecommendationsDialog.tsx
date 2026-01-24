@@ -24,7 +24,7 @@ export function EmployeeRecommendationsDialog({
   if (!selectedRequest) return null;
 
   const hiredRecommendations = recommendations.filter(r => r.status === 'hired');
-  const totalReward = hiredRecommendations.reduce((sum, r) => sum + (r.reward || 0), 0);
+  const totalReward = hiredRecommendations.reduce((sum, r) => sum + (r.reward_amount || 0), 0);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -73,26 +73,32 @@ export function EmployeeRecommendationsDialog({
                   <CardContent className="pt-6">
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className="font-semibold">{rec.candidateName}</p>
-                        <p className="text-sm text-muted-foreground">{rec.candidateEmail}</p>
+                        <p className="font-semibold">{rec.candidate_name}</p>
+                        <p className="text-sm text-muted-foreground">{rec.candidate_email}</p>
                       </div>
                       {getRecommendationStatusBadge(rec.status)}
                     </div>
                     <div className="space-y-2 text-sm">
                       <div>
                         <span className="text-muted-foreground">Вакансия: </span>
-                        <span className="font-medium">{rec.vacancyTitle}</span>
+                        <span className="font-medium">{rec.vacancy_title || 'Не указано'}</span>
                       </div>
-                      {rec.reward && (
+                      {rec.reward_amount && (
                         <div>
                           <span className="text-muted-foreground">Вознаграждение: </span>
-                          <span className="font-medium text-green-600">{rec.reward.toLocaleString('ru-RU')} ₽</span>
+                          <span className="font-medium text-green-600">{rec.reward_amount.toLocaleString('ru-RU')} ₽</span>
                         </div>
                       )}
                       <div>
                         <span className="text-muted-foreground">Дата: </span>
-                        <span>{new Date(rec.createdAt).toLocaleDateString('ru-RU')}</span>
+                        <span>{new Date(rec.created_at).toLocaleDateString('ru-RU')}</span>
                       </div>
+                      {rec.comment && (
+                        <div>
+                          <span className="text-muted-foreground">Комментарий: </span>
+                          <span className="text-sm">{rec.comment}</span>
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
