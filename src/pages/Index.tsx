@@ -546,8 +546,8 @@ function Index() {
   };
 
   const handleCreateRecommendation = async (data: { vacancyId: number; name: string; email: string; phone: string; comment: string }) => {
-    if (!data.name || !data.email) {
-      alert('Заполните обязательные поля: ФИО и Email');
+    if (!data.name || !data.phone) {
+      alert('Заполните обязательные поля: ФИО и Телефон');
       return;
     }
     
@@ -5087,6 +5087,16 @@ function Index() {
                               />
                             </div>
                             <div>
+                              <Label htmlFor="candidate-phone">Телефон *</Label>
+                              <Input 
+                                id="candidate-phone" 
+                                placeholder="+7 (999) 123-45-67"
+                                value={recommendationForm.phone}
+                                onChange={(e) => setRecommendationForm({...recommendationForm, phone: e.target.value})}
+                                required
+                              />
+                            </div>
+                            <div>
                               <Label htmlFor="candidate-email">Email</Label>
                               <Input 
                                 id="candidate-email" 
@@ -5094,15 +5104,6 @@ function Index() {
                                 placeholder="ivan@example.com"
                                 value={recommendationForm.email}
                                 onChange={(e) => setRecommendationForm({...recommendationForm, email: e.target.value})}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="candidate-phone">Телефон</Label>
-                              <Input 
-                                id="candidate-phone" 
-                                placeholder="+7 (999) 123-45-67"
-                                value={recommendationForm.phone}
-                                onChange={(e) => setRecommendationForm({...recommendationForm, phone: e.target.value})}
                               />
                             </div>
                             <div>
