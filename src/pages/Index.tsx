@@ -1428,6 +1428,72 @@ function Index() {
                 </div>
               </div>
             </div>
+
+            <div className="group">
+              <div className="relative bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden h-full text-white">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-yellow-500 to-orange-500"></div>
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 border-0 shadow-lg font-bold">⭐ Enterprise</Badge>
+                </div>
+                
+                <div className="p-8 pt-10">
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold mb-2">Индивидуальный</h3>
+                    <p className="text-sm text-gray-300">Для крупных компаний</p>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <div className="text-3xl sm:text-4xl font-bold mb-2">
+                      По запросу
+                    </div>
+                    <p className="text-sm text-gray-400 mb-1">индивидуальная цена</p>
+                  </div>
+                  
+                  <ul className="space-y-3 mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-yellow-500" size={14} />
+                      </div>
+                      <span className="text-sm">Неограниченное количество сотрудников</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-yellow-500" size={14} />
+                      </div>
+                      <span className="text-sm">Персональный менеджер 24/7</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-yellow-500" size={14} />
+                      </div>
+                      <span className="text-sm">Индивидуальная доработка функционала</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-yellow-500" size={14} />
+                      </div>
+                      <span className="text-sm">Интеграция с вашими системами</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-yellow-500/20 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-yellow-500" size={14} />
+                      </div>
+                      <span className="text-sm">Выделенный сервер</span>
+                    </li>
+                  </ul>
+                  
+                  <Button 
+                    className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-gray-900 hover:from-yellow-400 hover:to-orange-400 font-bold" 
+                    onClick={() => {
+                      window.scrollTo({ top: document.getElementById('contact')?.offsetTop || 0, behavior: 'smooth' });
+                    }}
+                  >
+                    <Icon name="Phone" className="mr-2" size={18} />
+                    Связаться со специалистом
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
         </section>
