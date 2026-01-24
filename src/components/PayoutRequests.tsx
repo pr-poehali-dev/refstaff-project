@@ -126,17 +126,19 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
   return (
     <>
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="pending">
-            На рассмотрении {pendingRequests.length > 0 && `(${pendingRequests.length})`}
+        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
+          <TabsTrigger value="pending" className="text-xs sm:text-sm px-2">
+            <span className="hidden sm:inline">На рассмотрении</span>
+            <span className="sm:hidden">Рассмотр.</span>
+            {pendingRequests.length > 0 && <span className="ml-1">({pendingRequests.length})</span>}
           </TabsTrigger>
-          <TabsTrigger value="approved">
+          <TabsTrigger value="approved" className="text-xs sm:text-sm px-2">
             Одобрено {approvedRequests.length > 0 && `(${approvedRequests.length})`}
           </TabsTrigger>
-          <TabsTrigger value="paid">
+          <TabsTrigger value="paid" className="text-xs sm:text-sm px-2">
             Выплачено {paidRequests.length > 0 && `(${paidRequests.length})`}
           </TabsTrigger>
-          <TabsTrigger value="rejected">
+          <TabsTrigger value="rejected" className="text-xs sm:text-sm px-2">
             Отклонено {rejectedRequests.length > 0 && `(${rejectedRequests.length})`}
           </TabsTrigger>
         </TabsList>
