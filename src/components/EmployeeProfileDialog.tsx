@@ -26,7 +26,7 @@ export function EmployeeProfileDialog({
 
   const hiredCount = employeeData?.recommendations?.filter((r: any) => r.status === 'hired').length || 0;
   const totalReward = employeeData?.recommendations?.reduce((sum: number, r: any) => 
-    r.status === 'hired' ? sum + (r.reward || 0) : sum, 0) || 0;
+    r.status === 'hired' ? sum + (r.reward_amount || 0) : sum, 0) || 0;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -102,19 +102,32 @@ export function EmployeeProfileDialog({
                 <div className="space-y-2">
                   {employeeData.recommendations.slice(0, 5).map((rec: any) => (
                     <Card key={rec.id}>
-                      <CardContent className="py-3">
-                        <div className="flex items-center justify-between">
-                          <div className="flex-1">
-                            <p className="font-medium text-sm">{rec.candidateName}</p>
-                            <p className="text-xs text-muted-foreground">{rec.vacancyTitle}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {rec.reward && (
-                              <span className="text-sm font-medium text-green-600">
-                                {rec.reward.toLocaleString('ru-RU')} ₽
-                              </span>
-                            )}
+                      <CardContent className="py-4">
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <p className="font-semibold">{rec.candidate_name}</p>
+                              <p className="text-sm text-muted-foreground">{rec.candidate_email}</p>
+                            </div>
                             {getRecommendationStatusBadge(rec.status)}
+                          </div>
+                          <div className="space-y-1 text-sm">
+                            <div>
+                              <span className="text-muted-foreground">Вакансия: </span>
+                              <span className="font-medium">{rec.vacancy_title || 'Не указано'}</span>
+                            </div>
+                            {rec.reward_amount && (
+                              <div>
+                                <span className="text-muted-foreground">Вознаграждение: </span>
+                                <span className="font-medium text-green-600">
+                                  {rec.reward_amount.toLocaleString('ru-RU')} ₽
+                                </span>
+                              </div>
+                            )}
+                            <div>
+                              <span className="text-muted-foreground">Дата: </span>
+                              <span>{new Date(rec.created_at).toLocaleDateString('ru-RU')}</span>
+                            </div>
                           </div>
                         </div>
                       </CardContent>
