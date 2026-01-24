@@ -5862,17 +5862,17 @@ function Index() {
       </Dialog>
 
       <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
-        <DialogContent className="max-w-2xl h-[600px] flex flex-col">
-          <DialogHeader>
-            <DialogTitle>Чат с HR отделом</DialogTitle>
-            <DialogDescription>Задайте вопросы о рекомендациях и вакансиях</DialogDescription>
+        <DialogContent className="max-w-2xl h-[90vh] sm:h-[600px] flex flex-col p-0">
+          <DialogHeader className="px-4 pt-4 pb-2">
+            <DialogTitle className="text-base sm:text-lg">Чат с HR отделом</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">Задайте вопросы о рекомендациях и вакансиях</DialogDescription>
           </DialogHeader>
-          <div className="flex-1 overflow-y-auto space-y-3 py-4">
+          <div className="flex-1 overflow-y-auto space-y-3 py-4 px-4">
             {chatMessages.map((msg) => (
               <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
-                  <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
-                  {msg.message && <div className="text-sm mb-2">{msg.message}</div>}
+                <div className={`max-w-[85%] sm:max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-3 sm:px-4 py-2`}>
+                  <div className="text-[10px] sm:text-xs opacity-70 mb-1">{msg.senderName}</div>
+                  {msg.message && <div className="text-xs sm:text-sm mb-2">{msg.message}</div>}
                   {msg.attachments && msg.attachments.length > 0 && (
                     <div className="space-y-2 mt-2">
                       {msg.attachments.map((attachment, idx) => (
@@ -5890,32 +5890,32 @@ function Index() {
                               download={attachment.name}
                               className={`flex items-center gap-2 p-2 rounded ${msg.isOwn ? 'bg-primary-foreground/10' : 'bg-background'} hover:opacity-80 transition`}
                             >
-                              <Icon name="File" size={16} />
+                              <Icon name="File" size={14} className="sm:w-4 sm:h-4 flex-shrink-0" />
                               <div className="flex-1 min-w-0">
-                                <div className="text-xs font-medium truncate">{attachment.name}</div>
+                                <div className="text-[10px] sm:text-xs font-medium truncate">{attachment.name}</div>
                                 {attachment.size && (
-                                  <div className="text-xs opacity-70">{(attachment.size / 1024).toFixed(1)} KB</div>
+                                  <div className="text-[10px] sm:text-xs opacity-70">{(attachment.size / 1024).toFixed(1)} KB</div>
                                 )}
                               </div>
-                              <Icon name="Download" size={14} />
+                              <Icon name="Download" size={12} className="sm:w-[14px] sm:h-[14px] flex-shrink-0" />
                             </a>
                           )}
                         </div>
                       ))}
                     </div>
                   )}
-                  <div className="text-xs opacity-70 mt-1">{msg.timestamp}</div>
+                  <div className="text-[10px] sm:text-xs opacity-70 mt-1">{msg.timestamp}</div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="space-y-2 pt-4 border-t">
+          <div className="space-y-2 pt-4 border-t px-4 pb-4">
             {selectedFiles.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {selectedFiles.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-2 bg-muted px-3 py-2 rounded text-sm">
+                  <div key={idx} className="flex items-center gap-2 bg-muted px-2 sm:px-3 py-1.5 sm:py-2 rounded text-xs sm:text-sm">
                     <Icon name={file.type.startsWith('image/') ? 'Image' : 'File'} size={14} />
-                    <span className="max-w-[150px] truncate">{file.name}</span>
+                    <span className="max-w-[100px] sm:max-w-[150px] truncate">{file.name}</span>
                     <button 
                       onClick={() => removeFile(idx)}
                       className="hover:text-destructive transition"
@@ -5939,17 +5939,19 @@ function Index() {
                 variant="outline" 
                 size="icon"
                 onClick={() => fileInputRef.current?.click()}
+                className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0"
               >
-                <Icon name="Paperclip" size={18} />
+                <Icon name="Paperclip" size={16} className="sm:w-[18px] sm:h-[18px]" />
               </Button>
               <Input 
                 placeholder="Введите сообщение..." 
                 value={newMessage}
                 onChange={(e) => setNewMessage(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
+                className="text-sm sm:text-base"
               />
-              <Button onClick={handleSendMessage}>
-                <Icon name="Send" size={18} />
+              <Button onClick={handleSendMessage} className="h-9 w-9 sm:h-10 sm:w-10 p-0 flex-shrink-0">
+                <Icon name="Send" size={16} className="sm:w-[18px] sm:h-[18px]" />
               </Button>
             </div>
           </div>
