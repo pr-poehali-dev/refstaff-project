@@ -32,14 +32,14 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <DialogTitle className="text-2xl mb-2">{recommendation.candidateName}</DialogTitle>
+              <Badge variant={statusInfo.variant} className="mb-2 w-fit">
+                {statusInfo.label}
+              </Badge>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Icon name="Briefcase" size={16} />
                 <span>{recommendation.vacancyTitle || recommendation.vacancy}</span>
               </div>
             </div>
-            <Badge variant={statusInfo.variant}>
-              {statusInfo.label}
-            </Badge>
           </div>
         </DialogHeader>
 
