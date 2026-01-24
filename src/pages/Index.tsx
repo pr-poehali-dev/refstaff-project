@@ -3356,7 +3356,7 @@ function Index() {
               onVacancyClick={(vacancyId) => {
                 const vacancy = vacancies.find(v => v.id === vacancyId);
                 if (vacancy) {
-                  setSelectedVacancy(vacancy);
+                  setSelectedVacancyDetail(vacancy);
                   setShowVacancyDetail(true);
                   setActiveEmployerTab('vacancies');
                 }
