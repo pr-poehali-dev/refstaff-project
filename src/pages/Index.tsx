@@ -5530,7 +5530,7 @@ function Index() {
                   </div>
                   <div className="flex gap-2">
                     <Icon name="UserPlus" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                    <p><strong>Отправка рекомендации:</strong> Нажмите "Рекомендовать кандидата", заполните контакты и опишите, почему этот человек подходит</p>
+                    <p><strong>Отправка рекомендации:</strong> Нажмите "Рекомендовать кандидата", заполните контакты и опишите, почему этот человек подходит. Также можно пригласить кандидата по реферальной ссылке</p>
                   </div>
                   <div className="flex gap-2">
                     <Icon name="Award" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" />
