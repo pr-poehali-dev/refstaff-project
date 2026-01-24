@@ -126,20 +126,26 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
   return (
     <>
       <Tabs defaultValue="pending" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 gap-1">
-          <TabsTrigger value="pending" className="text-xs sm:text-sm px-2">
-            <span className="hidden sm:inline">На рассмотрении</span>
-            <span className="sm:hidden">Рассмотр.</span>
-            {pendingRequests.length > 0 && <span className="ml-1">({pendingRequests.length})</span>}
+        <TabsList className="grid w-full grid-cols-4 h-auto">
+          <TabsTrigger value="pending" className="text-[10px] sm:text-sm px-1 sm:px-3 py-2 whitespace-normal leading-tight">
+            <span className="hidden md:inline">На рассмотрении</span>
+            <span className="md:hidden">Рассм.</span>
+            {pendingRequests.length > 0 && <span className="ml-0.5">({pendingRequests.length})</span>}
           </TabsTrigger>
-          <TabsTrigger value="approved" className="text-xs sm:text-sm px-2">
-            Одобрено {approvedRequests.length > 0 && `(${approvedRequests.length})`}
+          <TabsTrigger value="approved" className="text-[10px] sm:text-sm px-1 sm:px-3 py-2 whitespace-normal leading-tight">
+            <span className="hidden sm:inline">Одобрено</span>
+            <span className="sm:hidden">Одобр.</span>
+            {approvedRequests.length > 0 && <span className="ml-0.5">({approvedRequests.length})</span>}
           </TabsTrigger>
-          <TabsTrigger value="paid" className="text-xs sm:text-sm px-2">
-            Выплачено {paidRequests.length > 0 && `(${paidRequests.length})`}
+          <TabsTrigger value="paid" className="text-[10px] sm:text-sm px-1 sm:px-3 py-2 whitespace-normal leading-tight">
+            <span className="hidden sm:inline">Выплачено</span>
+            <span className="sm:hidden">Выпл.</span>
+            {paidRequests.length > 0 && <span className="ml-0.5">({paidRequests.length})</span>}
           </TabsTrigger>
-          <TabsTrigger value="rejected" className="text-xs sm:text-sm px-2">
-            Отклонено {rejectedRequests.length > 0 && `(${rejectedRequests.length})`}
+          <TabsTrigger value="rejected" className="text-[10px] sm:text-sm px-1 sm:px-3 py-2 whitespace-normal leading-tight">
+            <span className="hidden sm:inline">Отклонено</span>
+            <span className="sm:hidden">Откл.</span>
+            {rejectedRequests.length > 0 && <span className="ml-0.5">({rejectedRequests.length})</span>}
           </TabsTrigger>
         </TabsList>
 
