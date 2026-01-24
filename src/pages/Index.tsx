@@ -4904,7 +4904,7 @@ function Index() {
             </CardHeader>
             <CardContent className="space-y-3 sm:space-y-4 p-4 sm:p-6 pt-0 sm:pt-0">
               <div>
-                <div className="text-xs sm:text-sm text-muted-foreground mb-1">Доступно для вывода</div>
+                <div className="text-xs sm:text-sm text-muted-foreground mb-1">Доступно для выплаты</div>
                 <div className="text-2xl sm:text-3xl font-bold text-green-600">
                   {walletData?.wallet?.wallet_balance?.toLocaleString() || 0} ₽
                 </div>
