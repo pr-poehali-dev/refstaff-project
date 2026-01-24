@@ -1388,11 +1388,11 @@ function Index() {
                   
                   <div className="mb-6">
                     <div className="text-3xl sm:text-4xl font-bold mb-2">
-                      {pricingPeriod === 'monthly' ? '97 000 ₽' : '77 600 ₽'}
+                      {pricingPeriod === 'monthly' ? '54 900 ₽' : '43 920 ₽'}
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">в месяц</p>
                     {pricingPeriod === 'yearly' && (
-                      <p className="text-sm text-green-600 font-medium">931 200 ₽/год (экономия 232 800 ₽)</p>
+                      <p className="text-sm text-green-600 font-medium">527 040 ₽/год (экономия 131 760 ₽)</p>
                     )}
                   </div>
                   
