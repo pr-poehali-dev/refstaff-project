@@ -1487,10 +1487,7 @@ function Index() {
                     onClick={() => {
                       window.scrollTo({ top: document.getElementById('contact')?.offsetTop || 0, behavior: 'smooth' });
                     }}
-                  >
-                    <Icon name="Phone" className="mr-2" size={18} />
-                    Связаться со специалистом
-                  </Button>
+                  > Связаться со специалистом</Button>
                 </div>
               </div>
             </div>
