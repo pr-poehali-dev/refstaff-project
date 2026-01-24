@@ -3358,7 +3358,6 @@ function Index() {
                 if (vacancy) {
                   setSelectedVacancyDetail(vacancy);
                   setShowVacancyDetail(true);
-                  setActiveEmployerTab('vacancies');
                 }
               }}
             />
