@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import type { PayoutRequest } from './PayoutRequests';
 
@@ -11,6 +12,7 @@ interface EmployeeRecommendationsDialogProps {
   recommendations: any[];
   loading: boolean;
   getRecommendationStatusBadge: (status: string) => JSX.Element;
+  onVacancyClick?: (vacancyId: number) => void;
 }
 
 export function EmployeeRecommendationsDialog({
@@ -19,7 +21,8 @@ export function EmployeeRecommendationsDialog({
   selectedRequest,
   recommendations,
   loading,
-  getRecommendationStatusBadge
+  getRecommendationStatusBadge,
+  onVacancyClick
 }: EmployeeRecommendationsDialogProps) {
   if (!selectedRequest) return null;
 
@@ -79,9 +82,21 @@ export function EmployeeRecommendationsDialog({
                       {getRecommendationStatusBadge(rec.status)}
                     </div>
                     <div className="space-y-2 text-sm">
-                      <div>
+                      <div className="flex items-center gap-2">
                         <span className="text-muted-foreground">Вакансия: </span>
-                        <span className="font-medium">{rec.vacancy_title || 'Не указано'}</span>
+                        <Button
+                          variant="link"
+                          className="p-0 h-auto font-medium text-primary hover:underline"
+                          onClick={() => {
+                            if (rec.vacancy_id && onVacancyClick) {
+                              onVacancyClick(rec.vacancy_id);
+                              onOpenChange(false);
+                            }
+                          }}
+                        >
+                          {rec.vacancy_title || 'Не указано'}
+                          <Icon name="ExternalLink" className="ml-1" size={14} />
+                        </Button>
                       </div>
                       {rec.reward_amount && (
                         <div>

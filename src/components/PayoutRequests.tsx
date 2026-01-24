@@ -29,9 +29,10 @@ export interface PayoutRequest {
 interface PayoutRequestsProps {
   requests: PayoutRequest[];
   onUpdateStatus: (requestId: number, status: string, comment?: string) => void;
+  onVacancyClick?: (vacancyId: number) => void;
 }
 
-export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps) {
+export function PayoutRequests({ requests, onUpdateStatus, onVacancyClick }: PayoutRequestsProps) {
   const [selectedRequest, setSelectedRequest] = useState<PayoutRequest | null>(null);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<'approved' | 'rejected' | 'paid'>('approved');
@@ -236,6 +237,7 @@ export function PayoutRequests({ requests, onUpdateStatus }: PayoutRequestsProps
         recommendations={employeeRecommendations}
         loading={loadingRecommendations}
         getRecommendationStatusBadge={getRecommendationStatusBadge}
+        onVacancyClick={onVacancyClick}
       />
 
       <EmployeeProfileDialog

@@ -3353,6 +3353,14 @@ function Index() {
                   alert('Не удалось обновить статус выплаты');
                 }
               }}
+              onVacancyClick={(vacancyId) => {
+                const vacancy = vacancies.find(v => v.id === vacancyId);
+                if (vacancy) {
+                  setSelectedVacancy(vacancy);
+                  setShowVacancyDetail(true);
+                  setActiveEmployerTab('vacancies');
+                }
+              }}
             />
           </TabsContent>
 
