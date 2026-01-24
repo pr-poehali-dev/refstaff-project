@@ -1331,7 +1331,7 @@ function Index() {
                 className="min-w-[120px]"
               >
                 Год
-                <Badge className="ml-2 bg-green-500 text-white">-20%</Badge>
+                <Badge className="ml-2 bg-green-500 text-white">-15%</Badge>
               </Button>
             </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1388,11 +1388,11 @@ function Index() {
                   
                   <div className="mb-6">
                     <div className="text-3xl sm:text-4xl font-bold mb-2">
-                      {pricingPeriod === 'monthly' ? '54 900 ₽' : '43 920 ₽'}
+                      {pricingPeriod === 'monthly' ? '54 900 ₽' : '46 665 ₽'}
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">в месяц</p>
                     {pricingPeriod === 'yearly' && (
-                      <p className="text-sm text-green-600 font-medium">527 040 ₽/год (экономия 131 760 ₽)</p>
+                      <p className="text-sm text-green-600 font-medium">559 980 ₽/год (экономия 99 000 ₽)</p>
                     )}
                   </div>
                   
