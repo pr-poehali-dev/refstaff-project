@@ -2257,7 +2257,7 @@ function Index() {
                 По вопросам Соглашения обращайтесь:
               </p>
               <p className="text-muted-foreground mt-2">
-                Email: <a href="mailto:legal@ihunt.ru" className="text-primary hover:underline">legal@ihunt.ru</a>
+                Email: <a href="mailto:legal@ihunt.ru" className="text-primary hover:underline">info@i-hunt.ru</a>
               </p>
             </div>
           </div>
