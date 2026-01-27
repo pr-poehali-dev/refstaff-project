@@ -2011,7 +2011,7 @@ function Index() {
                 </p>
                 <p className="flex items-center gap-2">
                   <Icon name="Phone" size={16} className="text-muted-foreground" />
-                  <a href="tel:+74951234567" className="text-primary hover:underline">+7 (495) 123-45-67</a>
+                  <a href="tel:+74951234567" className="text-primary hover:underline"></a>
                 </p>
               </div>
             </div>
