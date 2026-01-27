@@ -2116,7 +2116,7 @@ function Index() {
                 По вопросам обработки персональных данных обращайтесь:
               </p>
               <p className="text-muted-foreground mt-2">
-                Email: <a href="mailto:privacy@ihunt.ru" className="text-primary hover:underline">privacy@ihunt.ru</a>
+                Email: <a href="mailto:privacy@ihunt.ru" className="text-primary hover:underline">info@i-hunt.ru</a>
               </p>
             </div>
           </div>
