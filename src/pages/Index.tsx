@@ -2007,7 +2007,7 @@ function Index() {
               <div className="space-y-2 text-sm">
                 <p className="flex items-center gap-2">
                   <Icon name="Mail" size={16} className="text-muted-foreground" />
-                  <a href="mailto:info@ihunt.ru" className="text-primary hover:underline">info@ihunt.ru</a>
+                  <a href="mailto:info@ihunt.ru" className="text-primary hover:underline">info@i-hunt.ru</a>
                 </p>
                 <p className="flex items-center gap-2">
                   <Icon name="Phone" size={16} className="text-muted-foreground" />
