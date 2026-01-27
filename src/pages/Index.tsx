@@ -2009,10 +2009,7 @@ function Index() {
                   <Icon name="Mail" size={16} className="text-muted-foreground" />
                   <a href="mailto:info@ihunt.ru" className="text-primary hover:underline">info@i-hunt.ru</a>
                 </p>
-                <p className="flex items-center gap-2">
-                  <Icon name="Phone" size={16} className="text-muted-foreground" />
-                  <a href="tel:+74951234567" className="text-primary hover:underline"></a>
-                </p>
+
               </div>
             </div>
           </div>
