@@ -1604,7 +1604,8 @@ function Index() {
       <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Регистрация компании</DialogTitle>
+            <DialogTitle>
+Регистрация компании</DialogTitle>
             <DialogDescription>Начните 14-дневный бесплатный пробный период</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
