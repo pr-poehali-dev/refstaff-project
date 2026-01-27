@@ -2490,9 +2490,9 @@ function Index() {
                 По вопросам обработки персональных данных обращайтесь:
               </p>
               <ul className="list-none space-y-1 text-muted-foreground mt-2 ml-4">
-                <li>Email: <a href="mailto:privacy@ihunt.ru" className="text-primary hover:underline">privacy@ihunt.ru</a></li>
+                <li>Email: <a href="mailto:privacy@ihunt.ru" className="text-primary hover:underline">info@i-hunt.ru</a></li>
                 <li>Адрес: Россия, г. Москва</li>
-                <li>Телефон: +7 (495) 123-45-67</li>
+                <li></li>
               </ul>
               <p className="text-muted-foreground mt-3">
                 <strong>Дата вступления в силу:</strong> 16 января 2026 г.
