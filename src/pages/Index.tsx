@@ -141,6 +141,14 @@ function Index() {
     department: ''
   });
   
+  const [contactForm, setContactForm] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [contactFormSubmitting, setContactFormSubmitting] = useState(false);
+  const [contactFormSuccess, setContactFormSuccess] = useState(false);
+  
   const [vacancyForm, setVacancyForm] = useState({
     title: '',
     department: '',
@@ -833,6 +841,47 @@ function Index() {
     }
   };
 
+  const handleContactFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!contactForm.name || !contactForm.email || !contactForm.message) {
+      alert('Пожалуйста, заполните все поля');
+      return;
+    }
+
+    setContactFormSubmitting(true);
+    setContactFormSuccess(false);
+
+    try {
+      const response = await fetch('https://functions.poehali.dev/7316b3af-fb17-41b7-a4f3-9195c9f48288', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: contactForm.name,
+          email: contactForm.email,
+          message: contactForm.message
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setContactFormSuccess(true);
+        setContactForm({ name: '', email: '', message: '' });
+        alert('✅ Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.');
+      } else {
+        alert('❌ Ошибка при отправке: ' + (data.error || 'Попробуйте позже'));
+      }
+    } catch (error) {
+      console.error('Ошибка отправки формы:', error);
+      alert('❌ Не удалось отправить сообщение. Проверьте подключение к интернету.');
+    } finally {
+      setContactFormSubmitting(false);
+    }
+  };
+
   const handleRegister = async () => {
     if (!registerForm.companyName || !registerForm.firstName || !registerForm.lastName || !registerForm.email || !registerForm.password || !registerForm.inn) {
       alert('Заполните все обязательные поля');
@@ -1512,7 +1561,7 @@ function Index() {
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-green-500 to-blue-500"></div>
               
               <div className="p-8 md:p-10">
-                <form className="space-y-6" aria-label="Форма обратной связи">
+                <form className="space-y-6" aria-label="Форма обратной связи" onSubmit={handleContactFormSubmit}>
                   <div>
                     <Label htmlFor="name" className="text-base font-medium">Имя</Label>
                     <Input 
@@ -1522,6 +1571,9 @@ function Index() {
                       autoComplete="name" 
                       required 
                       className="mt-2 h-12"
+                      value={contactForm.name}
+                      onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
+                      disabled={contactFormSubmitting}
                     />
                   </div>
                   <div>
@@ -1534,6 +1586,9 @@ function Index() {
                       autoComplete="email" 
                       required 
                       className="mt-2 h-12"
+                      value={contactForm.email}
+                      onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                      disabled={contactFormSubmitting}
                     />
                   </div>
                   <div>
@@ -1545,11 +1600,27 @@ function Index() {
                       rows={5} 
                       required 
                       className="mt-2"
+                      value={contactForm.message}
+                      onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
+                      disabled={contactFormSubmitting}
                     />
                   </div>
-                  <Button type="submit" className="w-full h-12 text-base bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700">
-                    <Icon name="Send" className="mr-2" size={18} />
-                    Отправить сообщение
+                  <Button 
+                    type="submit" 
+                    className="w-full h-12 text-base bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+                    disabled={contactFormSubmitting}
+                  >
+                    {contactFormSubmitting ? (
+                      <>
+                        <Icon name="Loader2" className="mr-2 animate-spin" size={18} />
+                        Отправка...
+                      </>
+                    ) : (
+                      <>
+                        <Icon name="Send" className="mr-2" size={18} />
+                        Отправить сообщение
+                      </>
+                    )}
                   </Button>
                 </form>
               </div>
