@@ -3860,7 +3860,7 @@ function Index() {
                     <Icon name="Mail" className="w-5 h-5 text-muted-foreground mt-0.5" />
                     <div>
                       <p className="font-medium text-sm">Email поддержка</p>
-                      <p className="text-sm text-muted-foreground">support@referral-platform.com</p>
+                      <p className="text-sm text-muted-foreground">info@i-hunt.ru</p>
                     </div>
                   </div>
                   <div className="flex gap-3 items-start">
