@@ -148,10 +148,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
 def send_contact_notification(user_name: str, user_email: str, user_message: str):
     """Отправляет уведомление о новом сообщении с формы контактов на email администратора"""
-    smtp_host = os.environ.get('SMTP_HOST')
-    smtp_port = int(os.environ.get('SMTP_PORT', '587'))
-    smtp_user = os.environ.get('SMTP_USER')
-    smtp_password = os.environ.get('SMTP_PASSWORD')
+    smtp_host = os.environ.get('EMAIL_SMTP_HOST')
+    smtp_port = int(os.environ.get('EMAIL_SMTP_PORT', '587'))
+    smtp_user = os.environ.get('EMAIL_FROM')
+    smtp_password = os.environ.get('EMAIL_PASSWORD')
     
     if not all([smtp_host, smtp_user, smtp_password]):
         raise Exception('SMTP not configured')
