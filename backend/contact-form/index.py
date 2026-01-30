@@ -98,11 +98,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cursor.close()
         conn.close()
 
-        # Отправка email уведомления
+        # Отправка email уведомления (не блокирует ответ пользователю)
+        email_sent = False
+        email_error_msg = None
         try:
             send_contact_notification(user_name, user_email, user_message)
+            email_sent = True
+            print(f"Email notification sent successfully to {os.environ.get('SMTP_USER')}")
         except Exception as email_error:
-            print(f"Warning: Failed to send email notification: {str(email_error)}")
+            email_error_msg = str(email_error)
+            print(f"Warning: Failed to send email notification: {email_error_msg}")
 
         return {
             'statusCode': 200,
@@ -233,7 +238,7 @@ def send_contact_notification(user_name: str, user_email: str, user_message: str
     html_part = MIMEText(html_content, 'html', 'utf-8')
     msg.attach(html_part)
     
-    with smtplib.SMTP(smtp_host, smtp_port) as server:
+    with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as server:
         server.starttls()
         server.login(smtp_user, smtp_password)
         server.send_message(msg)
