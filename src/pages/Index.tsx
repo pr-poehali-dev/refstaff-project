@@ -6620,19 +6620,6 @@ function Index() {
         onOpenChange={setShowEmployeeDetail}
         recommendations={recommendations}
       />
-
-      <VacancyDetail
-        vacancy={selectedVacancyDetail}
-        open={showVacancyDetail}
-        onOpenChange={setShowVacancyDetail}
-        showRecommendButton={userRole === 'employee'}
-        onRecommend={() => {
-          if (selectedVacancyDetail) {
-            setActiveVacancy(selectedVacancyDetail);
-            setShowVacancyDetail(false);
-          }
-        }}
-      />
     </>
   );
 }
