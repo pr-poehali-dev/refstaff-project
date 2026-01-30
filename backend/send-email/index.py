@@ -37,10 +37,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'isBase64Encoded': False
         }
 
-    smtp_host = os.environ.get('SMTP_HOST')
-    smtp_port = int(os.environ.get('SMTP_PORT', '587'))
-    smtp_user = os.environ.get('SMTP_USER')
-    smtp_password = os.environ.get('SMTP_PASSWORD')
+    smtp_host = os.environ.get('EMAIL_SMTP_HOST')
+    smtp_port = int(os.environ.get('EMAIL_SMTP_PORT', '587'))
+    smtp_user = os.environ.get('EMAIL_FROM')
+    smtp_password = os.environ.get('EMAIL_PASSWORD')
 
     if not all([smtp_host, smtp_user, smtp_password]):
         return {
@@ -83,7 +83,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     msg.attach(html_part)
 
     try:
-        with smtplib.SMTP(smtp_host, smtp_port) as server:
+        with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as server:
             server.starttls()
             server.login(smtp_user, smtp_password)
             server.send_message(msg)
