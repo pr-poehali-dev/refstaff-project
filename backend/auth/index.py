@@ -136,13 +136,27 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 pwd_hash, salt = hash_password(password)
                 
                 if company_name:
+                    # Проверяем уникальность ИНН если он указан
+                    if company_inn:
+                        cursor.execute(
+                            "SELECT id FROM t_p65890965_refstaff_project.companies WHERE inn = %s",
+                            (company_inn,)
+                        )
+                        if cursor.fetchone():
+                            return {
+                                'statusCode': 409,
+                                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                                'body': json.dumps({'error': 'Компания с таким ИНН уже зарегистрирована'}),
+                                'isBase64Encoded': False
+                            }
+                    
                     invite_token = os.urandom(16).hex()
                     cursor.execute("""
                         INSERT INTO t_p65890965_refstaff_project.companies 
-                        (name, employee_count, invite_token, subscription_tier, subscription_expires_at, created_at, updated_at)
-                        VALUES (%s, %s, %s, 'trial', %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                        (name, employee_count, invite_token, subscription_tier, subscription_expires_at, inn, created_at, updated_at)
+                        VALUES (%s, %s, %s, 'trial', %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                         RETURNING id
-                    """, (company_name, employee_count, invite_token, datetime.utcnow() + timedelta(days=14)))
+                    """, (company_name, employee_count, invite_token, datetime.utcnow() + timedelta(days=14), company_inn))
                     company_id = cursor.fetchone()['id']
                     role = 'admin'
                 else:
