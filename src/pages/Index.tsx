@@ -46,6 +46,11 @@ function Index() {
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
   const [showTermsDialog, setShowTermsDialog] = useState(false);
   const [showPersonalDataDialog, setShowPersonalDataDialog] = useState(false);
+  const [showForgotPasswordDialog, setShowForgotPasswordDialog] = useState(false);
+  const [showResetPasswordDialog, setShowResetPasswordDialog] = useState(false);
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [resetPasswordForm, setResetPasswordForm] = useState({ token: '', password: '', confirmPassword: '' });
+  const [passwordResetMessage, setPasswordResetMessage] = useState('');
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'yearly'>('monthly');
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
     { id: 1, senderId: 1, senderName: 'HR Manager', message: 'Здравствуйте! Как дела с рекомендациями?', timestamp: '10:30', isOwn: false },
@@ -338,6 +343,16 @@ function Index() {
   useEffect(() => {
     if (authToken && userRole !== 'guest') {
       verifyToken();
+    }
+
+    // Обработка токена восстановления пароля из URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const resetToken = urlParams.get('token');
+    if (resetToken) {
+      setResetPasswordForm({ token: resetToken, password: '', confirmPassword: '' });
+      setShowResetPasswordDialog(true);
+      // Очищаем URL от токена
+      window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, []);
 
@@ -972,6 +987,80 @@ function Index() {
     } catch (error) {
       console.error('Ошибка входа:', error);
       alert('Не удалось войти в систему');
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleRequestPasswordReset = async () => {
+    if (!forgotPasswordEmail.trim()) {
+      alert('Введите email');
+      return;
+    }
+
+    setIsAuthLoading(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/ec8d2e7d-ee4d-47cc-86ee-91464da954c3', {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotPasswordEmail })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPasswordResetMessage('Если email существует, на него отправлена ссылка для восстановления пароля');
+      } else {
+        setPasswordResetMessage(data.error || 'Произошла ошибка');
+      }
+    } catch (error) {
+      console.error('Ошибка запроса восстановления:', error);
+      setPasswordResetMessage('Не удалось отправить запрос');
+    } finally {
+      setIsAuthLoading(false);
+    }
+  };
+
+  const handleResetPassword = async () => {
+    if (resetPasswordForm.password !== resetPasswordForm.confirmPassword) {
+      setPasswordResetMessage('Пароли не совпадают');
+      return;
+    }
+
+    if (resetPasswordForm.password.length < 6) {
+      setPasswordResetMessage('Пароль должен содержать минимум 6 символов');
+      return;
+    }
+
+    setIsAuthLoading(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/490186ec-0761-4387-8b05-813aea3e8f94', {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token: resetPasswordForm.token,
+          password: resetPasswordForm.password
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setPasswordResetMessage('Пароль успешно изменен! Теперь вы можете войти с новым паролем.');
+        setTimeout(() => {
+          setShowResetPasswordDialog(false);
+          setShowLoginDialog(true);
+          setResetPasswordForm({ token: '', password: '', confirmPassword: '' });
+          setPasswordResetMessage('');
+        }, 2000);
+      } else {
+        setPasswordResetMessage(data.error || 'Произошла ошибка');
+      }
+    } catch (error) {
+      console.error('Ошибка сброса пароля:', error);
+      setPasswordResetMessage('Не удалось изменить пароль');
     } finally {
       setIsAuthLoading(false);
     }
@@ -1901,7 +1990,15 @@ function Index() {
                 <input type="checkbox" className="rounded" />
                 Запомнить меня
               </label>
-              <a href="#" className="text-sm text-primary hover:underline">Забыли пароль?</a>
+              <button 
+                onClick={() => {
+                  setShowLoginDialog(false);
+                  setShowForgotPasswordDialog(true);
+                }}
+                className="text-sm text-primary hover:underline"
+              >
+                Забыли пароль?
+              </button>
             </div>
             <Button className="w-full" onClick={handleLogin} disabled={isAuthLoading}>
               {isAuthLoading ? 'Вход...' : 'Войти'}
@@ -6620,6 +6717,116 @@ function Index() {
         onOpenChange={setShowEmployeeDetail}
         recommendations={recommendations}
       />
+
+      {/* Диалог запроса восстановления пароля */}
+      <Dialog open={showForgotPasswordDialog} onOpenChange={(open) => {
+        setShowForgotPasswordDialog(open);
+        if (!open) {
+          setForgotPasswordEmail('');
+          setPasswordResetMessage('');
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Восстановление пароля</DialogTitle>
+            <DialogDescription>
+              Введите email, и мы отправим вам ссылку для восстановления пароля
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="forgot-email">Email</Label>
+              <Input 
+                id="forgot-email" 
+                type="email"
+                placeholder="email@example.com"
+                value={forgotPasswordEmail}
+                onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleRequestPasswordReset()}
+              />
+            </div>
+            {passwordResetMessage && (
+              <div className="text-sm text-green-600 bg-green-50 p-3 rounded">
+                {passwordResetMessage}
+              </div>
+            )}
+            <Button 
+              className="w-full" 
+              onClick={handleRequestPasswordReset}
+              disabled={!forgotPasswordEmail.trim()}
+            >
+              Отправить ссылку
+            </Button>
+            <Button 
+              variant="ghost" 
+              className="w-full" 
+              onClick={() => {
+                setShowForgotPasswordDialog(false);
+                setForgotPasswordEmail('');
+                setPasswordResetMessage('');
+                setShowLoginDialog(true);
+              }}
+            >
+              Назад к входу
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Диалог сброса пароля */}
+      <Dialog open={showResetPasswordDialog} onOpenChange={setShowResetPasswordDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Новый пароль</DialogTitle>
+            <DialogDescription>
+              Введите новый пароль для вашего аккаунта
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="new-password">Новый пароль</Label>
+              <Input 
+                id="new-password" 
+                type="password"
+                placeholder="Минимум 6 символов"
+                value={resetPasswordForm.password}
+                onChange={(e) => setResetPasswordForm({...resetPasswordForm, password: e.target.value})}
+              />
+            </div>
+            <div>
+              <Label htmlFor="confirm-password">Подтвердите пароль</Label>
+              <Input 
+                id="confirm-password" 
+                type="password"
+                placeholder="Введите пароль еще раз"
+                value={resetPasswordForm.confirmPassword}
+                onChange={(e) => setResetPasswordForm({...resetPasswordForm, confirmPassword: e.target.value})}
+                onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
+              />
+            </div>
+            {passwordResetMessage && (
+              <div className={`text-sm p-3 rounded ${
+                passwordResetMessage.includes('успешно') 
+                  ? 'text-green-600 bg-green-50' 
+                  : 'text-red-600 bg-red-50'
+              }`}>
+                {passwordResetMessage}
+              </div>
+            )}
+            <Button 
+              className="w-full" 
+              onClick={handleResetPassword}
+              disabled={
+                !resetPasswordForm.password || 
+                !resetPasswordForm.confirmPassword || 
+                resetPasswordForm.password !== resetPasswordForm.confirmPassword
+              }
+            >
+              Изменить пароль
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
