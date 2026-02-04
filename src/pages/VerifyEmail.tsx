@@ -39,12 +39,16 @@ export default function VerifyEmail() {
           setMessage('Ваш email успешно подтверждён!');
           setUserData(data.user);
           
+          // Сохраняем токен и определяем роль для интерфейса
           localStorage.setItem('authToken', data.token);
-          localStorage.setItem('userRole', data.user.role);
+          const uiRole = data.user.role === 'admin' || data.user.is_admin ? 'employer' : 'employee';
+          localStorage.setItem('userRole', uiRole);
           
+          // Автоматически перенаправляем через 2 секунды
           setTimeout(() => {
-            navigate('/');
-          }, 3000);
+            navigate('/', { replace: true });
+            window.location.reload(); // Обновляем страницу для загрузки данных
+          }, 2000);
         } else {
           setStatus('error');
           setMessage(data.error || 'Не удалось подтвердить email');
@@ -104,7 +108,7 @@ export default function VerifyEmail() {
               </p>
               <p className="text-sm text-green-700 mt-3">
                 <Icon name="Info" className="w-4 h-4 inline mr-1" />
-                Вы будете автоматически перенаправлены на главную страницу через 3 секунды...
+                Вы будете автоматически перенаправлены в личный кабинет через 2 секунды...
               </p>
             </div>
           )}
