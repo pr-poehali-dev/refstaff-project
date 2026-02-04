@@ -58,6 +58,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     user_name = body_data.get('user_name', '')
     verification_token = body_data.get('verification_token')
     base_url = body_data.get('base_url', 'https://project.poehali.dev')
+    user_type = body_data.get('user_type', 'employee')  # 'company' или 'employee'
 
     if not to_email or not verification_token:
         return {
@@ -72,7 +73,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
     verification_url = f"{base_url}/verify-email?token={verification_token}"
 
-    html_content = create_verification_email_html(user_name, verification_url)
+    html_content = create_verification_email_html(user_name, verification_url, user_type)
 
     msg = MIMEMultipart('alternative')
     msg['Subject'] = 'Подтвердите вашу электронную почту'
@@ -111,8 +112,47 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
 
 
-def create_verification_email_html(user_name: str, verification_url: str) -> str:
+def create_verification_email_html(user_name: str, verification_url: str, user_type: str = 'employee') -> str:
     """Создает красиво оформленное HTML письмо для подтверждения email"""
+    
+    # Разные тексты для компаний и сотрудников
+    if user_type == 'company':
+        welcome_text = 'Спасибо за регистрацию компании на платформе <strong>iHUNT</strong>! Осталось всего один шаг — подтвердить вашу электронную почту.'
+        action_text = 'Нажмите на кнопку ниже, чтобы активировать ваш аккаунт и начать привлекать таланты через рекомендации сотрудников:'
+        benefits = [
+            ('💼', 'Управление вакансиями', 'Создавайте вакансии и получайте качественных кандидатов от ваших сотрудников'),
+            ('🎯', 'Умная система рекомендаций', 'Отслеживайте статус кандидатов и автоматизируйте выплату вознаграждений'),
+            ('📊', 'Аналитика и отчеты', 'Следите за эффективностью программы и ROI рекомендательной системы'),
+            ('⚡', 'Быстрый найм', 'Сократите время подбора персонала в 2-3 раза благодаря рекомендациям')
+        ]
+    else:
+        welcome_text = 'Спасибо за регистрацию на платформе <strong>iHUNT</strong>! Осталось всего один шаг — подтвердить вашу электронную почту.'
+        action_text = 'Нажмите на кнопку ниже, чтобы активировать ваш аккаунт и начать зарабатывать на рекомендациях:'
+        benefits = [
+            ('💰', 'Зарабатывайте на рекомендациях', 'Получайте вознаграждения за успешные рекомендации кандидатов'),
+            ('🚀', 'Быстрые выплаты', 'Деньги поступают на счет сразу после найма рекомендованного кандидата'),
+            ('🎯', 'Простой процесс', 'Рекомендуйте знакомых в пару кликов — мы позаботимся об остальном'),
+            ('📈', 'Отслеживание статуса', 'Следите за всеми вашими рекомендациями в реальном времени')
+        ]
+    
+    benefits_html = ''.join([
+        f"""
+                            <tr>
+                                <td style="padding: 15px 0; border-bottom: 1px solid #e2e8f0;">
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td width="40" style="font-size: 24px;">{icon}</td>
+                                            <td>
+                                                <p style="margin: 0 0 5px; color: #2d3748; font-size: 16px; font-weight: 600;">{title}</p>
+                                                <p style="margin: 0; color: #718096; font-size: 14px; line-height: 1.5;">{desc}</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+        """
+        for icon, title, desc in benefits
+    ])
     return f"""
 <!DOCTYPE html>
 <html lang="ru">
@@ -147,12 +187,11 @@ def create_verification_email_html(user_name: str, verification_url: str) -> str
                             </h2>
                             
                             <p style="margin: 0 0 20px; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                                Спасибо за регистрацию на платформе <strong>iHUNT</strong>! 
-                                Осталось всего один шаг — подтвердить вашу электронную почту.
+                                {welcome_text}
                             </p>
                             
                             <p style="margin: 0 0 30px; color: #4a5568; font-size: 16px; line-height: 1.6;">
-                                Нажмите на кнопку ниже, чтобы активировать ваш аккаунт и начать зарабатывать на рекомендациях:
+                                {action_text}
                             </p>
                             
                             <!-- Button -->
@@ -190,17 +229,13 @@ def create_verification_email_html(user_name: str, verification_url: str) -> str
                     <tr>
                         <td style="padding: 0 30px 40px;">
                             <div style="background: linear-gradient(135deg, #f0f4ff 0%, #f7f0ff 100%); 
-                                        padding: 25px; border-radius: 8px; border: 1px solid #e6e9ff;">
-                                <h3 style="margin: 0 0 15px; color: #1a1a1a; font-size: 18px; font-weight: 600;">
-                                    🎯 Что вас ждёт после активации:
+                                        padding: 25px; border-radius: 8px;">
+                                <h3 style="margin: 0 0 20px; color: #2d3748; font-size: 18px; font-weight: 600; text-align: center;">
+                                    🎁 Что вас ждет после активации:
                                 </h3>
-                                <ul style="margin: 0; padding-left: 20px; color: #4a5568; font-size: 14px; line-height: 1.8;">
-                                    <li>Доступ ко всем открытым вакансиям компании</li>
-                                    <li>Возможность рекомендовать кандидатов и зарабатывать</li>
-                                    <li>Личный кабинет с отслеживанием статусов</li>
-                                    <li>Статистика и рейтинг среди коллег</li>
-                                    <li>Быстрый вывод заработанных средств</li>
-                                </ul>
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    {benefits_html}
+                                </table>
                             </div>
                         </td>
                     </tr>
