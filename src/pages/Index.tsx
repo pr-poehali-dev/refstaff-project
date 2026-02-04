@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import Icon from '@/components/ui/icon';
+import { QRCodeSVG } from 'qrcode.react';
 import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Recommendation as ApiRecommendation, type Company, type WalletData } from '@/lib/api';
 import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment, PayoutRequest } from '@/types';
 import { EmployeeDetail } from '@/components/EmployeeDetail';
@@ -692,10 +693,13 @@ function Index() {
   };
 
   const handleGenerateReferralLink = () => {
-    const token = Math.random().toString(36).substring(2, 15);
-    const link = `${window.location.origin}/employee-register?company=${currentCompanyId}&token=${token}`;
-    setReferralLink(link);
-    setShowReferralLinkDialog(true);
+    if (company?.invite_token) {
+      const link = `${window.location.origin}/employee-register?token=${company.invite_token}`;
+      setReferralLink(link);
+      setShowReferralLinkDialog(true);
+    } else {
+      alert('Ошибка: токен компании не найден');
+    }
   };
 
   const handleCopyLink = (link: string) => {
@@ -6717,6 +6721,56 @@ function Index() {
         onOpenChange={setShowEmployeeDetail}
         recommendations={recommendations}
       />
+
+      {/* Диалог реферальной ссылки с QR-кодом */}
+      <Dialog open={showReferralLinkDialog} onOpenChange={setShowReferralLinkDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Регистрация сотрудников</DialogTitle>
+            <DialogDescription>
+              Поделитесь ссылкой или QR-кодом с новыми сотрудниками для регистрации
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-6 pt-4">
+            <div className="flex justify-center">
+              <div className="p-4 bg-white rounded-lg border-2 border-gray-200">
+                <QRCodeSVG value={referralLink} size={200} level="H" />
+              </div>
+            </div>
+            
+            <div>
+              <Label>Ссылка для регистрации</Label>
+              <div className="flex gap-2 mt-2">
+                <Input 
+                  value={referralLink} 
+                  readOnly 
+                  className="font-mono text-sm"
+                />
+                <Button 
+                  variant="outline"
+                  onClick={() => handleCopyLink(referralLink)}
+                >
+                  <Icon name="Copy" size={16} />
+                </Button>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <div className="flex items-start gap-2">
+                <Icon name="Info" className="text-blue-600 mt-0.5" size={16} />
+                <div className="text-sm text-blue-900">
+                  <p className="font-medium mb-1">Как использовать:</p>
+                  <ul className="list-disc list-inside space-y-1 text-blue-800">
+                    <li>Отправьте ссылку новому сотруднику</li>
+                    <li>Покажите QR-код для быстрого сканирования</li>
+                    <li>Сотрудник автоматически привяжется к вашей компании</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Диалог запроса восстановления пароля */}
       <Dialog open={showForgotPasswordDialog} onOpenChange={(open) => {

@@ -9,35 +9,35 @@ import Icon from '@/components/ui/icon';
 function EmployeeRegister() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const companyId = searchParams.get('company');
-  const token = searchParams.get('token');
+  const inviteToken = searchParams.get('token');
 
   const [companyName, setCompanyName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    position: '',
     email: '',
-    password: ''
+    password: '',
+    confirmPassword: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const loadCompanyInfo = async () => {
-      if (!companyId || !token) {
+      if (!inviteToken) {
         alert('Неверная ссылка для регистрации');
         navigate('/');
         return;
       }
 
       try {
-        const response = await fetch(`https://functions.poehali.dev/30d9dba4-a499-4866-8ccc-ea7addf62b16/?resource=company&company_id=${companyId}`);
+        const response = await fetch(`https://functions.poehali.dev/f1f66940-161e-4221-a729-4e0e555af034?invite_token=${inviteToken}`);
         if (response.ok) {
           const data = await response.json();
-          setCompanyName(data.name);
+          setCompanyName(data.company.name);
         } else {
-          alert('Компания не найдена');
+          alert('Компания не найдена или ссылка недействительна');
           navigate('/');
         }
       } catch (error) {
@@ -50,52 +50,55 @@ function EmployeeRegister() {
     };
 
     loadCompanyInfo();
-  }, [companyId, token, navigate]);
+  }, [inviteToken, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.firstName || !formData.lastName || !formData.position || !formData.email || !formData.password) {
-      alert('Заполните все поля');
+    if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
+      setError('Заполните все обязательные поля');
       return;
     }
 
     if (formData.password.length < 8) {
-      alert('Пароль должен быть минимум 8 символов');
+      setError('Пароль должен быть минимум 8 символов');
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setError('Пароли не совпадают');
       return;
     }
 
     setIsSubmitting(true);
+    setError('');
+
     try {
       const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'register_employee',
-          company_id: companyId,
-          invite_token: token,
+          action: 'register_employee_by_token',
           email: formData.email,
           password: formData.password,
           first_name: formData.firstName,
           last_name: formData.lastName,
-          position: formData.position
+          invite_token: inviteToken
         })
       });
 
       const data = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userRole', 'employee');
-        alert('Регистрация успешна! Добро пожаловать в команду.');
+        alert(`✅ Регистрация успешна!\n\nМы отправили письмо с подтверждением на ${formData.email}.\nПожалуйста, проверьте вашу почту и перейдите по ссылке в письме для активации аккаунта.`);
         navigate('/');
       } else {
-        alert(data.error || 'Ошибка регистрации');
+        setError(data.error || 'Ошибка регистрации');
       }
     } catch (error) {
       console.error('Ошибка регистрации:', error);
-      alert('Не удалось зарегистрироваться');
+      setError('Не удалось зарегистрироваться');
     } finally {
       setIsSubmitting(false);
     }
@@ -151,17 +154,6 @@ function EmployeeRegister() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="position">Должность *</Label>
-              <Input
-                id="position"
-                value={formData.position}
-                onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                placeholder="Менеджер по продажам"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="email">Email *</Label>
               <Input
                 id="email"
@@ -186,6 +178,25 @@ function EmployeeRegister() {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Подтвердите пароль *</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                placeholder="Повторите пароль"
+                required
+              />
+            </div>
+
+            {error && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 flex items-center gap-2">
+                <Icon name="AlertCircle" size={16} />
+                {error}
+              </div>
+            )}
+
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
@@ -201,7 +212,14 @@ function EmployeeRegister() {
             </Button>
 
             <p className="text-xs text-center text-muted-foreground mt-4">
-              Нажимая кнопку, вы соглашаетесь с условиями использования платформы
+              Уже есть аккаунт?{' '}
+              <button
+                type="button"
+                onClick={() => navigate('/')}
+                className="text-primary hover:underline"
+              >
+                Войти
+              </button>
             </p>
           </form>
         </CardContent>

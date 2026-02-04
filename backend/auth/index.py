@@ -305,6 +305,109 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            elif action == 'register_employee_by_token':
+                email = body_data.get('email', '').strip().lower()
+                password = body_data.get('password', '')
+                first_name = body_data.get('first_name', '')
+                last_name = body_data.get('last_name', '')
+                invite_token = body_data.get('invite_token', '')
+                
+                if not email or not password or not first_name or not last_name or not invite_token:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Missing required fields'}),
+                        'isBase64Encoded': False
+                    }
+                
+                if len(password) < 8:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Password must be at least 8 characters'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cursor.execute("SELECT id FROM t_p65890965_refstaff_project.companies WHERE invite_token = %s", (invite_token,))
+                company_record = cursor.fetchone()
+                
+                if not company_record:
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Invalid invite token'}),
+                        'isBase64Encoded': False
+                    }
+                
+                company_id = company_record['id']
+                
+                cursor.execute("SELECT id FROM t_p65890965_refstaff_project.users WHERE email = %s", (email,))
+                if cursor.fetchone():
+                    return {
+                        'statusCode': 409,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Email already registered'}),
+                        'isBase64Encoded': False
+                    }
+                
+                pwd_hash, salt = hash_password(password)
+                
+                cursor.execute("""
+                    INSERT INTO t_p65890965_refstaff_project.users 
+                    (company_id, email, password_hash, first_name, last_name, role, level, experience_points, 
+                     total_recommendations, successful_hires, total_earnings, wallet_balance, wallet_pending,
+                     is_admin, is_hr_manager, created_at, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, 'employee', 1, 0, 0, 0, 0, 0, 0, FALSE, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                    RETURNING id
+                """, (company_id, email, f"{pwd_hash}:{salt}", first_name, last_name))
+                
+                user_id = cursor.fetchone()['id']
+                
+                verification_token = os.urandom(32).hex()
+                expires_at = datetime.utcnow() + timedelta(hours=24)
+                
+                cursor.execute("""
+                    INSERT INTO t_p65890965_refstaff_project.email_verification_tokens 
+                    (user_id, token, expires_at, created_at)
+                    VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+                """, (user_id, verification_token, expires_at))
+                
+                conn.commit()
+                
+                import urllib.request
+                
+                send_email_url = 'https://functions.poehali.dev/f3ec5cfe-f5d1-4d21-9161-70bd08bed000'
+                email_data = {
+                    'to_email': email,
+                    'user_name': f"{first_name} {last_name}",
+                    'verification_token': verification_token,
+                    'base_url': 'https://project.poehali.dev',
+                    'user_type': 'employee'
+                }
+                
+                try:
+                    req = urllib.request.Request(
+                        send_email_url,
+                        data=json.dumps(email_data).encode('utf-8'),
+                        headers={'Content-Type': 'application/json'},
+                        method='POST'
+                    )
+                    with urllib.request.urlopen(req, timeout=10) as response:
+                        response.read()
+                except Exception as e:
+                    print(f"Failed to send verification email: {str(e)}")
+                
+                return {
+                    'statusCode': 201,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'message': 'Registration successful. Please check your email to verify your account.',
+                        'email': email,
+                        'email_verified': False
+                    }),
+                    'isBase64Encoded': False
+                }
+            
             elif action == 'verify_email':
                 token = body_data.get('token', '')
                 
