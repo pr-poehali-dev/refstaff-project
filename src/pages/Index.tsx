@@ -5353,7 +5353,7 @@ function Index() {
                             <Icon name="Copy" size={14} />
                           </Button>
                         </div>
-                        <Button size="sm" variant="outline" className="w-full text-xs" onClick={(e) => {
+                        <Button size="sm" className="w-full text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => {
                           e.stopPropagation();
                           const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
                           if (navigator.share) {
