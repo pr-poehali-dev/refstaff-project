@@ -5233,7 +5233,7 @@ function Index() {
                       </DialogTrigger>
                       <DialogContent onClick={(e) => e.stopPropagation()}>
                           <DialogHeader>
-                            <DialogTitle>Рекомендовать кандидата</DialogTitle>
+                            <DialogTitle>Данные кандидата</DialogTitle>
                             <DialogDescription>
                               Вакансия: {activeVacancy?.title}
                             </DialogDescription>
