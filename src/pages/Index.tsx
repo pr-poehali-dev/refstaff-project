@@ -4171,31 +4171,33 @@ function Index() {
       </Dialog>
 
       <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
-        <DialogContent className="max-w-4xl h-[600px] flex flex-col p-0">
+        <DialogContent className="max-w-4xl h-[80vh] sm:h-[600px] flex flex-col p-0">
           <div className="flex h-full">
-            <div className="w-72 border-r flex flex-col">
-              <div className="p-4 border-b">
-                <h3 className="font-semibold">Сотрудники</h3>
-                <p className="text-xs text-muted-foreground mt-1">Выберите сотрудника для диалога</p>
+            <div className="w-20 sm:w-72 border-r flex flex-col">
+              <div className="p-2 sm:p-4 border-b">
+                <h3 className="font-semibold text-sm sm:text-base hidden sm:block">Сотрудники</h3>
+                <Icon name="Users" className="sm:hidden mx-auto" size={20} />
+                <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Выберите сотрудника для диалога</p>
               </div>
               <div className="flex-1 overflow-y-auto">
                 {employees.map((emp) => (
                   <div
                     key={emp.id}
-                    className={`p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
+                    className={`p-2 sm:p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
                       activeChatEmployee?.id === emp.id ? 'bg-muted' : ''
                     }`}
                     onClick={() => setActiveChatEmployee(emp)}
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       {emp.avatar ? (
-                        <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full object-cover" />
+                        <img src={emp.avatar} alt={emp.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" />
                       ) : (
-                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon name="User" size={20} className="text-primary" />
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon name="User" size={16} className="text-primary sm:hidden" />
+                          <Icon name="User" size={20} className="text-primary hidden sm:block" />
                         </div>
                       )}
-                      <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0 hidden sm:block">
                         <p className="font-medium text-sm truncate">{emp.name}</p>
                         <p className="text-xs text-muted-foreground truncate">{emp.position}</p>
                       </div>
@@ -4208,25 +4210,26 @@ function Index() {
             <div className="flex-1 flex flex-col">
               {activeChatEmployee ? (
                 <>
-                  <div className="p-4 border-b">
-                    <div className="flex items-center gap-3">
+                  <div className="p-3 sm:p-4 border-b">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       {activeChatEmployee.avatar ? (
-                        <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-12 h-12 rounded-full object-cover" />
+                        <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover" />
                       ) : (
-                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Icon name="User" size={24} className="text-primary" />
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                          <Icon name="User" size={20} className="text-primary sm:hidden" />
+                          <Icon name="User" size={24} className="text-primary hidden sm:block" />
                         </div>
                       )}
                       <div>
-                        <h3 className="font-semibold">{activeChatEmployee.name}</h3>
-                        <p className="text-sm text-muted-foreground">{activeChatEmployee.position}</p>
+                        <h3 className="font-semibold text-sm sm:text-base">{activeChatEmployee.name}</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground">{activeChatEmployee.position}</p>
                       </div>
                     </div>
                   </div>
-                  <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-2 sm:space-y-3">
                     {chatMessages.map((msg) => (
                       <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-4 py-2`}>
+                        <div className={`max-w-[85%] sm:max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-3 py-2 sm:px-4`}>
                           <div className="text-xs opacity-70 mb-1">{msg.senderName}</div>
                           {msg.message && <div className="text-sm">{msg.message}</div>}
                           {msg.attachments && msg.attachments.map((att, idx) => (
@@ -4249,9 +4252,9 @@ function Index() {
                       </div>
                     ))}
                   </div>
-                  <div className="p-4 border-t">
+                  <div className="p-2 sm:p-4 border-t">
                     {selectedFiles.length > 0 && (
-                      <div className="mb-3 flex flex-wrap gap-2">
+                      <div className="mb-2 sm:mb-3 flex flex-wrap gap-2">
                         {selectedFiles.map((file, idx) => (
                           <div key={idx} className="relative bg-muted rounded-lg p-2 pr-8">
                             <div className="flex items-center gap-2">
@@ -4270,7 +4273,7 @@ function Index() {
                         ))}
                       </div>
                     )}
-                    <div className="flex gap-2">
+                    <div className="flex gap-1 sm:gap-2">
                       <input
                         type="file"
                         ref={fileInputRef}
@@ -4282,19 +4285,22 @@ function Index() {
                       <Button
                         variant="outline"
                         size="icon"
+                        className="h-9 w-9 sm:h-10 sm:w-10"
                         onClick={() => fileInputRef.current?.click()}
                       >
-                        <Icon name="Paperclip" size={18} />
+                        <Icon name="Paperclip" size={16} className="sm:hidden" />
+                        <Icon name="Paperclip" size={18} className="hidden sm:block" />
                       </Button>
                       <Input 
-                        placeholder="Введите сообщение..." 
+                        placeholder="Сообщение..." 
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                        className="flex-1"
+                        className="flex-1 text-sm"
                       />
-                      <Button onClick={handleSendMessage}>
-                        <Icon name="Send" size={18} />
+                      <Button onClick={handleSendMessage} className="h-9 w-9 sm:h-10 sm:w-10 p-0">
+                        <Icon name="Send" size={16} className="sm:hidden" />
+                        <Icon name="Send" size={18} className="hidden sm:block" />
                       </Button>
                     </div>
                   </div>
