@@ -673,7 +673,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             delete_query = """
                 DELETE FROM t_p65890965_refstaff_project.users
-                WHERE id = %s AND role = 'employee'
+                WHERE id = %s
                 RETURNING id, first_name, last_name
             """
             
