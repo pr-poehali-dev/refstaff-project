@@ -248,9 +248,13 @@ export const api = {
     return response.json();
   },
 
-  async deleteEmployee(userId: number): Promise<{ success: boolean; deleted: Employee }> {
+  async deleteEmployee(authToken: string, userId: number): Promise<{ success: boolean; deleted: Employee }> {
     const response = await fetch(`${API_URL}/?resource=employees&user_id=${userId}`, {
-      method: 'DELETE'
+      method: 'DELETE',
+      headers: { 
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      }
     });
     if (!response.ok) throw new Error('Failed to delete employee');
     return response.json();

@@ -609,8 +609,9 @@ function Index() {
   };
 
   const handleDeleteEmployee = async (userId: number) => {
+    if (!authToken) return;
     try {
-      await api.deleteEmployee(userId);
+      await api.deleteEmployee(authToken, userId);
       await loadData();
       setShowDeleteDialog(false);
       setEmployeeToDelete(null);
