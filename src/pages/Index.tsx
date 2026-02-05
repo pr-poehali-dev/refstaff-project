@@ -6207,7 +6207,8 @@ function Index() {
       <Dialog open={showEditProfileDialog} onOpenChange={setShowEditProfileDialog}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Редактировать профиль</DialogTitle>
+            <DialogTitle>
+Редактировать профиль</DialogTitle>
             <DialogDescription>
               Обновите информацию о вашем профиле и контакты
             </DialogDescription>
