@@ -5231,19 +5231,7 @@ function Index() {
                           <Icon name="UserPlus" size={18} />
                         </Button>
                       </DialogTrigger>
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0 pr-10">
-                      <div 
-                        className="flex-1 cursor-pointer hover:text-primary transition-colors"
-                        onClick={() => {
-                          if (vacancy.referralLink) {
-                            window.open(vacancy.referralLink, '_blank');
-                          }
-                        }}
-                      >
-                        <CardTitle className="text-sm sm:text-lg">{vacancy.title}</CardTitle>
-                        <CardDescription className="text-xs sm:text-sm">{vacancy.department}</CardDescription>
-                      </div>
-                        <DialogContent onClick={(e) => e.stopPropagation()}>
+                      <DialogContent onClick={(e) => e.stopPropagation()}>
                           <DialogHeader>
                             <DialogTitle>Рекомендовать кандидата</DialogTitle>
                             <DialogDescription>
@@ -5317,7 +5305,19 @@ function Index() {
                             </Button>
                           </div>
                         </DialogContent>
-                      </Dialog>
+                    </Dialog>
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0 pr-10">
+                      <div 
+                        className="flex-1 cursor-pointer hover:text-primary transition-colors"
+                        onClick={() => {
+                          if (vacancy.referralLink) {
+                            window.open(vacancy.referralLink, '_blank');
+                          }
+                        }}
+                      >
+                        <CardTitle className="text-sm sm:text-lg">{vacancy.title}</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">{vacancy.department}</CardDescription>
+                      </div>
                     </div>
                   </CardHeader>
                   <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
