@@ -5216,8 +5216,22 @@ function Index() {
                   key={vacancy.id} 
                   className="hover:shadow-md transition-shadow"
                 >
-                  <CardHeader className="p-3 sm:p-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0">
+                  <CardHeader className="p-3 sm:p-6 relative">
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button 
+                          size="icon" 
+                          variant="ghost"
+                          className="absolute top-2 right-2 h-8 w-8"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveVacancy(vacancy);
+                          }}
+                        >
+                          <Icon name="UserPlus" size={18} />
+                        </Button>
+                      </DialogTrigger>
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0 pr-10">
                       <div 
                         className="flex-1 cursor-pointer hover:text-primary transition-colors"
                         onClick={() => {
@@ -5229,17 +5243,6 @@ function Index() {
                         <CardTitle className="text-sm sm:text-lg">{vacancy.title}</CardTitle>
                         <CardDescription className="text-xs sm:text-sm">{vacancy.department}</CardDescription>
                       </div>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm" onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveVacancy(vacancy);
-                          }}>
-                            <Icon name="UserPlus" className="mr-1 sm:mr-2" size={14} />
-                            <span className="hidden sm:inline">Рекомендовать</span>
-                            <span className="sm:hidden">Рекомендовать</span>
-                          </Button>
-                        </DialogTrigger>
                         <DialogContent onClick={(e) => e.stopPropagation()}>
                           <DialogHeader>
                             <DialogTitle>Рекомендовать кандидата</DialogTitle>
