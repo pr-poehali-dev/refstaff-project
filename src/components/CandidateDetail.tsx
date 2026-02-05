@@ -31,7 +31,7 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
         <DialogHeader>
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
-              <DialogTitle className="text-2xl mb-2">{recommendation.candidateName}</DialogTitle>
+              <DialogTitle className="text-xl mb-2">{recommendation.candidateName}</DialogTitle>
               <Badge variant={statusInfo.variant} className="mb-2 w-fit">
                 {statusInfo.label}
               </Badge>
