@@ -2719,7 +2719,8 @@ function Index() {
                 <DialogContent className="max-h-[90vh] overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Новая вакансия</DialogTitle>
-                    <DialogDescription>Создайте новую вакансию для реферального найма</DialogDescription>
+                    <DialogDescription>Создайте новую вакансию 
+для реферального найма</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-4 pt-4">
                     <div>
