@@ -1221,12 +1221,12 @@ function Index() {
   ) => (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
-        <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
+        <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-2 sm:py-3 md:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
             <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
               <Icon name="Rocket" className="text-white" size={20} aria-hidden="true" />
             </div>
-            <span className="text-xl sm:text-2xl px-0 py-0 my-0 font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
+            <span className="text-lg sm:text-xl md:text-2xl px-0 py-0 my-0 font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
           </div>
           <nav className="hidden md:flex items-center gap-4 lg:gap-8" role="navigation" aria-label="Основная навигация">
             <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Как работает</button>
@@ -1245,18 +1245,18 @@ function Index() {
       </header>
 
       <main>
-        <section className="pt-20 sm:pt-24 lg:pt-32 pb-12 sm:pb-16 lg:pb-20 px-4" aria-labelledby="hero-title">
+        <section className="pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-8 sm:pb-12 md:pb-16 lg:pb-20 px-3 sm:px-4 lg:px-6" aria-labelledby="hero-title">
           <div className="container mx-auto max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
               <div className="text-center lg:text-left">
                 <Badge className="mb-4 sm:mb-6 animate-fade-in text-xs sm:text-sm">🚀 Реферальный рекрутинг</Badge>
-                <h1 id="hero-title" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                <h1 id="hero-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight">
                   Нанимайте лучших кандидатов через своих сотрудников
                 </h1>
-                <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-4 sm:mb-6 md:mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                   Платформа для реферального найма с геймификацией
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start">
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center lg:justify-start">
                   <Button size="default" className="animate-scale-in shadow-lg shadow-primary/25 text-sm sm:text-base" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
                     <Icon name="Rocket" className="mr-2" size={18} aria-hidden="true" />
                     <span className="hidden sm:inline">Начать бесплатно — 14 дней</span>
@@ -1302,12 +1302,12 @@ function Index() {
           </div>
         </section>
 
-        <section id="how" className="py-20 px-4 bg-gradient-to-br from-primary/5 via-white to-purple-50 relative overflow-hidden" aria-labelledby="how-title">
+        <section id="how" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-primary/5 via-white to-purple-50 relative overflow-hidden" aria-labelledby="how-title">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="container mx-auto max-w-7xl relative z-10">
             <div className="text-center mb-20">
               <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">⚡ Простой процесс</Badge>
-              <h2 id="how-title" className="text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+              <h2 id="how-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
                 Как это работает
               </h2>
               <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -1318,7 +1318,7 @@ function Index() {
             <div className="relative max-w-5xl mx-auto">
               <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-green-500 via-purple-500 to-orange-500 transform -translate-y-1/2 opacity-20"></div>
               
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-4">
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-4">
                 {[
                   { emoji: '🏢', title: 'Регистрация', desc: 'Создайте аккаунт компании и разместите открытые вакансии', color: 'from-blue-500 to-blue-600' },
                   { emoji: '👥', title: 'Приглашение', desc: 'Добавьте своих сотрудников в систему одним кликом', color: 'from-green-500 to-green-600' },
@@ -1360,19 +1360,19 @@ function Index() {
           </div>
         </section>
 
-        <section id="benefits" className="py-20 px-4 bg-gradient-to-br from-purple-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="benefits-title">
+        <section id="benefits" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-purple-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="benefits-title">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="container mx-auto max-w-7xl relative z-10">
-            <div className="text-center mb-20">
-              <Badge className="mb-4 bg-purple-500/10 text-purple-600 border-purple-500/20">✨ Почему iHUNT</Badge>
-              <h2 id="benefits-title" className="text-5xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <div className="text-center mb-10 sm:mb-14 md:mb-20">
+              <Badge className="mb-4 bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs sm:text-sm">✨ Почему iHUNT</Badge>
+              <h2 id="benefits-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Преимущества платформы
               </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
                 Все инструменты для эффективного реферального найма в одной системе
               </p>
             </div>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-6xl mx-auto">
               {[
                 { emoji: '💵', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%', gradient: 'from-green-500 to-emerald-500' },
                 { emoji: '⚡', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза', gradient: 'from-yellow-500 to-orange-500' },
@@ -1392,8 +1392,8 @@ function Index() {
                         </div>
                       </div>
                       
-                      <h3 className="text-xl font-bold mb-3 text-gray-900">{benefit.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
+                      <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{benefit.title}</h3>
+                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
                     </div>
                     
                     <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${benefit.gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
@@ -1401,12 +1401,12 @@ function Index() {
                 </div>
               ))}
             </div>
-            <div className="mt-16">
+            <div className="mt-8 sm:mt-12 md:mt-16">
               <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
-                <CardContent className="p-8">
-                  <div className="grid md:grid-cols-2 gap-8 items-center">
+                <CardContent className="p-4 sm:p-6 md:p-8">
+                  <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-center">
                     <div>
-                      <h3 className="text-2xl font-bold mb-4">🎯 Результаты наших клиентов</h3>
+                      <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">🎯 Результаты наших клиентов</h3>
                       <div className="space-y-4">
                         <div className="flex items-center gap-3">
                           <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
@@ -1451,16 +1451,16 @@ function Index() {
           </div>
         </section>
 
-        <section id="pricing" className="py-20 px-4 bg-gradient-to-br from-blue-50 via-white to-green-50 relative overflow-hidden" aria-labelledby="pricing-title">
+        <section id="pricing" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-blue-50 via-white to-green-50 relative overflow-hidden" aria-labelledby="pricing-title">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="container mx-auto max-w-6xl relative z-10">
-            <div className="text-center mb-16">
-              <Badge className="mb-4 bg-blue-500/10 text-blue-600 border-blue-500/20">💎 Прозрачное ценообразование</Badge>
-              <h2 id="pricing-title" className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Тарифы</h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">14 дней бесплатно для всех новых клиентов</p>
+            <div className="text-center mb-10 sm:mb-12 md:mb-16">
+              <Badge className="mb-4 bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs sm:text-sm">💎 Прозрачное ценообразование</Badge>
+              <h2 id="pricing-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Тарифы</h2>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">14 дней бесплатно для всех новых клиентов</p>
             </div>
             
-            <div className="flex items-center justify-center gap-3 mb-12">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10 md:mb-12">
               <Button 
                 variant={pricingPeriod === 'monthly' ? 'default' : 'outline'} 
                 onClick={() => setPricingPeriod('monthly')}
@@ -1477,19 +1477,19 @@ function Index() {
                 <Badge className="ml-2 bg-green-500 text-white">-15%</Badge>
               </Button>
             </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
             <div className="group">
               <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gray-400 to-gray-500"></div>
                 
                 <div className="p-8">
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-2">Пробный период</h3>
+                  <div className="mb-5 sm:mb-6">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Пробный период</h3>
                     <p className="text-sm text-muted-foreground">Протестируйте платформу</p>
                   </div>
                   
-                  <div className="mb-6">
-                    <div className="text-3xl sm:text-4xl font-bold mb-2">0 ₽</div>
+                  <div className="mb-5 sm:mb-6">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">0 ₽</div>
                     <p className="text-sm text-muted-foreground">14 дней бесплатно</p>
                   </div>
                   
@@ -1638,15 +1638,15 @@ function Index() {
         </div>
         </section>
 
-        <section id="contact" className="py-20 px-4 bg-gradient-to-br from-green-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="contact-title">
+        <section id="contact" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-green-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="contact-title">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="container mx-auto max-w-3xl relative z-10">
-            <div className="text-center mb-12">
-              <Badge className="mb-4 bg-green-500/10 text-green-600 border-green-500/20">💬 Контакты</Badge>
-              <h2 id="contact-title" className="text-5xl font-bold mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+            <div className="text-center mb-8 sm:mb-10 md:mb-12">
+              <Badge className="mb-4 bg-green-500/10 text-green-600 border-green-500/20 text-xs sm:text-sm">💬 Контакты</Badge>
+              <h2 id="contact-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                 Остались вопросы?
               </h2>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground px-4">
                 Свяжитесь с нами, и мы с радостью ответим на все ваши вопросы
               </p>
             </div>
@@ -1654,24 +1654,24 @@ function Index() {
             <div className="relative bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
               <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-green-500 to-blue-500"></div>
               
-              <div className="p-8 md:p-10">
-                <form className="space-y-6" aria-label="Форма обратной связи" onSubmit={handleContactFormSubmit}>
+              <div className="p-5 sm:p-6 md:p-8 lg:p-10">
+                <form className="space-y-4 sm:space-y-5 md:space-y-6" aria-label="Форма обратной связи" onSubmit={handleContactFormSubmit}>
                   <div>
-                    <Label htmlFor="name" className="text-base font-medium">Имя</Label>
+                    <Label htmlFor="name" className="text-sm sm:text-base font-medium">Имя</Label>
                     <Input 
                       id="name" 
                       name="name" 
                       placeholder="Иван Иванов" 
                       autoComplete="name" 
                       required 
-                      className="mt-2 h-12"
+                      className="mt-1.5 sm:mt-2 h-10 sm:h-11 md:h-12"
                       value={contactForm.name}
                       onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
                       disabled={contactFormSubmitting}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="email" className="text-base font-medium">Email</Label>
+                    <Label htmlFor="email" className="text-sm sm:text-base font-medium">Email</Label>
                     <Input 
                       id="email" 
                       name="email" 
@@ -1679,21 +1679,21 @@ function Index() {
                       placeholder="ivan@company.ru" 
                       autoComplete="email" 
                       required 
-                      className="mt-2 h-12"
+                      className="mt-1.5 sm:mt-2 h-10 sm:h-11 md:h-12"
                       value={contactForm.email}
                       onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
                       disabled={contactFormSubmitting}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="message" className="text-base font-medium">Сообщение</Label>
+                    <Label htmlFor="message" className="text-sm sm:text-base font-medium">Сообщение</Label>
                     <Textarea 
                       id="message" 
                       name="message" 
                       placeholder="Расскажите о вашем проекте..." 
-                      rows={5} 
+                      rows={4} 
                       required 
-                      className="mt-2"
+                      className="mt-1.5 sm:mt-2 text-sm sm:text-base"
                       value={contactForm.message}
                       onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
                       disabled={contactFormSubmitting}
@@ -1701,7 +1701,7 @@ function Index() {
                   </div>
                   <Button 
                     type="submit" 
-                    className="w-full h-12 text-base bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+                    className="w-full h-10 sm:h-11 md:h-12 text-sm sm:text-base bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
                     disabled={contactFormSubmitting}
                   >
                     {contactFormSubmitting ? (
@@ -1723,51 +1723,51 @@ function Index() {
         </section>
       </main>
 
-      <footer className="border-t bg-gray-50 py-12 px-4" role="contentinfo">
+      <footer className="border-t bg-gray-50 py-8 sm:py-10 md:py-12 px-3 sm:px-4 lg:px-6" role="contentinfo">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid md:grid-cols-4 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <Icon name="Rocket" className="text-primary" size={24} />
-                <span className="text-lg font-bold">iHUNT</span>
+                <span className="text-base sm:text-lg font-bold">iHUNT</span>
               </div>
               <p className="text-sm text-muted-foreground">
                 Платформа реферального рекрутинга с геймификацией
               </p>
             </div>
             <nav aria-label="Продукт">
-              <h4 className="font-semibold mb-4">Продукт</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Продукт</h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                 <li><a href="#benefits" className="hover:text-primary">Возможности</a></li>
                 <li><a href="#pricing" className="hover:text-primary">Тарифы</a></li>
                 <li><a href="#contact" className="hover:text-primary">API документация</a></li>
               </ul>
             </nav>
             <nav aria-label="Компания">
-              <h4 className="font-semibold mb-4">Компания</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Компания</h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                 <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
                 <li><a href="#contact" className="hover:text-primary">Блог</a></li>
                 <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
               </ul>
             </nav>
             <nav aria-label="Правовая информация">
-              <h4 className="font-semibold mb-4">Правовая информация</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
+              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Правовая информация</h4>
+              <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                 <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary">Политика конфиденциальности</button></li>
                 <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary">Пользовательское соглашение</button></li>
                 <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary">Обработка персональных данных</button></li>
               </ul>
             </nav>
           </div>
-          <div className="mt-12 pt-8 border-t text-center text-sm text-muted-foreground">
+          <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t text-center text-xs sm:text-sm text-muted-foreground">
             © 2025 iHUNT. Все права защищены.
           </div>
         </div>
       </footer>
 
       <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
 Регистрация компании</DialogTitle>
