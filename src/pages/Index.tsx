@@ -1771,7 +1771,8 @@ function Index() {
           <DialogHeader>
             <DialogTitle>
 Регистрация компании</DialogTitle>
-            <DialogDescription>Начните 14-дневный пробный период</DialogDescription>
+            <DialogDescription>Начните 14-дневный пробный 
+период</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 pt-4">
             <div>
