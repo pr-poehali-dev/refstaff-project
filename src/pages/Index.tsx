@@ -4305,9 +4305,23 @@ function Index() {
                 <h3 className="font-semibold text-sm sm:text-base hidden sm:block">Сотрудники</h3>
                 <Icon name="Users" className="sm:hidden mx-auto" size={20} />
                 <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Выберите сотрудника для диалога</p>
+                <div className="mt-2 hidden sm:block">
+                  <Input 
+                    placeholder="Поиск сотрудника..." 
+                    value={employeeSearchQuery}
+                    onChange={(e) => setEmployeeSearchQuery(e.target.value)}
+                    className="h-8 text-xs"
+                  />
+                </div>
               </div>
               <div className="flex-1 overflow-y-auto">
-                {employees.map((emp) => (
+                {employees.filter(emp => {
+                  if (!employeeSearchQuery) return true;
+                  const query = employeeSearchQuery.toLowerCase();
+                  return emp.name.toLowerCase().includes(query) || 
+                         emp.position.toLowerCase().includes(query) ||
+                         emp.department.toLowerCase().includes(query);
+                }).map((emp) => (
                   <div
                     key={emp.id}
                     className={`p-2 sm:p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
