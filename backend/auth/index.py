@@ -465,7 +465,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'to_email': email,
                     'user_name': f"{user['first_name']} {user['last_name']}",
                     'verification_token': verification_token,
-                    'base_url': 'https://project.poehali.dev',
+                    'base_url': 'https://i-hunt.ru',
                     'user_type': 'company'
                 }
                 
