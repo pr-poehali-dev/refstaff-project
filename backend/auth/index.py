@@ -408,6 +408,89 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            elif action == 'resend_verification':
+                email = body_data.get('email', '').strip().lower()
+                
+                if not email:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Email required'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cursor.execute("""
+                    SELECT id, first_name, last_name, email_verified
+                    FROM t_p65890965_refstaff_project.users
+                    WHERE email = %s
+                """, (email,))
+                
+                user = cursor.fetchone()
+                if not user:
+                    return {
+                        'statusCode': 404,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'User not found'}),
+                        'isBase64Encoded': False
+                    }
+                
+                if user['email_verified']:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Email already verified'}),
+                        'isBase64Encoded': False
+                    }
+                
+                cursor.execute("""
+                    DELETE FROM t_p65890965_refstaff_project.email_verification_tokens
+                    WHERE user_id = %s AND verified_at IS NULL
+                """, (user['id'],))
+                
+                verification_token = os.urandom(32).hex()
+                expires_at = datetime.utcnow() + timedelta(hours=24)
+                
+                cursor.execute("""
+                    INSERT INTO t_p65890965_refstaff_project.email_verification_tokens 
+                    (user_id, token, expires_at, created_at)
+                    VALUES (%s, %s, %s, CURRENT_TIMESTAMP)
+                """, (user['id'], verification_token, expires_at))
+                
+                conn.commit()
+                
+                import urllib.request
+                
+                send_email_url = 'https://functions.poehali.dev/f3ec5cfe-f5d1-4d21-9161-70bd08bed000'
+                email_data = {
+                    'to_email': email,
+                    'user_name': f"{user['first_name']} {user['last_name']}",
+                    'verification_token': verification_token,
+                    'base_url': 'https://project.poehali.dev',
+                    'user_type': 'company'
+                }
+                
+                try:
+                    req = urllib.request.Request(
+                        send_email_url,
+                        data=json.dumps(email_data).encode('utf-8'),
+                        headers={'Content-Type': 'application/json'},
+                        method='POST'
+                    )
+                    with urllib.request.urlopen(req, timeout=10) as response:
+                        response.read()
+                except Exception as e:
+                    print(f"Failed to send verification email: {str(e)}")
+                
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({
+                        'message': 'Verification email sent successfully',
+                        'email': email
+                    }),
+                    'isBase64Encoded': False
+                }
+            
             elif action == 'verify_email':
                 token = body_data.get('token', '')
                 

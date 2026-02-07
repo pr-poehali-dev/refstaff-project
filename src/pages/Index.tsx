@@ -201,6 +201,9 @@ function Index() {
   });
 
   const [isAuthLoading, setIsAuthLoading] = useState(false);
+  const [resendVerificationEmail, setResendVerificationEmail] = useState('');
+  const [resendVerificationTimer, setResendVerificationTimer] = useState(0);
+  const [isResendingVerification, setIsResendingVerification] = useState(false);
   
   const [showEditProfileDialog, setShowEditProfileDialog] = useState(false);
 
@@ -340,6 +343,15 @@ function Index() {
       localStorage.setItem('userRole', userRole);
     }
   }, [userRole]);
+
+  useEffect(() => {
+    if (resendVerificationTimer > 0) {
+      const timer = setTimeout(() => {
+        setResendVerificationTimer(resendVerificationTimer - 1);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [resendVerificationTimer]);
 
   useEffect(() => {
     if (authToken && userRole !== 'guest') {
@@ -987,6 +999,7 @@ function Index() {
         setLoginForm({ email: '', password: '' });
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (response.status === 403) {
+        setResendVerificationEmail(loginForm.email);
         alert('❌ Email не подтверждён!\n\nМы отправили письмо с подтверждением на вашу почту при регистрации.\nПожалуйста, проверьте почту (в том числе папку "Спам") и перейдите по ссылке в письме для активации аккаунта.');
       } else {
         alert(data.error || 'Неверный email или пароль');
@@ -996,6 +1009,45 @@ function Index() {
       alert('Не удалось войти в систему');
     } finally {
       setIsAuthLoading(false);
+    }
+  };
+
+  const handleResendVerification = async () => {
+    if (!resendVerificationEmail) {
+      alert('Email не найден');
+      return;
+    }
+
+    if (resendVerificationTimer > 0) {
+      alert(`Подождите ${resendVerificationTimer} секунд перед повторной отправкой`);
+      return;
+    }
+
+    setIsResendingVerification(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+        method: 'POST',
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'resend_verification',
+          email: resendVerificationEmail
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setResendVerificationTimer(30);
+        alert('✅ Письмо с подтверждением отправлено повторно!\n\nПроверьте вашу почту (в том числе папку "Спам").');
+      } else {
+        alert(data.error || 'Не удалось отправить письмо');
+      }
+    } catch (error) {
+      console.error('Ошибка отправки письма:', error);
+      alert('Не удалось отправить письмо с подтверждением');
+    } finally {
+      setIsResendingVerification(false);
     }
   };
 
@@ -2011,6 +2063,43 @@ function Index() {
             <Button className="w-full" onClick={handleLogin} disabled={isAuthLoading}>
               {isAuthLoading ? 'Вход...' : 'Войти'}
             </Button>
+            
+            {resendVerificationEmail && (
+              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg space-y-2">
+                <p className="text-sm font-medium text-yellow-900 flex items-center gap-1">
+                  <Icon name="AlertCircle" className="w-4 h-4" />
+                  Email не подтверждён
+                </p>
+                <p className="text-xs text-yellow-700">
+                  Проверьте почту {resendVerificationEmail} и перейдите по ссылке в письме
+                </p>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-xs"
+                  onClick={handleResendVerification}
+                  disabled={isResendingVerification || resendVerificationTimer > 0}
+                >
+                  {isResendingVerification ? (
+                    <>
+                      <Icon name="Loader2" className="w-3 h-3 mr-1 animate-spin" />
+                      Отправка...
+                    </>
+                  ) : resendVerificationTimer > 0 ? (
+                    <>
+                      <Icon name="Clock" className="w-3 h-3 mr-1" />
+                      Повторить через {resendVerificationTimer}с
+                    </>
+                  ) : (
+                    <>
+                      <Icon name="Mail" className="w-3 h-3 mr-1" />
+                      Отправить письмо повторно
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+            
             {loginType === 'employer' && (
               <div className="text-center text-sm text-muted-foreground">
                 Нет аккаунта?{' '}
