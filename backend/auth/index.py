@@ -193,7 +193,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'to_email': email,
                     'user_name': f"{first_name} {last_name}",
                     'verification_token': verification_token,
-                    'base_url': 'https://project.poehali.dev',
+                    'base_url': 'https://i-hunt.ru',
                     'user_type': 'company' if company_name else 'employee'
                 }
                 
@@ -381,7 +381,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'to_email': email,
                     'user_name': f"{first_name} {last_name}",
                     'verification_token': verification_token,
-                    'base_url': 'https://project.poehali.dev',
+                    'base_url': 'https://i-hunt.ru',
                     'user_type': 'employee'
                 }
                 

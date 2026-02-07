@@ -57,7 +57,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     to_email = body_data.get('to_email')
     user_name = body_data.get('user_name', '')
     verification_token = body_data.get('verification_token')
-    base_url = body_data.get('base_url', 'https://project.poehali.dev')
+    base_url = body_data.get('base_url', 'https://i-hunt.ru')
     user_type = body_data.get('user_type', 'employee')  # 'company' или 'employee'
 
     if not to_email or not verification_token:

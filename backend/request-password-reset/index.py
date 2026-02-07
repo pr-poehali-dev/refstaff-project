@@ -71,7 +71,7 @@ def handler(event: dict, context) -> dict:
         conn.commit()
         
         # Формируем ссылку для восстановления
-        reset_link = f"https://refstaff.poehali.dev/reset-password?token={token}"
+        reset_link = f"https://i-hunt.ru/?token={token}"
         
         # Отправляем email
         smtp_host = os.environ['EMAIL_SMTP_HOST']
