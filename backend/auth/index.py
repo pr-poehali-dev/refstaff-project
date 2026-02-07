@@ -506,7 +506,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 cursor.execute("""
                     SELECT id, company_id, email, password_hash, first_name, last_name, role, 
-                           position, department, avatar_url, level, is_admin, is_hr_manager
+                           position, department, avatar_url, level, is_admin, is_hr_manager, email_verified
                     FROM t_p65890965_refstaff_project.users 
                     WHERE email = %s
                 """, (email,))
@@ -535,6 +535,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         'statusCode': 401,
                         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
                         'body': json.dumps({'error': 'Invalid credentials'}),
+                        'isBase64Encoded': False
+                    }
+                
+                if not user['email_verified']:
+                    return {
+                        'statusCode': 403,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Email not verified. Please check your email for verification link.'}),
                         'isBase64Encoded': False
                     }
                 

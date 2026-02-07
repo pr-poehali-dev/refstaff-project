@@ -986,6 +986,8 @@ function Index() {
         setShowLoginDialog(false);
         setLoginForm({ email: '', password: '' });
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (response.status === 403) {
+        alert('❌ Email не подтверждён!\n\nМы отправили письмо с подтверждением на вашу почту при регистрации.\nПожалуйста, проверьте почту (в том числе папку "Спам") и перейдите по ссылке в письме для активации аккаунта.');
       } else {
         alert(data.error || 'Неверный email или пароль');
       }
