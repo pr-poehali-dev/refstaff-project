@@ -4165,7 +4165,8 @@ function Index() {
           <div className="space-y-4 pt-4">
             <div>
               <Label htmlFor="company-name-edit">Название компании</Label>
-              <Input id="company-name-edit" defaultValue="Acme Tech" />
+              <Input id="company-name-edit" value={company?.name || ''} readOnly disabled />
+              <p className="text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
             </div>
             <div>
               <Label htmlFor="company-logo">Логотип</Label>
@@ -4173,16 +4174,16 @@ function Index() {
             </div>
             <div>
               <Label htmlFor="company-desc">Описание</Label>
-              <Textarea id="company-desc" rows={3} placeholder="Расскажите о вашей компании..." />
+              <Textarea id="company-desc" rows={3} placeholder="Расскажите о вашей компании..." defaultValue={company?.description || ''} />
             </div>
             <div className="grid md:grid-cols-2 gap-4">
               <div>
                 <Label htmlFor="company-website">Веб-сайт</Label>
-                <Input id="company-website" placeholder="https://example.com" />
+                <Input id="company-website" placeholder="https://example.com" defaultValue={company?.website || ''} />
               </div>
               <div>
                 <Label htmlFor="company-industry">Отрасль</Label>
-                <Select>
+                <Select defaultValue={company?.industry || ''}>
                   <SelectTrigger>
                     <SelectValue placeholder="Выберите отрасль" />
                   </SelectTrigger>
@@ -4195,6 +4196,16 @@ function Index() {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div>
+              <Label htmlFor="company-inn">ИНН</Label>
+              <Input id="company-inn" value={company?.inn || ''} readOnly disabled />
+              <p className="text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
+            </div>
+            <div>
+              <Label htmlFor="company-employee-count">Количество сотрудников</Label>
+              <Input id="company-employee-count" type="number" value={company?.employee_count || 0} readOnly disabled />
+              <p className="text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
             </div>
 
             <Separator />
