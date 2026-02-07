@@ -3030,6 +3030,28 @@ function Index() {
                             <span className="hidden sm:inline">В архив</span>
                           </Button>
                         )}
+                        {vacancy.status === 'closed' && (
+                          <>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleRestoreVacancy(vacancy.id)}
+                              className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                            >
+                              <Icon name="RotateCcw" size={12} className="sm:mr-1" />
+                              <span className="hidden sm:inline">Открыть</span>
+                            </Button>
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleArchiveVacancy(vacancy.id)}
+                              className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                            >
+                              <Icon name="Archive" size={12} className="sm:mr-1" />
+                              <span className="hidden sm:inline">В архив</span>
+                            </Button>
+                          </>
+                        )}
                         {vacancy.status === 'archived' && (
                           <>
                             <Button 
