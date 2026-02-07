@@ -2959,7 +2959,8 @@ function Index() {
                         <Badge 
                           variant="secondary" 
                           className={`text-[9px] sm:text-xs px-1 sm:px-2 ${
-                            vacancy.status === 'archived' ? 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400' : ''
+                            vacancy.status === 'archived' ? 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400' : 
+                            vacancy.status === 'closed' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : ''
                           }`}
                         >
                           {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'Архив' : 'Закрыта'}
