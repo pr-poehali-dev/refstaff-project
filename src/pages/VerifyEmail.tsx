@@ -44,10 +44,9 @@ export default function VerifyEmail() {
           const uiRole = data.user.role === 'admin' || data.user.is_admin ? 'employer' : 'employee';
           localStorage.setItem('userRole', uiRole);
           
-          // Автоматически перенаправляем через 2 секунды
+          // Автоматически перенаправляем через 2 секунды с полной перезагрузкой
           setTimeout(() => {
-            navigate('/', { replace: true });
-            window.location.reload(); // Обновляем страницу для загрузки данных
+            window.location.href = '/'; // Редирект с перезагрузкой страницы
           }, 2000);
         } else {
           setStatus('error');
@@ -114,7 +113,7 @@ export default function VerifyEmail() {
           )}
 
           {status === 'success' && (
-            <Button onClick={() => navigate('/')} className="w-full">
+            <Button onClick={() => window.location.href = '/'} className="w-full">
               <Icon name="ArrowRight" className="w-4 h-4 mr-2" />
               Перейти в личный кабинет
             </Button>
