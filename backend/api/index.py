@@ -413,7 +413,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             query = """
                 SELECT id, name, employee_count, invite_token, logo_url, 
-                       description, website, industry, created_at
+                       description, website, industry, inn, created_at
                 FROM t_p65890965_refstaff_project.companies
                 WHERE id = %s
             """

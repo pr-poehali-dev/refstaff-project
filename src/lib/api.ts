@@ -66,6 +66,7 @@ export interface Company {
   description?: string;
   website?: string;
   industry?: string;
+  inn?: string;
   created_at: string;
 }
 
