@@ -4298,7 +4298,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
-        <DialogContent className="max-w-4xl h-[80vh] sm:h-[600px] flex flex-col p-0">
+        <DialogContent className="max-w-4xl h-[100vh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0">
           <div className="flex h-full">
             <div className="w-40 sm:w-72 border-r flex flex-col shrink-0">
               <div className="p-2 sm:p-4 border-b">
@@ -4338,7 +4338,10 @@ function Index() {
                         </div>
                       )}
                       <div className="flex-1 min-w-0">
-                        <p className="font-medium text-xs sm:text-sm truncate">{emp.name}</p>
+                        <p className="font-medium text-xs sm:text-sm truncate">
+                          <span className="sm:hidden">{emp.name.split(' ')[0]} {emp.name.split(' ')[1]?.[0]}.</span>
+                          <span className="hidden sm:inline">{emp.name}</span>
+                        </p>
                         <p className="text-xs text-muted-foreground truncate hidden sm:block">{emp.position}</p>
                       </div>
                     </div>
