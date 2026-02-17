@@ -103,6 +103,8 @@ function Index() {
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [prevRecommendationsCount, setPrevRecommendationsCount] = useState<number>(0);
+  const [newRecommendationsCount, setNewRecommendationsCount] = useState<number>(0);
   const [company, setCompany] = useState<Company | null>(null);
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -520,6 +522,14 @@ function Index() {
 
       setVacancies(mappedVacancies);
       setEmployees(mappedEmployees);
+      if (prevRecommendationsCount === 0) {
+        const pendingCount = mappedRecommendations.filter((r: Recommendation) => r.status === 'pending').length;
+        setNewRecommendationsCount(pendingCount);
+      } else {
+        const newCount = mappedRecommendations.length - prevRecommendationsCount;
+        if (newCount > 0) setNewRecommendationsCount(prev => prev + newCount);
+      }
+      setPrevRecommendationsCount(mappedRecommendations.length);
       setRecommendations(mappedRecommendations);
       setCompany(companyData);
       
@@ -2787,12 +2797,12 @@ function Index() {
             </div>
           </div>
         ) : (
-        <Tabs defaultValue="vacancies" className="space-y-6">
+        <Tabs defaultValue="vacancies" className="space-y-6" onValueChange={(val) => { if (val === 'recommendations') setNewRecommendationsCount(0); }}>
           <ScrollableTabs>
             <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-8 gap-1">
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💼 Вакансии</TabsTrigger>
               <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">👥 Сотрудники</TabsTrigger>
-              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🎯 Рекомендации</TabsTrigger>
+              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">🎯 Рекомендации{newRecommendationsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-green-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newRecommendationsCount}</span>}</TabsTrigger>
               <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💰 Выплаты</TabsTrigger>
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
               <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💬 Чаты</TabsTrigger>
