@@ -487,7 +487,6 @@ function Index() {
         recommendations: v.recommendations_count || 0,
         reward: v.reward_amount,
         payoutDelayDays: v.payout_delay_days || 30,
-        requirements: v.requirements || '',
         referralLink: v.referral_token && userRole === 'employee' ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
 
@@ -3035,7 +3034,7 @@ function Index() {
                               title: vacancy.title,
                               department: vacancy.department,
                               salary: vacancy.salary,
-                              requirements: vacancy.requirements || '',
+                              requirements: '',
                               reward: vacancy.reward.toString(),
                               payoutDelay: vacancy.payoutDelayDays.toString(),
                               city: vacancy.city || '',
