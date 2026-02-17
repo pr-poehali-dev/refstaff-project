@@ -2797,6 +2797,7 @@ function Index() {
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
               <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💬 Чаты</TabsTrigger>
               <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📊 Статистика</TabsTrigger>
+              <TabsTrigger value="subscription" className="text-xs whitespace-nowrap px-3 py-2 sm:hidden">💳 Подписка{subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
             </TabsList>
           </ScrollableTabs>
@@ -3862,6 +3863,65 @@ function Index() {
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="subscription" className="space-y-4 sm:hidden">
+            <h2 className="text-lg font-semibold flex items-center gap-2">
+              <span>💳</span> Подписка
+            </h2>
+            <Card className="border-primary">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base">До 300 сотрудников</CardTitle>
+                  <Badge variant={subscriptionDaysLeft < 7 ? 'destructive' : 'secondary'}>
+                    {subscriptionDaysLeft} дней
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="text-2xl font-bold">19 900 ₽ / мес</div>
+                <Progress value={(subscriptionDaysLeft / 30) * 100} className="h-2" />
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={16} />
+                    <span>Неограниченные вакансии</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={16} />
+                    <span>API интеграция</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={16} />
+                    <span>Аналитика и отчёты</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Button 
+              className="w-full" 
+              size="lg"
+              onClick={() => {
+                setSubscriptionDaysLeft(30);
+                alert('✅ Подписка продлена на 30 дней!');
+              }}
+            >
+              <Icon name="CreditCard" className="mr-2" size={18} />
+              Продлить подписку
+            </Button>
+            <Button variant="outline" className="w-full">
+              История платежей
+            </Button>
+            {subscriptionDaysLeft < 7 && (
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <Icon name="AlertTriangle" className="text-destructive mt-0.5" size={20} />
+                  <div className="flex-1 text-sm">
+                    <p className="font-medium text-destructive mb-1">Подписка заканчивается!</p>
+                    <p className="text-muted-foreground">Продлите, чтобы не потерять доступ к функциям</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="help" className="space-y-6">
