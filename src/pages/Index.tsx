@@ -168,6 +168,7 @@ function Index() {
     title: '',
     department: '',
     salary: '',
+    description: '',
     requirements: '',
     reward: '30000',
     payoutDelay: '30',
@@ -487,6 +488,7 @@ function Index() {
         recommendations: v.recommendations_count || 0,
         reward: v.reward_amount,
         payoutDelayDays: v.payout_delay_days || 30,
+        description: v.description || '',
         requirements: v.requirements || '',
         referralLink: v.referral_token && userRole === 'employee' ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
@@ -606,6 +608,7 @@ function Index() {
         title: vacancyForm.title,
         department: vacancyForm.department,
         salary_display: vacancyForm.salary,
+        description: vacancyForm.description,
         requirements: vacancyForm.requirements,
         reward_amount: parseInt(vacancyForm.reward),
         payout_delay_days: parseInt(vacancyForm.payoutDelay),
@@ -614,7 +617,7 @@ function Index() {
         is_remote: vacancyForm.isRemote
       });
       await loadData();
-      setVacancyForm({ title: '', department: '', salary: '', requirements: '', reward: '30000', payoutDelay: '30', city: '', isRemote: false });
+      setVacancyForm({ title: '', department: '', salary: '', description: '', requirements: '', reward: '30000', payoutDelay: '30', city: '', isRemote: false });
       alert('Вакансия успешно создана!');
     } catch (error) {
       console.error('Ошибка создания вакансии:', error);
@@ -685,13 +688,14 @@ function Index() {
         title: vacancyForm.title,
         department: vacancyForm.department,
         salary_display: vacancyForm.salary,
+        description: vacancyForm.description,
         requirements: vacancyForm.requirements,
         reward_amount: parseInt(vacancyForm.reward),
         payout_delay_days: parseInt(vacancyForm.payoutDelay)
       });
       await loadData();
       setActiveVacancy(null);
-      setVacancyForm({ title: '', department: '', salary: '', requirements: '', reward: '30000', payoutDelay: '30' });
+      setVacancyForm({ title: '', department: '', salary: '', description: '', requirements: '', reward: '30000', payoutDelay: '30', city: '', isRemote: false });
       alert('Вакансия успешно обновлена!');
     } catch (error) {
       console.error('Ошибка обновления вакансии:', error);
@@ -2925,10 +2929,20 @@ function Index() {
                       <p className="text-xs text-muted-foreground mt-1">Когда сотрудник получит деньги после принятия кандидата</p>
                     </div>
                     <div>
+                      <Label htmlFor="description">Описание вакансии</Label>
+                      <Textarea 
+                        id="description" 
+                        placeholder="Расскажите о вакансии, задачах и условиях работы..." 
+                        rows={4}
+                        value={vacancyForm.description}
+                        onChange={(e) => setVacancyForm({...vacancyForm, description: e.target.value})}
+                      />
+                    </div>
+                    <div>
                       <Label htmlFor="requirements">Требования</Label>
                       <Textarea 
                         id="requirements" 
-                        placeholder="Опыт работы от 5 лет..." 
+                        placeholder="Опыт работы от 5 лет, знание React..." 
                         rows={4}
                         value={vacancyForm.requirements}
                         onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
@@ -3035,6 +3049,7 @@ function Index() {
                               title: vacancy.title,
                               department: vacancy.department,
                               salary: vacancy.salary,
+                              description: vacancy.description || '',
                               requirements: vacancy.requirements || '',
                               reward: vacancy.reward.toString(),
                               payoutDelay: vacancy.payoutDelayDays.toString(),
@@ -3150,6 +3165,15 @@ function Index() {
                         <SelectItem value="90">Через 90 дней (испытательный срок)</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-description">Описание вакансии</Label>
+                    <Textarea 
+                      id="edit-description" 
+                      rows={4}
+                      value={vacancyForm.description}
+                      onChange={(e) => setVacancyForm({...vacancyForm, description: e.target.value})}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="edit-requirements">Требования</Label>

@@ -78,47 +78,38 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRe
 
           <Separator />
 
-          <div className="space-y-2 sm:space-y-3">
-            <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
-              <Icon name="FileText" size={18} />
-              Описание вакансии
-            </h3>
-            <div className="prose prose-sm max-w-none">
-              <p className="text-muted-foreground text-sm sm:text-base">
-                {vacancy.department} ищет профессионала на должность {vacancy.title}.
-              </p>
-              <p className="text-muted-foreground text-sm sm:text-base mt-2">
-                Это отличная возможность присоединиться к команде и получить конкурентную зарплату {vacancy.salary}.
-              </p>
+          {vacancy.description ? (
+            <div className="space-y-2 sm:space-y-3">
+              <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
+                <Icon name="FileText" size={18} />
+                Описание вакансии
+              </h3>
+              <p className="text-muted-foreground text-sm sm:text-base whitespace-pre-wrap">{vacancy.description}</p>
             </div>
-          </div>
+          ) : null}
 
-          <Separator />
+          {vacancy.requirements ? (
+            <>
+              {vacancy.description && <Separator />}
+              <div className="space-y-2 sm:space-y-3">
+                <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
+                  <Icon name="ClipboardList" size={18} />
+                  Требования
+                </h3>
+                <p className="text-muted-foreground text-sm sm:text-base whitespace-pre-wrap">{vacancy.requirements}</p>
+              </div>
+            </>
+          ) : null}
 
-          <div className="space-y-2 sm:space-y-3">
-            <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
-              <Icon name="Star" size={18} />
-              Преимущества
-            </h3>
-            <ul className="space-y-2">
-              <li className="flex items-start gap-2">
-                <Icon name="Check" className="text-green-600 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span className="text-sm sm:text-base">Высокая зарплата и премии по результатам работы</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Icon name="Check" className="text-green-600 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span className="text-sm sm:text-base">Профессиональное развитие и обучение</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Icon name="Check" className="text-green-600 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span className="text-sm sm:text-base">Дружный коллектив и комфортные условия работы</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Icon name="Check" className="text-green-600 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span className="text-sm sm:text-base">Социальный пакет и медицинская страховка</span>
-              </li>
-            </ul>
-          </div>
+          {!vacancy.description && !vacancy.requirements ? (
+            <div className="space-y-2 sm:space-y-3">
+              <h3 className="font-semibold text-base sm:text-lg flex items-center gap-2">
+                <Icon name="FileText" size={18} />
+                Описание вакансии
+              </h3>
+              <p className="text-muted-foreground text-sm sm:text-base italic">Описание и требования не заполнены</p>
+            </div>
+          ) : null}
 
           {showPublicLink && (
             <>

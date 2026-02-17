@@ -9,6 +9,7 @@ export interface Vacancy {
   recommendations: number;
   reward: number;
   payoutDelayDays: number;
+  description?: string;
   requirements?: string;
   referralLink?: string;
   city?: string;
