@@ -2787,16 +2787,16 @@ function Index() {
           </div>
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex min-w-full sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-8 gap-1">
-              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
-              <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3">👥 <span className="hidden sm:inline">Сотрудники</span></TabsTrigger>
-              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3">🎯 <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
-              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3">💰 <span className="hidden sm:inline">Выплаты</span></TabsTrigger>
-              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
-              <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3">💬 <span className="hidden sm:inline">Чаты</span></TabsTrigger>
-              <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3">📊 <span className="hidden sm:inline">Статистика</span></TabsTrigger>
-              <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3">❓ <span className="hidden sm:inline">Помощь</span></TabsTrigger>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
+            <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-8 gap-1">
+              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💼 Вакансии</TabsTrigger>
+              <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">👥 Сотрудники</TabsTrigger>
+              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🎯 Рекомендации</TabsTrigger>
+              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💰 Выплаты</TabsTrigger>
+              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
+              <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💬 Чаты</TabsTrigger>
+              <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📊 Статистика</TabsTrigger>
+              <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
             </TabsList>
           </div>
 
@@ -5262,15 +5262,15 @@ function Index() {
         </div>
 
         <Tabs defaultValue="news" className="space-y-4 sm:space-y-6">
-          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-            <TabsList className="inline-flex min-w-full sm:grid sm:w-full sm:grid-cols-7 gap-1">
-              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">📢 <span className="hidden sm:inline">Новости</span></TabsTrigger>
-              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">💼 <span className="hidden sm:inline">Вакансии</span></TabsTrigger>
-              <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">⭐ <span className="hidden sm:inline">Рекомендации</span></TabsTrigger>
-              <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🏆 <span className="hidden sm:inline">Рейтинг</span></TabsTrigger>
-              <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">🔔 <span className="hidden sm:inline">Уведомления</span></TabsTrigger>
-              <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">💳 <span className="hidden sm:inline">История</span></TabsTrigger>
-              <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-3">❓ <span className="hidden sm:inline">Помощь</span></TabsTrigger>
+          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
+            <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-7 gap-1">
+              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
+              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💼 Вакансии</TabsTrigger>
+              <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">⭐ Рекомендации</TabsTrigger>
+              <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🏆 Рейтинг</TabsTrigger>
+              <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🔔 Уведомления</TabsTrigger>
+              <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💳 История</TabsTrigger>
+              <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
             </TabsList>
           </div>
 

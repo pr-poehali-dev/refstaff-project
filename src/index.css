@@ -158,12 +158,14 @@
     touch-action: pan-y;
   }
 
-  .scrollbar-hide {
+  .scrollbar-hide,
+  .scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
 
-  .scrollbar-hide::-webkit-scrollbar {
+  .scrollbar-hide::-webkit-scrollbar,
+  .scrollbar-none::-webkit-scrollbar {
     display: none;
   }
 
