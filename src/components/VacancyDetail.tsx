@@ -26,7 +26,7 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRe
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3 mb-2">
                 <DialogTitle className="text-lg sm:text-2xl">{vacancy.title}</DialogTitle>
                 <Badge variant={vacancy.status === 'active' ? 'default' : 'secondary'} className="w-fit">
-                  {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'В архиве' : 'Закрыта'}
+                  {vacancy.status === 'active' ? 'Активна' : 'Архив'}
                 </Badge>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
@@ -71,7 +71,7 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRe
                 <span className="font-medium">Статус вакансии</span>
               </div>
               <p className="text-sm sm:text-base">
-                {vacancy.status === 'active' ? 'Открыт набор кандидатов' : 'Вакансия закрыта'}
+                {vacancy.status === 'active' ? 'Открыт набор кандидатов' : 'Вакансия в архиве'}
               </p>
             </div>
           </div>

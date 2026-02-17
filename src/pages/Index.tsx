@@ -698,17 +698,6 @@ function Index() {
     }
   };
 
-  const handleCloseVacancy = async (vacancyId: number) => {
-    try {
-      await api.updateVacancy(vacancyId, { status: 'closed' });
-      await loadData();
-      alert('Вакансия закрыта');
-    } catch (error) {
-      console.error('Ошибка закрытия вакансии:', error);
-      alert('Не удалось закрыть вакансию');
-    }
-  };
-
   const handleArchiveVacancy = async (vacancyId: number) => {
     try {
       await api.updateVacancy(vacancyId, { status: 'archived' });
@@ -2966,7 +2955,6 @@ function Index() {
                 <SelectContent>
                   <SelectItem value="all">Все статусы</SelectItem>
                   <SelectItem value="active">Активные</SelectItem>
-                  <SelectItem value="closed">Закрытые</SelectItem>
                   <SelectItem value="archived">Архив</SelectItem>
                 </SelectContent>
               </Select>
@@ -3000,11 +2988,10 @@ function Index() {
                         <Badge 
                           variant="secondary" 
                           className={`text-[9px] sm:text-xs px-1 sm:px-2 ${
-                            vacancy.status === 'archived' ? 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400' : 
-                            vacancy.status === 'closed' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' : ''
+                            vacancy.status === 'archived' ? 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400' : ''
                           }`}
                         >
-                          {vacancy.status === 'active' ? 'Активна' : vacancy.status === 'archived' ? 'Архив' : 'Закрыта'}
+                          {vacancy.status === 'active' ? 'Активна' : 'Архив'}
                         </Badge>
                         {vacancy.recommendations > 0 && (
                           <Badge variant="outline" className="text-[9px] sm:text-xs px-1 sm:px-2">
@@ -3038,29 +3025,27 @@ function Index() {
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                        {vacancy.status !== 'archived' && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              setActiveVacancy(vacancy);
-                              setVacancyForm({
-                                title: vacancy.title,
-                                department: vacancy.department,
-                                salary: vacancy.salary,
-                                requirements: '',
-                                reward: vacancy.reward.toString(),
-                                payoutDelay: vacancy.payoutDelayDays.toString(),
-                                city: vacancy.city || '',
-                                isRemote: vacancy.isRemote || false
-                              });
-                            }}
-                            className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
-                          >
-                            <Icon name="Pencil" size={12} className="sm:mr-1" />
-                            <span className="hidden sm:inline">Ред.</span>
-                          </Button>
-                        )}
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => {
+                            setActiveVacancy(vacancy);
+                            setVacancyForm({
+                              title: vacancy.title,
+                              department: vacancy.department,
+                              salary: vacancy.salary,
+                              requirements: '',
+                              reward: vacancy.reward.toString(),
+                              payoutDelay: vacancy.payoutDelayDays.toString(),
+                              city: vacancy.city || '',
+                              isRemote: vacancy.isRemote || false
+                            });
+                          }}
+                          className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                        >
+                          <Icon name="Pencil" size={12} className="sm:mr-1" />
+                          <span className="hidden sm:inline">Ред.</span>
+                        </Button>
                         {vacancy.status === 'active' && (
                           <Button 
                             variant="outline" 
@@ -3071,28 +3056,6 @@ function Index() {
                             <Icon name="Archive" size={12} className="sm:mr-1" />
                             <span className="hidden sm:inline">В архив</span>
                           </Button>
-                        )}
-                        {vacancy.status === 'closed' && (
-                          <>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleRestoreVacancy(vacancy.id)}
-                              className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
-                            >
-                              <Icon name="RotateCcw" size={12} className="sm:mr-1" />
-                              <span className="hidden sm:inline">Вернуть</span>
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleArchiveVacancy(vacancy.id)}
-                              className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
-                            >
-                              <Icon name="Archive" size={12} className="sm:mr-1" />
-                              <span className="hidden sm:inline">В архив</span>
-                            </Button>
-                          </>
                         )}
                         {vacancy.status === 'archived' && (
                           <>
@@ -3194,15 +3157,16 @@ function Index() {
                     <Button className="flex-1" onClick={handleUpdateVacancy}>Сохранить изменения</Button>
                     {activeVacancy?.status === 'active' && (
                       <Button 
-                        variant="destructive"
+                        variant="outline"
                         onClick={() => {
                           if (activeVacancy) {
-                            handleCloseVacancy(activeVacancy.id);
+                            handleArchiveVacancy(activeVacancy.id);
                             setActiveVacancy(null);
                           }
                         }}
                       >
-                        Закрыть вакансию
+                        <Icon name="Archive" size={16} className="mr-2" />
+                        В архив
                       </Button>
                     )}
                   </div>

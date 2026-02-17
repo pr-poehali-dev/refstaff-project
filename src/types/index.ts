@@ -5,7 +5,7 @@ export interface Vacancy {
   title: string;
   department: string;
   salary: string;
-  status: 'active' | 'closed' | 'archived';
+  status: 'active' | 'archived';
   recommendations: number;
   reward: number;
   payoutDelayDays: number;

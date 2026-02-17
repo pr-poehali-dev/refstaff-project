@@ -7,7 +7,7 @@ export interface Vacancy {
   salary_display: string;
   requirements?: string;
   description?: string;
-  status: 'active' | 'closed' | 'archived';
+  status: 'active' | 'archived';
   reward_amount: number;
   payout_delay_days?: number;
   referral_token?: string;
