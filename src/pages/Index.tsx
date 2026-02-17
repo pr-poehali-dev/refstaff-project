@@ -22,6 +22,7 @@ import { PayoutRequests } from '@/components/PayoutRequests';
 import { VacancyDetail } from '@/components/VacancyDetail';
 import { CandidateDetail } from '@/components/CandidateDetail';
 import { SubscriptionExpiredBlock } from '@/components/SubscriptionExpiredBlock';
+import Onboarding from '@/components/Onboarding';
 
 function Index() {
   const navigate = useNavigate();
@@ -42,6 +43,7 @@ function Index() {
   const [showCompanySettingsDialog, setShowCompanySettingsDialog] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [activeChatEmployee, setActiveChatEmployee] = useState<Employee | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [showCompanyProfileDialog, setShowCompanyProfileDialog] = useState(false);
   const [showAboutDialog, setShowAboutDialog] = useState(false);
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
@@ -356,9 +358,11 @@ function Index() {
   useEffect(() => {
     if (authToken && userRole !== 'guest') {
       verifyToken();
+      if (localStorage.getItem('showOnboarding') === 'true' && !localStorage.getItem('onboarding_completed')) {
+        setShowOnboarding(true);
+      }
     }
 
-    // Обработка токена восстановления пароля из URL
     const urlParams = new URLSearchParams(window.location.search);
     const resetToken = urlParams.get('token');
     if (resetToken) {
@@ -395,9 +399,12 @@ function Index() {
     if (window.confirm('Вы уверены, что хотите выйти из системы?')) {
       localStorage.removeItem('userRole');
       localStorage.removeItem('authToken');
+      localStorage.removeItem('showOnboarding');
+      localStorage.removeItem('onboarding_completed');
       setUserRole('guest');
       setAuthToken(null);
       setCurrentUser(null);
+      setShowOnboarding(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
@@ -6866,6 +6873,16 @@ function Index() {
       {userRole === 'guest' && renderLandingPage()}
       {userRole === 'employer' && renderEmployerDashboard()}
       {userRole === 'employee' && renderEmployeeDashboard()}
+
+      {showOnboarding && userRole !== 'guest' && (
+        <Onboarding
+          role={userRole}
+          onComplete={() => {
+            setShowOnboarding(false);
+            localStorage.removeItem('showOnboarding');
+          }}
+        />
+      )}
       
       <EmployeeDetail
         employee={selectedEmployee}

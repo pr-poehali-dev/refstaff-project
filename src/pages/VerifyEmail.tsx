@@ -43,6 +43,7 @@ export default function VerifyEmail() {
           localStorage.setItem('authToken', data.token);
           const uiRole = data.user.role === 'admin' || data.user.is_admin ? 'employer' : 'employee';
           localStorage.setItem('userRole', uiRole);
+          localStorage.setItem('showOnboarding', 'true');
           
           // Автоматически перенаправляем через 2 секунды с полной перезагрузкой
           setTimeout(() => {
