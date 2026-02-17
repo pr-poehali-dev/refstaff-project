@@ -1,4 +1,5 @@
 {
+  "notify-company": "https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be",
   "get-company-by-token": "https://functions.poehali.dev/f1f66940-161e-4221-a729-4e0e555af034",
   "reset-password": "https://functions.poehali.dev/490186ec-0761-4387-8b05-813aea3e8f94",
   "request-password-reset": "https://functions.poehali.dev/ec8d2e7d-ee4d-47cc-86ee-91464da954c3",

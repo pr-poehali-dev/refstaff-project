@@ -11,6 +11,17 @@ import os
 from typing import Dict, Any
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import urllib.request
+
+NOTIFY_URL = 'https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be'
+
+def send_notification(payload):
+    try:
+        data = json.dumps(payload).encode('utf-8')
+        req = urllib.request.Request(NOTIFY_URL, data=data, headers={'Content-Type': 'application/json'}, method='POST')
+        urllib.request.urlopen(req, timeout=5)
+    except Exception:
+        pass
 
 def get_db_connection():
     database_url = os.environ.get('DATABASE_URL')
@@ -120,7 +131,18 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             """
             cur.execute(query, (user_id, amount, payment_method, payment_details))
             new_request = cur.fetchone()
-            
+
+            cur.execute("SELECT first_name, last_name, company_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (user_id,))
+            payout_user = cur.fetchone()
+            if payout_user and payout_user.get('company_id'):
+                send_notification({
+                    'company_id': payout_user['company_id'],
+                    'event_type': 'new_payout_request',
+                    'user_name': f"{payout_user.get('first_name', '')} {payout_user.get('last_name', '')}",
+                    'amount': amount,
+                    'payment_method': payment_method or 'Не указан'
+                })
+
             return {
                 'statusCode': 201,
                 'headers': {

@@ -12,6 +12,17 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import urllib.request
+
+NOTIFY_URL = 'https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be'
+
+def send_notification(payload):
+    try:
+        data = json.dumps(payload).encode('utf-8')
+        req = urllib.request.Request(NOTIFY_URL, data=data, headers={'Content-Type': 'application/json'}, method='POST')
+        urllib.request.urlopen(req, timeout=5)
+    except Exception:
+        pass
 
 def get_db_connection():
     dsn = os.environ.get('DATABASE_URL')
@@ -396,7 +407,16 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         response.read()
                 except Exception as e:
                     print(f"Failed to send verification email: {str(e)}")
-                
+
+                send_notification({
+                    'company_id': company_id,
+                    'event_type': 'new_employee',
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'email': email,
+                    'position': 'Не указана'
+                })
+
                 return {
                     'statusCode': 201,
                     'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},

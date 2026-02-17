@@ -11,6 +11,17 @@ import os
 from typing import Dict, Any, Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import urllib.request
+
+NOTIFY_URL = 'https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be'
+
+def send_notification(payload):
+    try:
+        data = json.dumps(payload).encode('utf-8')
+        req = urllib.request.Request(NOTIFY_URL, data=data, headers={'Content-Type': 'application/json'}, method='POST')
+        urllib.request.urlopen(req, timeout=5)
+    except Exception:
+        pass
 
 def get_db_connection():
     database_url = os.environ.get('DATABASE_URL')
@@ -190,7 +201,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 WHERE id = %s
             """
             cur.execute(update_user_stats, (body_data.get('recommended_by'),))
-            
+
+            cur.execute("SELECT first_name, last_name, company_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (body_data.get('recommended_by'),))
+            rec_user = cur.fetchone()
+            vacancy_title = ''
+            if body_data.get('vacancy_id'):
+                cur.execute("SELECT title FROM t_p65890965_refstaff_project.vacancies WHERE id = %s", (body_data.get('vacancy_id'),))
+                vac = cur.fetchone()
+                if vac:
+                    vacancy_title = vac['title']
+            if rec_user and rec_user.get('company_id'):
+                send_notification({
+                    'company_id': rec_user['company_id'],
+                    'event_type': 'new_recommendation',
+                    'candidate_name': body_data.get('candidate_name', ''),
+                    'candidate_email': body_data.get('candidate_email', ''),
+                    'vacancy_title': vacancy_title,
+                    'recommended_by_name': f"{rec_user.get('first_name', '')} {rec_user.get('last_name', '')}",
+                    'reward_amount': body_data.get('reward_amount', 30000)
+                })
+
             return {
                 'statusCode': 201,
                 'headers': {
