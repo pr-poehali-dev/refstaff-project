@@ -3034,7 +3034,7 @@ function Index() {
                               title: vacancy.title,
                               department: vacancy.department,
                               salary: vacancy.salary,
-                              requirements: '',
+                              requirements: vacancy.requirements || '',
                               reward: vacancy.reward.toString(),
                               payoutDelay: vacancy.payoutDelayDays.toString(),
                               city: vacancy.city || '',
@@ -3151,7 +3151,7 @@ function Index() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="edit-requirements">Требования</Label>
+                    <Label htmlFor="edit-requirements">Описание вакансии</Label>
                     <Textarea 
                       id="edit-requirements" 
                       rows={4}
