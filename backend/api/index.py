@@ -104,9 +104,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             query = """
                 INSERT INTO t_p65890965_refstaff_project.vacancies 
-                (company_id, title, department, salary_display, requirements, description, reward_amount, payout_delay_days, created_by)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                RETURNING id, title, department, salary_display, status, reward_amount, payout_delay_days, created_at
+                (company_id, title, department, salary_display, requirements, description, reward_amount, payout_delay_days, created_by, referral_token)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, substring(md5(random()::text), 1, 12))
+                RETURNING id, title, department, salary_display, status, reward_amount, payout_delay_days, referral_token, created_at
             """
             
             cur.execute(query, (
