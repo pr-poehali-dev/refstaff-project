@@ -3063,17 +3063,23 @@ function Index() {
                               variant="outline" 
                               size="sm"
                               onClick={() => handleRestoreVacancy(vacancy.id)}
-                              className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                              className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
-                              <Icon name="RotateCcw" size={12} />
+                              <Icon name="RotateCcw" size={12} className="sm:mr-1" />
+                              <span className="hidden sm:inline">Активировать</span>
                             </Button>
                             <Button 
                               variant="destructive" 
                               size="sm"
-                              onClick={() => handleDeleteVacancy(vacancy.id)}
-                              className="flex-1 text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                              onClick={() => {
+                                if (window.confirm('Удалить вакансию безвозвратно?')) {
+                                  handleDeleteVacancy(vacancy.id);
+                                }
+                              }}
+                              className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
-                              <Icon name="Trash2" size={12} />
+                              <Icon name="Trash2" size={12} className="sm:mr-1" />
+                              <span className="hidden sm:inline">Удалить</span>
                             </Button>
                           </>
                         )}
