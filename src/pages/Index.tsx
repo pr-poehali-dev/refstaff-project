@@ -105,6 +105,10 @@ function Index() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [prevRecommendationsCount, setPrevRecommendationsCount] = useState<number>(0);
   const [newRecommendationsCount, setNewRecommendationsCount] = useState<number>(0);
+  const [prevEmployeesCount, setPrevEmployeesCount] = useState<number>(0);
+  const [newEmployeesCount, setNewEmployeesCount] = useState<number>(0);
+  const [prevPayoutsCount, setPrevPayoutsCount] = useState<number>(0);
+  const [newPayoutsCount, setNewPayoutsCount] = useState<number>(0);
   const [company, setCompany] = useState<Company | null>(null);
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -521,13 +525,22 @@ function Index() {
       });
 
       setVacancies(mappedVacancies);
+
+      if (prevEmployeesCount === 0) {
+        setNewEmployeesCount(mappedEmployees.length);
+      } else {
+        const empDiff = mappedEmployees.length - prevEmployeesCount;
+        if (empDiff > 0) setNewEmployeesCount(prev => prev + empDiff);
+      }
+      setPrevEmployeesCount(mappedEmployees.length);
       setEmployees(mappedEmployees);
+
       if (prevRecommendationsCount === 0) {
         const pendingCount = mappedRecommendations.filter((r: Recommendation) => r.status === 'pending').length;
         setNewRecommendationsCount(pendingCount);
       } else {
-        const newCount = mappedRecommendations.length - prevRecommendationsCount;
-        if (newCount > 0) setNewRecommendationsCount(prev => prev + newCount);
+        const recDiff = mappedRecommendations.length - prevRecommendationsCount;
+        if (recDiff > 0) setNewRecommendationsCount(prev => prev + recDiff);
       }
       setPrevRecommendationsCount(mappedRecommendations.length);
       setRecommendations(mappedRecommendations);
@@ -548,6 +561,15 @@ function Index() {
           reviewedAt: p.reviewed_at,
           reviewedBy: p.reviewed_by
         }));
+
+        if (prevPayoutsCount === 0) {
+          const pendingPayouts = mappedPayouts.filter(p => p.status === 'pending').length;
+          setNewPayoutsCount(pendingPayouts);
+        } else {
+          const payDiff = mappedPayouts.length - prevPayoutsCount;
+          if (payDiff > 0) setNewPayoutsCount(prev => prev + payDiff);
+        }
+        setPrevPayoutsCount(mappedPayouts.length);
         setPayoutRequests(mappedPayouts);
       }
 
@@ -2797,13 +2819,13 @@ function Index() {
             </div>
           </div>
         ) : (
-        <Tabs defaultValue="vacancies" className="space-y-6" onValueChange={(val) => { if (val === 'recommendations') setNewRecommendationsCount(0); }}>
+        <Tabs defaultValue="vacancies" className="space-y-6" onValueChange={(val) => { if (val === 'recommendations') setNewRecommendationsCount(0); if (val === 'employees') setNewEmployeesCount(0); if (val === 'payouts') setNewPayoutsCount(0); }}>
           <ScrollableTabs>
             <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-8 gap-1">
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💼 Вакансии</TabsTrigger>
-              <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">👥 Сотрудники</TabsTrigger>
-              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">🎯 Рекомендации{newRecommendationsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-green-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newRecommendationsCount}</span>}</TabsTrigger>
-              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💰 Выплаты</TabsTrigger>
+              <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">👥 Сотрудники{newEmployeesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-blue-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newEmployeesCount}</span>}</TabsTrigger>
+              <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🎯 Рекомендации{newRecommendationsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-green-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newRecommendationsCount}</span>}</TabsTrigger>
+              <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💰 Выплаты{newPayoutsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newPayoutsCount}</span>}</TabsTrigger>
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
               <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💬 Чаты</TabsTrigger>
               <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📊 Статистика</TabsTrigger>
