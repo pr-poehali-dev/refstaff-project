@@ -487,6 +487,7 @@ function Index() {
         recommendations: v.recommendations_count || 0,
         reward: v.reward_amount,
         payoutDelayDays: v.payout_delay_days || 30,
+        requirements: v.requirements || '',
         referralLink: v.referral_token && userRole === 'employee' ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
 
@@ -3151,7 +3152,7 @@ function Index() {
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="edit-requirements">Описание вакансии</Label>
+                    <Label htmlFor="edit-requirements">Требования</Label>
                     <Textarea 
                       id="edit-requirements" 
                       rows={4}
