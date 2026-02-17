@@ -23,6 +23,7 @@ import { VacancyDetail } from '@/components/VacancyDetail';
 import { CandidateDetail } from '@/components/CandidateDetail';
 import { SubscriptionExpiredBlock } from '@/components/SubscriptionExpiredBlock';
 import Onboarding from '@/components/Onboarding';
+import ScrollableTabs from '@/components/ScrollableTabs';
 
 function Index() {
   const navigate = useNavigate();
@@ -2787,7 +2788,7 @@ function Index() {
           </div>
         ) : (
         <Tabs defaultValue="vacancies" className="space-y-6">
-          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
+          <ScrollableTabs>
             <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-8 gap-1">
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💼 Вакансии</TabsTrigger>
               <TabsTrigger value="employees" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">👥 Сотрудники</TabsTrigger>
@@ -2798,7 +2799,7 @@ function Index() {
               <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📊 Статистика</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
             </TabsList>
-          </div>
+          </ScrollableTabs>
 
           <TabsContent value="vacancies" className="space-y-4">
             {isSubscriptionExpired ? (
@@ -5262,7 +5263,7 @@ function Index() {
         </div>
 
         <Tabs defaultValue="news" className="space-y-4 sm:space-y-6">
-          <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none">
+          <ScrollableTabs>
             <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-7 gap-1">
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💼 Вакансии</TabsTrigger>
@@ -5272,7 +5273,7 @@ function Index() {
               <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💳 История</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
             </TabsList>
-          </div>
+          </ScrollableTabs>
 
           <TabsContent value="news" className="space-y-4">
             <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
