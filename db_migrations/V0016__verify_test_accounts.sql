@@ -1,0 +1,1 @@
+UPDATE t_p65890965_refstaff_project.users SET email_verified = true WHERE email IN ('admin@company.ru', 'employee@company.ru');
