@@ -4300,10 +4300,9 @@ function Index() {
       <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
         <DialogContent className="max-w-4xl h-[80vh] sm:h-[600px] flex flex-col p-0">
           <div className="flex h-full">
-            <div className="w-20 sm:w-72 border-r flex flex-col">
+            <div className="w-40 sm:w-72 border-r flex flex-col shrink-0">
               <div className="p-2 sm:p-4 border-b">
-                <h3 className="font-semibold text-sm sm:text-base hidden sm:block">Сотрудники</h3>
-                <Icon name="Users" className="sm:hidden mx-auto" size={20} />
+                <h3 className="font-semibold text-xs sm:text-base">Сотрудники</h3>
                 <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Выберите сотрудника для диалога</p>
                 <div className="mt-2 hidden sm:block">
                   <Input 
@@ -4331,16 +4330,16 @@ function Index() {
                   >
                     <div className="flex items-center gap-2 sm:gap-3">
                       {emp.avatar ? (
-                        <img src={emp.avatar} alt={emp.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover" />
+                        <img src={emp.avatar} alt={emp.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                           <Icon name="User" size={16} className="text-primary sm:hidden" />
                           <Icon name="User" size={20} className="text-primary hidden sm:block" />
                         </div>
                       )}
-                      <div className="flex-1 min-w-0 hidden sm:block">
-                        <p className="font-medium text-sm truncate">{emp.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{emp.position}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-xs sm:text-sm truncate">{emp.name}</p>
+                        <p className="text-xs text-muted-foreground truncate hidden sm:block">{emp.position}</p>
                       </div>
                     </div>
                   </div>
