@@ -109,6 +109,11 @@ function Index() {
   const [newEmployeesCount, setNewEmployeesCount] = useState<number>(0);
   const [prevPayoutsCount, setPrevPayoutsCount] = useState<number>(0);
   const [newPayoutsCount, setNewPayoutsCount] = useState<number>(0);
+  const [prevVacanciesCount, setPrevVacanciesCount] = useState<number>(0);
+  const [newVacanciesCount, setNewVacanciesCount] = useState<number>(0);
+  const [newNewsCount, setNewNewsCount] = useState<number>(() => 0);
+  const [newNotificationsCount, setNewNotificationsCount] = useState<number>(() => 0);
+  const [employeeTabsInitialized, setEmployeeTabsInitialized] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -462,6 +467,13 @@ function Index() {
     }
   }, [userRole]);
 
+  useEffect(() => {
+    if (userRole === 'employee' && !isLoading && !employeeTabsInitialized) {
+      setNewNotificationsCount(notifications.filter(n => !n.read).length);
+      setEmployeeTabsInitialized(true);
+    }
+  }, [userRole, isLoading, employeeTabsInitialized]);
+
   const loadData = async () => {
     try {
       setIsLoading(true);
@@ -527,6 +539,15 @@ function Index() {
         };
       });
 
+      if (userRole === 'employee') {
+        if (prevVacanciesCount === 0) {
+          setNewVacanciesCount(mappedVacancies.length);
+        } else {
+          const vacDiff = mappedVacancies.length - prevVacanciesCount;
+          if (vacDiff > 0) setNewVacanciesCount(prev => prev + vacDiff);
+        }
+        setPrevVacanciesCount(mappedVacancies.length);
+      }
       setVacancies(mappedVacancies);
 
       if (prevEmployeesCount === 0) {
@@ -5349,14 +5370,18 @@ function Index() {
           </Card>
         </div>
 
-        <Tabs defaultValue="news" className="space-y-4 sm:space-y-6">
+        <Tabs defaultValue="news" className="space-y-4 sm:space-y-6" onValueChange={(tab) => {
+          if (tab === 'vacancies') setNewVacanciesCount(0);
+          if (tab === 'news') setNewNewsCount(0);
+          if (tab === 'notifications') setNewNotificationsCount(0);
+        }}>
           <ScrollableTabs>
             <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-7 gap-1">
-              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
-              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💼 Вакансии</TabsTrigger>
+              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">📢 Новости{newNewsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-purple-500 text-white border-0 leading-4">+{newNewsCount}</Badge>}</TabsTrigger>
+              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">💼 Вакансии{newVacanciesCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-green-500 text-white border-0 leading-4">+{newVacanciesCount}</Badge>}</TabsTrigger>
               <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">⭐ Рекомендации</TabsTrigger>
               <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🏆 Рейтинг</TabsTrigger>
-              <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🔔 Уведомления</TabsTrigger>
+              <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">🔔 Уведомления{newNotificationsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-red-500 text-white border-0 leading-4">+{newNotificationsCount}</Badge>}</TabsTrigger>
               <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💳 История</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
             </TabsList>
