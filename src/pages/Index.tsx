@@ -4319,34 +4319,36 @@ function Index() {
       </Dialog>
 
       <Dialog open={showCompanySettingsDialog} onOpenChange={setShowCompanySettingsDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Профиль компании</DialogTitle>
-            <DialogDescription>Управляйте информацией о вашей компании</DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Профиль компании</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">Управляйте информацией о вашей компании</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <Label htmlFor="company-name-edit">Название компании</Label>
-              <Input id="company-name-edit" value={company?.name || ''} readOnly disabled />
-              <p className="text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
-            </div>
-            <div>
-              <Label htmlFor="company-logo">Логотип</Label>
-              <Input id="company-logo" type="file" accept="image/*" />
-            </div>
-            <div>
-              <Label htmlFor="company-desc">Описание</Label>
-              <Textarea id="company-desc" rows={3} placeholder="Расскажите о вашей компании..." defaultValue={company?.description || ''} />
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
+          <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <Label htmlFor="company-website">Веб-сайт</Label>
-                <Input id="company-website" placeholder="https://example.com" defaultValue={company?.website || ''} />
+                <Label htmlFor="company-name-edit" className="text-xs sm:text-sm">Название компании</Label>
+                <Input id="company-name-edit" className="mt-1 text-sm" value={company?.name || ''} readOnly disabled />
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
               </div>
               <div>
-                <Label htmlFor="company-industry">Отрасль</Label>
+                <Label htmlFor="company-logo" className="text-xs sm:text-sm">Логотип</Label>
+                <Input id="company-logo" className="mt-1 text-sm" type="file" accept="image/*" />
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="company-desc" className="text-xs sm:text-sm">Описание</Label>
+              <Textarea id="company-desc" rows={3} className="mt-1 text-sm" placeholder="Расскажите о вашей компании..." defaultValue={company?.description || ''} />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <Label htmlFor="company-website" className="text-xs sm:text-sm">Веб-сайт</Label>
+                <Input id="company-website" className="mt-1 text-sm" placeholder="https://example.com" defaultValue={company?.website || ''} />
+              </div>
+              <div>
+                <Label htmlFor="company-industry" className="text-xs sm:text-sm">Отрасль</Label>
                 <Select defaultValue={company?.industry || ''}>
-                  <SelectTrigger>
+                  <SelectTrigger className="mt-1 text-sm">
                     <SelectValue placeholder="Выберите отрасль" />
                   </SelectTrigger>
                   <SelectContent>
@@ -4359,34 +4361,38 @@ function Index() {
                 </Select>
               </div>
             </div>
-            <div>
-              <Label htmlFor="company-inn">ИНН</Label>
-              <Input id="company-inn" value={company?.inn || ''} readOnly disabled />
-              <p className="text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
-            </div>
-            <div>
-              <Label htmlFor="company-employee-count">Количество сотрудников</Label>
-              <Input id="company-employee-count" type="number" value={company?.employee_count || 0} readOnly disabled />
-              <p className="text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <Label htmlFor="company-inn" className="text-xs sm:text-sm">ИНН</Label>
+                <Input id="company-inn" className="mt-1 text-sm" value={company?.inn || ''} readOnly disabled />
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
+              </div>
+              <div>
+                <Label htmlFor="company-employee-count" className="text-xs sm:text-sm">Кол-во сотрудников</Label>
+                <Input id="company-employee-count" className="mt-1 text-sm" type="number" value={company?.employee_count || 0} readOnly disabled />
+                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
+              </div>
             </div>
 
             <Separator />
 
             <div>
-              <h3 className="text-lg font-semibold mb-3">Контакты</h3>
-              <div className="space-y-4">
+              <h3 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3">Контакты</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <Label htmlFor="company-phone">Телефон</Label>
+                  <Label htmlFor="company-phone" className="text-xs sm:text-sm">Телефон</Label>
                   <Input 
                     id="company-phone" 
+                    className="mt-1 text-sm"
                     type="tel" 
                     placeholder="+7 (999) 123-45-67" 
                   />
                 </div>
                 <div>
-                  <Label htmlFor="company-email">Email</Label>
+                  <Label htmlFor="company-email" className="text-xs sm:text-sm">Email</Label>
                   <Input 
                     id="company-email" 
+                    className="mt-1 text-sm"
                     type="email" 
                     placeholder="info@company.ru" 
                   />
@@ -4397,30 +4403,32 @@ function Index() {
             <Separator />
 
             <div>
-              <h3 className="text-lg font-semibold mb-3">Социальные сети</h3>
-              <div className="space-y-4">
+              <h3 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3">Социальные сети</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <Label htmlFor="company-telegram">
+                  <Label htmlFor="company-telegram" className="text-xs sm:text-sm">
                     <div className="flex items-center gap-2">
-                      <Icon name="Send" size={16} />
+                      <Icon name="Send" size={14} />
                       Telegram
                     </div>
                   </Label>
                   <Input 
                     id="company-telegram" 
-                    placeholder="@company или https://t.me/company" 
+                    className="mt-1 text-sm"
+                    placeholder="@company или t.me/company" 
                   />
                 </div>
                 <div>
-                  <Label htmlFor="company-vk">
+                  <Label htmlFor="company-vk" className="text-xs sm:text-sm">
                     <div className="flex items-center gap-2">
-                      <Icon name="MessageCircle" size={16} />
+                      <Icon name="MessageCircle" size={14} />
                       VK
                     </div>
                   </Label>
                   <Input 
                     id="company-vk" 
-                    placeholder="https://vk.com/company" 
+                    className="mt-1 text-sm"
+                    placeholder="vk.com/company" 
                   />
                 </div>
               </div>
@@ -4428,8 +4436,8 @@ function Index() {
 
             <Separator />
 
-            <Button className="w-full" size="lg">
-              <Icon name="Save" className="mr-2" size={18} />
+            <Button className="w-full text-sm" size="lg">
+              <Icon name="Save" className="mr-2" size={16} />
               Сохранить изменения
             </Button>
           </div>
