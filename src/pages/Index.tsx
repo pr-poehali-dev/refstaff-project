@@ -1876,45 +1876,49 @@ function Index() {
       </footer>
 
       <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>
-Регистрация компании</DialogTitle>
-            <DialogDescription>Начните 14-дневный пробный 
-период</DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Регистрация компании</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">Начните 14-дневный пробный период</DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
+          <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
             <div>
-              <Label htmlFor="company-name">Название компании</Label>
+              <Label htmlFor="company-name" className="text-xs sm:text-sm">Название компании</Label>
               <Input 
                 id="company-name" 
+                className="mt-1 text-sm"
                 placeholder="Acme Corp" 
                 value={registerForm.companyName}
                 onChange={(e) => setRegisterForm({...registerForm, companyName: e.target.value})}
               />
             </div>
-            <div>
-              <Label htmlFor="admin-first-name">Имя</Label>
-              <Input 
-                id="admin-first-name" 
-                placeholder="Иван" 
-                value={registerForm.firstName}
-                onChange={(e) => setRegisterForm({...registerForm, firstName: e.target.value})}
-              />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="admin-first-name" className="text-xs sm:text-sm">Имя</Label>
+                <Input 
+                  id="admin-first-name" 
+                  className="mt-1 text-sm"
+                  placeholder="Иван" 
+                  value={registerForm.firstName}
+                  onChange={(e) => setRegisterForm({...registerForm, firstName: e.target.value})}
+                />
+              </div>
+              <div>
+                <Label htmlFor="admin-last-name" className="text-xs sm:text-sm">Фамилия</Label>
+                <Input 
+                  id="admin-last-name" 
+                  className="mt-1 text-sm"
+                  placeholder="Иванов" 
+                  value={registerForm.lastName}
+                  onChange={(e) => setRegisterForm({...registerForm, lastName: e.target.value})}
+                />
+              </div>
             </div>
             <div>
-              <Label htmlFor="admin-last-name">Фамилия</Label>
-              <Input 
-                id="admin-last-name" 
-                placeholder="Иванов" 
-                value={registerForm.lastName}
-                onChange={(e) => setRegisterForm({...registerForm, lastName: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="admin-email">Email</Label>
+              <Label htmlFor="admin-email" className="text-xs sm:text-sm">Email</Label>
               <Input 
                 id="admin-email" 
+                className="mt-1 text-sm"
                 type="email" 
                 placeholder="ivan@company.ru" 
                 value={registerForm.email}
@@ -1922,9 +1926,10 @@ function Index() {
               />
             </div>
             <div>
-              <Label htmlFor="admin-password">Пароль</Label>
+              <Label htmlFor="admin-password" className="text-xs sm:text-sm">Пароль</Label>
               <Input 
                 id="admin-password" 
+                className="mt-1 text-sm"
                 type="password" 
                 placeholder="Минимум 8 символов" 
                 value={registerForm.password}
@@ -1932,7 +1937,7 @@ function Index() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="company-inn">ИНН компании <span className="text-red-500">*</span></Label>
+              <Label htmlFor="company-inn" className="text-xs sm:text-sm">ИНН компании <span className="text-red-500">*</span></Label>
               <div className="flex gap-2">
                 <Input 
                   id="company-inn" 
@@ -1951,78 +1956,82 @@ function Index() {
                       });
                     }
                   }}
-                  className={innVerificationState.isVerified ? 'border-green-500' : innVerificationState.error ? 'border-red-500' : ''}
+                  className={`text-sm ${innVerificationState.isVerified ? 'border-green-500' : innVerificationState.error ? 'border-red-500' : ''}`}
                 />
                 <Button 
                   type="button"
                   variant="outline" 
+                  className="text-xs sm:text-sm shrink-0"
                   onClick={() => handleVerifyInn(registerForm.inn)}
                   disabled={innVerificationState.isChecking || !registerForm.inn || registerForm.inn.length < 10}
                 >
                   {innVerificationState.isChecking ? (
                     <>
-                      <Icon name="Loader2" className="w-4 h-4 mr-2 animate-spin" />
-                      Проверка...
+                      <Icon name="Loader2" className="w-4 h-4 mr-1 sm:mr-2 animate-spin" />
+                      <span className="hidden sm:inline">Проверка...</span>
+                      <span className="sm:hidden">...</span>
                     </>
                   ) : innVerificationState.isVerified ? (
                     <>
-                      <Icon name="CheckCircle2" className="w-4 h-4 mr-2 text-green-600" />
-                      Проверено
+                      <Icon name="CheckCircle2" className="w-4 h-4 mr-1 sm:mr-2 text-green-600" />
+                      <span className="hidden sm:inline">Проверено</span>
+                      <span className="sm:hidden">OK</span>
                     </>
                   ) : (
                     <>
-                      <Icon name="Search" className="w-4 h-4 mr-2" />
+                      <Icon name="Search" className="w-4 h-4 mr-1 sm:mr-2" />
                       Проверить
                     </>
                   )}
                 </Button>
               </div>
               {innVerificationState.error && (
-                <p className="text-sm text-red-500 flex items-center gap-1">
-                  <Icon name="AlertCircle" className="w-4 h-4" />
+                <p className="text-xs sm:text-sm text-red-500 flex items-center gap-1">
+                  <Icon name="AlertCircle" className="w-3.5 h-3.5 shrink-0" />
                   {innVerificationState.error}
                 </p>
               )}
               {innVerificationState.isVerified && innVerificationState.companyData && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg space-y-1">
-                  <p className="text-sm font-medium text-green-900 flex items-center gap-1">
-                    <Icon name="CheckCircle2" className="w-4 h-4" />
+                <div className="p-2 sm:p-3 bg-green-50 border border-green-200 rounded-lg space-y-1">
+                  <p className="text-xs sm:text-sm font-medium text-green-900 flex items-center gap-1">
+                    <Icon name="CheckCircle2" className="w-3.5 h-3.5 shrink-0" />
                     Компания найдена в ЕГРЮЛ
                   </p>
-                  <p className="text-sm text-green-700">
+                  <p className="text-xs sm:text-sm text-green-700 break-words">
                     <strong>Название:</strong> {innVerificationState.companyData.name?.short || innVerificationState.companyData.name?.full}
                   </p>
                   {innVerificationState.companyData.address?.full && (
-                    <p className="text-sm text-green-700">
+                    <p className="text-xs sm:text-sm text-green-700 break-words">
                       <strong>Адрес:</strong> {innVerificationState.companyData.address.full}
                     </p>
                   )}
-                  <p className="text-sm text-green-700">
+                  <p className="text-xs sm:text-sm text-green-700">
                     <strong>Статус:</strong> {innVerificationState.companyData.status?.text || 'Не указан'}
                   </p>
                   {!innVerificationState.companyData.status?.isActive && (
-                    <p className="text-sm text-orange-600 flex items-center gap-1 mt-2">
-                      <Icon name="AlertTriangle" className="w-4 h-4" />
-                      Внимание: компания не является действующей
+                    <p className="text-xs text-orange-600 flex items-center gap-1 mt-1">
+                      <Icon name="AlertTriangle" className="w-3.5 h-3.5 shrink-0" />
+                      Компания не является действующей
                     </p>
                   )}
                 </div>
               )}
             </div>
             <div>
-              <Label htmlFor="employee-count">Количество сотрудников</Label>
+              <Label htmlFor="employee-count" className="text-xs sm:text-sm">Количество сотрудников</Label>
               <Input 
                 id="employee-count" 
+                className="mt-1 text-sm"
                 type="number" 
                 placeholder="50" 
                 value={registerForm.employeeCount}
                 onChange={(e) => setRegisterForm({...registerForm, employeeCount: e.target.value})}
               />
             </div>
-            <Button className="w-full" onClick={handleRegister} disabled={isAuthLoading}>
+            <Button className="w-full text-sm" onClick={handleRegister} disabled={isAuthLoading}>
               {isAuthLoading ? 'Регистрация...' : 'Создать аккаунт'}
             </Button>
-            <p className="text-xs text-center text-muted-foreground">
+            <p className="text-[10px] sm:text-xs text-center text-muted-foreground">
               Нажимая кнопку, вы соглашаетесь с{' '}
               <button onClick={() => setShowTermsDialog(true)} className="text-primary hover:underline">условиями использования</button>
               {' '}и{' '}
