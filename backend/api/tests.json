@@ -29,18 +29,6 @@
       "method": "DELETE",
       "path": "/?resource=employees&user_id=99999",
       "expectedStatus": 404
-    },
-    {
-      "name": "Get employee chats",
-      "method": "GET",
-      "path": "/?resource=employee_chats&user_id=1&company_id=1",
-      "expectedStatus": 200
-    },
-    {
-      "name": "Get company employees list",
-      "method": "GET",
-      "path": "/?resource=company_employees&company_id=1&exclude_id=1",
-      "expectedStatus": 200
     }
   ]
 }

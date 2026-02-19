@@ -120,22 +120,6 @@ export interface ChatMessage {
   created_at: string;
 }
 
-export interface EmployeeChat {
-  id: number;
-  company_id: number;
-  participant1_id: number;
-  participant2_id: number;
-  peer_id: number;
-  peer_name: string;
-  peer_position?: string;
-  peer_department?: string;
-  peer_avatar?: string;
-  unread_count: number;
-  last_message?: string;
-  last_message_at?: string;
-  created_at: string;
-}
-
 export const api = {
   async getVacancies(companyId: number = 1, status: string = 'active'): Promise<Vacancy[]> {
     const response = await fetch(`${API_URL}/?resource=vacancies&company_id=${companyId}&status=${status}`);
@@ -316,51 +300,5 @@ export const api = {
     const response = await fetch(`${API_URL}/?resource=messages&chat_id=${chatId}`);
     if (!response.ok) throw new Error('Failed to fetch messages');
     return response.json();
-  },
-
-  async getCompanyEmployees(companyId: number, excludeId: number): Promise<{ id: number; first_name: string; last_name: string; position: string; department: string; avatar_url?: string }[]> {
-    const response = await fetch(`${API_URL}/?resource=company_employees&company_id=${companyId}&exclude_id=${excludeId}`);
-    if (!response.ok) throw new Error('Failed to fetch company employees');
-    return response.json();
-  },
-
-  async getEmployeeChats(userId: number, companyId: number): Promise<EmployeeChat[]> {
-    const response = await fetch(`${API_URL}/?resource=employee_chats&user_id=${userId}&company_id=${companyId}`);
-    if (!response.ok) throw new Error('Failed to fetch employee chats');
-    return response.json();
-  },
-
-  async createEmployeeChat(userId: number, peerId: number, companyId: number): Promise<{ chat_id?: number; id?: number }> {
-    const response = await fetch(`${API_URL}/?resource=employee_chats`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, peer_id: peerId, company_id: companyId })
-    });
-    if (!response.ok) throw new Error('Failed to create employee chat');
-    return response.json();
-  },
-
-  async getEmployeeMessages(chatId: number): Promise<ChatMessage[]> {
-    const response = await fetch(`${API_URL}/?resource=employee_messages&chat_id=${chatId}`);
-    if (!response.ok) throw new Error('Failed to fetch employee messages');
-    return response.json();
-  },
-
-  async sendEmployeeMessage(chatId: number, senderId: number, message: string): Promise<ChatMessage> {
-    const response = await fetch(`${API_URL}/?resource=employee_messages`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, sender_id: senderId, message })
-    });
-    if (!response.ok) throw new Error('Failed to send employee message');
-    return response.json();
-  },
-
-  async markEmployeeMessagesRead(chatId: number, readerId: number): Promise<void> {
-    await fetch(`${API_URL}/?resource=employee_messages&action=read`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, reader_id: readerId })
-    });
   }
 };

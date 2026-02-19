@@ -24,7 +24,6 @@ import { CandidateDetail } from '@/components/CandidateDetail';
 import { SubscriptionExpiredBlock } from '@/components/SubscriptionExpiredBlock';
 import Onboarding from '@/components/Onboarding';
 import ScrollableTabs from '@/components/ScrollableTabs';
-import EmployeeChat from '@/components/EmployeeChat';
 
 function Index() {
   const navigate = useNavigate();
@@ -7013,47 +7012,6 @@ function Index() {
 
 
     </>
-    );
-  };
-
-  const renderEmployeeDashboard = () => {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <header className="border-b bg-white">
-          <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
-                <Icon name="Rocket" className="text-white" size={20} />
-              </div>
-              <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              {currentUser && (
-                <span className="text-sm text-muted-foreground hidden sm:inline">
-                  {currentUser.first_name} {currentUser.last_name}
-                </span>
-              )}
-              <Button variant="ghost" onClick={handleLogout} size="sm" className="text-xs sm:text-sm">Выход</Button>
-            </div>
-          </div>
-        </header>
-
-        <div className="container mx-auto px-4 py-8">
-          <div className="mb-6 sm:mb-8">
-            <h1 className="text-xl sm:text-3xl font-bold mb-2 flex items-center gap-2 sm:gap-3">
-              <span className="text-2xl sm:text-4xl">💬</span>
-              <span className="hidden sm:inline">Чат с коллегами</span>
-              <span className="sm:hidden text-base">Чат</span>
-            </h1>
-            <p className="text-xs sm:text-base text-muted-foreground">Общайтесь с сотрудниками вашей компании</p>
-          </div>
-
-          <EmployeeChat
-            currentUserId={currentEmployeeId}
-            companyId={currentCompanyId}
-          />
-        </div>
-      </div>
     );
   };
 
