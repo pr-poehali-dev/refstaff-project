@@ -24,6 +24,7 @@ import { CandidateDetail } from '@/components/CandidateDetail';
 import { SubscriptionExpiredBlock } from '@/components/SubscriptionExpiredBlock';
 import Onboarding from '@/components/Onboarding';
 import ScrollableTabs from '@/components/ScrollableTabs';
+import GamesTab from '@/components/GamesTab';
 
 function Index() {
   const navigate = useNavigate();
@@ -5412,7 +5413,7 @@ function Index() {
           if (tab === 'notifications') setNewNotificationsCount(0);
         }}>
           <ScrollableTabs>
-            <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-7 gap-1">
+            <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-8 gap-1">
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">📢 Новости{newNewsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-purple-500 text-white border-0 leading-4">+{newNewsCount}</Badge>}</TabsTrigger>
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">💼 Вакансии{newVacanciesCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-green-500 text-white border-0 leading-4">+{newVacanciesCount}</Badge>}</TabsTrigger>
               <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">⭐ Рекомендации{newRecommendationsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-orange-500 text-white border-0 leading-4">+{newRecommendationsCount}</Badge>}</TabsTrigger>
@@ -5420,6 +5421,7 @@ function Index() {
               <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">🔔 Уведомления{newNotificationsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-red-500 text-white border-0 leading-4">+{newNotificationsCount}</Badge>}</TabsTrigger>
               <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💳 История</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
+              <TabsTrigger value="games" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🎮 Игры</TabsTrigger>
             </TabsList>
           </ScrollableTabs>
 
@@ -6161,6 +6163,12 @@ function Index() {
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          <TabsContent value="games" className="space-y-6">
+            <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">🎮 Мини-игры</h2>
+            <p className="text-sm text-muted-foreground">Отдохни и размяйся — здесь можно поиграть в перерыве</p>
+            <GamesTab />
           </TabsContent>
         </Tabs>
       </div>

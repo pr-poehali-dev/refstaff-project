@@ -1,0 +1,283 @@
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+
+// ─── Memory Game ────────────────────────────────────────────────────────────
+
+const EMOJIS = ['🚀', '⭐', '💎', '🎯', '🔥', '🏆', '💡', '🎁'];
+
+function MemoryGame() {
+  const [cards, setCards] = useState<{ id: number; emoji: string; flipped: boolean; matched: boolean }[]>([]);
+  const [selected, setSelected] = useState<number[]>([]);
+  const [moves, setMoves] = useState(0);
+  const [won, setWon] = useState(false);
+  const [bestScore, setBestScore] = useState<number | null>(() => {
+    const s = localStorage.getItem('memory_best');
+    return s ? parseInt(s) : null;
+  });
+
+  const init = useCallback(() => {
+    const pairs = [...EMOJIS, ...EMOJIS]
+      .sort(() => Math.random() - 0.5)
+      .map((emoji, i) => ({ id: i, emoji, flipped: false, matched: false }));
+    setCards(pairs);
+    setSelected([]);
+    setMoves(0);
+    setWon(false);
+  }, []);
+
+  useEffect(() => { init(); }, [init]);
+
+  useEffect(() => {
+    if (selected.length === 2) {
+      const [a, b] = selected;
+      if (cards[a].emoji === cards[b].emoji) {
+        setCards(prev => prev.map((c, i) => i === a || i === b ? { ...c, matched: true } : c));
+        setSelected([]);
+      } else {
+        const t = setTimeout(() => {
+          setCards(prev => prev.map((c, i) => i === a || i === b ? { ...c, flipped: false } : c));
+          setSelected([]);
+        }, 900);
+        return () => clearTimeout(t);
+      }
+    }
+  }, [selected, cards]);
+
+  useEffect(() => {
+    if (cards.length > 0 && cards.every(c => c.matched)) {
+      setWon(true);
+      if (bestScore === null || moves < bestScore) {
+        setBestScore(moves);
+        localStorage.setItem('memory_best', String(moves));
+      }
+    }
+  }, [cards, moves, bestScore]);
+
+  const flip = (i: number) => {
+    if (selected.length === 2 || cards[i].flipped || cards[i].matched) return;
+    setCards(prev => prev.map((c, idx) => idx === i ? { ...c, flipped: true } : c));
+    setSelected(prev => [...prev, i]);
+    if (selected.length === 1) setMoves(m => m + 1);
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <CardTitle className="text-base">🃏 Memory</CardTitle>
+          <div className="flex items-center gap-2 text-sm">
+            <Badge variant="outline">Ходов: {moves}</Badge>
+            {bestScore !== null && <Badge variant="secondary">Рекорд: {bestScore}</Badge>}
+            <Button size="sm" variant="ghost" onClick={init}>↺ Заново</Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {won ? (
+          <div className="text-center py-6 space-y-3">
+            <p className="text-4xl">🎉</p>
+            <p className="font-semibold text-lg">Победа за {moves} ходов!</p>
+            {bestScore === moves && <Badge className="bg-yellow-500 text-white">Новый рекорд!</Badge>}
+            <Button onClick={init}>Играть ещё</Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
+            {cards.map((card, i) => (
+              <button
+                key={card.id}
+                onClick={() => flip(i)}
+                className={`aspect-square rounded-lg text-2xl flex items-center justify-center transition-all duration-300 border-2 select-none
+                  ${card.flipped || card.matched
+                    ? 'bg-primary/10 border-primary/30 scale-95'
+                    : 'bg-muted border-muted-foreground/20 hover:border-primary/50 hover:scale-105 cursor-pointer'
+                  }
+                  ${card.matched ? 'opacity-50' : ''}
+                `}
+              >
+                {card.flipped || card.matched ? card.emoji : '❓'}
+              </button>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Reaction Game ───────────────────────────────────────────────────────────
+
+function ReactionGame() {
+  const [state, setState] = useState<'idle' | 'waiting' | 'ready' | 'done' | 'early'>('idle');
+  const [time, setTime] = useState<number | null>(null);
+  const [best, setBest] = useState<number | null>(() => {
+    const s = localStorage.getItem('reaction_best');
+    return s ? parseInt(s) : null;
+  });
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startRef = useRef<number>(0);
+
+  const start = () => {
+    setState('waiting');
+    const delay = 2000 + Math.random() * 3000;
+    timerRef.current = setTimeout(() => {
+      setState('ready');
+      startRef.current = Date.now();
+    }, delay);
+  };
+
+  const click = () => {
+    if (state === 'waiting') {
+      if (timerRef.current) clearTimeout(timerRef.current);
+      setState('early');
+      return;
+    }
+    if (state === 'ready') {
+      const elapsed = Date.now() - startRef.current;
+      setTime(elapsed);
+      setState('done');
+      if (best === null || elapsed < best) {
+        setBest(elapsed);
+        localStorage.setItem('reaction_best', String(elapsed));
+      }
+    }
+  };
+
+  const reset = () => { setState('idle'); setTime(null); };
+
+  const bgMap: Record<string, string> = {
+    idle: 'bg-muted hover:bg-muted/80',
+    waiting: 'bg-red-500/20 cursor-pointer',
+    ready: 'bg-green-500 cursor-pointer animate-pulse',
+    done: 'bg-blue-500/20',
+    early: 'bg-orange-500/20',
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <CardTitle className="text-base">⚡ Реакция</CardTitle>
+          {best !== null && <Badge variant="secondary">Рекорд: {best} мс</Badge>}
+        </div>
+      </CardHeader>
+      <CardContent>
+        <button
+          onClick={state === 'idle' || state === 'done' || state === 'early' ? start : click}
+          className={`w-full h-36 rounded-xl text-center transition-all duration-200 font-medium text-lg select-none ${bgMap[state]}`}
+        >
+          {state === 'idle' && '👆 Нажми, чтобы начать'}
+          {state === 'waiting' && '⏳ Жди зелёного...'}
+          {state === 'ready' && '🟢 ЖМИ!'}
+          {state === 'early' && <span>😅 Слишком рано! <br/><span className="text-sm text-muted-foreground">Нажми для повтора</span></span>}
+          {state === 'done' && time !== null && (
+            <span>
+              {time} мс {best === time && <span className="ml-1">🏆</span>}
+              <br/><span className="text-sm text-muted-foreground">Нажми для повтора</span>
+            </span>
+          )}
+        </button>
+        {(state === 'done' || state === 'early') && (
+          <Button size="sm" variant="ghost" onClick={reset} className="mt-3">↺ Сброс</Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Guess Number ────────────────────────────────────────────────────────────
+
+function GuessGame() {
+  const [secret, setSecret] = useState(() => Math.floor(Math.random() * 100) + 1);
+  const [input, setInput] = useState('');
+  const [hint, setHint] = useState('');
+  const [attempts, setAttempts] = useState(0);
+  const [won, setWon] = useState(false);
+  const [history, setHistory] = useState<{ n: number; hint: string }[]>([]);
+
+  const reset = () => {
+    setSecret(Math.floor(Math.random() * 100) + 1);
+    setInput('');
+    setHint('');
+    setAttempts(0);
+    setWon(false);
+    setHistory([]);
+  };
+
+  const guess = () => {
+    const n = parseInt(input);
+    if (isNaN(n) || n < 1 || n > 100) { setHint('Введи число от 1 до 100'); return; }
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
+    let h = '';
+    if (n === secret) { setWon(true); h = '🎯 Угадал!'; }
+    else if (n < secret) h = n < secret - 20 ? '🔼 Намного больше' : '🔼 Больше';
+    else h = n > secret + 20 ? '🔽 Намного меньше' : '🔽 Меньше';
+    setHint(h);
+    setHistory(prev => [{ n, hint: h }, ...prev]);
+    setInput('');
+  };
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <CardTitle className="text-base">🔢 Угадай число</CardTitle>
+          <div className="flex items-center gap-2">
+            <Badge variant="outline">Попыток: {attempts}</Badge>
+            <Button size="sm" variant="ghost" onClick={reset}>↺ Заново</Button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {won ? (
+          <div className="text-center py-4 space-y-3">
+            <p className="text-4xl">🎯</p>
+            <p className="font-semibold">Угадал за {attempts} {attempts === 1 ? 'попытку' : attempts < 5 ? 'попытки' : 'попыток'}!</p>
+            <Button onClick={reset}>Играть ещё</Button>
+          </div>
+        ) : (
+          <>
+            <p className="text-sm text-muted-foreground">Я загадал число от 1 до 100. Угадай его!</p>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                value={input}
+                onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && guess()}
+                placeholder="Введи число..."
+                min={1}
+                max={100}
+                className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+              />
+              <Button onClick={guess}>Проверить</Button>
+            </div>
+            {hint && <p className="text-center font-medium text-base">{hint}</p>}
+            {history.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-2">
+                {history.slice(0, 8).map((h, i) => (
+                  <Badge key={i} variant="outline" className="text-xs">{h.n} {h.hint.split(' ')[0]}</Badge>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Export ──────────────────────────────────────────────────────────────────
+
+export default function GamesTab() {
+  return (
+    <div className="grid gap-6 md:grid-cols-2">
+      <div className="md:col-span-2">
+        <MemoryGame />
+      </div>
+      <ReactionGame />
+      <GuessGame />
+    </div>
+  );
+}
