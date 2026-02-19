@@ -93,8 +93,8 @@ function VacancyApply() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!vacancy || !form.name || !form.email) {
-      alert('Заполните обязательные поля');
+    if (!vacancy || !form.name || !form.phone || !form.comment) {
+      alert('Заполните обязательные поля: ФИО, Телефон и Сопроводительное письмо');
       return;
     }
 
@@ -330,36 +330,37 @@ function VacancyApply() {
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
                       placeholder="example@mail.com"
-                      required
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="phone">Телефон</Label>
+                    <Label htmlFor="phone">Телефон *</Label>
                     <Input
                       id="phone"
                       type="tel"
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
                       placeholder="+7 (999) 123-45-67"
+                      required
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="comment">Сопроводительное письмо</Label>
+                    <Label htmlFor="comment">Сопроводительное письмо *</Label>
                     <Textarea
                       id="comment"
                       value={form.comment}
                       onChange={(e) => setForm({ ...form, comment: e.target.value })}
                       placeholder="Расскажите о себе и почему вы подходите на эту позицию..."
                       rows={4}
+                      required
                     />
                   </div>
 
@@ -378,7 +379,7 @@ function VacancyApply() {
                     )}
                   </div>
 
-                  <Button type="submit" className="w-full" size="lg">
+                  <Button type="submit" className="w-full" size="lg" disabled={!form.name || !form.phone || !form.comment}>
                     <Icon name="Send" size={18} className="mr-2" />
                     Отправить отклик
                   </Button>
