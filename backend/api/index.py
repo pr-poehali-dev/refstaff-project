@@ -917,6 +917,171 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
+        elif method == 'POST' and resource == 'employee_chats':
+            body_data = json.loads(event.get('body', '{}'))
+            user_id = body_data.get('user_id')
+            peer_id = body_data.get('peer_id')
+            company_id = body_data.get('company_id')
+            
+            p1 = min(int(user_id), int(peer_id))
+            p2 = max(int(user_id), int(peer_id))
+            
+            cur.execute("""
+                SELECT id FROM t_p65890965_refstaff_project.employee_chats
+                WHERE participant1_id = %s AND participant2_id = %s
+            """, (p1, p2))
+            existing = cur.fetchone()
+            
+            if existing:
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps({'chat_id': existing['id']}),
+                    'isBase64Encoded': False
+                }
+            
+            cur.execute("""
+                INSERT INTO t_p65890965_refstaff_project.employee_chats 
+                (company_id, participant1_id, participant2_id)
+                VALUES (%s, %s, %s)
+                RETURNING id, company_id, participant1_id, participant2_id, created_at
+            """, (company_id, p1, p2))
+            new_chat = cur.fetchone()
+            
+            return {
+                'statusCode': 201,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps(dict(new_chat), default=str),
+                'isBase64Encoded': False
+            }
+
+        elif method == 'GET' and resource == 'employee_chats':
+            user_id = query_params.get('user_id')
+            company_id = query_params.get('company_id')
+            
+            cur.execute("""
+                SELECT c.*,
+                       CASE WHEN c.participant1_id = %s THEN u2.id ELSE u1.id END as peer_id,
+                       CASE WHEN c.participant1_id = %s 
+                            THEN u2.first_name || ' ' || u2.last_name 
+                            ELSE u1.first_name || ' ' || u1.last_name END as peer_name,
+                       CASE WHEN c.participant1_id = %s THEN u2.position ELSE u1.position END as peer_position,
+                       CASE WHEN c.participant1_id = %s THEN u2.department ELSE u1.department END as peer_department,
+                       CASE WHEN c.participant1_id = %s THEN u2.avatar_url ELSE u1.avatar_url END as peer_avatar,
+                       (SELECT COUNT(*) FROM t_p65890965_refstaff_project.employee_messages 
+                        WHERE chat_id = c.id AND is_read = false AND sender_id != %s) as unread_count,
+                       (SELECT message FROM t_p65890965_refstaff_project.employee_messages 
+                        WHERE chat_id = c.id ORDER BY created_at DESC LIMIT 1) as last_message
+                FROM t_p65890965_refstaff_project.employee_chats c
+                JOIN t_p65890965_refstaff_project.users u1 ON c.participant1_id = u1.id
+                JOIN t_p65890965_refstaff_project.users u2 ON c.participant2_id = u2.id
+                WHERE c.company_id = %s AND (c.participant1_id = %s OR c.participant2_id = %s)
+                ORDER BY c.last_message_at DESC NULLS LAST
+            """, (user_id, user_id, user_id, user_id, user_id, user_id, company_id, user_id, user_id))
+            chats = cur.fetchall()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps([dict(c) for c in chats], default=str),
+                'isBase64Encoded': False
+            }
+
+        elif method == 'POST' and resource == 'employee_messages':
+            body_data = json.loads(event.get('body', '{}'))
+            chat_id = body_data.get('chat_id')
+            sender_id = body_data.get('sender_id')
+            message = body_data.get('message')
+            
+            cur.execute("""
+                INSERT INTO t_p65890965_refstaff_project.employee_messages 
+                (chat_id, sender_id, message)
+                VALUES (%s, %s, %s)
+                RETURNING id, chat_id, sender_id, message, is_read, created_at
+            """, (chat_id, sender_id, message))
+            new_msg = cur.fetchone()
+            
+            cur.execute("""
+                UPDATE t_p65890965_refstaff_project.employee_chats
+                SET last_message_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+            """, (chat_id,))
+            
+            result = dict(new_msg)
+            cur.execute("""
+                SELECT first_name || ' ' || last_name as sender_name, avatar_url as sender_avatar
+                FROM t_p65890965_refstaff_project.users WHERE id = %s
+            """, (sender_id,))
+            sender = cur.fetchone()
+            if sender:
+                result['sender_name'] = sender['sender_name']
+                result['sender_avatar'] = sender['sender_avatar']
+            
+            return {
+                'statusCode': 201,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps(result, default=str),
+                'isBase64Encoded': False
+            }
+
+        elif method == 'GET' and resource == 'employee_messages':
+            chat_id = query_params.get('chat_id')
+            
+            cur.execute("""
+                SELECT m.*,
+                       u.first_name || ' ' || u.last_name as sender_name,
+                       u.avatar_url as sender_avatar
+                FROM t_p65890965_refstaff_project.employee_messages m
+                JOIN t_p65890965_refstaff_project.users u ON m.sender_id = u.id
+                WHERE m.chat_id = %s
+                ORDER BY m.created_at ASC
+            """, (chat_id,))
+            messages = cur.fetchall()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps([dict(m) for m in messages], default=str),
+                'isBase64Encoded': False
+            }
+
+        elif method == 'PUT' and resource == 'employee_messages' and query_params.get('action') == 'read':
+            body_data = json.loads(event.get('body', '{}'))
+            chat_id = body_data.get('chat_id')
+            reader_id = body_data.get('reader_id')
+            
+            cur.execute("""
+                UPDATE t_p65890965_refstaff_project.employee_messages
+                SET is_read = true
+                WHERE chat_id = %s AND sender_id != %s AND is_read = false
+            """, (chat_id, reader_id))
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'success': True}),
+                'isBase64Encoded': False
+            }
+
+        elif method == 'GET' and resource == 'company_employees':
+            company_id = query_params.get('company_id')
+            exclude_id = query_params.get('exclude_id')
+            
+            cur.execute("""
+                SELECT id, first_name, last_name, position, department, avatar_url
+                FROM t_p65890965_refstaff_project.users
+                WHERE company_id = %s AND id != %s
+                ORDER BY first_name, last_name
+            """, (company_id, exclude_id))
+            employees = cur.fetchall()
+            
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps([dict(e) for e in employees], default=str),
+                'isBase64Encoded': False
+            }
+
         elif method == 'GET' and resource == 'stats':
             company_id = query_params.get('company_id', '1')
             
