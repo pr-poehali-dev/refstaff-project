@@ -1009,7 +1009,7 @@ function Index() {
       if (response.ok) {
         setShowRegisterDialog(false);
         setRegisterForm({ companyName: '', firstName: '', lastName: '', email: '', password: '', inn: '', employeeCount: '50' });
-        
+        if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'registration');
         alert(`✅ Регистрация успешна!\n\nМы отправили письмо с подтверждением на ${registerForm.email}.\nПожалуйста, проверьте вашу почту и перейдите по ссылке в письме для активации аккаунта.`);
       } else {
         alert(data.error || 'Ошибка регистрации');
@@ -1053,6 +1053,7 @@ function Index() {
         setUserRole(role);
         setShowLoginDialog(false);
         setLoginForm({ email: '', password: '' });
+        if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'login');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (response.status === 403) {
         setResendVerificationEmail(loginForm.email);
@@ -1367,7 +1368,7 @@ function Index() {
                   Платформа для реферального найма с геймификацией
                 </p>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center lg:justify-start">
-                  <Button size="default" className="animate-scale-in shadow-lg shadow-primary/25 text-sm sm:text-base" style={{ animationDelay: '0.2s' }} onClick={() => setShowRegisterDialog(true)} aria-label="Начать бесплатный пробный период на 14 дней">
+                  <Button size="default" className="animate-scale-in shadow-lg shadow-primary/25 text-sm sm:text-base" style={{ animationDelay: '0.2s' }} onClick={() => { setShowRegisterDialog(true); if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'click_cta_hero'); }} aria-label="Начать бесплатный пробный период на 14 дней">
                     <Icon name="Rocket" className="mr-2" size={18} aria-hidden="true" />
                     <span className="hidden sm:inline">Начать бесплатно — 14 дней</span>
                     <span className="sm:hidden">Начать бесплатно</span>
