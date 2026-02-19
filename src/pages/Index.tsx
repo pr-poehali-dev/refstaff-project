@@ -44,6 +44,7 @@ function Index() {
   const [showCompanySettingsDialog, setShowCompanySettingsDialog] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [activeChatEmployee, setActiveChatEmployee] = useState<Employee | null>(null);
+  const [lightboxImage, setLightboxImage] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showCompanyProfileDialog, setShowCompanyProfileDialog] = useState(false);
   const [showAboutDialog, setShowAboutDialog] = useState(false);
@@ -4531,15 +4532,26 @@ function Index() {
                           {msg.attachments && msg.attachments.map((att, idx) => (
                             <div key={idx} className="mt-1.5">
                               {att.type === 'image' ? (
-                                <img src={att.url} alt={att.name} className="rounded max-w-full max-h-32 sm:max-h-48 object-contain" />
+                                <img
+                                  src={att.url}
+                                  alt={att.name}
+                                  className="rounded max-w-full max-h-32 sm:max-h-48 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                                  onClick={() => setLightboxImage(att.url)}
+                                />
                               ) : (
-                                <div className="flex items-center gap-1.5 p-1.5 bg-background/10 rounded">
+                                <a
+                                  href={att.url}
+                                  download={att.name}
+                                  className="flex items-center gap-1.5 p-1.5 bg-background/10 rounded hover:bg-background/20 transition-colors group"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
                                   <Icon name="FileText" size={14} />
                                   <div className="flex-1 min-w-0">
                                     <p className="text-[10px] sm:text-xs font-medium truncate">{att.name}</p>
                                     <p className="text-[10px] sm:text-xs opacity-70">{(att.size / 1024).toFixed(1)} KB</p>
                                   </div>
-                                </div>
+                                  <Icon name="Download" size={12} className="opacity-60 group-hover:opacity-100 shrink-0" />
+                                </a>
                               )}
                             </div>
                           ))}
@@ -7213,6 +7225,35 @@ function Index() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4"
+          onClick={() => setLightboxImage(null)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white/80 hover:text-white transition-colors"
+            onClick={() => setLightboxImage(null)}
+          >
+            <Icon name="X" size={28} />
+          </button>
+          <img
+            src={lightboxImage}
+            alt=""
+            className="max-w-full max-h-full object-contain rounded-lg"
+            onClick={(e) => e.stopPropagation()}
+          />
+          <a
+            href={lightboxImage}
+            download
+            className="absolute bottom-4 right-4 bg-white/10 hover:bg-white/20 text-white rounded-lg px-4 py-2 flex items-center gap-2 text-sm transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Icon name="Download" size={16} />
+            Скачать
+          </a>
+        </div>
+      )}
     </>
   );
 }
