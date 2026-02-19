@@ -5546,7 +5546,7 @@ function Index() {
                           </DialogHeader>
                           <div className="space-y-4 pt-4">
                             <div>
-                              <Label htmlFor="candidate-name">ФИО кандидата</Label>
+                              <Label htmlFor="candidate-name">ФИО кандидата <span className="text-destructive">*</span></Label>
                               <Input 
                                 id="candidate-name" 
                                 placeholder="Иван Иванов"
