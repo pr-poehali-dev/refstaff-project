@@ -6167,7 +6167,7 @@ function Index() {
 
           <TabsContent value="games" className="space-y-6">
             <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">🎮 Мини-игры</h2>
-            <p className="text-sm text-muted-foreground">Отдохни и размяйся — здесь можно поиграть в перерыве</p>
+            <p className="text-sm text-muted-foreground">Отдохни — здесь можно поиграть в перерыве</p>
             <GamesTab />
           </TabsContent>
         </Tabs>
