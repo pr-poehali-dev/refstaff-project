@@ -649,8 +649,8 @@ function Index() {
   };
 
   const handleCreateRecommendation = async (data: { vacancyId: number; name: string; email: string; phone: string; comment: string }) => {
-    if (!data.name || !data.phone) {
-      alert('Заполните обязательные поля: ФИО и Телефон');
+    if (!data.name || !data.phone || !data.comment) {
+      alert('Заполните обязательные поля: ФИО, Телефон и Сопроводительное письмо');
       return;
     }
     
@@ -5555,7 +5555,7 @@ function Index() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor="candidate-phone">Телефон *</Label>
+                              <Label htmlFor="candidate-phone">Телефон <span className="text-destructive">*</span></Label>
                               <Input 
                                 id="candidate-phone" 
                                 placeholder="+7 (999) 123-45-67"
@@ -5575,7 +5575,7 @@ function Index() {
                               />
                             </div>
                             <div>
-                              <Label htmlFor="comment">Комментарий</Label>
+                              <Label htmlFor="comment">Сопроводительное письмо <span className="text-destructive">*</span></Label>
                               <Textarea 
                                 id="comment" 
                                 placeholder="Почему этот кандидат подходит..." 
@@ -5599,6 +5599,7 @@ function Index() {
                             </div>
                             <Button 
                               className="w-full" 
+                              disabled={!recommendationForm.name || !recommendationForm.phone || !recommendationForm.comment}
                               onClick={() => activeVacancy && handleCreateRecommendation({
                                 vacancyId: activeVacancy.id,
                                 name: recommendationForm.name,
