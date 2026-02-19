@@ -2697,7 +2697,7 @@ function Index() {
               </ul>
               <p className="text-muted-foreground mt-2">
                 Для реализации своих прав субъект может направить письменный запрос Оператору по адресу: 
-                <a href="mailto:privacy@ihunt.ru" className="text-primary hover:underline ml-1">privacy@ihunt.ru</a>
+                <a href="mailto:privacy@ihunt.ru" className="text-primary hover:underline ml-1">info@i-hunt.ru</a>
               </p>
             </div>
 
