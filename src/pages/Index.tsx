@@ -5647,7 +5647,7 @@ function Index() {
                       </div>
                       <Separator />
                       <div className="space-y-2">
-                        <Label className="text-[10px] sm:text-xs text-muted-foreground">Реферальная ссылка</Label>
+                        <Label className="text-[10px] sm:text-xs text-muted-foreground">Ссылка на вакансию</Label>
                         <div className="flex gap-1 sm:gap-2">
                           <Input 
                             value={vacancy.referralLink} 
