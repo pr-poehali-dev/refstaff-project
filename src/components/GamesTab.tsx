@@ -2,6 +2,68 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+
+const GAME_SCORES_URL = 'https://functions.poehali.dev/be3440bd-7b48-44a5-9e9b-442a9c17d5a8';
+
+const GAME_META: Record<string, { unit: string; biggerIsBetter: boolean }> = {
+  memory:    { unit: 'ходов',   biggerIsBetter: false },
+  reaction:  { unit: 'мс',      biggerIsBetter: false },
+  guess:     { unit: 'попыток', biggerIsBetter: false },
+  tictactoe: { unit: 'побед',   biggerIsBetter: true  },
+};
+
+interface Leader { name: string; avatar_url: string | null; score: number; }
+
+async function submitScore(game: string, score: number) {
+  const token = localStorage.getItem('authToken');
+  if (!token) return;
+  await fetch(GAME_SCORES_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+    body: JSON.stringify({ game, score }),
+  });
+}
+
+async function fetchLeaders(game: string): Promise<Leader[]> {
+  const res = await fetch(`${GAME_SCORES_URL}?game=${game}`);
+  const data = await res.json();
+  return data.leaders || [];
+}
+
+// ─── Leaderboard ─────────────────────────────────────────────────────────────
+
+function Leaderboard({ game, refresh }: { game: string; refresh: number }) {
+  const [leaders, setLeaders] = useState<Leader[]>([]);
+  const [loading, setLoading] = useState(true);
+  const meta = GAME_META[game];
+
+  useEffect(() => {
+    setLoading(true);
+    fetchLeaders(game).then(l => { setLeaders(l); setLoading(false); });
+  }, [game, refresh]);
+
+  if (loading) return <p className="text-xs text-muted-foreground text-center py-2">Загрузка...</p>;
+  if (leaders.length === 0) return <p className="text-xs text-muted-foreground text-center py-2">Пока нет рекордов. Будь первым!</p>;
+
+  const medals = ['🥇', '🥈', '🥉'];
+
+  return (
+    <div className="space-y-1.5">
+      {leaders.map((l, i) => (
+        <div key={i} className="flex items-center gap-2 text-sm">
+          <span className="w-5 text-center text-base">{medals[i] || `${i + 1}`}</span>
+          <Avatar className="h-6 w-6">
+            <AvatarImage src={l.avatar_url || ''} />
+            <AvatarFallback className="text-[10px]">{l.name[0]}</AvatarFallback>
+          </Avatar>
+          <span className="flex-1 truncate font-medium">{l.name}</span>
+          <span className="text-muted-foreground text-xs">{l.score} {meta.unit}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 // ─── Memory Game ────────────────────────────────────────────────────────────
 
@@ -16,6 +78,7 @@ function MemoryGame() {
     const s = localStorage.getItem('memory_best');
     return s ? parseInt(s) : null;
   });
+  const [lbRefresh, setLbRefresh] = useState(0);
 
   const init = useCallback(() => {
     const pairs = [...EMOJIS, ...EMOJIS]
@@ -48,9 +111,11 @@ function MemoryGame() {
   useEffect(() => {
     if (cards.length > 0 && cards.every(c => c.matched)) {
       setWon(true);
-      if (bestScore === null || moves < bestScore) {
+      const isNew = bestScore === null || moves < bestScore;
+      if (isNew) {
         setBestScore(moves);
         localStorage.setItem('memory_best', String(moves));
+        submitScore('memory', moves).then(() => setLbRefresh(r => r + 1));
       }
     }
   }, [cards, moves, bestScore]);
@@ -63,20 +128,20 @@ function MemoryGame() {
   };
 
   return (
-    <Card>
+    <Card className="md:col-span-2">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-base">🃏 Memory</CardTitle>
           <div className="flex items-center gap-2 text-sm">
             <Badge variant="outline">Ходов: {moves}</Badge>
-            {bestScore !== null && <Badge variant="secondary">Рекорд: {bestScore}</Badge>}
+            {bestScore !== null && <Badge variant="secondary">Мой рекорд: {bestScore}</Badge>}
             <Button size="sm" variant="ghost" onClick={init}>↺ Заново</Button>
           </div>
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         {won ? (
-          <div className="text-center py-6 space-y-3">
+          <div className="text-center py-4 space-y-3">
             <p className="text-4xl">🎉</p>
             <p className="font-semibold text-lg">Победа за {moves} ходов!</p>
             {bestScore === moves && <Badge className="bg-yellow-500 text-white">Новый рекорд!</Badge>}
@@ -89,10 +154,7 @@ function MemoryGame() {
                 key={card.id}
                 onClick={() => flip(i)}
                 className={`aspect-square rounded-lg text-2xl flex items-center justify-center transition-all duration-300 border-2 select-none
-                  ${card.flipped || card.matched
-                    ? 'bg-primary/10 border-primary/30 scale-95'
-                    : 'bg-muted border-muted-foreground/20 hover:border-primary/50 hover:scale-105 cursor-pointer'
-                  }
+                  ${card.flipped || card.matched ? 'bg-primary/10 border-primary/30 scale-95' : 'bg-muted border-muted-foreground/20 hover:border-primary/50 hover:scale-105 cursor-pointer'}
                   ${card.matched ? 'opacity-50' : ''}
                 `}
               >
@@ -101,6 +163,10 @@ function MemoryGame() {
             ))}
           </div>
         )}
+        <div className="border-t pt-3">
+          <p className="text-xs font-semibold text-muted-foreground mb-2">🏆 Таблица лидеров</p>
+          <Leaderboard game="memory" refresh={lbRefresh} />
+        </div>
       </CardContent>
     </Card>
   );
@@ -115,6 +181,7 @@ function ReactionGame() {
     const s = localStorage.getItem('reaction_best');
     return s ? parseInt(s) : null;
   });
+  const [lbRefresh, setLbRefresh] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startRef = useRef<number>(0);
 
@@ -140,6 +207,7 @@ function ReactionGame() {
       if (best === null || elapsed < best) {
         setBest(elapsed);
         localStorage.setItem('reaction_best', String(elapsed));
+        submitScore('reaction', elapsed).then(() => setLbRefresh(r => r + 1));
       }
     }
   };
@@ -159,28 +227,29 @@ function ReactionGame() {
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <CardTitle className="text-base">⚡ Реакция</CardTitle>
-          {best !== null && <Badge variant="secondary">Рекорд: {best} мс</Badge>}
+          {best !== null && <Badge variant="secondary">Мой рекорд: {best} мс</Badge>}
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <button
           onClick={state === 'idle' || state === 'done' || state === 'early' ? start : click}
-          className={`w-full h-36 rounded-xl text-center transition-all duration-200 font-medium text-lg select-none ${bgMap[state]}`}
+          className={`w-full h-32 rounded-xl text-center transition-all duration-200 font-medium text-lg select-none ${bgMap[state]}`}
         >
           {state === 'idle' && '👆 Нажми, чтобы начать'}
           {state === 'waiting' && '⏳ Жди зелёного...'}
           {state === 'ready' && '🟢 ЖМИ!'}
-          {state === 'early' && <span>😅 Слишком рано! <br /><span className="text-sm text-muted-foreground">Нажми для повтора</span></span>}
+          {state === 'early' && <span>😅 Слишком рано!<br /><span className="text-sm text-muted-foreground">Нажми для повтора</span></span>}
           {state === 'done' && time !== null && (
-            <span>
-              {time} мс {best === time && <span className="ml-1">🏆</span>}
-              <br /><span className="text-sm text-muted-foreground">Нажми для повтора</span>
-            </span>
+            <span>{time} мс {best === time && '🏆'}<br /><span className="text-sm text-muted-foreground">Нажми для повтора</span></span>
           )}
         </button>
         {(state === 'done' || state === 'early') && (
-          <Button size="sm" variant="ghost" onClick={reset} className="mt-3">↺ Сброс</Button>
+          <Button size="sm" variant="ghost" onClick={reset}>↺ Сброс</Button>
         )}
+        <div className="border-t pt-3">
+          <p className="text-xs font-semibold text-muted-foreground mb-2">🏆 Таблица лидеров</p>
+          <Leaderboard game="reaction" refresh={lbRefresh} />
+        </div>
       </CardContent>
     </Card>
   );
@@ -195,6 +264,7 @@ function GuessGame() {
   const [attempts, setAttempts] = useState(0);
   const [won, setWon] = useState(false);
   const [history, setHistory] = useState<{ n: number; hint: string }[]>([]);
+  const [lbRefresh, setLbRefresh] = useState(0);
 
   const reset = () => {
     setSecret(Math.floor(Math.random() * 100) + 1);
@@ -211,9 +281,15 @@ function GuessGame() {
     const newAttempts = attempts + 1;
     setAttempts(newAttempts);
     let h = '';
-    if (n === secret) { setWon(true); h = '🎯 Угадал!'; }
-    else if (n < secret) h = n < secret - 20 ? '🔼 Намного больше' : '🔼 Больше';
-    else h = n > secret + 20 ? '🔽 Намного меньше' : '🔽 Меньше';
+    if (n === secret) {
+      setWon(true);
+      h = '🎯 Угадал!';
+      submitScore('guess', newAttempts).then(() => setLbRefresh(r => r + 1));
+    } else if (n < secret) {
+      h = n < secret - 20 ? '🔼 Намного больше' : '🔼 Больше';
+    } else {
+      h = n > secret + 20 ? '🔽 Намного меньше' : '🔽 Меньше';
+    }
     setHint(h);
     setHistory(prev => [{ n, hint: h }, ...prev]);
     setInput('');
@@ -255,7 +331,7 @@ function GuessGame() {
             </div>
             {hint && <p className="text-center font-medium text-base">{hint}</p>}
             {history.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex flex-wrap gap-2">
                 {history.slice(0, 8).map((h, i) => (
                   <Badge key={i} variant="outline" className="text-xs">{h.n} {h.hint.split(' ')[0]}</Badge>
                 ))}
@@ -263,6 +339,10 @@ function GuessGame() {
             )}
           </>
         )}
+        <div className="border-t pt-3">
+          <p className="text-xs font-semibold text-muted-foreground mb-2">🏆 Таблица лидеров</p>
+          <Leaderboard game="guess" refresh={lbRefresh} />
+        </div>
       </CardContent>
     </Card>
   );
@@ -287,14 +367,8 @@ function checkWinner(board: TTTCell[]): { winner: TTTCell; line: number[] } | nu
 
 function botMove(board: TTTCell[]): number {
   const empty = board.map((v, i) => v === null ? i : -1).filter(i => i !== -1);
-  for (const i of empty) {
-    const b = [...board]; b[i] = 'O';
-    if (checkWinner(b)) return i;
-  }
-  for (const i of empty) {
-    const b = [...board]; b[i] = 'X';
-    if (checkWinner(b)) return i;
-  }
+  for (const i of empty) { const b = [...board]; b[i] = 'O'; if (checkWinner(b)) return i; }
+  for (const i of empty) { const b = [...board]; b[i] = 'X'; if (checkWinner(b)) return i; }
   if (board[4] === null) return 4;
   const corners = [0,2,6,8].filter(i => board[i] === null);
   if (corners.length) return corners[Math.floor(Math.random() * corners.length)];
@@ -306,17 +380,22 @@ function TicTacToe() {
   const [isX, setIsX] = useState(true);
   const [scores, setScores] = useState({ you: 0, bot: 0, draw: 0 });
   const [blocked, setBlocked] = useState(false);
+  const [lbRefresh, setLbRefresh] = useState(0);
 
   const result = checkWinner(board);
   const isDraw = !result && board.every(Boolean);
 
   useEffect(() => {
-    if (result || isDraw) {
-      setScores(s => ({
-        you: s.you + (result?.winner === 'X' ? 1 : 0),
-        bot: s.bot + (result?.winner === 'O' ? 1 : 0),
-        draw: s.draw + (isDraw ? 1 : 0),
-      }));
+    if (result?.winner === 'X') {
+      setScores(s => {
+        const newYou = s.you + 1;
+        submitScore('tictactoe', newYou).then(() => setLbRefresh(r => r + 1));
+        return { ...s, you: newYou };
+      });
+    } else if (result?.winner === 'O') {
+      setScores(s => ({ ...s, bot: s.bot + 1 }));
+    } else if (isDraw) {
+      setScores(s => ({ ...s, draw: s.draw + 1 }));
     }
   }, [result, isDraw]);
 
@@ -345,7 +424,6 @@ function TicTacToe() {
   };
 
   const reset = () => { setBoard(Array(9).fill(null)); setIsX(true); setBlocked(false); };
-
   const winLine = result?.line ?? [];
 
   return (
@@ -384,6 +462,10 @@ function TicTacToe() {
             </button>
           ))}
         </div>
+        <div className="border-t pt-3">
+          <p className="text-xs font-semibold text-muted-foreground mb-2">🏆 Таблица лидеров</p>
+          <Leaderboard game="tictactoe" refresh={lbRefresh} />
+        </div>
       </CardContent>
     </Card>
   );
@@ -394,9 +476,7 @@ function TicTacToe() {
 export default function GamesTab() {
   return (
     <div className="grid gap-6 md:grid-cols-2">
-      <div className="md:col-span-2">
-        <MemoryGame />
-      </div>
+      <MemoryGame />
       <ReactionGame />
       <GuessGame />
       <TicTacToe />

@@ -1,4 +1,5 @@
 {
+  "game-scores": "https://functions.poehali.dev/be3440bd-7b48-44a5-9e9b-442a9c17d5a8",
   "notify-company": "https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be",
   "get-company-by-token": "https://functions.poehali.dev/f1f66940-161e-4221-a729-4e0e555af034",
   "reset-password": "https://functions.poehali.dev/490186ec-0761-4387-8b05-813aea3e8f94",
