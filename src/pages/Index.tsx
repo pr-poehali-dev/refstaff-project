@@ -1869,9 +1869,7 @@ function Index() {
               </ul>
             </nav>
           </div>
-          <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t text-center text-xs sm:text-sm text-muted-foreground">
-            © 2025 iHUNT. Все права защищены.
-          </div>
+          <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t text-center text-xs sm:text-sm text-muted-foreground">© 2026 iHUNT. Все права защищены.</div>
         </div>
       </footer>
 
