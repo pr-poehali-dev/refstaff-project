@@ -3265,7 +3265,7 @@ function Index() {
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button variant="outline" onClick={handleGenerateReferralLink} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
                   <Icon name="Link" className="mr-1 sm:mr-2" size={16} />
-                  <span className="hidden md:inline">Ссылка для регистрации</span>
+                  <span className="hidden md:inline">Добавить сотрудника</span>
                   <span className="md:hidden">Ссылка</span>
                 </Button>
                 <Button onClick={() => setShowInviteDialog(true)} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
