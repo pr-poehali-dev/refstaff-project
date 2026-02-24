@@ -3302,11 +3302,7 @@ function Index() {
                   <span className="hidden md:inline">Добавить сотрудника</span>
                   <span className="md:hidden">Ссылка</span>
                 </Button>
-                <Button onClick={() => setShowInviteDialog(true)} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                  <Icon name="UserPlus" className="mr-1 sm:mr-2" size={16} />
-                  <span className="hidden md:inline">Добавить сотрудника</span>
-                  <span className="md:hidden">Добавить</span>
-                </Button>
+
               </div>
             </div>
             <div className="mb-4">
