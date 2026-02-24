@@ -29,5 +29,23 @@
       },
       "bodyMatcher": "partial"
     }
+  ,
+    {
+      "name": "Send invite email successfully",
+      "method": "POST",
+      "path": "/",
+      "body": {
+        "action": "invite_employee",
+        "to_email": "test@example.com",
+        "invite_link": "https://project.poehali.dev/employee-register?token=abc123",
+        "company_name": "ООО Тест",
+        "base_url": "https://project.poehali.dev"
+      },
+      "expectedStatus": 200,
+      "expectedBody": {
+        "message": "string"
+      },
+      "bodyMatcher": "partial"
+    }
   ]
 }

@@ -54,29 +54,47 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
 
     body_data = json.loads(event.get('body', '{}'))
+    action = body_data.get('action', 'verify_email')
     to_email = body_data.get('to_email')
-    user_name = body_data.get('user_name', '')
-    verification_token = body_data.get('verification_token')
     base_url = body_data.get('base_url', 'https://i-hunt.ru')
-    user_type = body_data.get('user_type', 'employee')  # 'company' или 'employee'
 
-    if not to_email or not verification_token:
+    if not to_email:
         return {
             'statusCode': 400,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json.dumps({'error': 'Missing required fields'}),
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Missing to_email'}),
             'isBase64Encoded': False
         }
 
-    verification_url = f"{base_url}/verify-email?token={verification_token}"
-
-    html_content = create_verification_email_html(user_name, verification_url, user_type)
+    if action == 'invite_employee':
+        invite_link = body_data.get('invite_link', '')
+        company_name = body_data.get('company_name', 'Компания')
+        if not invite_link:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Missing invite_link'}),
+                'isBase64Encoded': False
+            }
+        html_content = create_invite_email_html(company_name, invite_link)
+        subject = f'Приглашение на платформу iHUNT от {company_name}'
+    else:
+        user_name = body_data.get('user_name', '')
+        verification_token = body_data.get('verification_token')
+        user_type = body_data.get('user_type', 'employee')
+        if not verification_token:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Missing verification_token'}),
+                'isBase64Encoded': False
+            }
+        verification_url = f"{base_url}/verify-email?token={verification_token}"
+        html_content = create_verification_email_html(user_name, verification_url, user_type)
+        subject = 'Подтвердите вашу электронную почту'
 
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = 'Подтвердите вашу электронную почту'
+    msg['Subject'] = subject
     msg['From'] = smtp_user
     msg['To'] = to_email
 
@@ -110,6 +128,49 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             'body': json.dumps({'error': 'Failed to send email'}),
             'isBase64Encoded': False
         }
+
+
+def create_invite_email_html(company_name: str, invite_link: str) -> str:
+    """Создает HTML письмо-приглашение сотрудника в компанию"""
+    return f"""<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background-color:#f5f5f5;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f5f5;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background-color:#ffffff;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden;">
+        <tr><td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:40px 30px;text-align:center;">
+          <h1 style="margin:0;color:#ffffff;font-size:28px;font-weight:600;">🎯 iHUNT</h1>
+          <p style="margin:10px 0 0;color:rgba(255,255,255,0.9);font-size:16px;">Платформа поиска талантов</p>
+        </td></tr>
+        <tr><td style="padding:40px 30px;">
+          <h2 style="margin:0 0 20px;color:#1a1a1a;font-size:24px;font-weight:600;">Вас приглашают в команду! 👋</h2>
+          <p style="margin:0 0 20px;color:#4a5568;font-size:16px;line-height:1.6;">
+            Компания <strong>{company_name}</strong> приглашает вас зарегистрироваться на платформе <strong>iHUNT</strong> и начать зарабатывать на рекомендациях коллег.
+          </p>
+          <p style="margin:0 0 30px;color:#4a5568;font-size:16px;line-height:1.6;">
+            Нажмите на кнопку ниже, чтобы создать аккаунт — вы автоматически будете привязаны к компании {company_name}.
+          </p>
+          <table width="100%" cellpadding="0" cellspacing="0">
+            <tr><td align="center" style="padding:10px 0 30px;">
+              <a href="{invite_link}" style="display:inline-block;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#ffffff;text-decoration:none;padding:16px 40px;border-radius:8px;font-size:18px;font-weight:600;">
+                Зарегистрироваться →
+              </a>
+            </td></tr>
+          </table>
+          <p style="margin:0;color:#a0aec0;font-size:12px;line-height:1.6;">
+            Если кнопка не работает, скопируйте эту ссылку в браузер:<br>
+            <a href="{invite_link}" style="color:#667eea;word-break:break-all;">{invite_link}</a>
+          </p>
+        </td></tr>
+        <tr><td style="background-color:#f7fafc;padding:20px 30px;text-align:center;border-top:1px solid #e2e8f0;">
+          <p style="margin:0;color:#a0aec0;font-size:12px;">© 2026 iHUNT. Платформа реферального рекрутинга</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>"""
 
 
 def create_verification_email_html(user_name: str, verification_url: str, user_type: str = 'employee') -> str:

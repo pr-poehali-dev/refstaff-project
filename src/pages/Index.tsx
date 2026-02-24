@@ -241,6 +241,9 @@ function Index() {
 
   const [referralLink, setReferralLink] = useState('');
   const [showReferralLinkDialog, setShowReferralLinkDialog] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteSending, setInviteSending] = useState(false);
+  const [inviteSent, setInviteSent] = useState(false);
   const [activeRecommendation, setActiveRecommendation] = useState<Recommendation | null>(null);
   const [showRecommendationDetailsDialog, setShowRecommendationDetailsDialog] = useState(false);
   const [loginType, setLoginType] = useState<'employer' | 'employee'>('employer');
@@ -775,6 +778,37 @@ function Index() {
   const handleCopyLink = (link: string) => {
     navigator.clipboard.writeText(link);
     alert('Ссылка скопирована в буфер обмена');
+  };
+
+  const handleSendEmailInvite = async () => {
+    if (!inviteEmail || !inviteEmail.includes('@')) {
+      alert('Введите корректный email');
+      return;
+    }
+    setInviteSending(true);
+    try {
+      const res = await fetch('https://functions.poehali.dev/f3ec5cfe-f5d1-4d21-9161-70bd08bed000', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'invite_employee',
+          to_email: inviteEmail,
+          invite_link: referralLink,
+          company_name: company?.name || 'Компания',
+          base_url: window.location.origin
+        })
+      });
+      if (res.ok) {
+        setInviteSent(true);
+        setInviteEmail('');
+      } else {
+        alert('Не удалось отправить приглашение. Попробуйте ещё раз.');
+      }
+    } catch {
+      alert('Ошибка при отправке. Проверьте подключение к интернету.');
+    } finally {
+      setInviteSending(false);
+    }
   };
 
   const handleUpdateProfile = async () => {
@@ -7091,6 +7125,31 @@ function Index() {
                   <Icon name="Copy" size={16} />
                 </Button>
               </div>
+            </div>
+
+            <div>
+              <Label className="font-medium">Пригласить по email</Label>
+              <p className="text-xs text-muted-foreground mt-1 mb-2">Сотрудник получит письмо со ссылкой для регистрации</p>
+              {inviteSent ? (
+                <div className="flex items-center gap-2 text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3 text-sm">
+                  <Icon name="CheckCircle" size={16} />
+                  Приглашение отправлено! Можно отправить ещё одно.
+                  <button className="ml-auto underline text-xs" onClick={() => setInviteSent(false)}>Ещё</button>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <Input
+                    type="email"
+                    placeholder="email@example.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleSendEmailInvite()}
+                  />
+                  <Button onClick={handleSendEmailInvite} disabled={inviteSending}>
+                    {inviteSending ? <Icon name="Loader2" size={16} className="animate-spin" /> : <Icon name="Send" size={16} />}
+                  </Button>
+                </div>
+              )}
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
