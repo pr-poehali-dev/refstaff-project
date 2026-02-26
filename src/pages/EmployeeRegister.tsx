@@ -79,7 +79,17 @@ function EmployeeRegister() {
     setMeta('name', 'twitter:title', title);
     setMeta('name', 'twitter:description', description);
     setMeta('name', 'twitter:image', image);
-  }, []);
+
+    const proxyUrl = `https://functions.poehali.dev/44878f98-7873-41f8-a3b0-f47731016858?type=employee${inviteToken ? `&id=${inviteToken}` : ''}`;
+    let shareLink = document.querySelector('link[data-og-proxy]') as HTMLLinkElement;
+    if (!shareLink) {
+      shareLink = document.createElement('link');
+      shareLink.setAttribute('rel', 'alternate');
+      shareLink.setAttribute('data-og-proxy', 'true');
+      document.head.appendChild(shareLink);
+    }
+    shareLink.setAttribute('href', proxyUrl);
+  }, [inviteToken]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

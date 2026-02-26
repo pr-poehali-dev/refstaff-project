@@ -13,6 +13,12 @@
       "expectedStatus": 200
     },
     {
+      "name": "Employee register OG proxy returns HTML",
+      "method": "GET",
+      "path": "/?type=employee&id=6e0a28a7a23b3c7620ba603aea4e0b04",
+      "expectedStatus": 200
+    },
+    {
       "name": "Missing params returns 400",
       "method": "GET",
       "path": "/",

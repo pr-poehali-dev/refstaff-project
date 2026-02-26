@@ -13,6 +13,7 @@ APP_URL = 'https://refstaff.poehali.dev'
 
 VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/527161af-5ca6-4a19-a62f-86e2a76c97b8.jpg'
 REFERRAL_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/032a8a8d-15a3-4c23-85e1-3c02c8f864c7.jpg'
+EMPLOYEE_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/1a4f08a4-f047-444f-aab6-82e0357b0c94.jpg'
 
 BOT_AGENTS = [
     'vkshare', 'facebookexternalhit', 'twitterbot', 'telegrambot',
@@ -89,14 +90,34 @@ def handler(event: dict, context) -> dict:
     page_type = query.get('type', '')
     page_id = query.get('id', '')
 
-    if not page_type or not page_id:
+    if not page_type:
         return {
             'statusCode': 400,
             'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
-            'body': json.dumps({'error': 'type and id are required'})
+            'body': json.dumps({'error': 'type is required'})
         }
 
     try:
+        if page_type == 'employee':
+            token = query.get('id', '')
+            redirect_url = f'{APP_URL}/employee-register' + (f'?token={token}' if token else '')
+            title = 'Получай вознаграждение за рекомендацию наших вакансий | iHUNT'
+            description = 'Зарегистрируйся и рекомендуй вакансии своим знакомым — получай денежное вознаграждение за каждого успешного кандидата.'
+            image = EMPLOYEE_IMAGE
+            html = build_html(title, description, image, redirect_url, redirect_url)
+            return {
+                'statusCode': 200,
+                'headers': {**CORS_HEADERS, 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=300'},
+                'body': html
+            }
+
+        if not page_id:
+            return {
+                'statusCode': 400,
+                'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
+                'body': json.dumps({'error': 'id is required'})
+            }
+
         if page_type == 'vacancy':
             vacancy = fetch_vacancy_by_id(page_id)
             redirect_url = f'{APP_URL}/vacancy/{page_id}'
