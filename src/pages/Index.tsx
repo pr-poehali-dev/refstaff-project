@@ -3400,18 +3400,6 @@ function Index() {
                             </div>
                           </DialogContent>
                         </Dialog>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEmployeeToDelete(employee);
-                            setShowDeleteDialog(true);
-                          }}
-                          className="flex-1 sm:flex-none text-xs sm:text-sm"
-                        >
-                          <Icon name="Trash2" size={16} className="text-destructive" />
-                        </Button>
                       </div>
                     </div>
                     <div className="flex sm:hidden flex-wrap gap-1 sm:gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
@@ -3497,18 +3485,6 @@ function Index() {
                             </div>
                           </DialogContent>
                         </Dialog>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEmployeeToDelete(employee);
-                            setShowDeleteDialog(true);
-                          }}
-                          className="flex-1 sm:flex-none text-xs sm:text-sm"
-                        >
-                          <Icon name="Trash2" size={16} className="text-destructive" />
-                        </Button>
                     </div>
                     <Badge variant="outline" className="mt-2">Уровень {employee.level}</Badge>
                   </CardHeader>
@@ -4939,50 +4915,6 @@ function Index() {
                 }}
               >
                 Отмена
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Удалить сотрудника?</DialogTitle>
-            <DialogDescription>
-              Вы уверены, что хотите удалить {employeeToDelete?.name} из компании?
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <Icon name="AlertTriangle" className="text-destructive mt-0.5" size={20} />
-                <div className="flex-1 text-sm">
-                  <p className="font-medium text-destructive mb-1">Внимание!</p>
-                  <p className="text-muted-foreground">
-                    Это действие нельзя отменить. Сотрудник потеряет доступ к системе, но его рекомендации и статистика сохранятся.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => {
-                  setShowDeleteDialog(false);
-                  setEmployeeToDelete(null);
-                }}
-              >
-                Отмена
-              </Button>
-              <Button 
-                variant="destructive" 
-                className="flex-1"
-                onClick={() => employeeToDelete && handleDeleteEmployee(employeeToDelete.id)}
-              >
-                <Icon name="Trash2" className="mr-2" size={16} />
-                Удалить
               </Button>
             </div>
           </div>
