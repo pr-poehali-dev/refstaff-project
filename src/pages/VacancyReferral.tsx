@@ -35,7 +35,7 @@ function VacancyReferral() {
 
   useEffect(() => {
     if (vacancy) {
-      const ogImageUrl = `https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/6347791e-1dfb-48fb-b4ac-1b8937fc314f.jpg`;
+      const ogImageUrl = `https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/032a8a8d-15a3-4c23-85e1-3c02c8f864c7.jpg`;
       const vacancyUrl = `${window.location.origin}/r/${token}${referrerId ? `?ref=${referrerId}` : ''}`;
       
       document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
