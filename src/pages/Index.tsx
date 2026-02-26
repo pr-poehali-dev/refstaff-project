@@ -3948,9 +3948,7 @@ function Index() {
               <Icon name="CreditCard" className="mr-2" size={18} />
               Продлить подписку
             </Button>
-            <Button variant="outline" className="w-full">
-              История платежей
-            </Button>
+
             {subscriptionDaysLeft < 7 && (
               <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
                 <div className="flex items-start gap-3">
