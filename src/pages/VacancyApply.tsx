@@ -33,7 +33,7 @@ function VacancyApply() {
 
   useEffect(() => {
     if (vacancy) {
-      const ogImageUrl = `https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/6347791e-1dfb-48fb-b4ac-1b8937fc314f.jpg`;
+      const ogImageUrl = `https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/527161af-5ca6-4a19-a62f-86e2a76c97b8.jpg`;
       const vacancyUrl = `${window.location.origin}/vacancy/${vacancy.id}`;
       
       document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
