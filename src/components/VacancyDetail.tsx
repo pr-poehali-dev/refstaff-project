@@ -10,11 +10,12 @@ interface VacancyDetailProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRecommend?: () => void;
+  onRestore?: (id: number) => void;
   showRecommendButton?: boolean;
   showPublicLink?: boolean;
 }
 
-export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRecommendButton = true, showPublicLink = true }: VacancyDetailProps) {
+export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRestore, showRecommendButton = true, showPublicLink = true }: VacancyDetailProps) {
   if (!vacancy) return null;
 
   return (
@@ -178,6 +179,13 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, showRe
                 </div>
               </div>
             </>
+          )}
+
+          {vacancy.status === 'archived' && onRestore && (
+            <Button className="w-full" size="lg" variant="outline" onClick={() => onRestore(vacancy.id)}>
+              <Icon name="RotateCcw" size={18} className="mr-2" />
+              Активировать вакансию
+            </Button>
           )}
 
           {showRecommendButton && vacancy.status === 'active' && onRecommend && (

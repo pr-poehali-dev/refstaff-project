@@ -6667,6 +6667,7 @@ function Index() {
             setShowRecommendDialog(true);
           }
         }}
+        onRestore={userRole === 'employer' ? (id) => { handleRestoreVacancy(id); setShowVacancyDetail(false); } : undefined}
       />
 
       <Dialog open={showRecommendDialog} onOpenChange={setShowRecommendDialog}>
