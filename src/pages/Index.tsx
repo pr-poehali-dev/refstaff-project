@@ -776,6 +776,7 @@ function Index() {
     if (company?.invite_token) {
       const link = `${window.location.origin}/employee-register?token=${company.invite_token}`;
       setReferralLink(link);
+      setShowEmployeeDetail(false);
       setShowReferralLinkDialog(true);
     } else {
       alert('Ошибка: токен компании не найден');
