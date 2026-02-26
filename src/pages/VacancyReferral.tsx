@@ -114,8 +114,8 @@ function VacancyReferral() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!vacancy || !form.name || !form.email) {
-      alert('Заполните обязательные поля');
+    if (!vacancy || !form.name || !form.phone || !form.comment) {
+      alert('Заполните обязательные поля: ФИО, Телефон и Сопроводительное письмо');
       return;
     }
 
@@ -320,36 +320,37 @@ function VacancyReferral() {
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email *</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
                       placeholder="ivan@example.com"
                       value={form.email}
                       onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      required
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="phone">Телефон</Label>
+                    <Label htmlFor="phone">Телефон *</Label>
                     <Input
                       id="phone"
                       type="tel"
                       placeholder="+7 (999) 123-45-67"
                       value={form.phone}
                       onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                      required
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="comment">Сопроводительное письмо</Label>
+                    <Label htmlFor="comment">Сопроводительное письмо *</Label>
                     <Textarea
                       id="comment"
                       placeholder="Расскажите, почему вы подходите на эту позицию..."
                       rows={4}
                       value={form.comment}
                       onChange={(e) => setForm({ ...form, comment: e.target.value })}
+                      required
                     />
                   </div>
 
