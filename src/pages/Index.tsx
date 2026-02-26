@@ -3113,7 +3113,7 @@ function Index() {
                               className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
                               <Icon name="RotateCcw" size={12} className="sm:mr-1" />
-                              <span className="hidden sm:inline">Активировать</span>
+                              <span>Активировать</span>
                             </Button>
                             <Button 
                               variant="destructive" 
