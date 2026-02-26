@@ -4977,9 +4977,7 @@ function Index() {
               >
                 Изменить тарифный план
               </Button>
-              <Button variant="ghost" className="w-full text-muted-foreground">
-                История платежей
-              </Button>
+
               
               <Button 
                 variant="destructive" 
