@@ -4590,7 +4590,7 @@ function Index() {
       <Dialog open={showEditEmployeeDialog} onOpenChange={setShowEditEmployeeDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Редактировать данные сотрудника</DialogTitle>
+            <DialogTitle>Данные сотрудника</DialogTitle>
             <DialogDescription>
               Обновите информацию о {employeeToEdit?.name}
             </DialogDescription>
