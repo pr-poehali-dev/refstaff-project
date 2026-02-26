@@ -3394,17 +3394,21 @@ function Index() {
                                   onCheckedChange={(checked) => setRolesForm({...rolesForm, isHrManager: checked as boolean})}
                                 />
                               </div>
-                              <Separator />
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <Label>Администратор</Label>
-                                  <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
-                                </div>
-                                <Checkbox
-                                  checked={rolesForm.isAdmin}
-                                  onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
-                                />
-                              </div>
+                              {currentUser?.role === 'admin' && (
+                                <>
+                                  <Separator />
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <Label>Администратор</Label>
+                                      <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
+                                    </div>
+                                    <Checkbox
+                                      checked={rolesForm.isAdmin}
+                                      onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
+                                    />
+                                  </div>
+                                </>
+                              )}
                               <Button className="w-full" onClick={handleUpdateEmployeeRoles}>Сохранить</Button>
                             </div>
                           </DialogContent>
@@ -3479,17 +3483,21 @@ function Index() {
                                   onCheckedChange={(checked) => setRolesForm({...rolesForm, isHrManager: checked as boolean})}
                                 />
                               </div>
-                              <Separator />
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <Label>Администратор</Label>
-                                  <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
-                                </div>
-                                <Checkbox
-                                  checked={rolesForm.isAdmin}
-                                  onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
-                                />
-                              </div>
+                              {currentUser?.role === 'admin' && (
+                                <>
+                                  <Separator />
+                                  <div className="flex items-center justify-between">
+                                    <div>
+                                      <Label>Администратор</Label>
+                                      <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
+                                    </div>
+                                    <Checkbox
+                                      checked={rolesForm.isAdmin}
+                                      onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
+                                    />
+                                  </div>
+                                </>
+                              )}
                               <Button className="w-full" onClick={handleUpdateEmployeeRoles}>Сохранить</Button>
                             </div>
                           </DialogContent>
