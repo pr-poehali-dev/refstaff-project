@@ -33,7 +33,7 @@ function VacancyApply() {
 
   useEffect(() => {
     if (vacancy) {
-      const ogImageUrl = `https://functions.poehali.dev/c7d354d0-8ca6-4954-9c7d-d831a0fee869?title=${encodeURIComponent(vacancy.title)}&department=${encodeURIComponent(vacancy.department)}&salary=${encodeURIComponent(vacancy.salary_display)}`;
+      const ogImageUrl = `https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/6347791e-1dfb-48fb-b4ac-1b8937fc314f.jpg`;
       const vacancyUrl = `${window.location.origin}/vacancy/${vacancy.id}`;
       
       document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
