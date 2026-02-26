@@ -58,7 +58,41 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             company_id = query_params.get('company_id', '1')
             status = query_params.get('status', 'all')
             user_id = query_params.get('user_id')
-            
+            vacancy_id = query_params.get('vacancy_id')
+            referral_token = query_params.get('referral_token')
+
+            if vacancy_id:
+                cur.execute(
+                    f"""SELECT v.id, v.title, v.department, v.salary_display, v.status,
+                               v.reward_amount, v.payout_delay_days, v.requirements, v.description,
+                               v.referral_token, v.created_at, 0 as recommendations_count
+                        FROM t_p65890965_refstaff_project.vacancies v WHERE v.id = %s""",
+                    (vacancy_id,)
+                )
+                row = cur.fetchone()
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps(dict(row) if row else {}, default=str),
+                    'isBase64Encoded': False
+                }
+
+            if referral_token:
+                cur.execute(
+                    f"""SELECT v.id, v.title, v.department, v.salary_display, v.status,
+                               v.reward_amount, v.payout_delay_days, v.requirements, v.description,
+                               v.referral_token, v.created_at, 0 as recommendations_count
+                        FROM t_p65890965_refstaff_project.vacancies v WHERE v.referral_token = %s""",
+                    (referral_token,)
+                )
+                row = cur.fetchone()
+                return {
+                    'statusCode': 200,
+                    'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                    'body': json.dumps(dict(row) if row else {}, default=str),
+                    'isBase64Encoded': False
+                }
+
             where_clause = 'WHERE v.company_id = %s'
             params = [company_id]
             

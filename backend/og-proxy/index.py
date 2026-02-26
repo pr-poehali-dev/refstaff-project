@@ -7,7 +7,6 @@
 import json
 import os
 import urllib.request
-import urllib.parse
 
 API_URL = 'https://functions.poehali.dev/30d9dba4-a499-4866-8ccc-ea7addf62b16'
 APP_URL = 'https://refstaff.poehali.dev'
@@ -34,27 +33,19 @@ def is_bot(user_agent: str) -> bool:
 
 
 def fetch_vacancy_by_id(vacancy_id: str) -> dict:
-    url = f'{API_URL}?resource=vacancies&company_id=1&status=active'
+    url = f'{API_URL}?resource=vacancies&vacancy_id={vacancy_id}'
     req = urllib.request.Request(url)
     with urllib.request.urlopen(req, timeout=5) as resp:
         data = json.loads(resp.read().decode('utf-8'))
-    vacancies = data if isinstance(data, list) else data.get('vacancies', [])
-    for v in vacancies:
-        if str(v.get('id')) == str(vacancy_id):
-            return v
-    return {}
+    return data if isinstance(data, dict) and data.get('id') else {}
 
 
 def fetch_vacancy_by_token(token: str) -> dict:
-    url = f'{API_URL}?resource=vacancies&company_id=1&status=active'
+    url = f'{API_URL}?resource=vacancies&referral_token={token}'
     req = urllib.request.Request(url)
     with urllib.request.urlopen(req, timeout=5) as resp:
         data = json.loads(resp.read().decode('utf-8'))
-    vacancies = data if isinstance(data, list) else data.get('vacancies', [])
-    for v in vacancies:
-        if str(v.get('referral_token')) == str(token):
-            return v
-    return {}
+    return data if isinstance(data, dict) and data.get('id') else {}
 
 
 def build_html(title: str, description: str, image: str, url: str, redirect_url: str) -> str:
