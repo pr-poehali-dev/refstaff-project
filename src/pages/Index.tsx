@@ -3009,6 +3009,10 @@ function Index() {
                   v.department.toLowerCase().includes(vacancyFilter.search.toLowerCase());
                 const statusMatch = vacancyFilter.status === 'all' || v.status === vacancyFilter.status;
                 return searchMatch && statusMatch;
+              }).sort((a, b) => {
+                if (a.status === 'archived' && b.status !== 'archived') return 1;
+                if (a.status !== 'archived' && b.status === 'archived') return -1;
+                return 0;
               }).map((vacancy) => (
                 <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
                   <CardHeader className="p-2 sm:p-6">
