@@ -401,6 +401,14 @@ function Index() {
       if (response.ok) {
         const data = await response.json();
         setCurrentUser(data.user);
+        if (data.user?.role !== 'admin') {
+          if (data.user?.is_admin) {
+            setUserRole('employer');
+            localStorage.setItem('userRole', 'employer');
+          } else {
+            setUserRole('employee');
+          }
+        }
       } else {
         handleLogout();
       }
@@ -520,7 +528,9 @@ function Index() {
         email: e.email,
         phone: e.phone,
         telegram: e.telegram,
-        vk: e.vk
+        vk: e.vk,
+        isHrManager: e.is_hr_manager || false,
+        isAdmin: e.is_admin || false
       }));
 
       const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => {
@@ -1047,7 +1057,7 @@ function Index() {
 
       if (response.ok) {
         localStorage.setItem('authToken', data.token);
-        const role = data.user.role === 'admin' ? 'employer' : 'employee';
+        const role = (data.user.role === 'admin' || data.user.is_admin) ? 'employer' : 'employee';
         localStorage.setItem('userRole', role);
         setAuthToken(data.token);
         setCurrentUser(data.user);
@@ -5340,7 +5350,7 @@ function Index() {
           if (tab === 'notifications') setNewNotificationsCount(0);
         }}>
           <ScrollableTabs>
-            <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-8 gap-1">
+            <TabsList className="inline-flex w-max gap-1">
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">📢 Новости{newNewsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-purple-500 text-white border-0 leading-4">+{newNewsCount}</Badge>}</TabsTrigger>
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">💼 Вакансии{newVacanciesCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-green-500 text-white border-0 leading-4">+{newVacanciesCount}</Badge>}</TabsTrigger>
               <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">⭐ Рекомендации{newRecommendationsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-orange-500 text-white border-0 leading-4">+{newRecommendationsCount}</Badge>}</TabsTrigger>
@@ -5349,6 +5359,12 @@ function Index() {
               <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💳 История</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
               <TabsTrigger value="games" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🎮 Игры</TabsTrigger>
+              {currentUser?.is_hr_manager && (
+                <TabsTrigger value="hr-vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 bg-blue-50 text-blue-700">👔 HR: Вакансии</TabsTrigger>
+              )}
+              {currentUser?.is_hr_manager && (
+                <TabsTrigger value="hr-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 bg-blue-50 text-blue-700">👔 HR: Рекомендации</TabsTrigger>
+              )}
             </TabsList>
           </ScrollableTabs>
 
@@ -6098,6 +6114,89 @@ function Index() {
             <p className="text-sm text-muted-foreground">Отдохни — здесь можно поиграть в перерыве</p>
             <GamesTab />
           </TabsContent>
+
+          {currentUser?.is_hr_manager && (
+            <TabsContent value="hr-vacancies" className="space-y-4">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
+                    <span>👔</span> Управление вакансиями
+                  </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">Доступ HR Manager</p>
+                </div>
+              </div>
+              <div className="grid gap-4">
+                {vacancies.sort((a, b) => {
+                  if (a.status === 'archived' && b.status !== 'archived') return 1;
+                  if (a.status !== 'archived' && b.status === 'archived') return -1;
+                  return 0;
+                }).map((vacancy) => (
+                  <Card key={vacancy.id}>
+                    <CardHeader className="p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <CardTitle className="text-base">{vacancy.title}</CardTitle>
+                          <CardDescription>{vacancy.department}</CardDescription>
+                        </div>
+                        <Badge variant={vacancy.status === 'active' ? 'default' : 'secondary'}>
+                          {vacancy.status === 'active' ? 'Активна' : 'Архив'}
+                        </Badge>
+                      </div>
+                      <div className="flex flex-wrap gap-2 mt-2 text-sm text-muted-foreground">
+                        <span>💰 {vacancy.salary}</span>
+                        <span>🎁 {vacancy.reward.toLocaleString()} ₽</span>
+                        <span>👥 {vacancy.candidates} кандидатов</span>
+                      </div>
+                    </CardHeader>
+                  </Card>
+                ))}
+                {vacancies.length === 0 && (
+                  <Card><CardContent className="py-12 text-center text-muted-foreground">Вакансий нет</CardContent></Card>
+                )}
+              </div>
+            </TabsContent>
+          )}
+
+          {currentUser?.is_hr_manager && (
+            <TabsContent value="hr-recommendations" className="space-y-4">
+              <div className="mb-4">
+                <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
+                  <span>👔</span> Все рекомендации
+                </h2>
+                <p className="text-xs sm:text-sm text-muted-foreground">Доступ HR Manager</p>
+              </div>
+              <div className="grid gap-4">
+                {recommendations.map((rec) => (
+                  <Card key={rec.id}>
+                    <CardHeader className="p-4">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <CardTitle className="text-base">{rec.candidateName}</CardTitle>
+                          <CardDescription>{rec.vacancyTitle}</CardDescription>
+                        </div>
+                        <Badge variant={
+                          rec.status === 'hired' ? 'default' :
+                          rec.status === 'rejected' ? 'destructive' : 'secondary'
+                        }>
+                          {rec.status === 'pending' ? 'Новая' :
+                           rec.status === 'accepted' ? 'Принята' :
+                           rec.status === 'interview' ? 'Интервью' :
+                           rec.status === 'hired' ? 'Нанят' : 'Отклонена'}
+                        </Badge>
+                      </div>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        {rec.candidatePhone && <span>📞 {rec.candidatePhone}</span>}
+                        {rec.candidateEmail && <span className="ml-3">✉️ {rec.candidateEmail}</span>}
+                      </div>
+                    </CardHeader>
+                  </Card>
+                ))}
+                {recommendations.length === 0 && (
+                  <Card><CardContent className="py-12 text-center text-muted-foreground">Рекомендаций нет</CardContent></Card>
+                )}
+              </div>
+            </TabsContent>
+          )}
         </Tabs>
       </div>
 
