@@ -36,6 +36,8 @@ function VacancyReferral() {
   useEffect(() => {
     if (vacancy) {
       const ogImageUrl = `https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/032a8a8d-15a3-4c23-85e1-3c02c8f864c7.jpg`;
+      const refParam = referrerId ? `&ref=${referrerId}` : '';
+      const proxyUrl = `https://functions.poehali.dev/44878f98-7873-41f8-a3b0-f47731016858?type=referral&id=${token}${refParam}`;
       const vacancyUrl = `${window.location.origin}/r/${token}${referrerId ? `?ref=${referrerId}` : ''}`;
       
       document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
@@ -50,6 +52,23 @@ function VacancyReferral() {
       updateMetaTag('twitter:title', `${vacancy.title} — ${vacancy.department}`);
       updateMetaTag('twitter:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title}`);
       updateMetaTag('twitter:image', ogImageUrl);
+
+      let canonical = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+      if (!canonical) {
+        canonical = document.createElement('link');
+        canonical.setAttribute('rel', 'canonical');
+        document.head.appendChild(canonical);
+      }
+      canonical.setAttribute('href', vacancyUrl);
+
+      let shareLink = document.querySelector('link[data-og-proxy]') as HTMLLinkElement;
+      if (!shareLink) {
+        shareLink = document.createElement('link');
+        shareLink.setAttribute('rel', 'alternate');
+        shareLink.setAttribute('data-og-proxy', 'true');
+        document.head.appendChild(shareLink);
+      }
+      shareLink.setAttribute('href', proxyUrl);
     }
   }, [vacancy, token, referrerId]);
 
