@@ -3263,7 +3263,7 @@ function Index() {
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2">
-                <Button variant="outline" onClick={handleGenerateReferralLink} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
+                <Button onClick={handleGenerateReferralLink} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
                   <Icon name="Link" className="mr-1 sm:mr-2" size={16} />
                   <span>Пригласить сотрудника</span>
                 </Button>
