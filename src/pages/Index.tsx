@@ -5813,35 +5813,35 @@ function Index() {
               <span className="hidden sm:inline"></span>
             </h2>
             <div className="space-y-2 sm:space-y-3">
-              {[
-                { id: 1, type: 'pending', amount: 30000, desc: 'Вознаграждение за рекомендацию Елены Новиковой', date: '08.11.2025', unlockDate: '08.12.2025' },
-                { id: 2, type: 'pending', amount: 30000, desc: 'Вознаграждение за рекомендацию Алексея Козлова', date: '10.11.2025', unlockDate: '10.12.2025' },
-                { id: 3, type: 'earned', amount: 30000, desc: 'Вознаграждение за рекомендацию Ивана Петрова', date: '01.10.2025', unlockDate: '01.11.2025' },
-                { id: 4, type: 'earned', amount: 30000, desc: 'Вознаграждение за рекомендацию Марии Сидоровой', date: '15.09.2025', unlockDate: '15.10.2025' },
-              ].map((transaction) => (
-                <Card key={transaction.id}>
+              {recommendations.filter(r => r.status === 'accepted' || r.status === 'paid').length === 0 ? (
+                <Card>
+                  <CardContent className="p-6 text-center text-muted-foreground">
+                    История транзакций пуста
+                  </CardContent>
+                </Card>
+              ) : recommendations.filter(r => r.status === 'accepted' || r.status === 'paid').map((rec) => (
+                <Card key={rec.id}>
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          transaction.type === 'pending' ? 'bg-yellow-100' : 'bg-green-100'
+                          rec.status === 'accepted' ? 'bg-yellow-100' : 'bg-green-100'
                         }`}>
-                          <Icon name={transaction.type === 'pending' ? 'Clock' : 'CheckCircle'} 
-                                className={transaction.type === 'pending' ? 'text-yellow-600' : 'text-green-600'} 
+                          <Icon name={rec.status === 'accepted' ? 'Clock' : 'CheckCircle'}
+                                className={rec.status === 'accepted' ? 'text-yellow-600' : 'text-green-600'}
                                 size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-xs sm:text-sm truncate">{transaction.desc}</div>
+                          <div className="font-medium text-xs sm:text-sm truncate">Вознаграждение за рекомендацию {rec.candidate_name}</div>
                           <div className="text-[10px] sm:text-xs text-muted-foreground">
-                            {transaction.date} 
-                            {transaction.type === 'pending' && <span className="hidden sm:inline"> • Разблокировка {transaction.unlockDate}</span>}
+                            {new Date(rec.created_at).toLocaleDateString('ru-RU')}
                           </div>
                         </div>
                       </div>
                       <div className={`text-sm sm:text-lg font-bold flex-shrink-0 ${
-                        transaction.type === 'pending' ? 'text-yellow-600' : 'text-green-600'
+                        rec.status === 'accepted' ? 'text-yellow-600' : 'text-green-600'
                       }`}>
-                        +{transaction.amount.toLocaleString()} ₽
+                        +{(rec.reward_amount || 0).toLocaleString()} ₽
                       </div>
                     </div>
                   </CardContent>
