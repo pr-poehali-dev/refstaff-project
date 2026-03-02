@@ -58,13 +58,7 @@ function Index() {
   const [resetPasswordForm, setResetPasswordForm] = useState({ token: '', password: '', confirmPassword: '' });
   const [passwordResetMessage, setPasswordResetMessage] = useState('');
   const [pricingPeriod, setPricingPeriod] = useState<'monthly' | 'yearly'>('monthly');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { id: 1, senderId: 1, senderName: 'HR Manager', message: 'Здравствуйте! Как дела с рекомендациями?', timestamp: '10:30', isOwn: false },
-    { id: 2, senderId: 2, senderName: 'Вы', message: 'Отлично! У меня есть кандидат на вакансию Frontend Developer', timestamp: '10:32', isOwn: true },
-    { id: 3, senderId: 1, senderName: 'HR Manager', message: 'Отлично! Отправьте резюме пожалуйста', timestamp: '10:35', isOwn: false },
-    { id: 4, senderId: 2, senderName: 'Вы', message: 'Вот резюме кандидата', timestamp: '10:37', isOwn: true, attachments: [{ type: 'file', url: '#', name: 'resume_ivan_petrov.pdf', size: 245000 }] },
-    { id: 5, senderId: 2, senderName: 'Вы', message: 'И фото с последнего проекта', timestamp: '10:38', isOwn: true, attachments: [{ type: 'image', url: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085', name: 'project_screenshot.png', size: 892000 }] },
-  ]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -86,18 +80,7 @@ function Index() {
   const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState(12);
   
   const isSubscriptionExpired = subscriptionDaysLeft <= 0;
-  const [notifications, setNotifications] = useState<Array<{id: number; type: string; message: string; date: string; read: boolean}>>([
-    { id: 1, type: 'recommendation', message: 'Новая рекомендация от Анны Смирновой', date: '2026-01-16', read: false },
-    { id: 2, type: 'subscription', message: 'Подписка заканчивается через 12 дней', date: '2026-01-16', read: false },
-    { id: 3, type: 'hire', message: 'Кандидат Елена Новикова принята на должность', date: '2026-01-15', read: false },
-    { id: 4, type: 'payout', message: 'Ваш запрос на выплату 30 000 ₽ одобрен', date: '2026-01-15', read: false },
-    { id: 5, type: 'recommendation', message: 'Ваш кандидат приглашён на интервью', date: '2026-01-14', read: false },
-    { id: 6, type: 'payout', message: 'Выплата 15 000 ₽ зачислена на ваш счёт', date: '2026-01-13', read: true },
-    { id: 7, type: 'recommendation', message: 'Дмитрий Кузнецов рекомендовал кандидата на Backend Developer', date: '2026-01-13', read: true },
-    { id: 8, type: 'hire', message: 'Кандидат Алексей Волков вышел на работу', date: '2026-01-12', read: true },
-    { id: 9, type: 'payout', message: 'Новый запрос на выплату от Марии Петровой - 45 000 ₽', date: '2026-01-12', read: true },
-    { id: 10, type: 'recommendation', message: 'Отклонена рекомендация на Junior Designer', date: '2026-01-11', read: true },
-  ]);
+  const [notifications, setNotifications] = useState<Array<{id: number; type: string; message: string; date: string; read: boolean}>>([]);
   
   const currentEmployeeId = currentUser?.id || 1;
   const currentCompanyId = currentUser?.company_id || 1;

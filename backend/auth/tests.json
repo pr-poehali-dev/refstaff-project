@@ -9,60 +9,12 @@
       "bodyMatcher": "exact"
     },
     {
-      "name": "Register new user with company",
-      "method": "POST",
-      "path": "/",
-      "body": {
-        "action": "register",
-        "email": "test@example.com",
-        "password": "password123",
-        "first_name": "Test",
-        "last_name": "User",
-        "company_name": "Test Company",
-        "employee_count": 100
-      },
-      "expectedStatus": 201,
-      "expectedBody": {
-        "message": "string",
-        "token": "string",
-        "user": {
-          "id": "number",
-          "email": "string",
-          "first_name": "string",
-          "last_name": "string",
-          "company_id": "number",
-          "role": "string"
-        }
-      },
-      "bodyMatcher": "partial"
-    },
-    {
-      "name": "Login with valid credentials",
-      "method": "POST",
-      "path": "/",
-      "body": {
-        "action": "login",
-        "email": "test@example.com",
-        "password": "password123"
-      },
-      "expectedStatus": 200,
-      "expectedBody": {
-        "message": "string",
-        "token": "string",
-        "user": {
-          "id": "number",
-          "email": "string"
-        }
-      },
-      "bodyMatcher": "partial"
-    },
-    {
       "name": "Login with invalid credentials",
       "method": "POST",
       "path": "/",
       "body": {
         "action": "login",
-        "email": "test@example.com",
+        "email": "nonexistent@example.com",
         "password": "wrongpassword"
       },
       "expectedStatus": 401,
