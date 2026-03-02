@@ -6113,31 +6113,34 @@ function Index() {
                 <Icon name="Building2" className="text-primary" size={40} />
               </div>
               <div className="flex-1">
-                <h3 className="text-2xl font-bold">Acme Tech</h3>
-                <p className="text-muted-foreground">IT и технологии</p>
+                <h3 className="text-2xl font-bold">{company?.name || '—'}</h3>
+                <p className="text-muted-foreground">{company?.industry || ''}</p>
               </div>
             </div>
             <Separator />
             <div className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium">О компании</Label>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Мы ведущая технологическая компания, специализирующаяся на разработке инновационных решений для бизнеса. 
-                  Наша команда состоит из 500+ профессионалов по всему миру.
-                </p>
-              </div>
+              {company?.description && (
+                <div>
+                  <Label className="text-sm font-medium">О компании</Label>
+                  <p className="text-sm text-muted-foreground mt-1">{company.description}</p>
+                </div>
+              )}
               <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium">Веб-сайт</Label>
-                  <a href="https://acme-tech.com" target="_blank" className="text-sm text-primary hover:underline mt-1 flex items-center gap-1">
-                    acme-tech.com
-                    <Icon name="ExternalLink" size={14} />
-                  </a>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Количество сотрудников</Label>
-                  <p className="text-sm text-muted-foreground mt-1">500+</p>
-                </div>
+                {company?.website && (
+                  <div>
+                    <Label className="text-sm font-medium">Веб-сайт</Label>
+                    <a href={company.website.startsWith('http') ? company.website : `https://${company.website}`} target="_blank" className="text-sm text-primary hover:underline mt-1 flex items-center gap-1">
+                      {company.website.replace(/^https?:\/\//, '')}
+                      <Icon name="ExternalLink" size={14} />
+                    </a>
+                  </div>
+                )}
+                {company?.size && (
+                  <div>
+                    <Label className="text-sm font-medium">Количество сотрудников</Label>
+                    <p className="text-sm text-muted-foreground mt-1">{company.size}</p>
+                  </div>
+                )}
               </div>
               <div>
                 <Label className="text-sm font-medium">Открытые вакансии</Label>
