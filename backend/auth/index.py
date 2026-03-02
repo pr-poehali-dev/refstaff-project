@@ -10,6 +10,7 @@ import hashlib
 import hmac
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
+from decimal import Decimal
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import urllib.request
@@ -712,12 +713,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            user_dict = {k: float(v) if isinstance(v, Decimal) else v for k, v in dict(user).items()}
             return {
                 'statusCode': 200,
                 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-                'body': json.dumps({
-                    'user': dict(user)
-                }),
+                'body': json.dumps({'user': user_dict}),
                 'isBase64Encoded': False
             }
         
