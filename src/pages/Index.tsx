@@ -82,8 +82,8 @@ function Index() {
   const isSubscriptionExpired = subscriptionDaysLeft <= 0;
   const [notifications, setNotifications] = useState<Array<{id: number; type: string; message: string; date: string; read: boolean}>>([]);
   
-  const currentEmployeeId = currentUser?.id || 1;
-  const currentCompanyId = currentUser?.company_id || 1;
+  const currentEmployeeId = currentUser?.id;
+  const currentCompanyId = currentUser?.company_id;
   
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -455,10 +455,10 @@ function Index() {
   };
 
   useEffect(() => {
-    if (userRole === 'employer' || userRole === 'employee') {
+    if ((userRole === 'employer' || userRole === 'employee') && currentUser) {
       loadData();
     }
-  }, [userRole]);
+  }, [userRole, currentUser]);
 
   useEffect(() => {
     if (userRole === 'employee' && !isLoading && !employeeTabsInitialized) {
