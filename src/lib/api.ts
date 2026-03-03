@@ -68,6 +68,8 @@ export interface Company {
   website?: string;
   industry?: string;
   inn?: string;
+  telegram?: string;
+  vk?: string;
   created_at: string;
 }
 

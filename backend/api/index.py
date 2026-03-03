@@ -477,7 +477,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             query = """
                 SELECT id, name, employee_count, invite_token, logo_url, 
-                       description, website, industry, inn, created_at
+                       description, website, industry, inn, telegram, vk, created_at
                 FROM t_p65890965_refstaff_project.companies
                 WHERE id = %s
             """
@@ -517,6 +517,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if 'industry' in body_data:
                 update_fields.append('industry = %s')
                 params.append(body_data['industry'])
+            if 'telegram' in body_data:
+                update_fields.append('telegram = %s')
+                params.append(body_data['telegram'])
+            if 'vk' in body_data:
+                update_fields.append('vk = %s')
+                params.append(body_data['vk'])
             
             if not update_fields:
                 return {
@@ -534,7 +540,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 UPDATE t_p65890965_refstaff_project.companies 
                 SET {', '.join(update_fields)}
                 WHERE id = %s
-                RETURNING id, name, logo_url, description, website, industry
+                RETURNING id, name, logo_url, description, website, industry, telegram, vk
             """
             
             cur.execute(query, params)

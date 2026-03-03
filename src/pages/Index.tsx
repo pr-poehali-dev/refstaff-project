@@ -43,7 +43,7 @@ function Index() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [showCompanySettingsDialog, setShowCompanySettingsDialog] = useState(false);
-  const [companyEditForm, setCompanyEditForm] = useState({ description: '', website: '', industry: '' });
+  const [companyEditForm, setCompanyEditForm] = useState({ description: '', website: '', industry: '', telegram: '', vk: '' });
   const [isSavingCompany, setIsSavingCompany] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [activeChatEmployee, setActiveChatEmployee] = useState<Employee | null>(null);
@@ -530,6 +530,8 @@ function Index() {
         description: companyEditForm.description,
         website: companyEditForm.website,
         industry: companyEditForm.industry,
+        telegram: companyEditForm.telegram,
+        vk: companyEditForm.vk,
       });
       await loadData();
       setShowCompanySettingsDialog(false);
@@ -2697,10 +2699,10 @@ function Index() {
                 <Badge variant="destructive" className="ml-2 text-xs">{subscriptionDaysLeft} дн.</Badge>
               )}
             </Button>
-            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '' }); setShowCompanySettingsDialog(true); }} size="icon" className="sm:hidden">
+            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '', telegram: company?.telegram || '', vk: company?.vk || '' }); setShowCompanySettingsDialog(true); }} size="icon" className="sm:hidden">
               <Icon name="Settings" size={18} />
             </Button>
-            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '' }); setShowCompanySettingsDialog(true); }} size="sm" className="hidden sm:flex">
+            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '', telegram: company?.telegram || '', vk: company?.vk || '' }); setShowCompanySettingsDialog(true); }} size="sm" className="hidden sm:flex">
               <Icon name="Settings" className="mr-2" size={18} />
               <span className="hidden lg:inline">Настройки</span>
             </Button>
@@ -4268,6 +4270,26 @@ function Index() {
                 <Label htmlFor="company-employee-count" className="text-xs sm:text-sm">Кол-во сотрудников</Label>
                 <Input id="company-employee-count" className="mt-1 text-sm" type="number" value={company?.employee_count || 0} readOnly disabled />
                 <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
+              </div>
+            </div>
+
+            <Separator />
+
+            <div>
+              <h3 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">Социальные сети</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div>
+                  <Label htmlFor="company-telegram" className="text-xs sm:text-sm flex items-center gap-2">
+                    <Icon name="Send" size={14} /> Telegram
+                  </Label>
+                  <Input id="company-telegram" className="mt-1 text-sm" placeholder="@company или t.me/company" value={companyEditForm.telegram} onChange={(e) => setCompanyEditForm(f => ({ ...f, telegram: e.target.value }))} />
+                </div>
+                <div>
+                  <Label htmlFor="company-vk" className="text-xs sm:text-sm flex items-center gap-2">
+                    <Icon name="MessageCircle" size={14} /> ВКонтакте
+                  </Label>
+                  <Input id="company-vk" className="mt-1 text-sm" placeholder="vk.com/company" value={companyEditForm.vk} onChange={(e) => setCompanyEditForm(f => ({ ...f, vk: e.target.value }))} />
+                </div>
               </div>
             </div>
 
