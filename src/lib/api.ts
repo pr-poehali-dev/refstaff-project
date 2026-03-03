@@ -2,6 +2,7 @@ const API_URL = 'https://functions.poehali.dev/30d9dba4-a499-4866-8ccc-ea7addf62
 
 export interface Vacancy {
   id: number;
+  company_id?: number;
   title: string;
   department: string;
   salary_display: string;
@@ -125,6 +126,20 @@ export const api = {
     const response = await fetch(`${API_URL}/?resource=vacancies&company_id=${companyId}&status=${status}`);
     if (!response.ok) throw new Error('Failed to fetch vacancies');
     return response.json();
+  },
+
+  async getVacancyById(vacancyId: number): Promise<Vacancy | null> {
+    const response = await fetch(`${API_URL}/?resource=vacancies&vacancy_id=${vacancyId}`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data && data.id ? data : null;
+  },
+
+  async getVacancyByToken(token: string): Promise<Vacancy | null> {
+    const response = await fetch(`${API_URL}/?resource=vacancies&referral_token=${token}`);
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data && data.id ? data : null;
   },
 
   async createVacancy(data: Partial<Vacancy>): Promise<Vacancy> {

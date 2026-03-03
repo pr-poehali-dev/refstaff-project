@@ -92,13 +92,12 @@ function VacancyApply() {
     try {
       setIsLoading(true);
       
-      const vacanciesData = await api.getVacancies(1, 'active');
-      const foundVacancy = vacanciesData.find(v => v.id === parseInt(vacancyId || '0'));
+      const foundVacancy = await api.getVacancyById(parseInt(vacancyId || '0'));
       
       if (foundVacancy) {
         setVacancy(foundVacancy);
         
-        const companyData = await api.getCompany(1);
+        const companyData = await api.getCompany(foundVacancy.company_id || 1);
         setCompany(companyData);
       }
     } catch (error) {
