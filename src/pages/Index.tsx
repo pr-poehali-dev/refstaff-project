@@ -64,8 +64,12 @@ function Index() {
   const [newMessage, setNewMessage] = useState('');
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [activeChatId, setActiveChatId] = useState<number | null>(null);
+  const [isSendingMessage, setIsSendingMessage] = useState(false);
+  const chatPollRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const chatMessagesEndRef = React.useRef<HTMLDivElement>(null);
   const [newReward, setNewReward] = useState('30000');
-  const [unreadMessagesCount, setUnreadMessagesCount] = useState(2);
+  const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
@@ -326,28 +330,52 @@ function Index() {
     }
   };
 
-  const handleSendMessage = () => {
-    if (!newMessage.trim() && selectedFiles.length === 0) return;
-    
-    const attachments = selectedFiles.map(file => ({
-      type: file.type.startsWith('image/') ? 'image' as const : 'file' as const,
-      url: URL.createObjectURL(file),
-      name: file.name,
-      size: file.size
-    }));
-    
-    const newMsg: ChatMessage = {
-      id: chatMessages.length + 1,
-      senderId: 2,
-      senderName: 'Вы',
-      message: newMessage || (selectedFiles.length > 0 ? '' : ''),
-      timestamp: new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
-      isOwn: true,
-      attachments: attachments.length > 0 ? attachments : undefined
-    };
-    setChatMessages([...chatMessages, newMsg]);
-    setNewMessage('');
-    setSelectedFiles([]);
+  const loadChatMessages = async (chatId: number) => {
+    try {
+      const msgs = await api.getMessages(chatId);
+      const mapped: ChatMessage[] = msgs.map((m: any) => ({
+        id: m.id,
+        senderId: m.sender_id,
+        senderName: m.sender_name || 'Сотрудник',
+        message: m.message,
+        timestamp: new Date(m.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+        isOwn: m.sender_id === currentUser?.id,
+      }));
+      setChatMessages(mapped);
+      setTimeout(() => chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+    } catch (e) {
+      console.error('Failed to load messages:', e);
+    }
+  };
+
+  const handleSelectChatEmployee = async (emp: Employee) => {
+    setActiveChatEmployee(emp);
+    setChatMessages([]);
+    try {
+      const chat = await api.createChat(currentCompanyId, emp.id);
+      const chatId = (chat as any).id || (chat as any).chat_id;
+      setActiveChatId(chatId);
+      await loadChatMessages(chatId);
+      if (chatPollRef.current) clearInterval(chatPollRef.current);
+      chatPollRef.current = setInterval(() => loadChatMessages(chatId), 5000);
+    } catch (e) {
+      console.error('Failed to open chat:', e);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if ((!newMessage.trim() && selectedFiles.length === 0) || !activeChatId || isSendingMessage) return;
+    setIsSendingMessage(true);
+    try {
+      await api.sendMessage(activeChatId, currentUser?.id || 0, newMessage.trim());
+      setNewMessage('');
+      setSelectedFiles([]);
+      await loadChatMessages(activeChatId);
+    } catch (e) {
+      console.error('Failed to send message:', e);
+    } finally {
+      setIsSendingMessage(false);
+    }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -4303,7 +4331,7 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
+      <Dialog open={showChatDialog} onOpenChange={(open) => { setShowChatDialog(open); if (!open && chatPollRef.current) { clearInterval(chatPollRef.current); chatPollRef.current = null; } }}>
         <DialogContent className="max-w-4xl h-[100dvh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0">
           <div className="flex h-full overflow-hidden">
             <div className="w-[72px] sm:w-72 border-r flex flex-col shrink-0">
@@ -4332,7 +4360,7 @@ function Index() {
                     className={`p-1.5 sm:p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
                       activeChatEmployee?.id === emp.id ? 'bg-muted' : ''
                     }`}
-                    onClick={() => setActiveChatEmployee(emp)}
+                    onClick={() => handleSelectChatEmployee(emp)}
                   >
                     <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
                       {emp.avatar ? (
@@ -4375,6 +4403,9 @@ function Index() {
                     </div>
                   </div>
                   <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-2 sm:space-y-3">
+                    {chatMessages.length === 0 && (
+                      <div className="flex items-center justify-center h-full text-sm text-muted-foreground">Начните диалог</div>
+                    )}
                     {chatMessages.map((msg) => (
                       <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[90%] sm:max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-2 py-1.5 sm:px-4 sm:py-2`}>
@@ -4410,6 +4441,7 @@ function Index() {
                         </div>
                       </div>
                     ))}
+                    <div ref={chatMessagesEndRef} />
                   </div>
                   <div className="p-1.5 sm:p-4 border-t shrink-0">
                     {selectedFiles.length > 0 && (
@@ -4457,7 +4489,7 @@ function Index() {
                         onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                         className="flex-1 text-xs sm:text-sm h-8 sm:h-10 min-w-0"
                       />
-                      <Button onClick={handleSendMessage} className="h-8 w-8 sm:h-10 sm:w-10 p-0 shrink-0">
+                      <Button onClick={handleSendMessage} disabled={isSendingMessage} className="h-8 w-8 sm:h-10 sm:w-10 p-0 shrink-0">
                         <Icon name="Send" size={14} className="sm:hidden" />
                         <Icon name="Send" size={18} className="hidden sm:block" />
                       </Button>
