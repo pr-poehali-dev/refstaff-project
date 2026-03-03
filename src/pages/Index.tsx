@@ -6122,6 +6122,24 @@ function Index() {
                     <p className="text-sm text-muted-foreground mt-1">{company.size}</p>
                   </div>
                 )}
+                {company?.telegram && (
+                  <div>
+                    <Label className="text-sm font-medium">Telegram</Label>
+                    <a href={company.telegram.startsWith('http') ? company.telegram : `https://t.me/${company.telegram.replace(/^@/, '')}`} target="_blank" className="text-sm text-primary hover:underline mt-1 flex items-center gap-1">
+                      <Icon name="Send" size={14} />
+                      {company.telegram}
+                    </a>
+                  </div>
+                )}
+                {company?.vk && (
+                  <div>
+                    <Label className="text-sm font-medium">ВКонтакте</Label>
+                    <a href={company.vk.startsWith('http') ? company.vk : `https://${company.vk}`} target="_blank" className="text-sm text-primary hover:underline mt-1 flex items-center gap-1">
+                      <Icon name="MessageCircle" size={14} />
+                      {company.vk}
+                    </a>
+                  </div>
+                )}
               </div>
               <div>
                 <Label className="text-sm font-medium">Открытые вакансии</Label>
