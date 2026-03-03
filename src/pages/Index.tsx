@@ -43,6 +43,8 @@ function Index() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [showCompanySettingsDialog, setShowCompanySettingsDialog] = useState(false);
+  const [companyEditForm, setCompanyEditForm] = useState({ description: '', website: '', industry: '' });
+  const [isSavingCompany, setIsSavingCompany] = useState(false);
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [activeChatEmployee, setActiveChatEmployee] = useState<Employee | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
@@ -519,6 +521,23 @@ function Index() {
       return b.earnings - a.earnings;
     });
     return sortedEmployees.findIndex(e => e.id === emp.id) + 1;
+  };
+
+  const handleSaveCompany = async () => {
+    try {
+      setIsSavingCompany(true);
+      await api.updateCompany(currentCompanyId, {
+        description: companyEditForm.description,
+        website: companyEditForm.website,
+        industry: companyEditForm.industry,
+      });
+      await loadData();
+      setShowCompanySettingsDialog(false);
+    } catch (error) {
+      alert('Ошибка при сохранении');
+    } finally {
+      setIsSavingCompany(false);
+    }
   };
 
   const handleCreateVacancy = async () => {
@@ -2678,10 +2697,10 @@ function Index() {
                 <Badge variant="destructive" className="ml-2 text-xs">{subscriptionDaysLeft} дн.</Badge>
               )}
             </Button>
-            <Button variant="ghost" onClick={() => setShowCompanySettingsDialog(true)} size="icon" className="sm:hidden">
+            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '' }); setShowCompanySettingsDialog(true); }} size="icon" className="sm:hidden">
               <Icon name="Settings" size={18} />
             </Button>
-            <Button variant="ghost" onClick={() => setShowCompanySettingsDialog(true)} size="sm" className="hidden sm:flex">
+            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '' }); setShowCompanySettingsDialog(true); }} size="sm" className="hidden sm:flex">
               <Icon name="Settings" className="mr-2" size={18} />
               <span className="hidden lg:inline">Настройки</span>
             </Button>
@@ -4216,16 +4235,16 @@ function Index() {
             </div>
             <div>
               <Label htmlFor="company-desc" className="text-xs sm:text-sm">Описание</Label>
-              <Textarea id="company-desc" rows={3} className="mt-1 text-sm" placeholder="Расскажите о вашей компании..." defaultValue={company?.description || ''} />
+              <Textarea id="company-desc" rows={3} className="mt-1 text-sm" placeholder="Расскажите о вашей компании..." value={companyEditForm.description} onChange={(e) => setCompanyEditForm(f => ({ ...f, description: e.target.value }))} />
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
                 <Label htmlFor="company-website" className="text-xs sm:text-sm">Веб-сайт</Label>
-                <Input id="company-website" className="mt-1 text-sm" placeholder="https://example.com" defaultValue={company?.website || ''} />
+                <Input id="company-website" className="mt-1 text-sm" placeholder="https://example.com" value={companyEditForm.website} onChange={(e) => setCompanyEditForm(f => ({ ...f, website: e.target.value }))} />
               </div>
               <div>
                 <Label htmlFor="company-industry" className="text-xs sm:text-sm">Отрасль</Label>
-                <Select defaultValue={company?.industry || ''}>
+                <Select value={companyEditForm.industry} onValueChange={(val) => setCompanyEditForm(f => ({ ...f, industry: val }))}>
                   <SelectTrigger className="mt-1 text-sm">
                     <SelectValue placeholder="Выберите отрасль" />
                   </SelectTrigger>
@@ -4254,69 +4273,9 @@ function Index() {
 
             <Separator />
 
-            <div>
-              <h3 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3">Контакты</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <Label htmlFor="company-phone" className="text-xs sm:text-sm">Телефон</Label>
-                  <Input 
-                    id="company-phone" 
-                    className="mt-1 text-sm"
-                    type="tel" 
-                    placeholder="+7 (999) 123-45-67" 
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="company-email" className="text-xs sm:text-sm">Email</Label>
-                  <Input 
-                    id="company-email" 
-                    className="mt-1 text-sm"
-                    type="email" 
-                    placeholder="info@company.ru" 
-                  />
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div>
-              <h3 className="text-sm sm:text-lg font-semibold mb-2 sm:mb-3">Социальные сети</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-                <div>
-                  <Label htmlFor="company-telegram" className="text-xs sm:text-sm">
-                    <div className="flex items-center gap-2">
-                      <Icon name="Send" size={14} />
-                      Telegram
-                    </div>
-                  </Label>
-                  <Input 
-                    id="company-telegram" 
-                    className="mt-1 text-sm"
-                    placeholder="@company или t.me/company" 
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="company-vk" className="text-xs sm:text-sm">
-                    <div className="flex items-center gap-2">
-                      <Icon name="MessageCircle" size={14} />
-                      VK
-                    </div>
-                  </Label>
-                  <Input 
-                    id="company-vk" 
-                    className="mt-1 text-sm"
-                    placeholder="vk.com/company" 
-                  />
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <Button className="w-full text-sm" size="lg">
-              <Icon name="Save" className="mr-2" size={16} />
-              Сохранить изменения
+            <Button className="w-full text-sm" size="lg" onClick={handleSaveCompany} disabled={isSavingCompany}>
+              <Icon name={isSavingCompany ? 'Loader2' : 'Save'} className={`mr-2 ${isSavingCompany ? 'animate-spin' : ''}`} size={16} />
+              {isSavingCompany ? 'Сохранение...' : 'Сохранить изменения'}
             </Button>
           </div>
         </DialogContent>
