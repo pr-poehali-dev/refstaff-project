@@ -333,7 +333,7 @@ function Index() {
   const loadChatMessages = async (chatId: number) => {
     try {
       const msgs = await api.getMessages(chatId);
-      const mapped: ChatMessage[] = msgs.map((m: any) => ({
+      const mapped: ChatMessage[] = msgs.map((m) => ({
         id: m.id,
         senderId: m.sender_id,
         senderName: m.sender_name || 'Сотрудник',
@@ -351,9 +351,11 @@ function Index() {
   const handleSelectChatEmployee = async (emp: Employee) => {
     setActiveChatEmployee(emp);
     setChatMessages([]);
+    setActiveChatId(null);
     try {
-      const chat = await api.createChat(currentCompanyId, emp.id);
-      const chatId = (chat as any).id || (chat as any).chat_id;
+      const chat = await api.createChat(currentCompanyId || 0, emp.id);
+      const chatId = Number(chat.chat_id || chat.id);
+      if (!chatId) { console.error('No chatId returned', chat); return; }
       setActiveChatId(chatId);
       await loadChatMessages(chatId);
       if (chatPollRef.current) clearInterval(chatPollRef.current);
@@ -4483,13 +4485,14 @@ function Index() {
                         <Icon name="Paperclip" size={18} className="hidden sm:block" />
                       </Button>
                       <Input 
-                        placeholder="Сообщение..." 
+                        placeholder={activeChatId ? "Сообщение..." : "Загрузка чата..."}
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                        disabled={!activeChatId || isSendingMessage}
                         className="flex-1 text-xs sm:text-sm h-8 sm:h-10 min-w-0"
                       />
-                      <Button onClick={handleSendMessage} disabled={isSendingMessage} className="h-8 w-8 sm:h-10 sm:w-10 p-0 shrink-0">
+                      <Button onClick={handleSendMessage} disabled={!activeChatId || isSendingMessage} className="h-8 w-8 sm:h-10 sm:w-10 p-0 shrink-0">
                         <Icon name="Send" size={14} className="sm:hidden" />
                         <Icon name="Send" size={18} className="hidden sm:block" />
                       </Button>

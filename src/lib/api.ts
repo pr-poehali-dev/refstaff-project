@@ -100,7 +100,8 @@ export interface WalletData {
 }
 
 export interface Chat {
-  id: number;
+  id?: number;
+  chat_id?: number;
   company_id: number;
   employee_id: number;
   last_message_at?: string;
