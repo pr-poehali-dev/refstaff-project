@@ -414,6 +414,8 @@ function Index() {
   useEffect(() => {
     if ((userRole === 'employer' || userRole === 'employee') && currentUser) {
       loadData();
+      const pollInterval = setInterval(() => loadData(), 30000);
+      return () => clearInterval(pollInterval);
     }
   }, [userRole, currentUser]);
 
@@ -500,9 +502,45 @@ function Index() {
       if (userRole === 'employee') {
         if (prevVacanciesCount > 0) {
           const vacDiff = mappedVacancies.length - prevVacanciesCount;
-          if (vacDiff > 0) setNewVacanciesCount(prev => prev + vacDiff);
+          if (vacDiff > 0) {
+            setNewVacanciesCount(prev => prev + vacDiff);
+            const newVacs = mappedVacancies.slice(mappedVacancies.length - vacDiff);
+            setNotifications(prev => [
+              ...newVacs.map((v, i) => ({
+                id: Date.now() + i,
+                type: 'vacancy',
+                message: `Новая вакансия: "${v.title}" — ${v.salary}`,
+                date: new Date().toISOString(),
+                read: false
+              })),
+              ...prev
+            ]);
+          }
         }
         setPrevVacanciesCount(mappedVacancies.length);
+
+        if (prevRecommendationsCount > 0) {
+          const prevRecs = recommendations;
+          mappedRecommendations.forEach((rec) => {
+            const prevRec = prevRecs.find(r => r.id === rec.id);
+            if (prevRec && prevRec.status !== rec.status) {
+              const statusLabels: Record<string, string> = {
+                pending: 'На рассмотрении',
+                accepted: 'Принят',
+                rejected: 'Отклонён',
+                hired: 'Нанят',
+                interview: 'На собеседовании'
+              };
+              setNotifications(prev => [{
+                id: Date.now() + rec.id,
+                type: 'recommendation',
+                message: `Статус кандидата "${rec.candidateName}" изменён: ${statusLabels[rec.status] || rec.status}`,
+                date: new Date().toISOString(),
+                read: false
+              }, ...prev]);
+            }
+          });
+        }
       }
       setVacancies(mappedVacancies);
 
@@ -553,7 +591,48 @@ function Index() {
 
       if (userRole === 'employee') {
         const wallet = await api.getWallet(currentEmployeeId).catch(() => null);
+        if (wallet && walletData) {
+          const prevBalance = walletData.wallet?.wallet_balance || 0;
+          const newBalance = wallet.wallet?.wallet_balance || 0;
+          if (newBalance > prevBalance) {
+            setNotifications(prev => [{
+              id: Date.now(),
+              type: 'wallet',
+              message: `Баланс пополнен: +${(newBalance - prevBalance).toLocaleString()} ₽`,
+              date: new Date().toISOString(),
+              read: false
+            }, ...prev]);
+          }
+          const prevTxCount = walletData.transactions?.length || 0;
+          const newTxCount = wallet.transactions?.length || 0;
+          if (newTxCount > prevTxCount) {
+            const newTx = wallet.transactions[0];
+            if (newTx) {
+              setNotifications(prev => [{
+                id: Date.now() + 1,
+                type: 'wallet',
+                message: `Новая запись в истории кошелька: ${newTx.description || 'Транзакция'} (${newTx.amount > 0 ? '+' : ''}${newTx.amount.toLocaleString()} ₽)`,
+                date: new Date().toISOString(),
+                read: false
+              }, ...prev]);
+            }
+          }
+        }
         setWalletData(wallet);
+      }
+
+      if (userRole === 'employee') {
+        const employeeChats = Array.isArray(chatsData) ? chatsData : [];
+        const totalUnread = employeeChats.reduce((sum: number, c: Chat) => sum + (c.unread_count || 0), 0);
+        if (totalUnread > unreadMessagesCount && unreadMessagesCount >= 0 && prevRecommendationsCount > 0) {
+          setNotifications(prev => [{
+            id: Date.now() + 2,
+            type: 'chat',
+            message: `Новые сообщения в чате с HR (${totalUnread} непрочитанных)`,
+            date: new Date().toISOString(),
+            read: false
+          }, ...prev]);
+        }
       }
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
@@ -6504,6 +6583,7 @@ function Index() {
               <div className="text-center py-8 text-muted-foreground">
                 <Icon name="Bell" size={48} className="mx-auto mb-2 opacity-20" />
                 <p>Нет новых уведомлений</p>
+                <p className="text-xs mt-1">Здесь появятся уведомления о новых вакансиях, изменениях статусов кандидатов, сообщениях и балансе</p>
               </div>
             ) : (
               notifications.map((notif) => (
@@ -6516,35 +6596,47 @@ function Index() {
                     ));
                   }}
                 >
-                  <CardContent className="p-4">
+                  <CardContent className="p-3">
                     <div className="flex items-start gap-3">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
                         notif.type === 'recommendation' ? 'bg-blue-100' :
                         notif.type === 'subscription' ? 'bg-orange-100' :
-                        'bg-green-100'
+                        notif.type === 'vacancy' ? 'bg-purple-100' :
+                        notif.type === 'wallet' ? 'bg-green-100' :
+                        notif.type === 'chat' ? 'bg-indigo-100' :
+                        notif.type === 'news' ? 'bg-yellow-100' :
+                        'bg-gray-100'
                       }`}>
                         <Icon 
                           name={
                             notif.type === 'recommendation' ? 'UserPlus' :
                             notif.type === 'subscription' ? 'CreditCard' :
-                            'CheckCircle'
+                            notif.type === 'vacancy' ? 'Briefcase' :
+                            notif.type === 'wallet' ? 'Wallet' :
+                            notif.type === 'chat' ? 'MessageCircle' :
+                            notif.type === 'news' ? 'Newspaper' :
+                            'Bell'
                           } 
                           className={
                             notif.type === 'recommendation' ? 'text-blue-600' :
                             notif.type === 'subscription' ? 'text-orange-600' :
-                            'text-green-600'
+                            notif.type === 'vacancy' ? 'text-purple-600' :
+                            notif.type === 'wallet' ? 'text-green-600' :
+                            notif.type === 'chat' ? 'text-indigo-600' :
+                            notif.type === 'news' ? 'text-yellow-600' :
+                            'text-gray-600'
                           }
-                          size={20} 
+                          size={18} 
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium">{notif.message}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(notif.date).toLocaleDateString('ru-RU')}
+                        <p className="text-sm font-medium leading-snug">{notif.message}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {new Date(notif.date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                       {!notif.read && (
-                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-2" />
+                        <div className="w-2 h-2 rounded-full bg-primary flex-shrink-0 mt-1.5" />
                       )}
                     </div>
                   </CardContent>
@@ -6552,14 +6644,23 @@ function Index() {
               ))
             )}
           </div>
-          <div className="pt-4 border-t">
+          <div className="pt-4 border-t flex gap-2">
             <Button 
               variant="ghost" 
-              className="w-full"
+              className="flex-1"
               onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
             >
-              Отметить все как прочитанные
+              Прочитать все
             </Button>
+            {notifications.length > 0 && (
+              <Button
+                variant="ghost"
+                className="flex-1 text-muted-foreground"
+                onClick={() => setNotifications([])}
+              >
+                Очистить
+              </Button>
+            )}
           </div>
         </DialogContent>
       </Dialog>
