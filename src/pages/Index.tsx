@@ -4556,18 +4556,33 @@ function Index() {
                 <Label htmlFor="company-logo" className="text-xs sm:text-sm">Логотип</Label>
                 <div className="mt-1 flex items-center gap-3">
                   {(companyLogoPreview || company?.logo_url) && (
-                    <img
-                      src={companyLogoPreview || company?.logo_url}
-                      alt="Логотип"
-                      className="h-12 w-12 object-contain rounded border"
-                    />
+                    <div className="relative">
+                      <img
+                        src={companyLogoPreview || company?.logo_url}
+                        alt="Логотип"
+                        className="h-12 w-12 object-contain rounded border"
+                      />
+                      <button
+                        type="button"
+                        className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-red-700"
+                        onClick={() => {
+                          setCompanyLogoPreview(null);
+                          setCompanyLogoFile(null);
+                          if (company?.logo_url) {
+                            api.updateCompany(currentCompanyId, { logo_url: '' });
+                            setCompany(prev => prev ? { ...prev, logo_url: undefined } : null);
+                          }
+                        }}
+                        title="Удалить логотип"
+                      >✕</button>
+                    </div>
                   )}
                   <div className="flex-1">
                     <Input
                       id="company-logo"
                       className="text-sm"
                       type="file"
-                      accept="image/*"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
                       onChange={(e) => {
                         const file = e.target.files?.[0];
                         if (file) {
@@ -4583,7 +4598,7 @@ function Index() {
                         }
                       }}
                     />
-                    <p className="text-[10px] text-muted-foreground mt-1">PNG, JPG до 5 МБ</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">PNG, JPG, WebP до 5 МБ. Рекомендуется квадратное изображение от 200×200 пикселей</p>
                   </div>
                 </div>
               </div>
