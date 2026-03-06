@@ -6940,7 +6940,7 @@ function Index() {
             {withdrawForm.paymentMethod === 'account' ? (
               <>
                 <div>
-                  <Label>ФИО получателя</Label>
+                  <Label>ФИО получателя <span className="text-destructive">*</span></Label>
                   <Input
                     placeholder="Иванов Иван Иванович"
                     value={withdrawForm.accountFullName}
@@ -6948,7 +6948,7 @@ function Index() {
                   />
                 </div>
                 <div>
-                  <Label>Банк получателя</Label>
+                  <Label>Банк получателя <span className="text-destructive">*</span></Label>
                   <Input
                     placeholder="ПАО Сбербанк"
                     value={withdrawForm.accountBank}
@@ -6956,7 +6956,7 @@ function Index() {
                   />
                 </div>
                 <div>
-                  <Label>Расчётный счёт</Label>
+                  <Label>Расчётный счёт <span className="text-destructive">*</span></Label>
                   <Input
                     placeholder="40817810099910004312"
                     value={withdrawForm.accountNumber}
@@ -6965,7 +6965,7 @@ function Index() {
                   />
                 </div>
                 <div>
-                  <Label>БИК</Label>
+                  <Label>БИК <span className="text-destructive">*</span></Label>
                   <Input
                     placeholder="044525225"
                     value={withdrawForm.accountBik}
