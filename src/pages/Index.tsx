@@ -112,7 +112,7 @@ function Index() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [showEmployeeDetail, setShowEmployeeDetail] = useState(false);
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
-  const [employeeStatusFilter, setEmployeeStatusFilter] = useState<'all' | 'active' | 'fired'>('active');
+  const [employeeStatusFilter, setEmployeeStatusFilter] = useState<'all' | 'active' | 'fired' | 'admin'>('active');
   const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
   const [showVacancyDetail, setShowVacancyDetail] = useState(false);
   const [showRecommendDialog, setShowRecommendDialog] = useState(false);
@@ -3247,26 +3247,24 @@ function Index() {
                 onChange={(e) => setEmployeeSearchQuery(e.target.value)}
                 className="w-full text-sm"
               />
-              <div className="flex gap-1 shrink-0">
-                {(['all', 'active', 'fired'] as const).map((status) => (
-                  <Button
-                    key={status}
-                    size="sm"
-                    variant={employeeStatusFilter === status ? 'default' : 'outline'}
-                    onClick={() => setEmployeeStatusFilter(status)}
-                    className="text-xs"
-                  >
-                    {status === 'all' ? 'Все' : status === 'active' ? 'Активные' : 'Уволенные'}
-                  </Button>
-                ))}
-              </div>
+              <select
+                value={employeeStatusFilter}
+                onChange={(e) => setEmployeeStatusFilter(e.target.value as 'all' | 'active' | 'fired' | 'admin')}
+                className="shrink-0 text-sm border border-input rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+              >
+                <option value="all">Все</option>
+                <option value="active">Активные</option>
+                <option value="fired">Уволенные</option>
+                <option value="admin">Администраторы</option>
+              </select>
             </div>
             <div className="grid gap-4">
               {employees.filter(emp => {
                 const matchesStatus =
                   employeeStatusFilter === 'all' ||
                   (employeeStatusFilter === 'active' && !emp.isFired) ||
-                  (employeeStatusFilter === 'fired' && emp.isFired);
+                  (employeeStatusFilter === 'fired' && emp.isFired) ||
+                  (employeeStatusFilter === 'admin' && emp.isAdmin);
                 const matchesSearch =
                   employeeSearchQuery === '' ||
                   emp.name.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
