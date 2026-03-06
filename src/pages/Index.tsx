@@ -5317,12 +5317,7 @@ function Index() {
               <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💳 История</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
               <TabsTrigger value="games" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🎮 Игры</TabsTrigger>
-              {currentUser?.is_hr_manager && (
-                <TabsTrigger value="hr-vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 bg-blue-50 text-blue-700">👔 HR: Вакансии</TabsTrigger>
-              )}
-              {currentUser?.is_hr_manager && (
-                <TabsTrigger value="hr-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 bg-blue-50 text-blue-700">👔 HR: Рекомендации</TabsTrigger>
-              )}
+
             </TabsList>
           </ScrollableTabs>
 
