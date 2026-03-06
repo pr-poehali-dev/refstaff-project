@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { api, type Vacancy, type Company } from '@/lib/api';
 
 function VacancyReferral() {
@@ -28,6 +29,7 @@ function VacancyReferral() {
   });
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
 
   useEffect(() => {
     loadVacancyData();
@@ -115,6 +117,11 @@ function VacancyReferral() {
     
     if (!vacancy || !form.name || !form.phone || !form.comment) {
       alert('Заполните обязательные поля: ФИО, Телефон и Сопроводительное письмо');
+      return;
+    }
+
+    if (!captchaToken) {
+      alert('Пожалуйста, подтвердите, что вы не робот');
       return;
     }
 
@@ -394,7 +401,15 @@ function VacancyReferral() {
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full" size="lg">
+                  <div className="flex justify-center">
+                    <Turnstile
+                      siteKey="0x4AAAAAABiMT5DEJnwtSbKQ"
+                      onSuccess={(token) => setCaptchaToken(token)}
+                      onExpire={() => setCaptchaToken(null)}
+                    />
+                  </div>
+
+                  <Button type="submit" className="w-full" size="lg" disabled={!captchaToken}>
                     <Icon name="Send" className="mr-2" size={18} />
                     Отправить отклик
                   </Button>
