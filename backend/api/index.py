@@ -271,35 +271,37 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             body_data = json.loads(event.get('body', '{}'))
             recommendation_id = body_data.get('id')
             new_status = body_data.get('status')
+
+            # Получаем текущий статус рекомендации до обновления
+            cur.execute(
+                "SELECT status, recommended_by, reward_amount FROM t_p65890965_refstaff_project.recommendations WHERE id = %s",
+                (recommendation_id,)
+            )
+            current_rec = cur.fetchone()
+            old_status = current_rec['status'] if current_rec else None
             
             query = """
                 UPDATE t_p65890965_refstaff_project.recommendations 
-                SET status = %s, reviewed_at = CURRENT_TIMESTAMP
+                SET status = %s, reviewed_at = CURRENT_TIMESTAMP,
+                    accepted_at = CASE WHEN %s = 'accepted' THEN CURRENT_TIMESTAMP ELSE NULL END
                 WHERE id = %s
                 RETURNING id, status, reviewed_at
             """
             
-            cur.execute(query, (new_status, recommendation_id))
+            cur.execute(query, (new_status, new_status, recommendation_id))
             updated_recommendation = cur.fetchone()
             
-            if new_status == 'accepted':
-                get_recommendation = """
-                    SELECT recommended_by, reward_amount 
-                    FROM t_p65890965_refstaff_project.recommendations 
-                    WHERE id = %s
-                """
-                cur.execute(get_recommendation, (recommendation_id,))
-                rec_data = cur.fetchone()
-                
+            if new_status == 'accepted' and old_status != 'accepted':
+                # Принятие кандидата: начисляем бонус и XP
                 update_user = """
                     UPDATE t_p65890965_refstaff_project.users 
                     SET successful_hires = successful_hires + 1,
-                        wallet_pending = wallet_pending + %s,
+                        wallet_pending = GREATEST(0, wallet_pending + %s),
                         experience_points = experience_points + 100,
                         level = 1 + FLOOR((experience_points + 100) / 100)
                     WHERE id = %s
                 """
-                cur.execute(update_user, (rec_data['reward_amount'], rec_data['recommended_by']))
+                cur.execute(update_user, (current_rec['reward_amount'], current_rec['recommended_by']))
                 
                 get_vacancy_delay = """
                     SELECT payout_delay_days FROM t_p65890965_refstaff_project.vacancies
@@ -315,10 +317,33 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     VALUES (%s, %s, %s, CURRENT_TIMESTAMP + INTERVAL '{delay_days} days', 'pending')
                 """
                 cur.execute(create_pending_payout, (
-                    rec_data['recommended_by'], 
+                    current_rec['recommended_by'], 
                     recommendation_id, 
-                    rec_data['reward_amount']
+                    current_rec['reward_amount']
                 ))
+
+            elif old_status == 'accepted' and new_status in ('pending', 'rejected'):
+                # Откат: снимаем бонус, XP и удаляем pending_payout
+                cur.execute(
+                    "SELECT amount FROM t_p65890965_refstaff_project.pending_payouts WHERE recommendation_id = %s AND status = 'pending'",
+                    (recommendation_id,)
+                )
+                payout_row = cur.fetchone()
+                refund_amount = payout_row['amount'] if payout_row else current_rec['reward_amount']
+
+                cur.execute(
+                    "DELETE FROM t_p65890965_refstaff_project.pending_payouts WHERE recommendation_id = %s AND status = 'pending'",
+                    (recommendation_id,)
+                )
+
+                cur.execute("""
+                    UPDATE t_p65890965_refstaff_project.users 
+                    SET successful_hires = GREATEST(0, successful_hires - 1),
+                        wallet_pending = GREATEST(0, wallet_pending - %s),
+                        experience_points = GREATEST(0, experience_points - 100),
+                        level = GREATEST(1, 1 + FLOOR((GREATEST(0, experience_points - 100)) / 100))
+                    WHERE id = %s
+                """, (refund_amount, current_rec['recommended_by']))
             
             return {
                 'statusCode': 200,
