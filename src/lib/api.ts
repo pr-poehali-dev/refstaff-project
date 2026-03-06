@@ -310,6 +310,14 @@ export const api = {
     return response.json();
   },
 
+  async markMessagesRead(chatId: number, readerId: number): Promise<void> {
+    await fetch(`${API_URL}/?resource=messages`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, reader_id: readerId })
+    });
+  },
+
   async getWallet(userId: number): Promise<WalletData> {
     const response = await fetch(`${API_URL}/?resource=wallet&user_id=${userId}`);
     if (!response.ok) throw new Error('Failed to fetch wallet');

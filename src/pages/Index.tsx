@@ -15,7 +15,7 @@ import { Separator } from '@/components/ui/separator';
 import { Checkbox } from '@/components/ui/checkbox';
 import Icon from '@/components/ui/icon';
 import { QRCodeSVG } from 'qrcode.react';
-import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Recommendation as ApiRecommendation, type Company, type WalletData } from '@/lib/api';
+import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Recommendation as ApiRecommendation, type Company, type WalletData, type Chat } from '@/lib/api';
 import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment, PayoutRequest } from '@/types';
 import { EmployeeDetail } from '@/components/EmployeeDetail';
 import { PayoutRequests } from '@/components/PayoutRequests';
@@ -70,6 +70,7 @@ function Index() {
   const chatMessagesEndRef = React.useRef<HTMLDivElement>(null);
   const [newReward, setNewReward] = useState('30000');
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
+  const [chats, setChats] = useState<Chat[]>([]);
   const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [employeeToEdit, setEmployeeToEdit] = useState<Employee | null>(null);
@@ -358,6 +359,14 @@ function Index() {
       if (!chatId) { console.error('No chatId returned', chat); return; }
       setActiveChatId(chatId);
       await loadChatMessages(chatId);
+      if (currentUser?.id) {
+        api.markMessagesRead(chatId, currentUser.id);
+        setChats(prev => prev.map(c => (c.id === chatId || c.chat_id === chatId) ? { ...c, unread_count: 0 } : c));
+        setUnreadMessagesCount(prev => {
+          const chatUnread = chats.find(c => c.id === chatId || c.chat_id === chatId)?.unread_count || 0;
+          return Math.max(0, prev - chatUnread);
+        });
+      }
       if (chatPollRef.current) clearInterval(chatPollRef.current);
       chatPollRef.current = setInterval(() => loadChatMessages(chatId), 5000);
     } catch (e) {
@@ -418,7 +427,7 @@ function Index() {
     try {
       setIsLoading(true);
       const vacancyStatus = userRole === 'employer' ? 'all' : 'active';
-      const [vacanciesData, employeesData, recommendationsData, companyData, payoutsData] = await Promise.all([
+      const [vacanciesData, employeesData, recommendationsData, companyData, payoutsData, chatsData] = await Promise.all([
         api.getVacancies(currentCompanyId, vacancyStatus).catch(() => []),
         api.getEmployees(currentCompanyId).catch(() => []),
         userRole === 'employer'
@@ -428,6 +437,9 @@ function Index() {
         userRole === 'employer' 
           ? fetch(`https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901?company_id=${currentCompanyId}`)
               .then(res => res.json()).catch(() => [])
+          : Promise.resolve([]),
+        userRole === 'employer' && currentUser?.id
+          ? api.getChats(currentUser.id, currentCompanyId).catch(() => [])
           : Promise.resolve([])
       ]);
 
@@ -529,6 +541,12 @@ function Index() {
         }
         setPrevPayoutsCount(mappedPayouts.length);
         setPayoutRequests(mappedPayouts);
+      }
+
+      if (Array.isArray(chatsData) && chatsData.length > 0) {
+        setChats(chatsData);
+        const totalUnread = chatsData.reduce((sum: number, c: Chat) => sum + (c.unread_count || 0), 0);
+        setUnreadMessagesCount(totalUnread);
       }
 
       if (userRole === 'employee') {
@@ -3810,7 +3828,11 @@ function Index() {
               <span className="sm:hidden">Чаты</span>
             </h2>
             <div className="grid gap-3">
-              {employees.slice(0, 3).map((emp) => (
+              {(chats.length > 0 ? chats : employees.slice(0, 3).map(emp => ({ employee_id: emp.id, unread_count: 0 }))).map((chat) => {
+                const emp = employees.find(e => e.id === chat.employee_id);
+                if (!emp) return null;
+                const unread = chat.unread_count || 0;
+                return (
                 <Card key={emp.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
                   setActiveChatEmployee(emp);
                   setShowChatDialog(true);
@@ -3822,13 +3844,14 @@ function Index() {
                       </Avatar>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium">{emp.name}</div>
-                        <div className="text-sm text-muted-foreground truncate">Отлично! У меня есть кандидат...</div>
+                        <div className="text-sm text-muted-foreground truncate">{emp.position}</div>
                       </div>
-                      <Badge variant="secondary">2</Badge>
+                      {unread > 0 && <Badge className="bg-red-500 hover:bg-red-500 text-white">{unread}</Badge>}
                     </div>
                   </CardContent>
                 </Card>
-              ))}
+                );
+              })}
             </div>
             </>
             )}

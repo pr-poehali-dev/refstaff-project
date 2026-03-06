@@ -902,6 +902,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
+        elif method == 'PUT' and resource == 'messages':
+            body_data = json.loads(event.get('body') or '{}')
+            chat_id = body_data.get('chat_id')
+            reader_id = body_data.get('reader_id')
+            cur.execute("""
+                UPDATE t_p65890965_refstaff_project.chat_messages
+                SET is_read = true
+                WHERE chat_id = %s AND sender_id != %s AND is_read = false
+            """, (chat_id, reader_id))
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'updated': True})
+            }
+
         elif method == 'POST' and resource == 'messages':
             body_data = json.loads(event.get('body', '{}'))
             
