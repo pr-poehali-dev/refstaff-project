@@ -5339,10 +5339,7 @@ function Index() {
                 size="sm"
                 onClick={() => setShowWithdrawDialog(true)}
                 disabled={(walletData?.wallet?.wallet_balance || 0) === 0}
-              >
-                <Icon name="Download" className="mr-2" size={14} />
-                Вывести средства
-              </Button>
+              >Запросить выплату</Button>
             </CardContent>
           </Card>
         </div>
