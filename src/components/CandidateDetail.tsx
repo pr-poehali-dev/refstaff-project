@@ -17,8 +17,8 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
     const config: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; color: string }> = {
       pending: { label: 'На рассмотрении', variant: 'secondary', color: 'text-yellow-600' },
       interview: { label: 'На интервью', variant: 'default', color: 'text-blue-600' },
-      hired: { label: 'Принят', variant: 'outline', color: 'text-green-600' },
-      accepted: { label: 'Принят', variant: 'outline', color: 'text-green-600' },
+      hired: { label: 'Принят', variant: 'default', color: 'bg-green-600 text-white' },
+      accepted: { label: 'Принят', variant: 'default', color: 'bg-green-600 text-white' },
       rejected: { label: 'Отклонён', variant: 'destructive', color: 'text-red-600' },
     };
     return config[status] || config.pending;
@@ -33,7 +33,7 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
           <div className="flex items-start justify-between gap-4">
             <div className="flex-1">
               <DialogTitle className="text-xl mb-2">{recommendation.candidateName}</DialogTitle>
-              <Badge variant={statusInfo.variant} className="mb-2 w-fit">
+              <Badge variant={statusInfo.variant} className={`mb-2 w-fit ${statusInfo.color}`}>
                 {statusInfo.label}
               </Badge>
               <div className="flex items-center gap-2 text-muted-foreground">
