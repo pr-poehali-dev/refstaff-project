@@ -323,7 +323,37 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 first_name = body_data.get('first_name', '')
                 last_name = body_data.get('last_name', '')
                 invite_token = body_data.get('invite_token', '')
-                
+                turnstile_token = body_data.get('turnstile_token', '')
+
+                if not turnstile_token:
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Капча не пройдена'}),
+                        'isBase64Encoded': False
+                    }
+
+                import urllib.request as _urllib_request
+                _ts_data = json.dumps({
+                    'secret': os.environ.get('TURNSTILE_SECRET_KEY', ''),
+                    'response': turnstile_token
+                }).encode('utf-8')
+                _ts_req = _urllib_request.Request(
+                    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+                    data=_ts_data,
+                    headers={'Content-Type': 'application/json'},
+                    method='POST'
+                )
+                with _urllib_request.urlopen(_ts_req, timeout=10) as _ts_resp:
+                    _ts_result = json.loads(_ts_resp.read())
+                if not _ts_result.get('success'):
+                    return {
+                        'statusCode': 400,
+                        'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                        'body': json.dumps({'error': 'Проверка капчи не прошла. Попробуйте ещё раз'}),
+                        'isBase64Encoded': False
+                    }
+
                 if not email or not password or not first_name or not last_name or not invite_token:
                     return {
                         'statusCode': 400,

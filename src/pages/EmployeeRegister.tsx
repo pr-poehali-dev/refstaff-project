@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
+import { Turnstile } from '@marsidev/react-turnstile';
 
 function EmployeeRegister() {
   const [searchParams] = useSearchParams();
@@ -22,6 +23,7 @@ function EmployeeRegister() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   useEffect(() => {
     const loadCompanyInfo = async () => {
@@ -99,6 +101,11 @@ function EmployeeRegister() {
       return;
     }
 
+    if (!turnstileToken) {
+      setError('Пожалуйста, подтвердите, что вы не робот');
+      return;
+    }
+
     if (formData.password.length < 8) {
       setError('Пароль должен быть минимум 8 символов');
       return;
@@ -123,7 +130,8 @@ function EmployeeRegister() {
           password: formData.password,
           first_name: formData.firstName,
           last_name: formData.lastName,
-          invite_token: inviteToken
+          invite_token: inviteToken,
+          turnstile_token: turnstileToken
         })
       });
 
@@ -229,6 +237,15 @@ function EmployeeRegister() {
               />
             </div>
 
+            <div className="flex justify-center">
+              <Turnstile
+                siteKey="0x4AAAAAACnexPnHsy0yGN6Z"
+                onSuccess={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken('')}
+                onError={() => setTurnstileToken('')}
+              />
+            </div>
+
             {error && (
               <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 flex items-center gap-2">
                 <Icon name="AlertCircle" size={16} />
@@ -236,7 +253,7 @@ function EmployeeRegister() {
               </div>
             )}
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
+            <Button type="submit" className="w-full" disabled={isSubmitting || !turnstileToken}>
               {isSubmitting ? (
                 <>
                   <Icon name="Loader2" className="mr-2 animate-spin" size={18} />
