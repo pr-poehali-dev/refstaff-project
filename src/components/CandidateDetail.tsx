@@ -15,7 +15,7 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
 
   const getStatusInfo = (status: string) => {
     const config: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; color: string }> = {
-      pending: { label: 'На рассмотрении', variant: 'secondary', color: 'text-yellow-600' },
+      pending: { label: 'На рассмотрении', variant: 'secondary', color: 'bg-yellow-500 text-white' },
       interview: { label: 'На интервью', variant: 'default', color: 'text-blue-600' },
       hired: { label: 'Принят', variant: 'default', color: 'bg-green-600 text-white' },
       accepted: { label: 'Принят', variant: 'default', color: 'bg-green-600 text-white' },
