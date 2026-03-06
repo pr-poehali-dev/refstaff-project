@@ -414,7 +414,7 @@ function Index() {
   useEffect(() => {
     if ((userRole === 'employer' || userRole === 'employee') && currentUser) {
       loadData();
-      const pollInterval = setInterval(() => loadData(), 30000);
+      const pollInterval = setInterval(() => loadData(true), 30000);
       return () => clearInterval(pollInterval);
     }
   }, [userRole, currentUser]);
@@ -426,9 +426,9 @@ function Index() {
     }
   }, [userRole, isLoading, employeeTabsInitialized]);
 
-  const loadData = async () => {
+  const loadData = async (silent = false) => {
     try {
-      setIsLoading(true);
+      if (!silent) setIsLoading(true);
       const vacancyStatus = userRole === 'employer' ? 'all' : 'active';
       const [vacanciesData, employeesData, recommendationsData, companyData, payoutsData, chatsData] = await Promise.all([
         api.getVacancies(currentCompanyId, vacancyStatus).catch(() => []),
