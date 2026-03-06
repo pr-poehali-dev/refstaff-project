@@ -179,8 +179,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     INSERT INTO t_p65890965_refstaff_project.users 
                     (company_id, email, password_hash, first_name, last_name, role, level, experience_points, 
                      total_recommendations, successful_hires, total_earnings, wallet_balance, wallet_pending,
-                     is_admin, is_hr_manager, created_at, updated_at)
-                    VALUES (%s, %s, %s, %s, %s, %s, 1, 0, 0, 0, 0, 0, 0, %s, FALSE, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                     is_admin, created_at, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, 1, 0, 0, 0, 0, 0, 0, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                     RETURNING id
                 """, (company_id, email, f"{pwd_hash}:{salt}", first_name, last_name, role, role == 'admin'))
                 
