@@ -293,7 +293,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     UPDATE t_p65890965_refstaff_project.users 
                     SET successful_hires = successful_hires + 1,
                         wallet_pending = wallet_pending + %s,
-                        experience_points = experience_points + 100
+                        experience_points = experience_points + 100,
+                        level = 1 + FLOOR((experience_points + 100) / 100)
                     WHERE id = %s
                 """
                 cur.execute(update_user, (rec_data['reward_amount'], rec_data['recommended_by']))
