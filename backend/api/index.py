@@ -186,6 +186,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             query = f"""
                 SELECT r.*, 
                        v.title as vacancy_title,
+                       v.payout_delay_days,
                        u.first_name || ' ' || u.last_name as recommended_by_name
                 FROM t_p65890965_refstaff_project.recommendations r
                 JOIN t_p65890965_refstaff_project.vacancies v ON r.vacancy_id = v.id

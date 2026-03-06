@@ -478,7 +478,8 @@ function Index() {
           recommendedBy: r.recommended_by_name,
           employeeId: r.recommended_by,
           comment: r.comment,
-          resumeUrl: r.resume_url
+          resumeUrl: r.resume_url,
+          payoutDelayDays: r.payout_delay_days ?? 30
         };
       });
 
@@ -5617,12 +5618,12 @@ function Index() {
                         <CardDescription>{rec.vacancyTitle || rec.vacancy}</CardDescription>
                       </div>
                       <Badge variant={
-                        rec.status === 'hired' ? 'default' : 
+                        rec.status === 'hired' || rec.status === 'accepted' ? 'default' : 
                         rec.status === 'rejected' ? 'destructive' :
                         rec.status === 'interview' ? 'outline' :
                         'secondary'
-                      }>
-                        {rec.status === 'hired' ? 'Принят' : 
+                      } className={rec.status === 'accepted' ? 'bg-green-600 hover:bg-green-600' : ''}>
+                        {rec.status === 'hired' || rec.status === 'accepted' ? 'Принят' : 
                          rec.status === 'rejected' ? 'Отклонён' : 
                          rec.status === 'interview' ? 'На интервью' :
                          'На рассмотрении'}
@@ -5639,19 +5640,20 @@ function Index() {
                         <Icon name="Award" size={16} />
                         <span>{rec.reward.toLocaleString()} ₽</span>
                       </div>
-                      {rec.status === 'accepted' && rec.acceptedDate && (() => {
+                      {(rec.status === 'accepted' || rec.status === 'hired') && rec.acceptedDate && (() => {
                         const acceptedDate = new Date(rec.acceptedDate);
                         const today = new Date();
                         const daysPassed = Math.floor((today.getTime() - acceptedDate.getTime()) / (1000 * 60 * 60 * 24));
-                        const daysRemaining = Math.max(0, 30 - daysPassed);
+                        const delayDays = rec.payoutDelayDays ?? 30;
+                        const daysRemaining = Math.max(0, delayDays - daysPassed);
                         
                         return (
-                          <div className="flex items-center gap-1 text-green-600">
+                          <div className={`flex items-center gap-1 ${daysRemaining > 0 ? 'text-orange-600' : 'text-green-600'}`}>
                             <Icon name="Clock" size={16} />
                             <span>
                               {daysRemaining > 0 
-                                ? `Разблокировка через ${daysRemaining} ${daysRemaining === 1 ? 'день' : daysRemaining < 5 ? 'дня' : 'дней'}`
-                                : 'Средства разблокированы'
+                                ? `Выплата через ${daysRemaining} ${daysRemaining === 1 ? 'день' : daysRemaining < 5 ? 'дня' : 'дней'}`
+                                : '✓ Выплата доступна'
                               }
                             </span>
                           </div>

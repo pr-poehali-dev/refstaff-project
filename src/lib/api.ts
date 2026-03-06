@@ -52,6 +52,7 @@ export interface Recommendation {
   recommended_by_name?: string;
   created_at: string;
   accepted_at?: string;
+  payout_delay_days?: number;
 }
 
 export interface CompanyStats {

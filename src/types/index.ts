@@ -49,6 +49,7 @@ export interface Recommendation {
   employeeId?: number;
   comment?: string;
   resumeUrl?: string;
+  payoutDelayDays?: number;
 }
 
 export interface ChatMessage {
