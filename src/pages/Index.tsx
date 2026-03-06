@@ -45,6 +45,8 @@ function Index() {
   const [showCompanySettingsDialog, setShowCompanySettingsDialog] = useState(false);
   const [companyEditForm, setCompanyEditForm] = useState({ description: '', website: '', industry: '', telegram: '', vk: '' });
   const [isSavingCompany, setIsSavingCompany] = useState(false);
+  const [companyLogoFile, setCompanyLogoFile] = useState<File | null>(null);
+  const [companyLogoPreview, setCompanyLogoPreview] = useState<string | null>(null);
   const [showChatDialog, setShowChatDialog] = useState(false);
   const [activeChatEmployee, setActiveChatEmployee] = useState<Employee | null>(null);
   const [lightboxImage, setLightboxImage] = useState<string | null>(null);
@@ -733,13 +735,20 @@ function Index() {
   const handleSaveCompany = async () => {
     try {
       setIsSavingCompany(true);
+      let logoUrl: string | undefined;
+      if (companyLogoFile) {
+        logoUrl = await api.uploadResume(companyLogoFile);
+      }
       await api.updateCompany(currentCompanyId, {
         description: companyEditForm.description,
         website: companyEditForm.website,
         industry: companyEditForm.industry,
         telegram: companyEditForm.telegram,
         vk: companyEditForm.vk,
+        ...(logoUrl ? { logo_url: logoUrl } : {})
       });
+      setCompanyLogoFile(null);
+      setCompanyLogoPreview(null);
       await loadData();
       setShowCompanySettingsDialog(false);
     } catch (error) {
@@ -2897,10 +2906,16 @@ function Index() {
       <header className="border-b bg-white">
         <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
-              <Icon name="Rocket" className="text-white" size={20} />
-            </div>
-            <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
+            {company?.logo_url ? (
+              <img src={company.logo_url} alt={company.name} className="h-8 max-w-[140px] object-contain" />
+            ) : (
+              <>
+                <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
+                  <Icon name="Rocket" className="text-white" size={20} />
+                </div>
+                <span className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             <Button variant="ghost" size="icon" className="relative" onClick={() => setShowNotificationsDialog(true)}>
@@ -4539,7 +4554,38 @@ function Index() {
               </div>
               <div>
                 <Label htmlFor="company-logo" className="text-xs sm:text-sm">Логотип</Label>
-                <Input id="company-logo" className="mt-1 text-sm" type="file" accept="image/*" />
+                <div className="mt-1 flex items-center gap-3">
+                  {(companyLogoPreview || company?.logo_url) && (
+                    <img
+                      src={companyLogoPreview || company?.logo_url}
+                      alt="Логотип"
+                      className="h-12 w-12 object-contain rounded border"
+                    />
+                  )}
+                  <div className="flex-1">
+                    <Input
+                      id="company-logo"
+                      className="text-sm"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 5 * 1024 * 1024) {
+                            alert('Файл слишком большой. Максимум 5 МБ');
+                            e.target.value = '';
+                            return;
+                          }
+                          setCompanyLogoFile(file);
+                          const reader = new FileReader();
+                          reader.onload = (ev) => setCompanyLogoPreview(ev.target?.result as string);
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                    <p className="text-[10px] text-muted-foreground mt-1">PNG, JPG до 5 МБ</p>
+                  </div>
+                </div>
               </div>
             </div>
             <div>
