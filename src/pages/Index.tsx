@@ -522,10 +522,7 @@ function Index() {
           reviewedBy: p.reviewed_by
         }));
 
-        if (prevPayoutsCount === 0) {
-          const pendingPayouts = mappedPayouts.filter(p => p.status === 'pending').length;
-          setNewPayoutsCount(pendingPayouts);
-        } else {
+        if (prevPayoutsCount > 0) {
           const payDiff = mappedPayouts.length - prevPayoutsCount;
           if (payDiff > 0) setNewPayoutsCount(prev => prev + payDiff);
         }
