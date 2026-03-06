@@ -3823,6 +3823,23 @@ function Index() {
                           </Button>
                         </div>
                       )}
+                      {rec.status === 'rejected' && (
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (window.confirm('Вернуть кандидата на рассмотрение?')) {
+                              handleUpdateRecommendationStatus(rec.id, 'pending');
+                            }
+                          }} 
+                          disabled={isSubscriptionExpired}
+                          className="text-xs"
+                        >
+                          <Icon name="RotateCcw" className="mr-1" size={14} />
+                          На рассмотрение
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
