@@ -403,7 +403,7 @@ function VacancyReferral() {
 
                   <div className="flex justify-center">
                     <Turnstile
-                      siteKey="1x00000000000000000000AA"
+                      siteKey="0x4AAAAAACnexPnHsy0yGN6Z"
                       onSuccess={(token) => setCaptchaToken(token)}
                       onExpire={() => setCaptchaToken(null)}
                     />
