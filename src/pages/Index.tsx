@@ -127,6 +127,7 @@ function Index() {
     amount: '',
     paymentMethod: 'card',
     paymentDetails: '',
+    bankName: '',
     accountFullName: '',
     accountBank: '',
     accountNumber: '',
@@ -6974,14 +6975,24 @@ function Index() {
                 </div>
               </>
             ) : (
-              <div>
-                <Label>Реквизиты</Label>
-                <Input
-                  placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
-                  value={withdrawForm.paymentDetails}
-                  onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
-                />
-              </div>
+              <>
+                <div>
+                  <Label>Реквизиты <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
+                    value={withdrawForm.paymentDetails}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label>Наименование банка <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder="ПАО Сбербанк"
+                    value={withdrawForm.bankName || ''}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, bankName: e.target.value})}
+                  />
+                </div>
+              </>
             )}
             <Button 
               className="w-full"
@@ -7014,8 +7025,8 @@ function Index() {
                     return;
                   }
                 } else {
-                  if (!withdrawForm.paymentDetails.trim()) {
-                    alert('Укажите реквизиты для выплаты');
+                  if (!withdrawForm.paymentDetails.trim() || !withdrawForm.bankName.trim()) {
+                    alert('Заполните реквизиты и наименование банка');
                     return;
                   }
                 }
@@ -7023,7 +7034,7 @@ function Index() {
                 try {
                   const paymentDetails = withdrawForm.paymentMethod === 'account'
                     ? `ФИО: ${withdrawForm.accountFullName}\nБанк: ${withdrawForm.accountBank}\nРасчётный счёт: ${withdrawForm.accountNumber}\nБИК: ${withdrawForm.accountBik}`
-                    : withdrawForm.paymentDetails;
+                    : `${withdrawForm.paymentDetails}\nБанк: ${withdrawForm.bankName}`;
                   
                   const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
                     method: 'POST',
