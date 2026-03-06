@@ -112,6 +112,7 @@ function Index() {
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [showEmployeeDetail, setShowEmployeeDetail] = useState(false);
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
+  const [employeeStatusFilter, setEmployeeStatusFilter] = useState<'all' | 'active' | 'fired'>('active');
   const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
   const [showVacancyDetail, setShowVacancyDetail] = useState(false);
   const [showRecommendDialog, setShowRecommendDialog] = useState(false);
@@ -3239,21 +3240,41 @@ function Index() {
 
               </div>
             </div>
-            <div className="mb-4">
+            <div className="mb-4 flex flex-col sm:flex-row gap-2">
               <Input
                 placeholder="Поиск..."
                 value={employeeSearchQuery}
                 onChange={(e) => setEmployeeSearchQuery(e.target.value)}
                 className="w-full text-sm"
               />
+              <div className="flex gap-1 shrink-0">
+                {(['all', 'active', 'fired'] as const).map((status) => (
+                  <Button
+                    key={status}
+                    size="sm"
+                    variant={employeeStatusFilter === status ? 'default' : 'outline'}
+                    onClick={() => setEmployeeStatusFilter(status)}
+                    className="text-xs"
+                  >
+                    {status === 'all' ? 'Все' : status === 'active' ? 'Активные' : 'Уволенные'}
+                  </Button>
+                ))}
+              </div>
             </div>
             <div className="grid gap-4">
-              {employees.filter(emp => 
-                employeeSearchQuery === '' || 
-                emp.name.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
-                emp.position.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
-                emp.department.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
-                (emp.email && emp.email.toLowerCase().includes(employeeSearchQuery.toLowerCase()))
+              {employees.filter(emp => {
+                const matchesStatus =
+                  employeeStatusFilter === 'all' ||
+                  (employeeStatusFilter === 'active' && !emp.isFired) ||
+                  (employeeStatusFilter === 'fired' && emp.isFired);
+                const matchesSearch =
+                  employeeSearchQuery === '' ||
+                  emp.name.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
+                  emp.position.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
+                  emp.department.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
+                  (emp.email && emp.email.toLowerCase().includes(employeeSearchQuery.toLowerCase()));
+                return matchesStatus && matchesSearch;
+              }
               ).map((employee) => (
                 <Card 
                   key={employee.id} 
