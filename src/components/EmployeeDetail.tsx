@@ -17,14 +17,15 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
   const employeeRecommendations = recommendations.filter(r => r.employeeId === employee.id);
   
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive' }> = {
-      pending: { label: 'На рассмотрении', variant: 'secondary' },
-      interview: { label: 'На интервью', variant: 'default' },
-      hired: { label: 'Принят', variant: 'default' },
-      rejected: { label: 'Отклонён', variant: 'destructive' },
+    const statusConfig: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; className: string }> = {
+      pending:   { label: 'На рассмотрении', variant: 'secondary',    className: 'bg-yellow-500 text-white' },
+      interview: { label: 'На интервью',     variant: 'default',      className: 'bg-blue-600 text-white' },
+      hired:     { label: 'Принят',          variant: 'default',      className: 'bg-green-600 text-white' },
+      accepted:  { label: 'Принят',          variant: 'default',      className: 'bg-green-600 text-white' },
+      rejected:  { label: 'Отклонён',        variant: 'destructive',  className: 'text-white' },
     };
     const config = statusConfig[status] || statusConfig.pending;
-    return <Badge variant={config.variant}>{config.label}</Badge>;
+    return <Badge variant={config.variant} className={config.className}>{config.label}</Badge>;
   };
 
   return (
