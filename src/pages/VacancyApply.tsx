@@ -405,7 +405,7 @@ function VacancyApply() {
 
                   <div className="flex justify-center">
                     <Turnstile
-                      siteKey="0x4AAAAAABiMT5DEJnwtSbKQ"
+                      siteKey="1x00000000000000000000AA"
                       onSuccess={(token) => setCaptchaToken(token)}
                       onExpire={() => setCaptchaToken(null)}
                     />
