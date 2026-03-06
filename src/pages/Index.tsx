@@ -5837,62 +5837,81 @@ function Index() {
             </Card>
 
             <h3 className="text-base sm:text-lg font-semibold mt-4 sm:mt-6">Мои достижения</h3>
-            <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-              <Card>
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
-                      <Icon name="Star" className="text-yellow-600" size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm sm:text-lg truncate">Первая рекомендация</div>
-                      <div className="text-xs sm:text-sm text-muted-foreground">Получено 10.11.2025</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                      <Icon name="Target" className="text-green-600" size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm sm:text-lg truncate">Меткий глаз</div>
-                      <div className="text-xs sm:text-sm text-muted-foreground">3 успешных найма</div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="opacity-50">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                      <Icon name="Award" className="text-purple-600" size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm sm:text-lg truncate">Рекрутер месяца</div>
-                      <div className="text-xs sm:text-sm text-muted-foreground">2/5 наймов</div>
-                      <Progress value={40} className="h-1 mt-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-              <Card className="opacity-50">
-                <CardContent className="p-4 sm:p-6">
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <Icon name="Crown" className="text-blue-600" size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm sm:text-lg truncate">Золотой рекрутер</div>
-                      <div className="text-xs sm:text-sm text-muted-foreground">4/10 успешных наймов</div>
-                      <Progress value={40} className="h-1 mt-2" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {(() => {
+              const me = employees.find(e => e.id === currentEmployeeId);
+              const myRecs = recommendations.filter(r => r.employeeId === currentEmployeeId);
+              const myHires = me?.hired || 0;
+              const myRecsCount = me?.recommendations || 0;
+              const firstRec = myRecs.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
+              const hasFirstRec = myRecsCount >= 1;
+              const hasSharpEye = myHires >= 3;
+              const recruiterProgress = Math.min(myHires, 5);
+              const goldProgress = Math.min(myHires, 10);
+              return (
+                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
+                  <Card className={!hasFirstRec ? 'opacity-50' : ''}>
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                          <Icon name="Star" className="text-yellow-600" size={24} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm sm:text-lg truncate">Первая рекомендация</div>
+                          {hasFirstRec && firstRec
+                            ? <div className="text-xs sm:text-sm text-muted-foreground">Получено {new Date(firstRec.date).toLocaleDateString('ru-RU')}</div>
+                            : <div className="text-xs sm:text-sm text-muted-foreground">{myRecsCount}/1 рекомендаций<Progress value={myRecsCount * 100} className="h-1 mt-2" /></div>
+                          }
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className={!hasSharpEye ? 'opacity-50' : ''}>
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                          <Icon name="Target" className="text-green-600" size={24} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm sm:text-lg truncate">Меткий глаз</div>
+                          {hasSharpEye
+                            ? <div className="text-xs sm:text-sm text-muted-foreground">3 успешных найма выполнено ✓</div>
+                            : <div className="text-xs sm:text-sm text-muted-foreground">{myHires}/3 успешных найма<Progress value={Math.round((myHires / 3) * 100)} className="h-1 mt-2" /></div>
+                          }
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className={myHires < 5 ? 'opacity-50' : ''}>
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
+                          <Icon name="Award" className="text-purple-600" size={24} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm sm:text-lg truncate">Рекрутер месяца</div>
+                          <div className="text-xs sm:text-sm text-muted-foreground">{recruiterProgress}/5 наймов</div>
+                          <Progress value={Math.round((recruiterProgress / 5) * 100)} className="h-1 mt-2" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                  <Card className={myHires < 10 ? 'opacity-50' : ''}>
+                    <CardContent className="p-4 sm:p-6">
+                      <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                          <Icon name="Crown" className="text-blue-600" size={24} />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="font-medium text-sm sm:text-lg truncate">Золотой рекрутер</div>
+                          <div className="text-xs sm:text-sm text-muted-foreground">{goldProgress}/10 успешных наймов</div>
+                          <Progress value={Math.round((goldProgress / 10) * 100)} className="h-1 mt-2" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              );
+            })()}
           </TabsContent>
 
           <TabsContent value="wallet-history" className="space-y-4">
