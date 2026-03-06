@@ -257,11 +257,11 @@ export const api = {
     return response.json();
   },
 
-  async updateEmployeeRole(userId: number, isHrManager?: boolean, isAdmin?: boolean): Promise<Employee> {
+  async updateEmployeeRole(userId: number, _isHrManager?: boolean, isAdmin?: boolean): Promise<Employee> {
     const response = await fetch(`${API_URL}/?resource=employees&action=role`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, is_hr_manager: isHrManager, is_admin: isAdmin })
+      body: JSON.stringify({ user_id: userId, is_admin: isAdmin })
     });
     if (!response.ok) throw new Error('Failed to update employee role');
     return response.json();

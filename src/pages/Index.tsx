@@ -236,7 +236,6 @@ function Index() {
   const [employeeToEditRoles, setEmployeeToEditRoles] = useState<Employee | null>(null);
   const [showEditRolesDialog, setShowEditRolesDialog] = useState(false);
   const [rolesForm, setRolesForm] = useState({
-    isHrManager: false,
     isAdmin: false
   });
 
@@ -453,7 +452,6 @@ function Index() {
         phone: e.phone,
         telegram: e.telegram,
         vk: e.vk,
-        isHrManager: e.is_hr_manager || false,
         isAdmin: e.is_admin || false
       }));
 
@@ -1231,7 +1229,7 @@ function Index() {
     if (!employeeToEditRoles) return;
     
     try {
-      await api.updateEmployeeRole(employeeToEditRoles.id, rolesForm.isHrManager, rolesForm.isAdmin);
+      await api.updateEmployeeRole(employeeToEditRoles.id, undefined, rolesForm.isAdmin);
       await loadData();
       setShowEditRolesDialog(false);
       setEmployeeToEditRoles(null);
@@ -3261,7 +3259,7 @@ function Index() {
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
                           <CardTitle className="text-base sm:text-lg truncate">{employee.name}</CardTitle>
-                          {employee.isHrManager && <Badge variant="secondary" className="text-xs">HR</Badge>}
+
                           {employee.isAdmin && <Badge className="text-xs">Admin</Badge>}
                           <Badge variant="outline" className="bg-primary/10 text-xs hidden sm:inline-flex">
                             <Icon name="Trophy" size={12} className="mr-1" />
@@ -3314,7 +3312,6 @@ function Index() {
                               e.stopPropagation();
                               setEmployeeToEditRoles(employee);
                               setRolesForm({
-                                isHrManager: employee.isHrManager || false,
                                 isAdmin: employee.isAdmin || false
                               });
                               setShowEditRolesDialog(true);
@@ -3328,19 +3325,8 @@ function Index() {
                               <DialogDescription>Назначьте права доступа сотруднику</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 pt-4">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <Label>HR Manager</Label>
-                                  <p className="text-xs text-muted-foreground">Управление вакансиями и рекомендациями</p>
-                                </div>
-                                <Checkbox
-                                  checked={rolesForm.isHrManager}
-                                  onCheckedChange={(checked) => setRolesForm({...rolesForm, isHrManager: checked as boolean})}
-                                />
-                              </div>
                               {currentUser?.role === 'admin' && (
                                 <>
-                                  <Separator />
                                   <div className="flex items-center justify-between">
                                     <div>
                                       <Label>Администратор</Label>
@@ -3403,7 +3389,6 @@ function Index() {
                               e.stopPropagation();
                               setEmployeeToEditRoles(employee);
                               setRolesForm({
-                                isHrManager: employee.isHrManager || false,
                                 isAdmin: employee.isAdmin || false
                               });
                               setShowEditRolesDialog(true);
@@ -3417,19 +3402,8 @@ function Index() {
                               <DialogDescription>Назначьте права доступа сотруднику</DialogDescription>
                             </DialogHeader>
                             <div className="space-y-4 pt-4">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <Label>HR Manager</Label>
-                                  <p className="text-xs text-muted-foreground">Управление вакансиями и рекомендациями</p>
-                                </div>
-                                <Checkbox
-                                  checked={rolesForm.isHrManager}
-                                  onCheckedChange={(checked) => setRolesForm({...rolesForm, isHrManager: checked as boolean})}
-                                />
-                              </div>
                               {currentUser?.role === 'admin' && (
                                 <>
-                                  <Separator />
                                   <div className="flex items-center justify-between">
                                     <div>
                                       <Label>Администратор</Label>
