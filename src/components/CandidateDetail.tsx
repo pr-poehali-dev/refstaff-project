@@ -18,6 +18,7 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
       pending: { label: 'На рассмотрении', variant: 'secondary', color: 'text-yellow-600' },
       interview: { label: 'На интервью', variant: 'default', color: 'text-blue-600' },
       hired: { label: 'Принят', variant: 'outline', color: 'text-green-600' },
+      accepted: { label: 'Принят', variant: 'outline', color: 'text-green-600' },
       rejected: { label: 'Отклонён', variant: 'destructive', color: 'text-red-600' },
     };
     return config[status] || config.pending;
