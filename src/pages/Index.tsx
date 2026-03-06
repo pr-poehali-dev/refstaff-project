@@ -5824,13 +5824,13 @@ function Index() {
               <span className="hidden sm:inline"></span>
             </h2>
             <div className="space-y-2 sm:space-y-3">
-              {recommendations.filter(r => r.status === 'accepted' || r.status === 'paid').length === 0 ? (
+              {recommendations.filter(r => r.employeeId === currentEmployeeId && (r.status === 'accepted' || r.status === 'hired')).length === 0 ? (
                 <Card>
                   <CardContent className="p-6 text-center text-muted-foreground">
                     История транзакций пуста
                   </CardContent>
                 </Card>
-              ) : recommendations.filter(r => r.status === 'accepted' || r.status === 'paid').map((rec) => (
+              ) : recommendations.filter(r => r.employeeId === currentEmployeeId && (r.status === 'accepted' || r.status === 'hired')).map((rec) => (
                 <Card key={rec.id}>
                   <CardContent className="p-3 sm:p-4">
                     <div className="flex items-center justify-between gap-3">
@@ -5843,16 +5843,16 @@ function Index() {
                                 size={16} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-xs sm:text-sm truncate">Вознаграждение за рекомендацию {rec.candidate_name}</div>
+                          <div className="font-medium text-xs sm:text-sm truncate">Вознаграждение за рекомендацию {rec.candidateName}</div>
                           <div className="text-[10px] sm:text-xs text-muted-foreground">
-                            {new Date(rec.created_at).toLocaleDateString('ru-RU')}
+                            {new Date(rec.date).toLocaleDateString('ru-RU')}
                           </div>
                         </div>
                       </div>
                       <div className={`text-sm sm:text-lg font-bold flex-shrink-0 ${
                         rec.status === 'accepted' ? 'text-yellow-600' : 'text-green-600'
                       }`}>
-                        +{(rec.reward_amount || 0).toLocaleString()} ₽
+                        +{(rec.reward || 0).toLocaleString()} ₽
                       </div>
                     </div>
                   </CardContent>
