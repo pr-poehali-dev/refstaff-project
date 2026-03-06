@@ -5552,6 +5552,10 @@ function Index() {
                           <Icon name="Award" size={14} />
                           <span className="font-medium">{vacancy.reward.toLocaleString()} ₽</span>
                         </div>
+                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
+                          <Icon name="Clock" size={14} />
+                          <span>Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'} после найма</span>
+                        </div>
                       </div>
                       <Separator />
                       <div className="space-y-2">
