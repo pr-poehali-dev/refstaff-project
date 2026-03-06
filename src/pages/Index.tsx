@@ -577,7 +577,19 @@ function Index() {
 
         if (prevPayoutsCount > 0) {
           const payDiff = mappedPayouts.length - prevPayoutsCount;
-          if (payDiff > 0) setNewPayoutsCount(prev => prev + payDiff);
+          if (payDiff > 0) {
+            setNewPayoutsCount(prev => prev + payDiff);
+            const newPays = mappedPayouts.filter(p => !payoutRequests.find(ex => ex.id === p.id));
+            newPays.forEach((pay, i) => {
+              setNotifications(prev => [{
+                id: Date.now() + 60 + i,
+                type: 'payout',
+                message: `Новый запрос на выплату от ${pay.userName}: ${pay.amount.toLocaleString()} ₽`,
+                date: new Date().toISOString(),
+                read: false
+              }, ...prev]);
+            });
+          }
         }
         setPrevPayoutsCount(mappedPayouts.length);
         setPayoutRequests(mappedPayouts);
@@ -586,7 +598,75 @@ function Index() {
       if (Array.isArray(chatsData) && chatsData.length > 0) {
         setChats(chatsData);
         const totalUnread = chatsData.reduce((sum: number, c: Chat) => sum + (c.unread_count || 0), 0);
+        if (userRole === 'employer' && totalUnread > unreadMessagesCount && prevRecommendationsCount > 0) {
+          setNotifications(prev => [{
+            id: Date.now() + 10,
+            type: 'chat',
+            message: `Новые сообщения в чате (${totalUnread} непрочитанных)`,
+            date: new Date().toISOString(),
+            read: false
+          }, ...prev]);
+        }
         setUnreadMessagesCount(totalUnread);
+      }
+
+      if (userRole === 'employer') {
+        if (prevEmployeesCount > 0) {
+          const newEmps = mappedEmployees.filter(e => !employees.find(ex => ex.id === e.id));
+          newEmps.forEach((emp, i) => {
+            setNotifications(prev => [{
+              id: Date.now() + 20 + i,
+              type: 'employee',
+              message: `Зарегистрировался новый сотрудник: ${emp.name} (${emp.position})`,
+              date: new Date().toISOString(),
+              read: false
+            }, ...prev]);
+          });
+        }
+
+        if (prevRecommendationsCount > 0) {
+          const newRecs = mappedRecommendations.filter(r => !recommendations.find(ex => ex.id === r.id));
+          newRecs.forEach((rec, i) => {
+            setNotifications(prev => [{
+              id: Date.now() + 30 + i,
+              type: 'recommendation',
+              message: `Новая рекомендация: "${rec.candidateName}" на вакансию "${rec.vacancyTitle || rec.vacancy}"`,
+              date: new Date().toISOString(),
+              read: false
+            }, ...prev]);
+          });
+
+          const statusLabels: Record<string, string> = {
+            pending: 'На рассмотрении', accepted: 'Принят',
+            rejected: 'Отклонён', hired: 'Нанят', interview: 'На собеседовании'
+          };
+          mappedRecommendations.forEach((rec, i) => {
+            const prevRec = recommendations.find(r => r.id === rec.id);
+            if (prevRec && prevRec.status !== rec.status) {
+              setNotifications(prev => [{
+                id: Date.now() + 40 + i,
+                type: 'recommendation',
+                message: `Статус кандидата "${rec.candidateName}" изменён на "${statusLabels[rec.status] || rec.status}"`,
+                date: new Date().toISOString(),
+                read: false
+              }, ...prev]);
+            }
+          });
+        }
+
+        if (subscriptionDaysLeft <= 3 && subscriptionDaysLeft > 0) {
+          setNotifications(prev => {
+            const alreadyExists = prev.some(n => n.type === 'subscription' && n.message.includes('подписка'));
+            if (alreadyExists) return prev;
+            return [{
+              id: Date.now() + 50,
+              type: 'subscription',
+              message: `⚠️ Через ${subscriptionDaysLeft} дн. истекает подписка на сервис. Продлите, чтобы не потерять доступ.`,
+              date: new Date().toISOString(),
+              read: false
+            }, ...prev];
+          });
+        }
       }
 
       if (userRole === 'employee') {
@@ -6624,6 +6704,8 @@ function Index() {
                         notif.type === 'wallet' ? 'bg-green-100' :
                         notif.type === 'chat' ? 'bg-indigo-100' :
                         notif.type === 'news' ? 'bg-yellow-100' :
+                        notif.type === 'employee' ? 'bg-teal-100' :
+                        notif.type === 'payout' ? 'bg-rose-100' :
                         'bg-gray-100'
                       }`}>
                         <Icon 
@@ -6634,6 +6716,8 @@ function Index() {
                             notif.type === 'wallet' ? 'Wallet' :
                             notif.type === 'chat' ? 'MessageCircle' :
                             notif.type === 'news' ? 'Newspaper' :
+                            notif.type === 'employee' ? 'UserCheck' :
+                            notif.type === 'payout' ? 'Banknote' :
                             'Bell'
                           } 
                           className={
@@ -6643,6 +6727,8 @@ function Index() {
                             notif.type === 'wallet' ? 'text-green-600' :
                             notif.type === 'chat' ? 'text-indigo-600' :
                             notif.type === 'news' ? 'text-yellow-600' :
+                            notif.type === 'employee' ? 'text-teal-600' :
+                            notif.type === 'payout' ? 'text-rose-600' :
                             'text-gray-600'
                           }
                           size={18} 
