@@ -476,9 +476,7 @@ function Index() {
       });
 
       if (userRole === 'employee') {
-        if (prevVacanciesCount === 0) {
-          setNewVacanciesCount(mappedVacancies.length);
-        } else {
+        if (prevVacanciesCount > 0) {
           const vacDiff = mappedVacancies.length - prevVacanciesCount;
           if (vacDiff > 0) setNewVacanciesCount(prev => prev + vacDiff);
         }
@@ -486,19 +484,14 @@ function Index() {
       }
       setVacancies(mappedVacancies);
 
-      if (prevEmployeesCount === 0) {
-        setNewEmployeesCount(mappedEmployees.length);
-      } else {
+      if (prevEmployeesCount > 0) {
         const empDiff = mappedEmployees.length - prevEmployeesCount;
         if (empDiff > 0) setNewEmployeesCount(prev => prev + empDiff);
       }
       setPrevEmployeesCount(mappedEmployees.length);
       setEmployees(mappedEmployees);
 
-      if (prevRecommendationsCount === 0) {
-        const pendingCount = mappedRecommendations.filter((r: Recommendation) => r.status === 'pending').length;
-        setNewRecommendationsCount(pendingCount);
-      } else {
+      if (prevRecommendationsCount > 0) {
         const recDiff = mappedRecommendations.length - prevRecommendationsCount;
         if (recDiff > 0) setNewRecommendationsCount(prev => prev + recDiff);
       }
