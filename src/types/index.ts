@@ -48,6 +48,7 @@ export interface Recommendation {
   recommendedBy?: string;
   employeeId?: number;
   comment?: string;
+  resumeUrl?: string;
 }
 
 export interface ChatMessage {

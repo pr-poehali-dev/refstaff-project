@@ -212,9 +212,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             query = """
                 INSERT INTO t_p65890965_refstaff_project.recommendations 
-                (vacancy_id, recommended_by, candidate_name, candidate_email, candidate_phone, comment, reward_amount)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
-                RETURNING id, vacancy_id, candidate_name, candidate_email, status, reward_amount, created_at
+                (vacancy_id, recommended_by, candidate_name, candidate_email, candidate_phone, comment, resume_url, reward_amount)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING id, vacancy_id, candidate_name, candidate_email, status, resume_url, reward_amount, created_at
             """
             
             cur.execute(query, (
@@ -224,6 +224,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 body_data.get('candidate_email'),
                 body_data.get('candidate_phone', ''),
                 body_data.get('comment', ''),
+                body_data.get('resume_url'),
                 body_data.get('reward_amount', 30000)
             ))
             

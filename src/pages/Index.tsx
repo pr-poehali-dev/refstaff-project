@@ -477,7 +477,8 @@ function Index() {
           reward: r.reward_amount,
           recommendedBy: r.recommended_by_name,
           employeeId: r.recommended_by,
-          comment: r.comment
+          comment: r.comment,
+          resumeUrl: r.resume_url
         };
       });
 
@@ -4704,6 +4705,20 @@ function Index() {
                   {activeRecommendation.comment || 'Комментарий отсутствует'}
                 </p>
               </div>
+
+              {activeRecommendation.resumeUrl && (
+                <div>
+                  <Label className="text-xs text-muted-foreground">Резюме</Label>
+                  <div className="mt-1">
+                    <a href={activeRecommendation.resumeUrl} target="_blank" rel="noopener noreferrer" download>
+                      <Button variant="outline" size="sm" className="gap-2">
+                        <Icon name="Download" size={16} />
+                        Скачать резюме
+                      </Button>
+                    </a>
+                  </div>
+                </div>
+              )}
 
               <div>
                 <Label className="text-xs text-muted-foreground">Вознаграждение</Label>

@@ -123,10 +123,9 @@ function VacancyApply() {
     }
 
     try {
-      let resumeComment = form.comment;
-      
+      let resumeUrl: string | undefined;
       if (resumeFile) {
-        resumeComment += `\n\n[Приложено резюме: ${resumeFile.name}]`;
+        resumeUrl = await api.uploadResume(resumeFile);
       }
 
       await api.createRecommendation({
@@ -134,7 +133,8 @@ function VacancyApply() {
         candidate_name: form.name,
         candidate_email: form.email,
         candidate_phone: form.phone,
-        comment: resumeComment
+        comment: form.comment,
+        resume_url: resumeUrl
       });
       
       setIsSubmitted(true);

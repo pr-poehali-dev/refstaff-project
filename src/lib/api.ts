@@ -1,4 +1,5 @@
 const API_URL = 'https://functions.poehali.dev/30d9dba4-a499-4866-8ccc-ea7addf62b16';
+const UPLOAD_RESUME_URL = 'https://functions.poehali.dev/369f37fd-9898-42bb-9c4c-3bf096f5da1b';
 
 export interface Vacancy {
   id: number;
@@ -44,6 +45,7 @@ export interface Recommendation {
   candidate_email: string;
   candidate_phone?: string;
   comment?: string;
+  resume_url?: string;
   status: 'pending' | 'accepted' | 'rejected';
   reward_amount: number;
   recommended_by?: number;
@@ -189,6 +191,22 @@ export const api = {
     const response = await fetch(url);
     if (!response.ok) throw new Error('Failed to fetch recommendations');
     return response.json();
+  },
+
+  async uploadResume(file: File): Promise<string> {
+    const arrayBuffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+    const base64 = btoa(binary);
+    const response = await fetch(UPLOAD_RESUME_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_data: base64, file_name: file.name })
+    });
+    if (!response.ok) throw new Error('Failed to upload resume');
+    const result = await response.json();
+    return result.resume_url;
   },
 
   async createRecommendation(data: Partial<Recommendation>): Promise<Recommendation> {
