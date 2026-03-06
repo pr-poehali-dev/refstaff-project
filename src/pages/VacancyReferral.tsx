@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -15,6 +15,7 @@ function VacancyReferral() {
   const { token } = useParams();
   const [searchParams] = useSearchParams();
   const referrerId = searchParams.get('ref');
+  const navigate = useNavigate();
 
   const [vacancy, setVacancy] = useState<Vacancy | null>(null);
   const [company, setCompany] = useState<Company | null>(null);
@@ -210,9 +211,15 @@ function VacancyReferral() {
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50 safe-area-inset-top">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Icon name="Rocket" className="text-primary" size={24} />
-            <span className="text-lg sm:text-xl font-bold">iHUNT</span>
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+              <Icon name="ArrowLeft" size={16} className="mr-1" />
+              Назад
+            </Button>
+            <div className="flex items-center gap-2">
+              <Icon name="Rocket" className="text-primary" size={24} />
+              <span className="text-lg sm:text-xl font-bold">iHUNT</span>
+            </div>
           </div>
           {company?.website && (
             <Button variant="ghost" size="sm" onClick={() => window.open(company.website, '_blank')}>
