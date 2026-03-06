@@ -19,7 +19,7 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
       interview: { label: 'На интервью', variant: 'default', color: 'text-blue-600' },
       hired: { label: 'Принят', variant: 'default', color: 'bg-green-600 text-white' },
       accepted: { label: 'Принят', variant: 'default', color: 'bg-green-600 text-white' },
-      rejected: { label: 'Отклонён', variant: 'destructive', color: 'text-red-600' },
+      rejected: { label: 'Отклонён', variant: 'destructive', color: 'text-white' },
     };
     return config[status] || config.pending;
   };
