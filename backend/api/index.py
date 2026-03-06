@@ -454,7 +454,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 SELECT id, first_name, last_name, position, department, 
                        level, experience_points, total_recommendations, 
                        successful_hires, total_earnings, avatar_url,
-                       email, phone, telegram, vk
+                       email, phone, telegram, vk, is_admin, is_fired
                 FROM t_p65890965_refstaff_project.users
                 WHERE company_id = %s AND role = 'employee'
                 ORDER BY successful_hires DESC, total_recommendations DESC
@@ -614,12 +614,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             update_fields = []
             params = []
             
-            if 'is_hr_manager' in body_data:
-                update_fields.append('is_hr_manager = %s')
-                params.append(body_data['is_hr_manager'])
             if 'is_admin' in body_data:
                 update_fields.append('is_admin = %s')
                 params.append(body_data['is_admin'])
+            if 'is_fired' in body_data:
+                update_fields.append('is_fired = %s')
+                params.append(body_data['is_fired'])
             
             if not update_fields:
                 return {
@@ -637,7 +637,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 UPDATE t_p65890965_refstaff_project.users 
                 SET {', '.join(update_fields)}
                 WHERE id = %s
-                RETURNING id, first_name, last_name, is_hr_manager, is_admin
+                RETURNING id, first_name, last_name, is_admin, is_fired
             """
             
             cur.execute(query, params)

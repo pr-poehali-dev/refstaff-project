@@ -27,6 +27,7 @@ export interface Employee {
   earnings: number;
   level: number;
   isAdmin?: boolean;
+  isFired?: boolean;
   email?: string;
   phone?: string;
   telegram?: string;

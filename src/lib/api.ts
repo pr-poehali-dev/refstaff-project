@@ -32,6 +32,8 @@ export interface Employee {
   phone?: string;
   telegram?: string;
   vk?: string;
+  is_admin?: boolean;
+  is_fired?: boolean;
 }
 
 export interface Recommendation {
@@ -264,6 +266,16 @@ export const api = {
       body: JSON.stringify({ user_id: userId, is_admin: isAdmin })
     });
     if (!response.ok) throw new Error('Failed to update employee role');
+    return response.json();
+  },
+
+  async updateEmployeeFired(userId: number, isFired: boolean): Promise<Employee> {
+    const response = await fetch(`${API_URL}/?resource=employees&action=role`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, is_fired: isFired })
+    });
+    if (!response.ok) throw new Error('Failed to update employee status');
     return response.json();
   },
 

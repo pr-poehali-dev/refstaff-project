@@ -452,7 +452,8 @@ function Index() {
         phone: e.phone,
         telegram: e.telegram,
         vk: e.vk,
-        isAdmin: e.is_admin || false
+        isAdmin: e.is_admin || false,
+        isFired: e.is_fired || false
       }));
 
       const mappedRecommendations: Recommendation[] = recommendationsData.map((r: ApiRecommendation) => {
@@ -1237,6 +1238,18 @@ function Index() {
     } catch (error) {
       console.error('Ошибка обновления прав сотрудника:', error);
       alert('Не удалось обновить права сотрудника');
+    }
+  };
+
+  const handleToggleFired = async (employee: Employee) => {
+    const action = employee.isFired ? 'восстановить' : 'уволить';
+    if (!confirm(`Вы уверены, что хотите ${action} сотрудника ${employee.name}?`)) return;
+    try {
+      await api.updateEmployeeFired(employee.id, !employee.isFired);
+      await loadData();
+    } catch (error) {
+      console.error('Ошибка изменения статуса сотрудника:', error);
+      alert('Не удалось изменить статус сотрудника');
     }
   };
 
@@ -3260,7 +3273,12 @@ function Index() {
                         <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
                           <CardTitle className="text-base sm:text-lg truncate">{employee.name}</CardTitle>
 
-                          {employee.isAdmin && <Badge className="text-xs">Admin</Badge>}
+                          {employee.isFired
+                            ? <Badge variant="destructive" className="text-xs">Уволен</Badge>
+                            : employee.isAdmin
+                              ? <Badge className="text-xs bg-purple-600 hover:bg-purple-600">Администратор</Badge>
+                              : <Badge variant="secondary" className="text-xs">Действующий</Badge>
+                          }
                           <Badge variant="outline" className="bg-primary/10 text-xs hidden sm:inline-flex">
                             <Icon name="Trophy" size={12} className="mr-1" />
                             #{calculateEmployeeRank(employee)}
@@ -3336,6 +3354,21 @@ function Index() {
                                       checked={rolesForm.isAdmin}
                                       onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
                                     />
+                                  </div>
+                                  <div className="border-t pt-4">
+                                    <Button
+                                      variant={employeeToEditRoles?.isFired ? "outline" : "destructive"}
+                                      className="w-full"
+                                      onClick={() => {
+                                        if (employeeToEditRoles) {
+                                          setShowEditRolesDialog(false);
+                                          handleToggleFired(employeeToEditRoles);
+                                        }
+                                      }}
+                                    >
+                                      <Icon name={employeeToEditRoles?.isFired ? "UserCheck" : "UserX"} size={16} className="mr-2" />
+                                      {employeeToEditRoles?.isFired ? 'Восстановить сотрудника' : 'Уволить сотрудника'}
+                                    </Button>
                                   </div>
                                 </>
                               )}
@@ -3413,6 +3446,21 @@ function Index() {
                                       checked={rolesForm.isAdmin}
                                       onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
                                     />
+                                  </div>
+                                  <div className="border-t pt-4">
+                                    <Button
+                                      variant={employeeToEditRoles?.isFired ? "outline" : "destructive"}
+                                      className="w-full"
+                                      onClick={() => {
+                                        if (employeeToEditRoles) {
+                                          setShowEditRolesDialog(false);
+                                          handleToggleFired(employeeToEditRoles);
+                                        }
+                                      }}
+                                    >
+                                      <Icon name={employeeToEditRoles?.isFired ? "UserCheck" : "UserX"} size={16} className="mr-2" />
+                                      {employeeToEditRoles?.isFired ? 'Восстановить сотрудника' : 'Уволить сотрудника'}
+                                    </Button>
                                   </div>
                                 </>
                               )}
