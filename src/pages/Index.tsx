@@ -396,6 +396,12 @@ function Index() {
   };
 
   useEffect(() => {
+    if (showChatDialog && activeChatEmployee) {
+      handleSelectChatEmployee(activeChatEmployee);
+    }
+  }, [showChatDialog, activeChatEmployee?.id]);
+
+  useEffect(() => {
     if ((userRole === 'employer' || userRole === 'employee') && currentUser) {
       loadData();
     }
