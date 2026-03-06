@@ -6487,8 +6487,12 @@ function Index() {
           </DialogHeader>
           <div className="space-y-6 pt-4">
             <div className="flex items-center gap-4">
-              <div className="w-20 h-20 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Icon name="Building2" className="text-primary" size={40} />
+              <div className="w-20 h-20 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+                {company?.logo_url ? (
+                  <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-1" />
+                ) : (
+                  <Icon name="Building2" className="text-primary" size={40} />
+                )}
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-bold">{company?.name || '—'}</h3>
