@@ -467,6 +467,7 @@ function Index() {
         hired: e.successful_hires,
         earnings: Number(e.total_earnings),
         level: e.level,
+        experiencePoints: e.experience_points || 0,
         email: e.email,
         phone: e.phone,
         telegram: e.telegram,
@@ -5262,13 +5263,22 @@ function Index() {
             </CardHeader>
             <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
               <div className="space-y-3 sm:space-y-4">
-                <div>
-                  <div className="flex justify-between text-xs sm:text-sm mb-2">
-                    <span className="font-medium">Уровень 5</span>
-                    <span className="text-muted-foreground">250 / 500 XP</span>
-                  </div>
-                  <Progress value={50} className="h-2" />
-                </div>
+                {(() => {
+                  const emp = employees.find(e => e.id === currentEmployeeId);
+                  const level = emp?.level || 1;
+                  const xp = emp?.experiencePoints || 0;
+                  const xpForNextLevel = level * 100;
+                  const xpProgress = Math.min(100, Math.round((xp / xpForNextLevel) * 100));
+                  return (
+                    <div>
+                      <div className="flex justify-between text-xs sm:text-sm mb-2">
+                        <span className="font-medium">Уровень {level}</span>
+                        <span className="text-muted-foreground">{xp} / {xpForNextLevel} XP</span>
+                      </div>
+                      <Progress value={xpProgress} className="h-2" />
+                    </div>
+                  );
+                })()}
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t">
                   <div className="text-center">
                     <div className="text-2xl sm:text-3xl mb-1">🎯</div>

@@ -26,6 +26,7 @@ export interface Employee {
   hired: number;
   earnings: number;
   level: number;
+  experiencePoints?: number;
   isAdmin?: boolean;
   isFired?: boolean;
   email?: string;
