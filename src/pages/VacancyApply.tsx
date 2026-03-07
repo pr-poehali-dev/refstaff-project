@@ -211,6 +211,7 @@ function VacancyApply() {
           
           <Button
             variant="outline"
+            className="md:hidden"
             onClick={() => {
               const vacancyUrl = `${window.location.origin}/vacancy/${vacancy.id}`;
               const text = `${vacancy.title} — ${vacancy.department}\n${vacancy.salary_display}`;
