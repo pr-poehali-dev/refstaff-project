@@ -470,7 +470,7 @@ function Index() {
         avatar: e.avatar_url || '',
         recommendations: e.total_recommendations,
         hired: e.successful_hires,
-        earnings: Number(e.total_earnings),
+        earnings: Number(e.total_earned ?? e.total_earnings),
         level: e.level,
         experiencePoints: e.experience_points || 0,
         email: e.email,

@@ -490,8 +490,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             query = """
                 SELECT id, first_name, last_name, position, department, 
                        level, experience_points, total_recommendations, 
-                       successful_hires, total_earnings, avatar_url,
-                       email, phone, telegram, vk, is_admin, is_fired
+                       successful_hires, total_earnings,
+                       wallet_pending, wallet_balance,
+                       (wallet_pending + wallet_balance) as total_earned,
+                       avatar_url, email, phone, telegram, vk, is_admin, is_fired
                 FROM t_p65890965_refstaff_project.users
                 WHERE company_id = %s AND role = 'employee'
                 ORDER BY successful_hires DESC, total_recommendations DESC

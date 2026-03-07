@@ -28,6 +28,9 @@ export interface Employee {
   total_recommendations: number;
   successful_hires: number;
   total_earnings: number;
+  wallet_pending?: number;
+  wallet_balance?: number;
+  total_earned?: number;
   avatar_url?: string;
   email?: string;
   phone?: string;
