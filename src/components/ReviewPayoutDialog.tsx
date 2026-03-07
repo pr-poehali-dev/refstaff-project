@@ -45,9 +45,17 @@ export function ReviewPayoutDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="approved">Одобрить</SelectItem>
-                <SelectItem value="rejected">Отклонить</SelectItem>
-                <SelectItem value="paid">Выплачено</SelectItem>
+                {selectedRequest.status === 'approved' ? (
+                  <>
+                    <SelectItem value="paid">Выплачено</SelectItem>
+                    <SelectItem value="rejected">Отклонить</SelectItem>
+                  </>
+                ) : (
+                  <>
+                    <SelectItem value="approved">Одобрить</SelectItem>
+                    <SelectItem value="rejected">Отклонить</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>

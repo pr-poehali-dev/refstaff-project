@@ -3877,6 +3877,7 @@ function Index() {
             </div>
             <PayoutRequests 
               requests={payoutRequests}
+              companyId={currentCompanyId}
               onUpdateStatus={async (requestId, status, comment) => {
                 try {
                   const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {

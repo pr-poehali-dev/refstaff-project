@@ -28,11 +28,12 @@ export interface PayoutRequest {
 
 interface PayoutRequestsProps {
   requests: PayoutRequest[];
+  companyId?: number;
   onUpdateStatus: (requestId: number, status: string, comment?: string) => void;
   onVacancyClick?: (vacancyId: number) => void;
 }
 
-export function PayoutRequests({ requests, onUpdateStatus, onVacancyClick }: PayoutRequestsProps) {
+export function PayoutRequests({ requests, companyId = 1, onUpdateStatus, onVacancyClick }: PayoutRequestsProps) {
   const [selectedRequest, setSelectedRequest] = useState<PayoutRequest | null>(null);
   const [showReviewDialog, setShowReviewDialog] = useState(false);
   const [reviewStatus, setReviewStatus] = useState<'approved' | 'rejected' | 'paid'>('approved');
@@ -69,7 +70,7 @@ export function PayoutRequests({ requests, onUpdateStatus, onVacancyClick }: Pay
 
   const handleReview = (request: PayoutRequest) => {
     setSelectedRequest(request);
-    setReviewStatus('approved');
+    setReviewStatus(request.status === 'approved' ? 'paid' : 'approved');
     setReviewComment('');
     setShowReviewDialog(true);
   };
@@ -89,7 +90,7 @@ export function PayoutRequests({ requests, onUpdateStatus, onVacancyClick }: Pay
     setLoadingRecommendations(true);
     
     try {
-      const recommendations = await api.getRecommendations(1, undefined, request.userId);
+      const recommendations = await api.getRecommendations(companyId, undefined, request.userId);
       setEmployeeRecommendations(recommendations);
     } catch (error) {
       console.error('Ошибка загрузки рекомендаций:', error);
@@ -105,10 +106,10 @@ export function PayoutRequests({ requests, onUpdateStatus, onVacancyClick }: Pay
     setLoadingEmployee(true);
     
     try {
-      const employees = await api.getEmployees(1);
+      const employees = await api.getEmployees(companyId);
       const employee = employees.find(emp => emp.id === request.userId);
       if (employee) {
-        const recommendations = await api.getRecommendations(1, undefined, request.userId);
+        const recommendations = await api.getRecommendations(companyId, undefined, request.userId);
         setEmployeeData({ ...employee, recommendations });
       }
     } catch (error) {

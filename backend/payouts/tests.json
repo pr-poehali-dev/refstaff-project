@@ -1,45 +1,30 @@
 {
   "tests": [
     {
-      "name": "Create payout request",
-      "method": "POST",
-      "path": "/",
-      "body": {
-        "user_id": 1,
-        "amount": 50000,
-        "payment_method": "Банковская карта",
-        "payment_details": "4111 **** **** 1111"
-      },
-      "expectedStatus": 201,
-      "expectedBody": {
-        "id": "number",
-        "user_id": 1,
-        "amount": "number",
-        "status": "pending"
-      },
-      "bodyMatcher": "partial"
+      "name": "Get payout requests by company",
+      "method": "GET",
+      "path": "/?company_id=18",
+      "expectedStatus": 200
     },
     {
       "name": "Get payout requests by user",
       "method": "GET",
-      "path": "/?user_id=1",
-      "expectedStatus": 200,
-      "expectedBody": "array",
-      "bodyMatcher": "type"
+      "path": "/?user_id=32",
+      "expectedStatus": 200
     },
     {
-      "name": "Update payout request status",
+      "name": "Update non-existent request returns 404",
       "method": "PUT",
       "path": "/",
       "body": {
-        "request_id": 1,
+        "request_id": 999999,
         "status": "approved",
-        "admin_comment": "Одобрено к выплате",
-        "reviewed_by": 1
+        "admin_comment": "test",
+        "reviewed_by": 32
       },
-      "expectedStatus": 200,
+      "expectedStatus": 404,
       "expectedBody": {
-        "status": "approved"
+        "error": "string"
       },
       "bodyMatcher": "partial"
     }

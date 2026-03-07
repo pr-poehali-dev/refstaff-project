@@ -168,6 +168,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'isBase64Encoded': False
                 }
             
+            # Получаем текущий запрос перед обновлением
+            cur.execute(
+                "SELECT user_id, amount, status FROM t_p65890965_refstaff_project.payout_requests WHERE id = %s",
+                (request_id,)
+            )
+            current_request = cur.fetchone()
+
             query = """
                 UPDATE t_p65890965_refstaff_project.payout_requests
                 SET status = %s, admin_comment = %s, reviewed_at = NOW(), reviewed_by = %s
@@ -176,7 +183,36 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             """
             cur.execute(query, (status, admin_comment, reviewed_by, request_id))
             updated_request = cur.fetchone()
-            
+
+            if updated_request and current_request:
+                payout_amount = current_request['amount']
+                user_id = current_request['user_id']
+                old_status = current_request['status']
+
+                if status == 'paid' and old_status != 'paid':
+                    # Переносим из pending в balance + записываем транзакцию
+                    cur.execute("""
+                        UPDATE t_p65890965_refstaff_project.users
+                        SET wallet_pending = GREATEST(0, wallet_pending - %s),
+                            wallet_balance = wallet_balance + %s,
+                            total_earnings = total_earnings + %s
+                        WHERE id = %s
+                    """, (payout_amount, payout_amount, payout_amount, user_id))
+                    cur.execute("""
+                        INSERT INTO t_p65890965_refstaff_project.wallet_transactions
+                        (user_id, amount, type, description)
+                        VALUES (%s, %s, 'payout', 'Выплата по запросу #' || %s)
+                    """, (user_id, payout_amount, request_id))
+
+                elif status == 'rejected' and old_status in ('pending', 'approved'):
+                    # При отклонении — убираем из wallet_pending если было pending
+                    if old_status == 'pending':
+                        cur.execute("""
+                            UPDATE t_p65890965_refstaff_project.users
+                            SET wallet_pending = GREATEST(0, wallet_pending - %s)
+                            WHERE id = %s
+                        """, (payout_amount, user_id))
+
             if not updated_request:
                 return {
                     'statusCode': 404,
