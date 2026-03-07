@@ -160,6 +160,7 @@ function Index() {
   const [contactForm, setContactForm] = useState({
     name: '',
     email: '',
+    phone: '',
     message: ''
   });
   const [contactFormSubmitting, setContactFormSubmitting] = useState(false);
@@ -1130,7 +1131,7 @@ function Index() {
         body: JSON.stringify({
           name: contactForm.name,
           email: contactForm.email,
-          message: contactForm.message
+          message: `${contactForm.phone ? `Телефон: ${contactForm.phone}\n\n` : ''}${contactForm.message}`
         })
       });
 
@@ -1138,7 +1139,7 @@ function Index() {
 
       if (response.ok) {
         setContactFormSuccess(true);
-        setContactForm({ name: '', email: '', message: '' });
+        setContactForm({ name: '', email: '', phone: '', message: '' });
         alert('✅ Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.');
       } else {
         alert('❌ Ошибка при отправке: ' + (data.error || 'Попробуйте позже'));
@@ -1925,6 +1926,20 @@ function Index() {
                       className="mt-1.5 sm:mt-2 h-10 sm:h-11 md:h-12"
                       value={contactForm.email}
                       onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
+                      disabled={contactFormSubmitting}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="contact-phone" className="text-sm sm:text-base font-medium">Телефон</Label>
+                    <Input 
+                      id="contact-phone" 
+                      name="phone" 
+                      type="tel" 
+                      placeholder="+7 (999) 123-45-67" 
+                      autoComplete="tel" 
+                      className="mt-1.5 sm:mt-2 h-10 sm:h-11 md:h-12"
+                      value={contactForm.phone}
+                      onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
                       disabled={contactFormSubmitting}
                     />
                   </div>
