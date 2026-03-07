@@ -1778,7 +1778,7 @@ function Index() {
                     </li>
                   </ul>
                   
-                  <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Попробовать</Button>
+                  <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Попробовать самостоятельно</Button>
                 </div>
               </div>
             </div>
