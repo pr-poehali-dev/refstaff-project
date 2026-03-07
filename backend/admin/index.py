@@ -107,19 +107,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
         return ok({'company': dict(company), 'users': users, 'vacancies': vacancies})
 
-    # --- UPDATE COMPANY ADMIN COMMENT ---
-    if method == 'PUT' and resource == 'company_comment':
-        company_id = body.get('company_id')
-        comment = body.get('admin_comment', '')
-        if not company_id:
-            return err('company_id required')
-        cur.execute(f"""
-            UPDATE {SCHEMA}.companies
-            SET admin_comment = %s, updated_at = CURRENT_TIMESTAMP
-            WHERE id = %s
-        """, (comment or None, company_id))
-        return ok({'success': True})
-
     # --- UPDATE COMPANY SUBSCRIPTION ---
     if method == 'PUT' and resource == 'company_subscription':
         company_id = body.get('company_id')
