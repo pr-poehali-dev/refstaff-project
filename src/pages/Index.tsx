@@ -1872,7 +1872,7 @@ function Index() {
                     </li>
                   </ul>
                   
-                  <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500" onClick={() => setShowRegisterDialog(true)}>Подключить</Button>
+                  <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500" onClick={() => setShowDemoDialog(true)}>Подключить</Button>
                 </div>
               </div>
             </div>
