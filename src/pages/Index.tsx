@@ -5272,88 +5272,92 @@ function Index() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Управление подпиской</DialogTitle>
-            <DialogDescription>Ваш текущий тарифный план</DialogDescription>
+            <DialogDescription>Текущий статус и продление тарифного плана</DialogDescription>
           </DialogHeader>
-          <div className="space-y-6 pt-4">
-            <Card className="border-primary">
+          <div className="space-y-4 pt-2">
+            <Card className={subscriptionDaysLeft <= 0 ? 'border-destructive' : subscriptionDaysLeft < 7 ? 'border-orange-400' : 'border-primary'}>
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle>До 300 сотрудников</CardTitle>
-                  <Badge variant={subscriptionDaysLeft < 7 ? 'destructive' : 'secondary'}>
-                    {subscriptionDaysLeft} дней осталось
+                  <CardTitle className="text-base">{company?.subscription_tier === 'trial' ? 'Пробный период' : 'Продвинутый'}</CardTitle>
+                  <Badge variant={subscriptionDaysLeft <= 0 ? 'destructive' : subscriptionDaysLeft < 7 ? 'destructive' : 'secondary'}>
+                    {subscriptionDaysLeft <= 0 ? 'Истекла' : `${subscriptionDaysLeft} дн. осталось`}
                   </Badge>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="text-3xl font-bold">19 900 ₽ / мес</div>
-                <Progress value={(subscriptionDaysLeft / 30) * 100} className="h-2" />
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center gap-2">
-                    <Icon name="Check" className="text-green-600" size={16} />
-                    <span>Неограниченные вакансии</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Icon name="Check" className="text-green-600" size={16} />
-                    <span>API интеграция</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Icon name="Check" className="text-green-600" size={16} />
-                    <span>Аналитика и отчёты</span>
-                  </div>
-                </div>
+              <CardContent>
+                <Progress value={Math.max(0, Math.min(100, (subscriptionDaysLeft / 30) * 100))} className="h-2" />
+                {company?.subscription_expires_at && (
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Действует до: {new Date(company.subscription_expires_at).toLocaleDateString('ru-RU')}
+                  </p>
+                )}
               </CardContent>
             </Card>
 
-            <div className="space-y-3">
-              <Button 
-                className="w-full" 
-                size="lg"
-                onClick={() => {
-                  setSubscriptionDaysLeft(30);
-                  alert('✅ Подписка продлена на 30 дней!');
-                  setShowSubscriptionDialog(false);
-                }}
-              >
-                <Icon name="CreditCard" className="mr-2" size={18} />
-                Продлить подписку
-              </Button>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={() => {
-                  window.scrollTo({ top: document.getElementById('pricing')?.offsetTop || 0, behavior: 'smooth' });
-                  setShowSubscriptionDialog(false);
-                }}
-              >
-                Изменить тарифный план
-              </Button>
-
-              
-              <Button 
-                variant="destructive" 
-                className="w-full text-xs"
-                onClick={() => {
-                  setSubscriptionDaysLeft(0);
-                  alert('⚠️ Подписка истекла! (тестовый режим)');
-                }}
-              >
-                🧪 Тест: Истечь подписку
-              </Button>
-            </div>
-
             {subscriptionDaysLeft < 7 && (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Icon name="AlertTriangle" className="text-destructive mt-0.5" size={20} />
-                  <div className="flex-1 text-sm">
-                    <p className="font-medium text-destructive mb-1">Подписка заканчивается!</p>
-                    <p className="text-muted-foreground">
-                      Продлите подписку, чтобы не потерять доступ к функциям платформы
-                    </p>
-                  </div>
-                </div>
+              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3 flex items-start gap-2">
+                <Icon name="AlertTriangle" className="text-destructive mt-0.5 shrink-0" size={16} />
+                <p className="text-sm text-destructive">
+                  {subscriptionDaysLeft <= 0 ? 'Подписка истекла. Доступ ограничен.' : 'Подписка заканчивается. Продлите, чтобы не потерять доступ.'}
+                </p>
               </div>
             )}
+
+            <div className="space-y-3">
+              <p className="text-sm font-medium">Оставить заявку на продление</p>
+              <Input
+                placeholder="Ваше имя"
+                value={demoForm.name}
+                onChange={(e) => setDemoForm({ ...demoForm, name: e.target.value })}
+              />
+              <Input
+                placeholder="Телефон"
+                type="tel"
+                value={demoForm.phone}
+                onChange={(e) => setDemoForm({ ...demoForm, phone: e.target.value })}
+              />
+              <Input
+                placeholder="Email"
+                type="email"
+                value={demoForm.email}
+                onChange={(e) => setDemoForm({ ...demoForm, email: e.target.value })}
+              />
+              <Button
+                className="w-full"
+                disabled={demoFormSubmitting}
+                onClick={async () => {
+                  if (!demoForm.name || !demoForm.phone || !demoForm.email) {
+                    alert('Заполните имя, телефон и email');
+                    return;
+                  }
+                  setDemoFormSubmitting(true);
+                  try {
+                    await fetch('https://functions.poehali.dev/7316b3af-fb17-41b7-a4f3-9195c9f48288', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name: demoForm.name,
+                        email: 'info@i-hunt.ru',
+                        message: `ЗАЯВКА НА ПРОДЛЕНИЕ ПОДПИСКИ\n\nКомпания: ${company?.name || '—'}\nИмя: ${demoForm.name}\nТелефон: ${demoForm.phone}\nEmail: ${demoForm.email}\nТариф: ${company?.subscription_tier || '—'}\nОсталось дней: ${subscriptionDaysLeft}`
+                      })
+                    });
+                    setShowSubscriptionDialog(false);
+                    setDemoForm({ companyName: '', name: '', phone: '', email: '', employeeCount: '' });
+                    alert('✅ Заявка отправлена! Мы свяжемся с вами в ближайшее время.');
+                  } catch {
+                    alert('Ошибка отправки. Попробуйте позже.');
+                  } finally {
+                    setDemoFormSubmitting(false);
+                  }
+                }}
+              >
+                {demoFormSubmitting ? (
+                  <><Icon name="Loader2" className="mr-2 animate-spin" size={16} />Отправка...</>
+                ) : (
+                  <><Icon name="CreditCard" className="mr-2" size={16} />Продлить подписку</>
+                )}
+              </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
