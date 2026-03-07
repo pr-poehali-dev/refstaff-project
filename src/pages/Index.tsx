@@ -5304,20 +5304,36 @@ function Index() {
             )}
 
             <div className="space-y-3">
-              <p className="text-sm font-medium">Оставить заявку на продление</p>
+              <p className="text-sm font-medium text-muted-foreground">Тариф "Продвинутый" — без ограничений на сотрудников</p>
+              <div className="grid grid-cols-2 gap-3">
+                <Card className={`cursor-pointer border-2 transition-colors ${demoForm.employeeCount === '30' ? 'border-primary bg-primary/5' : 'border-border'}`}
+                  onClick={() => setDemoForm({ ...demoForm, employeeCount: '30' })}>
+                  <CardContent className="p-4 text-center">
+                    <p className="font-bold text-lg">54 900 ₽</p>
+                    <p className="text-xs text-muted-foreground">30 дней</p>
+                  </CardContent>
+                </Card>
+                <Card className={`cursor-pointer border-2 transition-colors ${demoForm.employeeCount === '365' ? 'border-primary bg-primary/5' : 'border-border'}`}
+                  onClick={() => setDemoForm({ ...demoForm, employeeCount: '365' })}>
+                  <CardContent className="p-4 text-center">
+                    <p className="font-bold text-lg">559 980 ₽</p>
+                    <p className="text-xs text-muted-foreground">1 год <span className="text-green-600 font-medium">−15%</span></p>
+                  </CardContent>
+                </Card>
+              </div>
               <Input
-                placeholder="Ваше имя"
+                placeholder="Ваше имя *"
                 value={demoForm.name}
                 onChange={(e) => setDemoForm({ ...demoForm, name: e.target.value })}
               />
               <Input
-                placeholder="Телефон"
+                placeholder="Телефон *"
                 type="tel"
                 value={demoForm.phone}
                 onChange={(e) => setDemoForm({ ...demoForm, phone: e.target.value })}
               />
               <Input
-                placeholder="Email"
+                placeholder="Email *"
                 type="email"
                 value={demoForm.email}
                 onChange={(e) => setDemoForm({ ...demoForm, email: e.target.value })}
@@ -5330,6 +5346,7 @@ function Index() {
                     alert('Заполните имя, телефон и email');
                     return;
                   }
+                  const period = demoForm.employeeCount === '365' ? '1 год (559 980 ₽)' : demoForm.employeeCount === '30' ? '30 дней (54 900 ₽)' : 'не выбран';
                   setDemoFormSubmitting(true);
                   try {
                     await fetch('https://functions.poehali.dev/7316b3af-fb17-41b7-a4f3-9195c9f48288', {
@@ -5338,7 +5355,7 @@ function Index() {
                       body: JSON.stringify({
                         name: demoForm.name,
                         email: 'info@i-hunt.ru',
-                        message: `ЗАЯВКА НА ПРОДЛЕНИЕ ПОДПИСКИ\n\nКомпания: ${company?.name || '—'}\nИмя: ${demoForm.name}\nТелефон: ${demoForm.phone}\nEmail: ${demoForm.email}\nТариф: ${company?.subscription_tier || '—'}\nОсталось дней: ${subscriptionDaysLeft}`
+                        message: `ЗАЯВКА НА ПРОДЛЕНИЕ ПОДПИСКИ\n\nКомпания: ${company?.name || '—'}\nИмя: ${demoForm.name}\nТелефон: ${demoForm.phone}\nEmail: ${demoForm.email}\nВыбранный период: ${period}\nТекущий тариф: ${company?.subscription_tier || '—'}\nОсталось дней: ${subscriptionDaysLeft}`
                       })
                     });
                     setShowSubscriptionDialog(false);
@@ -5354,7 +5371,7 @@ function Index() {
                 {demoFormSubmitting ? (
                   <><Icon name="Loader2" className="mr-2 animate-spin" size={16} />Отправка...</>
                 ) : (
-                  <><Icon name="CreditCard" className="mr-2" size={16} />Продлить подписку</>
+                  <><Icon name="CreditCard" className="mr-2" size={16} />Отправить заявку</>
                 )}
               </Button>
             </div>
@@ -5785,6 +5802,9 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="vacancies" className="space-y-4">
+            {isSubscriptionExpired ? (
+              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+            ) : (<>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
               <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
                 <span>💼 Вакансии</span>
@@ -5978,6 +5998,7 @@ function Index() {
                 </Card>
               ))}
             </div>
+            </>)}
           </TabsContent>
 
           <TabsContent value="my-recommendations" className="space-y-4">
