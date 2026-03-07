@@ -2029,162 +2029,137 @@ function Index() {
       </footer>
 
       <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-          <DialogHeader>
+        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90dvh] overflow-y-auto md:overflow-visible md:max-h-none p-4 sm:p-6">
+          <DialogHeader className="pb-1">
             <DialogTitle className="text-base sm:text-lg">Регистрация компании</DialogTitle>
             <DialogDescription className="text-xs sm:text-sm">Начните 14-дневный пробный период</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
-            <div>
-              <Label htmlFor="company-name" className="text-xs sm:text-sm">Название компании</Label>
-              <Input 
-                id="company-name" 
-                className="mt-1 text-sm"
-                placeholder="Acme Corp" 
-                value={registerForm.companyName}
-                onChange={(e) => setRegisterForm({...registerForm, companyName: e.target.value})}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-2 pt-1">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="col-span-2">
+                <Label htmlFor="company-name" className="text-xs">Название компании</Label>
+                <Input 
+                  id="company-name" 
+                  className="mt-1 h-8 text-sm"
+                  placeholder="Acme Corp" 
+                  value={registerForm.companyName}
+                  onChange={(e) => setRegisterForm({...registerForm, companyName: e.target.value})}
+                />
+              </div>
               <div>
-                <Label htmlFor="admin-first-name" className="text-xs sm:text-sm">Имя</Label>
+                <Label htmlFor="admin-first-name" className="text-xs">Имя</Label>
                 <Input 
                   id="admin-first-name" 
-                  className="mt-1 text-sm"
+                  className="mt-1 h-8 text-sm"
                   placeholder="Иван" 
                   value={registerForm.firstName}
                   onChange={(e) => setRegisterForm({...registerForm, firstName: e.target.value})}
                 />
               </div>
               <div>
-                <Label htmlFor="admin-last-name" className="text-xs sm:text-sm">Фамилия</Label>
+                <Label htmlFor="admin-last-name" className="text-xs">Фамилия</Label>
                 <Input 
                   id="admin-last-name" 
-                  className="mt-1 text-sm"
+                  className="mt-1 h-8 text-sm"
                   placeholder="Иванов" 
                   value={registerForm.lastName}
                   onChange={(e) => setRegisterForm({...registerForm, lastName: e.target.value})}
                 />
               </div>
-            </div>
-            <div>
-              <Label htmlFor="admin-email" className="text-xs sm:text-sm">Email</Label>
-              <Input 
-                id="admin-email" 
-                className="mt-1 text-sm"
-                type="email" 
-                placeholder="ivan@company.ru" 
-                value={registerForm.email}
-                onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="admin-password" className="text-xs sm:text-sm">Пароль</Label>
-              <Input 
-                id="admin-password" 
-                className="mt-1 text-sm"
-                type="password" 
-                placeholder="Минимум 8 символов" 
-                value={registerForm.password}
-                onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="company-inn" className="text-xs sm:text-sm">ИНН компании <span className="text-red-500">*</span></Label>
-              <div className="flex gap-2">
+              <div>
+                <Label htmlFor="admin-email" className="text-xs">Email</Label>
                 <Input 
-                  id="company-inn" 
-                  placeholder="1234567890" 
-                  maxLength={12} 
-                  value={registerForm.inn}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '');
-                    setRegisterForm({...registerForm, inn: value});
-                    if (innVerificationState.isVerified || innVerificationState.error) {
-                      setInnVerificationState({
-                        isChecking: false,
-                        isVerified: false,
-                        error: null,
-                        companyData: null
-                      });
-                    }
-                  }}
-                  className={`text-sm ${innVerificationState.isVerified ? 'border-green-500' : innVerificationState.error ? 'border-red-500' : ''}`}
+                  id="admin-email" 
+                  className="mt-1 h-8 text-sm"
+                  type="email" 
+                  placeholder="ivan@company.ru" 
+                  value={registerForm.email}
+                  onChange={(e) => setRegisterForm({...registerForm, email: e.target.value})}
                 />
-                <Button 
-                  type="button"
-                  variant="outline" 
-                  className="text-xs sm:text-sm shrink-0"
-                  onClick={() => handleVerifyInn(registerForm.inn)}
-                  disabled={innVerificationState.isChecking || !registerForm.inn || registerForm.inn.length < 10}
-                >
-                  {innVerificationState.isChecking ? (
-                    <>
-                      <Icon name="Loader2" className="w-4 h-4 mr-1 sm:mr-2 animate-spin" />
-                      <span className="hidden sm:inline">Проверка...</span>
-                      <span className="sm:hidden">...</span>
-                    </>
-                  ) : innVerificationState.isVerified ? (
-                    <>
-                      <Icon name="CheckCircle2" className="w-4 h-4 mr-1 sm:mr-2 text-green-600" />
-                      <span className="hidden sm:inline">Проверено</span>
-                      <span className="sm:hidden">OK</span>
-                    </>
-                  ) : (
-                    <>
-                      <Icon name="Search" className="w-4 h-4 mr-1 sm:mr-2" />
-                      Проверить
-                    </>
-                  )}
-                </Button>
               </div>
-              {innVerificationState.error && (
-                <p className="text-xs sm:text-sm text-red-500 flex items-center gap-1">
-                  <Icon name="AlertCircle" className="w-3.5 h-3.5 shrink-0" />
-                  {innVerificationState.error}
-                </p>
-              )}
-              {innVerificationState.isVerified && innVerificationState.companyData && (
-                <div className="p-2 sm:p-3 bg-green-50 border border-green-200 rounded-lg space-y-1">
-                  <p className="text-xs sm:text-sm font-medium text-green-900 flex items-center gap-1">
-                    <Icon name="CheckCircle2" className="w-3.5 h-3.5 shrink-0" />
-                    Компания найдена в ЕГРЮЛ
-                  </p>
-                  <p className="text-xs sm:text-sm text-green-700 break-words">
-                    <strong>Название:</strong> {innVerificationState.companyData.name?.short || innVerificationState.companyData.name?.full}
-                  </p>
-                  {innVerificationState.companyData.address?.full && (
-                    <p className="text-xs sm:text-sm text-green-700 break-words">
-                      <strong>Адрес:</strong> {innVerificationState.companyData.address.full}
-                    </p>
-                  )}
-                  <p className="text-xs sm:text-sm text-green-700">
-                    <strong>Статус:</strong> {innVerificationState.companyData.status?.text || 'Не указан'}
-                  </p>
-                  {!innVerificationState.companyData.status?.isActive && (
-                    <p className="text-xs text-orange-600 flex items-center gap-1 mt-1">
-                      <Icon name="AlertTriangle" className="w-3.5 h-3.5 shrink-0" />
-                      Компания не является действующей
-                    </p>
-                  )}
+              <div>
+                <Label htmlFor="admin-password" className="text-xs">Пароль</Label>
+                <Input 
+                  id="admin-password" 
+                  className="mt-1 h-8 text-sm"
+                  type="password" 
+                  placeholder="Минимум 8 символов" 
+                  value={registerForm.password}
+                  onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
+                />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="col-span-2 space-y-1">
+                <Label htmlFor="company-inn" className="text-xs">ИНН компании <span className="text-red-500">*</span></Label>
+                <div className="flex gap-2">
+                  <Input 
+                    id="company-inn" 
+                    placeholder="1234567890" 
+                    maxLength={12} 
+                    value={registerForm.inn}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setRegisterForm({...registerForm, inn: value});
+                      if (innVerificationState.isVerified || innVerificationState.error) {
+                        setInnVerificationState({
+                          isChecking: false,
+                          isVerified: false,
+                          error: null,
+                          companyData: null
+                        });
+                      }
+                    }}
+                    className={`h-8 text-sm ${innVerificationState.isVerified ? 'border-green-500' : innVerificationState.error ? 'border-red-500' : ''}`}
+                  />
+                  <Button 
+                    type="button"
+                    variant="outline" 
+                    className="h-8 text-xs shrink-0 px-3"
+                    onClick={() => handleVerifyInn(registerForm.inn)}
+                    disabled={innVerificationState.isChecking || !registerForm.inn || registerForm.inn.length < 10}
+                  >
+                    {innVerificationState.isChecking ? (
+                      <Icon name="Loader2" className="w-4 h-4 animate-spin" />
+                    ) : innVerificationState.isVerified ? (
+                      <><Icon name="CheckCircle2" className="w-4 h-4 text-green-600 mr-1" />OK</>
+                    ) : (
+                      'Проверить'
+                    )}
+                  </Button>
                 </div>
-              )}
+                {innVerificationState.error && (
+                  <p className="text-xs text-red-500 flex items-center gap-1">
+                    <Icon name="AlertCircle" className="w-3 h-3 shrink-0" />
+                    {innVerificationState.error}
+                  </p>
+                )}
+                {innVerificationState.isVerified && innVerificationState.companyData && (
+                  <div className="p-2 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-xs font-medium text-green-900 flex items-center gap-1">
+                      <Icon name="CheckCircle2" className="w-3 h-3 shrink-0" />
+                      {innVerificationState.companyData.name?.short || innVerificationState.companyData.name?.full}
+                      {' · '}{innVerificationState.companyData.status?.text || ''}
+                    </p>
+                  </div>
+                )}
+              </div>
+              <div className="col-span-2">
+                <Label htmlFor="employee-count" className="text-xs">Количество сотрудников</Label>
+                <Input 
+                  id="employee-count" 
+                  className="mt-1 h-8 text-sm"
+                  type="number" 
+                  placeholder="50" 
+                  value={registerForm.employeeCount}
+                  onChange={(e) => setRegisterForm({...registerForm, employeeCount: e.target.value})}
+                />
+              </div>
             </div>
-            <div>
-              <Label htmlFor="employee-count" className="text-xs sm:text-sm">Количество сотрудников</Label>
-              <Input 
-                id="employee-count" 
-                className="mt-1 text-sm"
-                type="number" 
-                placeholder="50" 
-                value={registerForm.employeeCount}
-                onChange={(e) => setRegisterForm({...registerForm, employeeCount: e.target.value})}
-              />
-            </div>
-            <Button className="w-full text-sm" onClick={handleRegister} disabled={isAuthLoading}>
+            <Button className="w-full h-9 text-sm" onClick={handleRegister} disabled={isAuthLoading}>
               {isAuthLoading ? 'Регистрация...' : 'Создать аккаунт'}
             </Button>
-            <p className="text-[10px] sm:text-xs text-center text-muted-foreground">
+            <p className="text-[10px] text-center text-muted-foreground">
               Нажимая кнопку, вы соглашаетесь с{' '}
               <button onClick={() => setShowTermsDialog(true)} className="text-primary hover:underline">условиями использования</button>
               {' '}и{' '}
