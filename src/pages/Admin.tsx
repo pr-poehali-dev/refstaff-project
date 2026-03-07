@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 
 const ADMIN_URL = 'https://functions.poehali.dev/e7549642-317b-4f05-b0f9-2c056de3cef0';
@@ -92,6 +93,8 @@ export default function Admin() {
   const [userForm, setUserForm] = useState({ first_name: '', last_name: '', position: '', is_admin: false, is_fired: false });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('analytics');
+  const [commentText, setCommentText] = useState('');
+  const [savingComment, setSavingComment] = useState(false);
 
   const handleLogin = async () => {
     if (!secret.trim()) { setAuthError('Введите секретный ключ'); return; }
@@ -119,7 +122,22 @@ export default function Admin() {
   const loadCompanyDetail = async (id: number) => {
     const data = await adminFetch(secret, `?resource=company&company_id=${id}`);
     setSelectedCompany(data);
+    setCommentText(data.company?.admin_comment || '');
     setShowCompanyDialog(true);
+  };
+
+  const handleSaveComment = async () => {
+    if (!selectedCompany?.company?.id) return;
+    setSavingComment(true);
+    await adminFetch(secret, '?resource=company_comment', 'PUT', {
+      company_id: selectedCompany.company.id,
+      admin_comment: commentText,
+    });
+    setSavingComment(false);
+    setSelectedCompany((prev: typeof selectedCompany) => ({
+      ...prev,
+      company: { ...prev.company, admin_comment: commentText },
+    }));
   };
 
   const handleExtendSub = async () => {
@@ -369,6 +387,21 @@ export default function Admin() {
                   </div>
                   <Button size="sm" onClick={() => { setSubForm({ company_id: selectedCompany.company.id, tier: 'advanced', days: '30' }); setShowSubDialog(true); }}>
                     Продлить
+                  </Button>
+                </div>
+
+                <div>
+                  <p className="text-gray-400 text-sm mb-2">Комментарий администратора</p>
+                  <Textarea
+                    placeholder="Заметки о компании (видны только в админке и в аккаунте компании)..."
+                    value={commentText}
+                    onChange={e => setCommentText(e.target.value)}
+                    className="bg-gray-800 border-gray-700 text-white text-sm resize-none"
+                    rows={3}
+                  />
+                  <Button size="sm" className="mt-2" onClick={handleSaveComment} disabled={savingComment}>
+                    {savingComment ? <Icon name="Loader2" size={14} className="animate-spin mr-1" /> : <Icon name="Save" size={14} className="mr-1" />}
+                    Сохранить
                   </Button>
                 </div>
 

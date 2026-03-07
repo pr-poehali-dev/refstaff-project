@@ -4732,6 +4732,21 @@ function Index() {
               </div>
             </div>
 
+            {company?.admin_comment && (
+              <>
+                <Separator />
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 sm:p-4">
+                  <div className="flex items-start gap-2">
+                    <Icon name="MessageSquare" size={16} className="text-amber-600 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-xs sm:text-sm font-medium text-amber-800 mb-1">Заметка от администратора</p>
+                      <p className="text-xs sm:text-sm text-amber-700 whitespace-pre-wrap">{company.admin_comment}</p>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
             <Separator />
 
             <Button className="w-full text-sm" size="lg" onClick={handleSaveCompany} disabled={isSavingCompany}>
