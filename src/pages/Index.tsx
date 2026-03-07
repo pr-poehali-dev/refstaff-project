@@ -2029,7 +2029,7 @@ function Index() {
       </footer>
 
       <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">Регистрация компании</DialogTitle>
             <DialogDescription className="text-xs sm:text-sm">Начните 14-дневный пробный период</DialogDescription>
@@ -2320,7 +2320,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showAboutDialog} onOpenChange={setShowAboutDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible">
           <DialogHeader>
             <DialogTitle className="text-2xl">О iHUNT</DialogTitle>
           </DialogHeader>
@@ -2412,7 +2412,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showPrivacyDialog} onOpenChange={setShowPrivacyDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible">
           <DialogHeader>
             <DialogTitle className="text-2xl">Политика конфиденциальности</DialogTitle>
             <DialogDescription>Последнее обновление: 14 ноября 2025 г.</DialogDescription>
@@ -2516,7 +2516,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showTermsDialog} onOpenChange={setShowTermsDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible">
           <DialogHeader>
             <DialogTitle className="text-2xl">Пользовательское соглашение</DialogTitle>
             <DialogDescription>Последнее обновление: 14 ноября 2025 г.</DialogDescription>
@@ -2657,7 +2657,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showPersonalDataDialog} onOpenChange={setShowPersonalDataDialog}>
-        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-3xl max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible">
           <DialogHeader>
             <DialogTitle>Положение об обработке персональных данных</DialogTitle>
             <DialogDescription>
@@ -3015,7 +3015,7 @@ function Index() {
                   <DialogTrigger asChild>
                     <Button disabled={isSubscriptionExpired} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">Создать вакансию</Button>
                   </DialogTrigger>
-                <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+                <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible p-4 sm:p-6">
                   <DialogHeader>
                     <DialogTitle className="text-base sm:text-lg">Новая вакансия</DialogTitle>
                     <DialogDescription className="text-xs sm:text-sm">Создайте новую вакансию для реферального найма</DialogDescription>
@@ -3296,7 +3296,7 @@ function Index() {
             </div>
 
             <Dialog open={activeVacancy !== null} onOpenChange={(open) => !open && setActiveVacancy(null)}>
-              <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+              <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible p-4 sm:p-6">
                 <DialogHeader>
                   <DialogTitle className="text-base sm:text-lg">Редактировать вакансию</DialogTitle>
                   <DialogDescription className="text-xs sm:text-sm">Обновите информацию о вакансии</DialogDescription>
@@ -4541,7 +4541,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showCompanySettingsDialog} onOpenChange={setShowCompanySettingsDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">Профиль компании</DialogTitle>
             <DialogDescription className="text-xs sm:text-sm">Управляйте информацией о вашей компании</DialogDescription>
@@ -6892,7 +6892,7 @@ function Index() {
     </div>
 
       <Dialog open={showEditProfileDialog} onOpenChange={setShowEditProfileDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">Изменить профиль</DialogTitle>
             <DialogDescription className="text-xs sm:text-sm">

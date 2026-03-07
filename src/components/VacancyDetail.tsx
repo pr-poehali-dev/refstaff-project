@@ -20,7 +20,7 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRest
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
+      <DialogContent className="max-w-3xl max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible p-4 sm:p-6">
         <DialogHeader>
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 sm:gap-4">
             <div className="flex-1">

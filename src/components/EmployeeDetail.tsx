@@ -30,7 +30,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90dvh] md:max-h-fit overflow-y-auto md:overflow-visible">
         <DialogHeader>
           <DialogTitle className="text-2xl">
             {employee.name}
