@@ -2011,7 +2011,15 @@ function Index() {
         <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90dvh] overflow-y-auto md:overflow-visible md:max-h-none p-4 sm:p-6">
           <DialogHeader className="pb-1">
             <DialogTitle className="text-base sm:text-lg">Регистрация компании</DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm">Начните 14-дневный пробный период</DialogDescription>
+            <DialogDescription className="text-xs sm:text-sm">
+              Начните 14-дневный пробный период или{' '}
+              <button
+                className="text-primary hover:underline font-medium"
+                onClick={() => { setShowRegisterDialog(false); setShowDemoDialog(true); }}
+              >
+                запросите демо
+              </button>
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-2 pt-1">
             <div className="grid grid-cols-2 gap-2">
