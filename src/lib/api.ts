@@ -79,6 +79,8 @@ export interface Company {
   telegram?: string;
   vk?: string;
   created_at: string;
+  subscription_tier?: string;
+  subscription_expires_at?: string;
 }
 
 export interface Wallet {

@@ -86,7 +86,7 @@ function Index() {
   const [showIntegrationsDialog, setShowIntegrationsDialog] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const [showNotificationsDialog, setShowNotificationsDialog] = useState(false);
-  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState(12);
+  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState(0);
   
   const isSubscriptionExpired = subscriptionDaysLeft <= 0;
   const [notifications, setNotifications] = useState<Array<{id: number; type: string; message: string; date: string; read: boolean}>>([]);
@@ -571,6 +571,12 @@ function Index() {
       setPrevRecommendationsCount(mappedRecommendations.length);
       setRecommendations(mappedRecommendations);
       setCompany(companyData);
+      if (companyData?.subscription_expires_at) {
+        const expires = new Date(companyData.subscription_expires_at);
+        const now = new Date();
+        const days = Math.ceil((expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        setSubscriptionDaysLeft(days);
+      }
       
       if (userRole === 'employer' && Array.isArray(payoutsData)) {
         const mappedPayouts: PayoutRequest[] = payoutsData.map((p: any) => ({
