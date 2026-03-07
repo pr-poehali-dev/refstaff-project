@@ -164,6 +164,16 @@ function Index() {
   });
   const [contactFormSubmitting, setContactFormSubmitting] = useState(false);
   const [contactFormSuccess, setContactFormSuccess] = useState(false);
+
+  const [showDemoDialog, setShowDemoDialog] = useState(false);
+  const [demoForm, setDemoForm] = useState({
+    companyName: '',
+    name: '',
+    phone: '',
+    email: '',
+    employeeCount: ''
+  });
+  const [demoFormSubmitting, setDemoFormSubmitting] = useState(false);
   
   const [vacancyForm, setVacancyForm] = useState({
     title: '',
@@ -1070,6 +1080,36 @@ function Index() {
     }
   };
 
+  const handleDemoFormSubmit = async () => {
+    if (!demoForm.companyName || !demoForm.name || !demoForm.phone || !demoForm.email) {
+      alert('Заполните все обязательные поля');
+      return;
+    }
+    setDemoFormSubmitting(true);
+    try {
+      const response = await fetch('https://functions.poehali.dev/7316b3af-fb17-41b7-a4f3-9195c9f48288', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: demoForm.name,
+          email: 'info@i-hunt.ru',
+          message: `ЗАПРОС НА ДЕМОНСТРАЦИЮ\n\nКомпания: ${demoForm.companyName}\nИмя: ${demoForm.name}\nТелефон: ${demoForm.phone}\nПочта: ${demoForm.email}\nКоличество сотрудников: ${demoForm.employeeCount || 'не указано'}`
+        })
+      });
+      if (response.ok) {
+        setShowDemoDialog(false);
+        setDemoForm({ companyName: '', name: '', phone: '', email: '', employeeCount: '' });
+        alert('✅ Заявка на демонстрацию отправлена! Мы свяжемся с вами в ближайшее время.');
+      } else {
+        alert('❌ Ошибка при отправке. Попробуйте позже.');
+      }
+    } catch {
+      alert('❌ Не удалось отправить заявку. Проверьте подключение к интернету.');
+    } finally {
+      setDemoFormSubmitting(false);
+    }
+  };
+
   const handleContactFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -1779,6 +1819,7 @@ function Index() {
                   </ul>
                   
                   <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Попробовать самостоятельно</Button>
+                  <Button className="w-full mt-2" variant="secondary" onClick={() => setShowDemoDialog(true)}>Запросить демонстрацию</Button>
                 </div>
               </div>
             </div>
@@ -2228,6 +2269,76 @@ function Index() {
                 </button>
               </div>
             )}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showDemoDialog} onOpenChange={setShowDemoDialog}>
+        <DialogContent className="max-w-[95vw] sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Запросить демонстрацию</DialogTitle>
+            <DialogDescription>Заполните форму, и мы покажем как работает платформа</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <div>
+              <Label htmlFor="demo-company" className="text-sm">Наименование компании <span className="text-destructive">*</span></Label>
+              <Input
+                id="demo-company"
+                className="mt-1"
+                placeholder="Acme Corp"
+                value={demoForm.companyName}
+                onChange={(e) => setDemoForm({ ...demoForm, companyName: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="demo-name" className="text-sm">Имя <span className="text-destructive">*</span></Label>
+              <Input
+                id="demo-name"
+                className="mt-1"
+                placeholder="Иван Иванов"
+                value={demoForm.name}
+                onChange={(e) => setDemoForm({ ...demoForm, name: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="demo-phone" className="text-sm">Номер телефона <span className="text-destructive">*</span></Label>
+              <Input
+                id="demo-phone"
+                className="mt-1"
+                type="tel"
+                placeholder="+7 (999) 123-45-67"
+                value={demoForm.phone}
+                onChange={(e) => setDemoForm({ ...demoForm, phone: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="demo-email" className="text-sm">Почта <span className="text-destructive">*</span></Label>
+              <Input
+                id="demo-email"
+                className="mt-1"
+                type="email"
+                placeholder="ivan@company.ru"
+                value={demoForm.email}
+                onChange={(e) => setDemoForm({ ...demoForm, email: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label htmlFor="demo-count" className="text-sm">Количество сотрудников</Label>
+              <Input
+                id="demo-count"
+                className="mt-1"
+                placeholder="100"
+                value={demoForm.employeeCount}
+                onChange={(e) => setDemoForm({ ...demoForm, employeeCount: e.target.value })}
+              />
+            </div>
+            <Button className="w-full mt-2" onClick={handleDemoFormSubmit} disabled={demoFormSubmitting}>
+              {demoFormSubmitting ? (
+                <><Icon name="Loader2" className="mr-2 animate-spin" size={16} />Отправка...</>
+              ) : (
+                <><Icon name="Send" className="mr-2" size={16} />Отправить заявку</>
+              )}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
