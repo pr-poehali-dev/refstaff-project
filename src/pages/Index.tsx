@@ -1864,6 +1864,30 @@ function Index() {
                       </div>
                       <span className="text-sm">Геймификация</span>
                     </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Нет ограничений на размещение вакансий</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Выделенный менеджер</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Работа с рекомендациями и откликами</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Внутренний чат с сотрудниками</span>
+                    </li>
                   </ul>
                   
                   <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500" onClick={() => setShowDemoDialog(true)}>Подключить</Button>
