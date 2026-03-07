@@ -98,9 +98,23 @@ function VacancyApply() {
       
       if (foundVacancy) {
         setVacancy(foundVacancy);
-        
-        const companyData = await api.getCompany(foundVacancy.company_id || 1);
-        setCompany(companyData);
+        const v = foundVacancy as Vacancy & { company_name?: string; company_description?: string; company_website?: string; company_industry?: string; company_logo_url?: string };
+        if (v.company_name) {
+          setCompany({
+            id: v.company_id || 0,
+            name: v.company_name,
+            description: v.company_description || '',
+            website: v.company_website || '',
+            industry: v.company_industry || '',
+            logo_url: v.company_logo_url || '',
+            employee_count: 0,
+            invite_token: '',
+            created_at: ''
+          });
+        } else if (foundVacancy.company_id) {
+          const companyData = await api.getCompany(foundVacancy.company_id);
+          setCompany(companyData);
+        }
       }
     } catch (error) {
       console.error('Ошибка загрузки вакансии:', error);

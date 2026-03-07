@@ -65,8 +65,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute(
                     f"""SELECT v.id, v.title, v.department, v.salary_display, v.status,
                                v.reward_amount, v.payout_delay_days, v.requirements, v.description,
-                               v.referral_token, v.created_at, 0 as recommendations_count
-                        FROM t_p65890965_refstaff_project.vacancies v WHERE v.id = %s""",
+                               v.referral_token, v.created_at, v.company_id, 0 as recommendations_count,
+                               c.name as company_name, c.description as company_description,
+                               c.website as company_website, c.industry as company_industry,
+                               c.logo_url as company_logo_url
+                        FROM t_p65890965_refstaff_project.vacancies v
+                        LEFT JOIN t_p65890965_refstaff_project.companies c ON v.company_id = c.id
+                        WHERE v.id = %s""",
                     (vacancy_id,)
                 )
                 row = cur.fetchone()
@@ -81,8 +86,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 cur.execute(
                     f"""SELECT v.id, v.title, v.department, v.salary_display, v.status,
                                v.reward_amount, v.payout_delay_days, v.requirements, v.description,
-                               v.referral_token, v.created_at, 0 as recommendations_count
-                        FROM t_p65890965_refstaff_project.vacancies v WHERE v.referral_token = %s""",
+                               v.referral_token, v.created_at, v.company_id, 0 as recommendations_count,
+                               c.name as company_name, c.description as company_description,
+                               c.website as company_website, c.industry as company_industry,
+                               c.logo_url as company_logo_url
+                        FROM t_p65890965_refstaff_project.vacancies v
+                        LEFT JOIN t_p65890965_refstaff_project.companies c ON v.company_id = c.id
+                        WHERE v.referral_token = %s""",
                     (referral_token,)
                 )
                 row = cur.fetchone()
