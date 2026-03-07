@@ -2037,7 +2037,7 @@ function Index() {
           <div className="space-y-2 pt-1">
             <div className="grid grid-cols-2 gap-2">
               <div className="col-span-2">
-                <Label htmlFor="company-name" className="text-xs">Название компании</Label>
+                <Label htmlFor="company-name" className="text-xs">Название компании <span className="text-destructive">*</span></Label>
                 <Input 
                   id="company-name" 
                   className="mt-1 h-8 text-sm"
@@ -2047,7 +2047,7 @@ function Index() {
                 />
               </div>
               <div>
-                <Label htmlFor="admin-first-name" className="text-xs">Имя</Label>
+                <Label htmlFor="admin-first-name" className="text-xs">Имя <span className="text-destructive">*</span></Label>
                 <Input 
                   id="admin-first-name" 
                   className="mt-1 h-8 text-sm"
@@ -2057,7 +2057,7 @@ function Index() {
                 />
               </div>
               <div>
-                <Label htmlFor="admin-last-name" className="text-xs">Фамилия</Label>
+                <Label htmlFor="admin-last-name" className="text-xs">Фамилия <span className="text-destructive">*</span></Label>
                 <Input 
                   id="admin-last-name" 
                   className="mt-1 h-8 text-sm"
@@ -2067,7 +2067,7 @@ function Index() {
                 />
               </div>
               <div>
-                <Label htmlFor="admin-email" className="text-xs">Email</Label>
+                <Label htmlFor="admin-email" className="text-xs">Email <span className="text-destructive">*</span></Label>
                 <Input 
                   id="admin-email" 
                   className="mt-1 h-8 text-sm"
@@ -2078,7 +2078,7 @@ function Index() {
                 />
               </div>
               <div>
-                <Label htmlFor="admin-password" className="text-xs">Пароль</Label>
+                <Label htmlFor="admin-password" className="text-xs">Пароль <span className="text-destructive">*</span></Label>
                 <Input 
                   id="admin-password" 
                   className="mt-1 h-8 text-sm"
@@ -2145,7 +2145,7 @@ function Index() {
                 )}
               </div>
               <div className="col-span-2">
-                <Label htmlFor="employee-count" className="text-xs">Количество сотрудников</Label>
+                <Label htmlFor="employee-count" className="text-xs">Количество сотрудников <span className="text-destructive">*</span></Label>
                 <Input 
                   id="employee-count" 
                   className="mt-1 h-8 text-sm"
