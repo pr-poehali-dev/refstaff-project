@@ -2322,8 +2322,8 @@ function Index() {
       <Dialog open={showDemoDialog} onOpenChange={setShowDemoDialog}>
         <DialogContent className="max-w-[95vw] sm:max-w-md">
           <DialogHeader>
-            <DialogTitle>Запросить демонстрацию</DialogTitle>
-            <DialogDescription>Заполните форму, и мы покажем как работает платформа</DialogDescription>
+            <DialogTitle>Запросить доступ</DialogTitle>
+            <DialogDescription>Заполните форму и мы свяжемся с вами в ближайшее время</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 pt-2">
             <div>
