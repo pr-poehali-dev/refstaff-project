@@ -6292,13 +6292,25 @@ function Index() {
                   return true;
                 })
                 .map((notif) => (
-                  <Card key={notif.id} className={notif.read ? 'opacity-60' : ''}>
+                  <Card
+                    key={notif.id}
+                    className={`transition-opacity cursor-pointer hover:shadow-sm ${notif.read ? 'opacity-60' : ''}`}
+                    onClick={() => {
+                      if (!notif.read) {
+                        setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
+                        setNewNotificationsCount(prev => Math.max(0, prev - 1));
+                      }
+                    }}
+                  >
                     <CardContent className="p-3 sm:p-4">
                       <div className="flex items-start gap-2 sm:gap-3">
                         <div className={`p-1.5 sm:p-2 rounded-full flex-shrink-0 ${
                           notif.type === 'recommendation' ? 'bg-blue-100' :
                           notif.type === 'hire' ? 'bg-green-100' :
                           notif.type === 'payout' ? 'bg-yellow-100' :
+                          notif.type === 'wallet' ? 'bg-purple-100' :
+                          notif.type === 'chat' ? 'bg-teal-100' :
+                          notif.type === 'vacancy' ? 'bg-orange-100' :
                           'bg-gray-100'
                         }`}>
                           <Icon 
@@ -6306,6 +6318,9 @@ function Index() {
                               notif.type === 'recommendation' ? 'UserPlus' :
                               notif.type === 'hire' ? 'CheckCircle' :
                               notif.type === 'payout' ? 'DollarSign' :
+                              notif.type === 'wallet' ? 'Wallet' :
+                              notif.type === 'chat' ? 'MessageSquare' :
+                              notif.type === 'vacancy' ? 'Briefcase' :
                               'Bell'
                             }
                             size={16}
@@ -6313,6 +6328,9 @@ function Index() {
                               notif.type === 'recommendation' ? 'text-blue-600' :
                               notif.type === 'hire' ? 'text-green-600' :
                               notif.type === 'payout' ? 'text-yellow-600' :
+                              notif.type === 'wallet' ? 'text-purple-600' :
+                              notif.type === 'chat' ? 'text-teal-600' :
+                              notif.type === 'vacancy' ? 'text-orange-600' :
                               'text-gray-600'
                             }
                           />
@@ -6327,8 +6345,10 @@ function Index() {
                             })}
                           </p>
                         </div>
-                        {!notif.read && (
+                        {!notif.read ? (
                           <Badge variant="default" className="text-[10px] sm:text-xs flex-shrink-0">Новое</Badge>
+                        ) : (
+                          <Icon name="Check" size={14} className="text-muted-foreground flex-shrink-0 mt-0.5" />
                         )}
                       </div>
                     </CardContent>
