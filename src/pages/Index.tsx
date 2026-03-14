@@ -86,9 +86,9 @@ function Index() {
   const [showIntegrationsDialog, setShowIntegrationsDialog] = useState(false);
   const [showSubscriptionDialog, setShowSubscriptionDialog] = useState(false);
   const [showNotificationsDialog, setShowNotificationsDialog] = useState(false);
-  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState(0);
+  const [subscriptionDaysLeft, setSubscriptionDaysLeft] = useState<number | null>(null);
   
-  const isSubscriptionExpired = subscriptionDaysLeft <= 0;
+  const isSubscriptionExpired = subscriptionDaysLeft !== null && subscriptionDaysLeft <= 0;
   const [notifications, setNotifications] = useState<Array<{id: number; type: string; message: string; date: string; read: boolean}>>([]);
   
   const currentEmployeeId = currentUser?.id;
@@ -703,7 +703,7 @@ function Index() {
           });
         }
 
-        if (subscriptionDaysLeft <= 3 && subscriptionDaysLeft > 0) {
+        if (subscriptionDaysLeft !== null && subscriptionDaysLeft <= 3 && subscriptionDaysLeft > 0) {
           setNotifications(prev => {
             const alreadyExists = prev.some(n => n.type === 'subscription' && n.message.includes('подписка'));
             if (alreadyExists) return prev;
@@ -3029,7 +3029,7 @@ function Index() {
             <Button variant="ghost" onClick={() => setShowSubscriptionDialog(true)} size="sm" className="hidden sm:flex">
               <Icon name="CreditCard" className="mr-2" size={18} />
               <span className="hidden lg:inline">Подписка</span>
-              {subscriptionDaysLeft < 14 && (
+              {subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 && (
                 <Badge variant="destructive" className="ml-2 text-xs">{subscriptionDaysLeft} дн.</Badge>
               )}
             </Button>
@@ -3096,7 +3096,7 @@ function Index() {
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
               <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💬 Чаты</TabsTrigger>
               <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📊 Статистика</TabsTrigger>
-              <TabsTrigger value="subscription" className="text-xs whitespace-nowrap px-3 py-2 sm:hidden">💳 Подписка{subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
+              <TabsTrigger value="subscription" className="text-xs whitespace-nowrap px-3 py-2 sm:hidden">💳 Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
             </TabsList>
           </ScrollableTabs>
