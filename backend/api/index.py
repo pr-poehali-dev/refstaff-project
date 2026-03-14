@@ -8,10 +8,14 @@ Returns: HTTP response dict с statusCode, headers, body
 
 import json
 import os
+import base64
+import uuid
+import mimetypes
 from typing import Dict, Any, Optional
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import urllib.request
+import boto3
 
 NOTIFY_URL = 'https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be'
 
@@ -958,16 +962,50 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         elif method == 'POST' and resource == 'messages':
             body_data = json.loads(event.get('body', '{}'))
             
+            attachment_url = None
+            attachment_name = None
+            attachment_type = None
+            attachment_size = None
+            
+            if body_data.get('attachment_data'):
+                att_data = body_data['attachment_data']
+                file_bytes = base64.b64decode(att_data['base64'])
+                ext = att_data.get('name', 'file').rsplit('.', 1)[-1].lower()
+                key = f"chat-attachments/{uuid.uuid4()}.{ext}"
+                content_type = att_data.get('mime_type', 'application/octet-stream')
+                
+                s3 = boto3.client(
+                    's3',
+                    endpoint_url='https://bucket.poehali.dev',
+                    aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
+                    aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY']
+                )
+                s3.put_object(
+                    Bucket='files',
+                    Key=key,
+                    Body=file_bytes,
+                    ContentType=content_type
+                )
+                attachment_url = f"https://cdn.poehali.dev/projects/{os.environ['AWS_ACCESS_KEY_ID']}/bucket/{key}"
+                attachment_name = att_data.get('name')
+                attachment_type = 'image' if content_type.startswith('image/') else 'file'
+                attachment_size = len(file_bytes)
+            
             insert_message = """
                 INSERT INTO t_p65890965_refstaff_project.chat_messages 
-                (chat_id, sender_id, message)
-                VALUES (%s, %s, %s)
-                RETURNING id, chat_id, sender_id, message, is_read, created_at
+                (chat_id, sender_id, message, attachment_url, attachment_name, attachment_type, attachment_size)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                RETURNING id, chat_id, sender_id, message, is_read, created_at,
+                          attachment_url, attachment_name, attachment_type, attachment_size
             """
             cur.execute(insert_message, (
                 body_data.get('chat_id'),
                 body_data.get('sender_id'),
-                body_data.get('message')
+                body_data.get('message', ''),
+                attachment_url,
+                attachment_name,
+                attachment_type,
+                attachment_size
             ))
             new_message = cur.fetchone()
             

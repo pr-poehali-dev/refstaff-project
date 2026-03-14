@@ -355,6 +355,12 @@ function Index() {
         message: m.message,
         timestamp: new Date(m.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
         isOwn: m.sender_id === currentUser?.id,
+        attachments: m.attachment_url ? [{
+          type: m.attachment_type as 'image' | 'file',
+          url: m.attachment_url,
+          name: m.attachment_name || 'файл',
+          size: m.attachment_size || 0,
+        }] : undefined,
       }));
       setChatMessages(mapped);
       setTimeout(() => chatMessagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
@@ -392,7 +398,26 @@ function Index() {
     if ((!newMessage.trim() && selectedFiles.length === 0) || !activeChatId || isSendingMessage) return;
     setIsSendingMessage(true);
     try {
-      await api.sendMessage(activeChatId, currentUser?.id || 0, newMessage.trim());
+      if (selectedFiles.length > 0) {
+        for (const file of selectedFiles) {
+          const base64 = await new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const result = reader.result as string;
+              resolve(result.split(',')[1]);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          });
+          await api.sendMessage(activeChatId, currentUser?.id || 0, newMessage.trim(), {
+            base64,
+            name: file.name,
+            mime_type: file.type,
+          });
+        }
+      } else {
+        await api.sendMessage(activeChatId, currentUser?.id || 0, newMessage.trim());
+      }
       setNewMessage('');
       setSelectedFiles([]);
       await loadChatMessages(activeChatId);

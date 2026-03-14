@@ -348,11 +348,11 @@ export const api = {
     return response.json();
   },
 
-  async sendMessage(chatId: number, senderId: number, message: string): Promise<ChatMessage> {
+  async sendMessage(chatId: number, senderId: number, message: string, attachment?: { base64: string; name: string; mime_type: string }): Promise<ChatMessage> {
     const response = await fetch(`${API_URL}/?resource=messages`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, sender_id: senderId, message })
+      body: JSON.stringify({ chat_id: chatId, sender_id: senderId, message, attachment_data: attachment || null })
     });
     if (!response.ok) throw new Error('Failed to send message');
     return response.json();
