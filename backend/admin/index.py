@@ -61,7 +61,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             FROM {SCHEMA}.companies c
             LEFT JOIN {SCHEMA}.users u ON u.company_id = c.id
             LEFT JOIN {SCHEMA}.vacancies v ON v.company_id = c.id
-            LEFT JOIN {SCHEMA}.recommendations r ON r.company_id = c.id
+            LEFT JOIN {SCHEMA}.recommendations r ON r.vacancy_id = v.id
             GROUP BY c.id
             ORDER BY c.created_at DESC
         """)
@@ -82,7 +82,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             FROM {SCHEMA}.companies c
             LEFT JOIN {SCHEMA}.users u ON u.company_id = c.id
             LEFT JOIN {SCHEMA}.vacancies v ON v.company_id = c.id
-            LEFT JOIN {SCHEMA}.recommendations r ON r.company_id = c.id
+            LEFT JOIN {SCHEMA}.recommendations r ON r.vacancy_id = v.id
             WHERE c.id = %s
             GROUP BY c.id
         """, (company_id,))
