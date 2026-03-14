@@ -1080,6 +1080,128 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
         
+        elif method == 'GET' and resource == 'notifications':
+            user_id = query_params.get('user_id')
+            notifications = []
+
+            # Рекомендации сотрудника: новые и с изменённым статусом за последние 30 дней
+            cur.execute("""
+                SELECT r.id, r.candidate_name, r.status, r.created_at, r.reviewed_at,
+                       v.title as vacancy_title
+                FROM t_p65890965_refstaff_project.recommendations r
+                JOIN t_p65890965_refstaff_project.vacancies v ON r.vacancy_id = v.id
+                WHERE r.recommended_by = %s
+                  AND (
+                    r.created_at >= NOW() - INTERVAL '30 days'
+                    OR r.reviewed_at >= NOW() - INTERVAL '30 days'
+                  )
+                ORDER BY GREATEST(r.created_at, COALESCE(r.reviewed_at, r.created_at)) DESC
+                LIMIT 20
+            """, (user_id,))
+            recs = cur.fetchall()
+            status_labels = {
+                'pending': 'На рассмотрении',
+                'accepted': 'Принят',
+                'rejected': 'Отклонён',
+                'hired': 'Нанят',
+                'interview': 'На собеседовании'
+            }
+            for rec in recs:
+                rec = dict(rec)
+                if rec.get('reviewed_at'):
+                    notifications.append({
+                        'id': f"rec_status_{rec['id']}",
+                        'type': 'recommendation',
+                        'message': f"Статус кандидата \"{rec['candidate_name']}\" ({rec['vacancy_title']}): {status_labels.get(rec['status'], rec['status'])}",
+                        'date': rec['reviewed_at'].isoformat() if rec.get('reviewed_at') else rec['created_at'].isoformat(),
+                        'read': False
+                    })
+                else:
+                    notifications.append({
+                        'id': f"rec_new_{rec['id']}",
+                        'type': 'recommendation',
+                        'message': f"Рекомендация отправлена: \"{rec['candidate_name']}\" на вакансию \"{rec['vacancy_title']}\"",
+                        'date': rec['created_at'].isoformat(),
+                        'read': True
+                    })
+
+            # Непрочитанные сообщения в чатах
+            cur.execute("""
+                SELECT c.id as chat_id, comp.name as company_name,
+                       COUNT(m.id) as unread_count,
+                       MAX(m.created_at) as last_message_at
+                FROM t_p65890965_refstaff_project.chats c
+                JOIN t_p65890965_refstaff_project.companies comp ON c.company_id = comp.id
+                JOIN t_p65890965_refstaff_project.chat_messages m ON m.chat_id = c.id
+                WHERE c.employee_id = %s
+                  AND m.is_read = false
+                  AND m.sender_id != %s
+                GROUP BY c.id, comp.name
+            """, (user_id, user_id))
+            chats = cur.fetchall()
+            for chat in chats:
+                chat = dict(chat)
+                notifications.append({
+                    'id': f"chat_{chat['chat_id']}",
+                    'type': 'chat',
+                    'message': f"Непрочитанные сообщения от HR ({chat['company_name']}): {chat['unread_count']} шт.",
+                    'date': chat['last_message_at'].isoformat() if chat.get('last_message_at') else None,
+                    'read': False
+                })
+
+            # Транзакции кошелька за последние 30 дней
+            cur.execute("""
+                SELECT id, amount, description, created_at, type
+                FROM t_p65890965_refstaff_project.wallet_transactions
+                WHERE user_id = %s
+                  AND created_at >= NOW() - INTERVAL '30 days'
+                ORDER BY created_at DESC
+                LIMIT 10
+            """, (user_id,))
+            txs = cur.fetchall()
+            for tx in txs:
+                tx = dict(tx)
+                sign = '+' if tx['amount'] > 0 else ''
+                notifications.append({
+                    'id': f"wallet_{tx['id']}",
+                    'type': 'wallet',
+                    'message': f"{tx.get('description') or 'Транзакция'}: {sign}{int(tx['amount']):,} ₽".replace(',', ' '),
+                    'date': tx['created_at'].isoformat(),
+                    'read': True
+                })
+
+            # Новые вакансии компании за последние 7 дней
+            cur.execute("""
+                SELECT v.id, v.title, v.salary_display, v.created_at
+                FROM t_p65890965_refstaff_project.vacancies v
+                JOIN t_p65890965_refstaff_project.users u ON u.id = %s
+                WHERE v.company_id = u.company_id
+                  AND v.status = 'active'
+                  AND v.created_at >= NOW() - INTERVAL '7 days'
+                ORDER BY v.created_at DESC
+                LIMIT 5
+            """, (user_id,))
+            vacs = cur.fetchall()
+            for vac in vacs:
+                vac = dict(vac)
+                notifications.append({
+                    'id': f"vac_{vac['id']}",
+                    'type': 'vacancy',
+                    'message': f"Новая вакансия: \"{vac['title']}\" — {vac.get('salary_display', '')}",
+                    'date': vac['created_at'].isoformat(),
+                    'read': False
+                })
+
+            # Сортируем по дате
+            notifications.sort(key=lambda x: x.get('date') or '', reverse=True)
+
+            return {
+                'statusCode': 200,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps(notifications, default=str),
+                'isBase64Encoded': False
+            }
+
         cur.close()
         conn.close()
         

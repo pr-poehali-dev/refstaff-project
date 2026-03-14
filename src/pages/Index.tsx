@@ -458,11 +458,16 @@ function Index() {
   }, [userRole, currentUser]);
 
   useEffect(() => {
-    if (userRole === 'employee' && !isLoading && !employeeTabsInitialized) {
-      setNewNotificationsCount(notifications.filter(n => !n.read).length);
+    if (userRole === 'employee' && !isLoading && !employeeTabsInitialized && currentEmployeeId) {
+      api.getNotifications(currentEmployeeId)
+        .then(notifs => {
+          setNotifications(notifs.map(n => ({ ...n, id: typeof n.id === 'string' ? parseInt(n.id.replace(/\D/g, '')) || Date.now() : n.id })));
+          setNewNotificationsCount(notifs.filter(n => !n.read).length);
+        })
+        .catch(() => {});
       setEmployeeTabsInitialized(true);
     }
-  }, [userRole, isLoading, employeeTabsInitialized]);
+  }, [userRole, isLoading, employeeTabsInitialized, currentEmployeeId]);
 
   const loadData = async (silent = false) => {
     try {

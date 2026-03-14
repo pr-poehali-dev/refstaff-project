@@ -329,6 +329,12 @@ export const api = {
     return response.json();
   },
 
+  async getNotifications(userId: number): Promise<Array<{id: string; type: string; message: string; date: string; read: boolean}>> {
+    const response = await fetch(`${API_URL}/?resource=notifications&user_id=${userId}`);
+    if (!response.ok) throw new Error('Failed to fetch notifications');
+    return response.json();
+  },
+
   async createChat(companyId: number, employeeId: number): Promise<Chat> {
     const response = await fetch(`${API_URL}/?resource=chats`, {
       method: 'POST',
