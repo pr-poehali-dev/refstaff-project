@@ -4162,7 +4162,7 @@ function Index() {
               const conversion = totalRecs > 0 ? Math.round((acceptedRecs / totalRecs) * 100) : 0;
               const totalBonuses = recommendations
                 .filter(r => r.status === 'accepted' || r.status === 'hired')
-                .reduce((sum, r) => sum + (r.reward || 0), 0);
+                .reduce((sum, r) => sum + (parseFloat(String(r.reward)) || 0), 0);
               const bonusDisplay = totalBonuses >= 1000000
                 ? `${(totalBonuses / 1000000).toFixed(1)}М ₽`
                 : totalBonuses >= 1000
