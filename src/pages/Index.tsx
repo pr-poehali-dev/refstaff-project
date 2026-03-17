@@ -4773,20 +4773,26 @@ function Index() {
       </Dialog>
 
       <Dialog open={showChatDialog} onOpenChange={(open) => { setShowChatDialog(open); if (!open && chatPollRef.current) { clearInterval(chatPollRef.current); chatPollRef.current = null; } }}>
-        <DialogContent className="max-w-4xl h-[100dvh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0">
+        <DialogContent className="max-w-4xl h-[100dvh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
           <div className="flex h-full overflow-hidden">
-            <div className="w-[72px] sm:w-72 border-r flex flex-col shrink-0">
-              <div className="p-2 sm:p-4 border-b">
-                <h3 className="font-semibold text-[10px] sm:text-base text-center sm:text-left">Чаты</h3>
-                <p className="text-xs text-muted-foreground mt-1 hidden sm:block">Выберите сотрудника для диалога</p>
-                <div className="mt-2 hidden sm:block">
-                  <Input 
-                    placeholder="Поиск сотрудника..." 
-                    value={employeeSearchQuery}
-                    onChange={(e) => setEmployeeSearchQuery(e.target.value)}
-                    className="h-8 text-xs"
-                  />
+            {/* Sidebar — on mobile hidden when chat is open */}
+            <div className={`${activeChatEmployee ? 'hidden sm:flex' : 'flex'} w-full sm:w-72 border-r flex-col shrink-0`}>
+              <div className="p-3 sm:p-4 border-b flex items-center justify-between gap-2">
+                <div className="flex-1">
+                  <h3 className="font-semibold text-base">Чаты</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5 hidden sm:block">Выберите сотрудника для диалога</p>
                 </div>
+                <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 sm:hidden" onClick={() => setShowChatDialog(false)}>
+                  <Icon name="X" size={18} />
+                </Button>
+              </div>
+              <div className="px-3 py-2 sm:px-4 border-b">
+                <Input 
+                  placeholder="Поиск сотрудника..." 
+                  value={employeeSearchQuery}
+                  onChange={(e) => setEmployeeSearchQuery(e.target.value)}
+                  className="h-9 text-sm"
+                />
               </div>
               <div className="flex-1 overflow-y-auto">
                 {employees.filter(emp => {
@@ -4798,25 +4804,22 @@ function Index() {
                 }).map((emp) => (
                   <div
                     key={emp.id}
-                    className={`p-1.5 sm:p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
+                    className={`p-3 border-b cursor-pointer hover:bg-muted/50 transition-colors ${
                       activeChatEmployee?.id === emp.id ? 'bg-muted' : ''
                     }`}
                     onClick={() => handleSelectChatEmployee(emp)}
                   >
-                    <div className="flex flex-col sm:flex-row items-center gap-1 sm:gap-3">
+                    <div className="flex items-center gap-3">
                       {emp.avatar ? (
-                        <img src={emp.avatar} alt={emp.name} className="w-8 h-8 sm:w-10 sm:h-10 rounded-full object-cover shrink-0" />
+                        <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <Icon name="User" size={16} className="text-primary" />
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <Icon name="User" size={18} className="text-primary" />
                         </div>
                       )}
-                      <div className="min-w-0 sm:flex-1 w-full">
-                        <p className="font-medium text-[10px] sm:text-sm truncate text-center sm:text-left leading-tight">
-                          <span className="sm:hidden">{emp.name.split(' ')[0]}</span>
-                          <span className="hidden sm:inline">{emp.name}</span>
-                        </p>
-                        <p className="text-xs text-muted-foreground truncate hidden sm:block">{emp.position}</p>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-medium text-sm truncate">{emp.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{emp.position}</p>
                       </div>
                     </div>
                   </div>
@@ -4824,23 +4827,28 @@ function Index() {
               </div>
             </div>
 
-            <div className="flex-1 flex flex-col min-w-0">
+            <div className={`${activeChatEmployee ? 'flex' : 'hidden sm:flex'} flex-1 flex-col min-w-0`}>
               {activeChatEmployee ? (
                 <>
-                  <div className="p-2 sm:p-4 border-b shrink-0">
-                    <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="p-3 sm:p-4 border-b shrink-0">
+                    <div className="flex items-center gap-3">
+                      <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 sm:hidden" onClick={() => setActiveChatEmployee(null)}>
+                        <Icon name="ArrowLeft" size={18} />
+                      </Button>
                       {activeChatEmployee.avatar ? (
-                        <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-8 h-8 sm:w-12 sm:h-12 rounded-full object-cover shrink-0" />
+                        <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover shrink-0" />
                       ) : (
-                        <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <Icon name="User" size={16} className="text-primary sm:hidden" />
-                          <Icon name="User" size={24} className="text-primary hidden sm:block" />
+                        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                          <Icon name="User" size={18} className="text-primary" />
                         </div>
                       )}
-                      <div className="min-w-0">
-                        <h3 className="font-semibold text-xs sm:text-base truncate">{activeChatEmployee.name}</h3>
-                        <p className="text-[10px] sm:text-sm text-muted-foreground truncate">{activeChatEmployee.position}</p>
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-semibold text-sm sm:text-base truncate">{activeChatEmployee.name}</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground truncate">{activeChatEmployee.position}</p>
                       </div>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 sm:hidden" onClick={() => setShowChatDialog(false)}>
+                        <Icon name="X" size={18} />
+                      </Button>
                     </div>
                   </div>
                   <div className="flex-1 overflow-y-auto p-2 sm:p-4 space-y-2 sm:space-y-3">
