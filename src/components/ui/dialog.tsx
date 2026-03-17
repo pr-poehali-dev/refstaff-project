@@ -29,8 +29,8 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> & { hideClose?: boolean }
+>(({ className, children, hideClose, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay />
     <DialogPrimitive.Content
@@ -42,10 +42,12 @@ const DialogContent = React.forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute right-3 top-3 sm:right-4 sm:top-4 md:right-3 md:top-3 rounded-full bg-transparent hover:bg-accent border border-transparent hover:border-border p-2 sm:p-3 md:p-2.5 transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring disabled:pointer-events-none z-10">
-        <X className="h-5 w-5 sm:h-6 sm:w-6 md:h-5 md:w-5 text-foreground" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
+      {!hideClose && (
+        <DialogPrimitive.Close className="absolute right-3 top-3 sm:right-4 sm:top-4 md:right-3 md:top-3 rounded-full bg-transparent hover:bg-accent border border-transparent hover:border-border p-2 sm:p-3 md:p-2.5 transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-ring disabled:pointer-events-none z-10">
+          <X className="h-5 w-5 sm:h-6 sm:w-6 md:h-5 md:w-5 text-foreground" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      )}
     </DialogPrimitive.Content>
   </DialogPortal>
 ))

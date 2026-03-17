@@ -4773,7 +4773,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showChatDialog} onOpenChange={(open) => { setShowChatDialog(open); if (!open && chatPollRef.current) { clearInterval(chatPollRef.current); chatPollRef.current = null; } }}>
-        <DialogContent className="max-w-4xl h-[100dvh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
+        <DialogContent hideClose className="max-w-4xl h-[100dvh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
           <div className="flex h-full overflow-hidden">
             {/* Sidebar — on mobile hidden when chat is open */}
             <div className={`${activeChatEmployee ? 'hidden sm:flex' : 'flex'} w-full sm:w-72 border-r flex-col shrink-0`}>
