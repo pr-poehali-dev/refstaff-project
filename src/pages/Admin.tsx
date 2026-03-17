@@ -130,6 +130,15 @@ export default function Admin() {
     alert('✅ Подписка обновлена');
   };
 
+  const handleCancelSub = async () => {
+    if (!selectedCompany) return;
+    if (!confirm('Отменить подписку компании? Доступ будет ограничен.')) return;
+    await adminFetch(secret, '?resource=company_subscription', 'PUT', { company_id: selectedCompany.company.id, tier: 'none', days: '0' });
+    loadCompanies();
+    loadCompanyDetail(selectedCompany.company.id);
+    alert('✅ Подписка отменена');
+  };
+
   const handleUpdateUser = async () => {
     if (!selectedUser) return;
     await adminFetch(secret, '?resource=user', 'PUT', { user_id: selectedUser.id, ...userForm });
@@ -367,9 +376,14 @@ export default function Admin() {
                       <p className="text-gray-400 text-xs">До: {new Date(selectedCompany.company.subscription_expires_at).toLocaleDateString('ru-RU')}</p>
                     )}
                   </div>
-                  <Button size="sm" onClick={() => { setSubForm({ company_id: selectedCompany.company.id, tier: 'advanced', days: '30' }); setShowSubDialog(true); }}>
-                    Продлить
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="destructive" onClick={handleCancelSub}>
+                      Отменить
+                    </Button>
+                    <Button size="sm" onClick={() => { setSubForm({ company_id: selectedCompany.company.id, tier: 'advanced', days: '30' }); setShowSubDialog(true); }}>
+                      Продлить
+                    </Button>
+                  </div>
                 </div>
 
                 {selectedCompany.users?.length > 0 && (

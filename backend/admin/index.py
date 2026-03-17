@@ -115,6 +115,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if not company_id:
             return err('company_id required')
         from datetime import datetime, timedelta
+        if tier == 'none' or days == 0:
+            cur.execute(f"""
+                UPDATE {SCHEMA}.companies
+                SET subscription_tier = 'none', subscription_expires_at = NULL, updated_at = CURRENT_TIMESTAMP
+                WHERE id = %s
+            """, (company_id,))
+            return ok({'success': True, 'expires_at': None})
         expires = datetime.utcnow() + timedelta(days=days)
         cur.execute(f"""
             UPDATE {SCHEMA}.companies
