@@ -1918,12 +1918,7 @@ function Index() {
                       </div>
                       <span className="text-sm">Любое кол-во сотрудников</span>
                     </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">API-интеграции с ATS</span>
-                    </li>
+
                     <li className="flex items-start gap-3">
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
                         <Icon name="Check" className="text-green-600" size={14} />
