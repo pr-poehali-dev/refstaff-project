@@ -2999,9 +2999,6 @@ function Index() {
   );
 
   const renderEmployerDashboard = () => {
-    const isSubscriptionExpired = company?.subscription_end_date 
-      ? new Date(company.subscription_end_date) < new Date() 
-      : false;
     
     return (
     <div className="min-h-screen bg-gray-50">
