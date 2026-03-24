@@ -7157,15 +7157,35 @@ function Index() {
                       const file = e.target.files?.[0];
                       if (file) {
                         const reader = new FileReader();
-                        reader.onloadend = () => {
-                          setProfileForm({...profileForm, avatar: reader.result as string});
+                        reader.onloadend = async () => {
+                          const base64 = reader.result as string;
+                          setProfileForm(f => ({...f, avatar: base64, avatarUploading: true}));
+                          try {
+                            const res = await fetch('https://functions.poehali.dev/5166b7c1-bbcb-454c-90c7-70522447c174', {
+                              method: 'POST',
+                              headers: {'Content-Type': 'application/json'},
+                              body: JSON.stringify({user_id: currentEmployeeId, image_data: base64})
+                            });
+                            const data = await res.json();
+                            if (data.avatar_url) {
+                              setProfileForm(f => ({...f, avatar: data.avatar_url, avatarUploading: false}));
+                            } else {
+                              setProfileForm(f => ({...f, avatarUploading: false}));
+                              alert('Ошибка загрузки фото');
+                            }
+                          } catch {
+                            setProfileForm(f => ({...f, avatarUploading: false}));
+                            alert('Ошибка загрузки фото');
+                          }
                         };
                         reader.readAsDataURL(file);
                       }
                     }}
                     className="cursor-pointer text-sm"
                   />
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Выберите изображение</p>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
+                    {(profileForm as {avatarUploading?: boolean}).avatarUploading ? '⏳ Загрузка фото...' : 'Выберите изображение'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -7182,7 +7202,6 @@ function Index() {
                       phone: profileForm.phone,
                       telegram: profileForm.telegram,
                       vk: profileForm.vk,
-                      avatar_url: profileForm.avatar
                     });
                     await loadData();
                     setShowEditProfileDialog(false);
