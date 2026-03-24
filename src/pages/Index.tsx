@@ -3965,6 +3965,10 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="payouts" className="space-y-4">
+            {isSubscriptionExpired ? (
+              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+            ) : (
+            <>
             <div className="mb-4 sm:mb-6">
               <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 mb-2">
                 <span>💰</span>
@@ -4010,9 +4014,12 @@ function Index() {
                 }
               }}
             />
+            </>
+            )}
           </TabsContent>
 
           <TabsContent value="news" className="space-y-4">
+            {isSubscriptionExpired ? <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /> : <>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
               <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
                 <span>📢</span>
@@ -4109,6 +4116,7 @@ function Index() {
                 </Card>
               ))}
             </div>
+            </>}
           </TabsContent>
 
           <TabsContent value="chats" className="space-y-4">
@@ -4152,6 +4160,7 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">
+            {isSubscriptionExpired ? <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /> : <>
             <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
               <span>📊</span>
               Статистика по компании
@@ -4258,6 +4267,7 @@ function Index() {
                 </>
               );
             })()}
+            </>}
           </TabsContent>
 
           <TabsContent value="subscription" className="space-y-4 sm:hidden">
