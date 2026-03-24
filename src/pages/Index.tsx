@@ -457,18 +457,37 @@ function Index() {
     }
   }, [userRole, currentUser]);
 
+  const getReadNotifIds = () => {
+    try { return new Set<string>(JSON.parse(localStorage.getItem('readNotifIds') || '[]')); } catch { return new Set<string>(); }
+  };
+  const markNotifIdsRead = (ids: string[]) => {
+    const existing = getReadNotifIds();
+    ids.forEach(id => existing.add(id));
+    localStorage.setItem('readNotifIds', JSON.stringify([...existing].slice(-200)));
+  };
+
   useEffect(() => {
     if (showNotificationsDialog) {
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setNotifications(prev => {
+        const ids = prev.filter(n => !n.read).map(n => String(n.id));
+        if (ids.length) markNotifIdsRead(ids);
+        return prev.map(n => ({ ...n, read: true }));
+      });
+      setNewNotificationsCount(0);
     }
   }, [showNotificationsDialog]);
 
   useEffect(() => {
     if (userRole === 'employee' && !isLoading && !employeeTabsInitialized && currentEmployeeId) {
+      const readIds = getReadNotifIds();
       api.getNotifications(currentEmployeeId)
         .then(notifs => {
-          setNotifications(notifs.map(n => ({ ...n, id: typeof n.id === 'string' ? parseInt(n.id.replace(/\D/g, '')) || Date.now() : n.id })));
-          setNewNotificationsCount(notifs.filter(n => !n.read).length);
+          const mapped = notifs.map(n => {
+            const strId = String(n.id);
+            return { ...n, id: typeof n.id === 'string' ? parseInt(n.id.replace(/\D/g, '')) || Date.now() : n.id, read: n.read || readIds.has(strId) };
+          });
+          setNotifications(mapped);
+          setNewNotificationsCount(mapped.filter(n => !n.read).length);
         })
         .catch(() => {});
       setEmployeeTabsInitialized(true);
@@ -5767,7 +5786,14 @@ function Index() {
           if (tab === 'vacancies') setNewVacanciesCount(0);
           if (tab === 'news') setNewNewsCount(0);
           if (tab === 'my-recommendations') setNewRecommendationsCount(0);
-          if (tab === 'notifications') setNewNotificationsCount(0);
+          if (tab === 'notifications') {
+            setNewNotificationsCount(0);
+            setNotifications(prev => {
+              const ids = prev.filter(n => !n.read).map(n => String(n.id));
+              if (ids.length) markNotifIdsRead(ids);
+              return prev.map(n => ({ ...n, read: true }));
+            });
+          }
         }}>
           <ScrollableTabs>
             <TabsList className="inline-flex w-max gap-1">
