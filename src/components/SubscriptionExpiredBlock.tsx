@@ -64,9 +64,7 @@ export function SubscriptionExpiredBlock({ onRenew }: SubscriptionExpiredBlockPr
             
             <p className="text-sm text-gray-500">
               или свяжитесь с поддержкой:{' '}
-              <a href="mailto:support@ihunt.ru" className="text-primary hover:underline">
-                support@ihunt.ru
-              </a>
+              <a href="mailto:support@ihunt.ru" className="text-primary hover:underline">info@i-hunt.ru</a>
             </p>
           </div>
         </CardContent>
