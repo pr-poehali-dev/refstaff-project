@@ -1903,11 +1903,11 @@ function Index() {
                   
                   <div className="mb-4 sm:mb-6">
                     <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
-                      {pricingPeriod === 'monthly' ? '54 900 ₽' : '46 665 ₽'}
+                      {pricingPeriod === 'monthly' ? '19 900 ₽' : '16 915 ₽'}
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">в месяц</p>
                     {pricingPeriod === 'yearly' && (
-                      <p className="text-sm text-green-600 font-medium">559 980 ₽/год (экономия 99 000 ₽)</p>
+                      <p className="text-sm text-green-600 font-medium">202 980 ₽/год (экономия 35 820 ₽)</p>
                     )}
                   </div>
                   
@@ -5265,14 +5265,14 @@ function Index() {
                 <Card className={`cursor-pointer border-2 transition-colors ${demoForm.employeeCount === '30' ? 'border-primary bg-primary/5' : 'border-border'}`}
                   onClick={() => setDemoForm({ ...demoForm, employeeCount: '30' })}>
                   <CardContent className="p-4 text-center">
-                    <p className="font-bold text-lg">54 900 ₽</p>
+                    <p className="font-bold text-lg">19 900 ₽</p>
                     <p className="text-xs text-muted-foreground">30 дней</p>
                   </CardContent>
                 </Card>
                 <Card className={`cursor-pointer border-2 transition-colors ${demoForm.employeeCount === '365' ? 'border-primary bg-primary/5' : 'border-border'}`}
                   onClick={() => setDemoForm({ ...demoForm, employeeCount: '365' })}>
                   <CardContent className="p-4 text-center">
-                    <p className="font-bold text-lg">559 980 ₽</p>
+                    <p className="font-bold text-lg">202 980 ₽</p>
                     <p className="text-xs text-muted-foreground">1 год <span className="text-green-600 font-medium">−15%</span></p>
                   </CardContent>
                 </Card>
@@ -5302,7 +5302,7 @@ function Index() {
                     alert('Заполните имя, телефон и email');
                     return;
                   }
-                  const period = demoForm.employeeCount === '365' ? '1 год (559 980 ₽)' : demoForm.employeeCount === '30' ? '30 дней (54 900 ₽)' : 'не выбран';
+                  const period = demoForm.employeeCount === '365' ? '1 год (202 980 ₽)' : demoForm.employeeCount === '30' ? '30 дней (19 900 ₽)' : 'не выбран';
                   setDemoFormSubmitting(true);
                   try {
                     await fetch('https://functions.poehali.dev/7316b3af-fb17-41b7-a4f3-9195c9f48288', {
