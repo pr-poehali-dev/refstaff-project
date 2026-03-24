@@ -6966,7 +6966,12 @@ function Index() {
             <Button 
               variant="ghost" 
               className="flex-1"
-              onClick={() => setNotifications(notifications.map(n => ({ ...n, read: true })))}
+              onClick={() => {
+                const ids = notifications.filter(n => !n.read).map(n => String(n.id));
+                if (ids.length) markNotifIdsRead(ids);
+                setNotifications(notifications.map(n => ({ ...n, read: true })));
+                setNewNotificationsCount(0);
+              }}
             >
               Прочитать все
             </Button>
