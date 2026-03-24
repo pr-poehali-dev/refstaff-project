@@ -601,7 +601,9 @@ function Index() {
       setPrevRecommendationsCount(mappedRecommendations.length);
       setRecommendations(mappedRecommendations);
       setCompany(companyData);
-      if (companyData?.subscription_expires_at) {
+      if (companyData?.subscription_tier === 'none' || !companyData?.subscription_expires_at) {
+        setSubscriptionDaysLeft(-1);
+      } else {
         const expires = new Date(companyData.subscription_expires_at);
         const now = new Date();
         const days = Math.ceil((expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
