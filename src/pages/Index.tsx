@@ -7182,7 +7182,7 @@ function Index() {
                       phone: profileForm.phone,
                       telegram: profileForm.telegram,
                       vk: profileForm.vk,
-                      avatar: profileForm.avatar
+                      avatar_url: profileForm.avatar
                     });
                     await loadData();
                     setShowEditProfileDialog(false);
