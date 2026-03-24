@@ -3119,7 +3119,12 @@ function Index() {
             </div>
           </div>
         ) : (
-        <Tabs defaultValue="vacancies" className="space-y-6" onValueChange={(val) => { if (val === 'recommendations') setNewRecommendationsCount(0); if (val === 'employees') setNewEmployeesCount(0); if (val === 'payouts') setNewPayoutsCount(0); }}>
+        <Tabs defaultValue="vacancies" className="space-y-6" onValueChange={(val) => {
+          if (val === 'recommendations') setNewRecommendationsCount(0);
+          if (val === 'employees') setNewEmployeesCount(0);
+          if (val === 'payouts') setNewPayoutsCount(0);
+          if (val === 'chats') setUnreadMessagesCount(0);
+        }}>
           <ScrollableTabs>
             <TabsList className="inline-flex w-max sm:grid sm:w-full sm:grid-cols-4 lg:grid-cols-8 gap-1">
               <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💼 Вакансии</TabsTrigger>
@@ -3127,7 +3132,7 @@ function Index() {
               <TabsTrigger value="recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🎯 Рекомендации{newRecommendationsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-green-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newRecommendationsCount}</span>}</TabsTrigger>
               <TabsTrigger value="payouts" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💰 Выплаты{newPayoutsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newPayoutsCount}</span>}</TabsTrigger>
               <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📢 Новости</TabsTrigger>
-              <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💬 Чаты</TabsTrigger>
+              <TabsTrigger value="chats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💬 Чаты{unreadMessagesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">{unreadMessagesCount}</span>}</TabsTrigger>
               <TabsTrigger value="stats" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">📊 Статистика</TabsTrigger>
               <TabsTrigger value="subscription" className="text-xs whitespace-nowrap px-3 py-2 sm:hidden">💳 Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
               <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
