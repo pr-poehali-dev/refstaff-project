@@ -4184,7 +4184,7 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">
-            {isSubscriptionExpired ? <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /> : <>
+            <>
             <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
               <span>📊</span>
               Статистика по компании
@@ -4291,7 +4291,7 @@ function Index() {
                 </>
               );
             })()}
-            </>}
+            </>
           </TabsContent>
 
           <TabsContent value="subscription" className="space-y-4 sm:hidden">
