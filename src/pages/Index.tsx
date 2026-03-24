@@ -458,6 +458,12 @@ function Index() {
   }, [userRole, currentUser]);
 
   useEffect(() => {
+    if (showNotificationsDialog) {
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    }
+  }, [showNotificationsDialog]);
+
+  useEffect(() => {
     if (userRole === 'employee' && !isLoading && !employeeTabsInitialized && currentEmployeeId) {
       api.getNotifications(currentEmployeeId)
         .then(notifs => {
