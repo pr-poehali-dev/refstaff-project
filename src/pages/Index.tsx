@@ -1663,7 +1663,7 @@ function Index() {
                     className="w-full h-auto"
                   />
                 </div>
-                <div className="absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
+                <div className="hidden sm:block absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                       <Icon name="TrendingUp" className="text-green-600" size={24} />
@@ -1682,12 +1682,12 @@ function Index() {
         <section id="how" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-primary/5 via-white to-purple-50 relative overflow-hidden" aria-labelledby="how-title">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="container mx-auto max-w-7xl relative z-10">
-            <div className="text-center mb-20">
+            <div className="text-center mb-8 sm:mb-12 md:mb-20">
               <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">⚡ Простой процесс</Badge>
               <h2 id="how-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
                 Как это работает
               </h2>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
                 Запустите реферальную программу за 4 простых шага и начните получать рекомендации
               </p>
             </div>
@@ -1706,18 +1706,18 @@ function Index() {
                     <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
                       <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${step.color}`}></div>
                       
-                      <div className="p-6 pt-8">
-                        <div className="flex items-start gap-4 mb-4">
-                          <div className={`flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
-                            <span className="text-2xl">{step.emoji}</span>
+                      <div className="p-4 sm:p-6 pt-6 sm:pt-8">
+                        <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                          <div className={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                            <span className="text-xl sm:text-2xl">{step.emoji}</span>
                           </div>
-                          <div className={`flex-shrink-0 w-10 h-10 rounded-full bg-gradient-to-br ${step.color} text-white flex items-center justify-center font-bold text-lg shadow-md`}>
+                          <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br ${step.color} text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-md`}>
                             {i + 1}
                           </div>
                         </div>
                         
-                        <h3 className="text-xl font-bold mb-3 text-gray-900">{step.title}</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+                        <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{step.title}</h3>
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
                       </div>
                       
                       <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${step.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
@@ -1762,14 +1762,14 @@ function Index() {
                   <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
                     <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${benefit.gradient}`}></div>
                     
-                    <div className="p-6 pt-8">
-                      <div className="flex items-center gap-4 mb-4">
-                        <div className={`flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
-                          <span className="text-2xl">{benefit.emoji}</span>
+                    <div className="p-4 sm:p-6 pt-5 sm:pt-8">
+                      <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                        <div className={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                          <span className="text-xl sm:text-2xl">{benefit.emoji}</span>
                         </div>
                       </div>
                       
-                      <h3 className="text-lg sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{benefit.title}</h3>
+                      <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{benefit.title}</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
                     </div>
                     
@@ -1859,18 +1859,18 @@ function Index() {
               <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gray-400 to-gray-500"></div>
                 
-                <div className="p-8">
-                  <div className="mb-5 sm:mb-6">
+                <div className="p-5 sm:p-8">
+                  <div className="mb-4 sm:mb-6">
                     <h3 className="text-xl sm:text-2xl font-bold mb-2">Пробный период</h3>
                     <p className="text-sm text-muted-foreground">Протестируйте платформу</p>
                   </div>
                   
-                  <div className="mb-5 sm:mb-6">
+                  <div className="mb-4 sm:mb-6">
                     <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">0 ₽</div>
                     <p className="text-sm text-muted-foreground">14 дней бесплатно</p>
                   </div>
                   
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-5 sm:mb-8">
                     <li className="flex items-start gap-3">
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
                         <Icon name="Check" className="text-green-600" size={14} />
@@ -1895,14 +1895,14 @@ function Index() {
               <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
                 <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 to-red-500"></div>
                 
-                <div className="p-8">
-                  <div className="mb-6">
-                    <h3 className="text-2xl font-bold mb-2">Продвинутый</h3>
+                <div className="p-5 sm:p-8">
+                  <div className="mb-4 sm:mb-6">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Продвинутый</h3>
                     <p className="text-sm text-muted-foreground">Корпоративный тариф</p>
                   </div>
                   
-                  <div className="mb-6">
-                    <div className="text-3xl sm:text-4xl font-bold mb-2">
+                  <div className="mb-4 sm:mb-6">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
                       {pricingPeriod === 'monthly' ? '54 900 ₽' : '46 665 ₽'}
                     </div>
                     <p className="text-sm text-muted-foreground mb-1">в месяц</p>
@@ -1911,7 +1911,7 @@ function Index() {
                     )}
                   </div>
                   
-                  <ul className="space-y-3 mb-8">
+                  <ul className="space-y-3 mb-5 sm:mb-8">
                     <li className="flex items-start gap-3">
                       <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
                         <Icon name="Check" className="text-green-600" size={14} />
