@@ -442,11 +442,19 @@ function Index() {
   const handleOpenChat = () => {
     setShowChatDialog(true);
     setUnreadMessagesCount(0);
+    if (userRole === 'employee') {
+      const hr = employees.find(e => e.isAdmin && !e.isFired) || employees[0];
+      if (hr) setActiveChatEmployee(hr);
+    }
   };
 
   useEffect(() => {
     if (showChatDialog && activeChatEmployee) {
       handleSelectChatEmployee(activeChatEmployee);
+    }
+    if (!showChatDialog && chatPollRef.current) {
+      clearInterval(chatPollRef.current);
+      chatPollRef.current = null;
     }
   }, [showChatDialog, activeChatEmployee?.id]);
 
