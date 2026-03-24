@@ -4969,28 +4969,6 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showReferralLinkDialog} onOpenChange={setShowReferralLinkDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Ссылка для регистрации сотрудников</DialogTitle>
-            <DialogDescription>
-              Отправьте эту ссылку новым сотрудникам для регистрации в системе
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div className="flex gap-2">
-              <Input value={referralLink} readOnly />
-              <Button onClick={() => handleCopyLink(referralLink)}>
-                <Icon name="Copy" size={18} />
-              </Button>
-            </div>
-            <p className="text-xs text-muted-foreground">
-              После регистрации по этой ссылке сотрудник автоматически присоединится к вашей компании
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={showRecommendationDetailsDialog} onOpenChange={setShowRecommendationDetailsDialog}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
