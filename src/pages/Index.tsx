@@ -22,6 +22,7 @@ import { PayoutRequests } from '@/components/PayoutRequests';
 import { VacancyDetail } from '@/components/VacancyDetail';
 import { CandidateDetail } from '@/components/CandidateDetail';
 import { SubscriptionExpiredBlock } from '@/components/SubscriptionExpiredBlock';
+import CompanyStats from '@/components/CompanyStats';
 import Onboarding from '@/components/Onboarding';
 import ScrollableTabs from '@/components/ScrollableTabs';
 import GamesTab from '@/components/GamesTab';
@@ -4184,114 +4185,12 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">
-            <>
-            <h2 className="text-2xl font-semibold flex items-center gap-2 mb-4">
-              <span>📊</span>
-              Статистика по компании
-            </h2>
-            {(() => {
-              const totalRecs = recommendations.length;
-              const acceptedRecs = recommendations.filter(r => r.status === 'accepted' || r.status === 'hired').length;
-              const conversion = totalRecs > 0 ? Math.round((acceptedRecs / totalRecs) * 100) : 0;
-              const totalBonuses = recommendations
-                .filter(r => r.status === 'accepted' || r.status === 'hired')
-                .reduce((sum, r) => sum + (parseFloat(String(r.reward)) || 0), 0);
-              const bonusDisplay = totalBonuses >= 1000000
-                ? `${(totalBonuses / 1000000).toFixed(1)}М ₽`
-                : totalBonuses >= 1000
-                ? `${Math.round(totalBonuses / 1000)}К ₽`
-                : `${totalBonuses.toLocaleString()} ₽`;
-              const now = new Date();
-              const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
-              const recsThisMonth = recommendations.filter(r => new Date(r.date) >= monthAgo).length;
-              const recsPrevMonth = recommendations.filter(r => {
-                const d = new Date(r.date);
-                const twoMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 2, now.getDate());
-                return d >= twoMonthsAgo && d < monthAgo;
-              }).length;
-              const monthGrowth = recsPrevMonth > 0 ? Math.round(((recsThisMonth - recsPrevMonth) / recsPrevMonth) * 100) : null;
-              const activeEmployees = employees.filter(e => !e.isFired).length;
-
-              return (
-                <>
-                  <div className="grid md:grid-cols-4 gap-4">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardDescription>Всего рекомендаций</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">{totalRecs}</div>
-                        {monthGrowth !== null ? (
-                          <p className={`text-xs mt-1 ${monthGrowth >= 0 ? 'text-green-600' : 'text-red-500'}`}>
-                            {monthGrowth >= 0 ? '+' : ''}{monthGrowth}% за месяц
-                          </p>
-                        ) : (
-                          <p className="text-xs text-muted-foreground mt-1">{recsThisMonth} за этот месяц</p>
-                        )}
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardDescription>Принято кандидатов</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">{acceptedRecs}</div>
-                        <p className="text-xs text-green-600 mt-1">Конверсия {conversion}%</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardDescription>Сумма вознаграждений</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">{bonusDisplay}</div>
-                        <p className="text-xs text-muted-foreground mt-1">За весь период</p>
-                      </CardContent>
-                    </Card>
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardDescription>Активных сотрудников</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="text-3xl font-bold">{activeEmployees}</div>
-                        <p className="text-xs text-muted-foreground mt-1">Из {employees.length} всего</p>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Топ рекрутеров</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      {employees.filter(e => e.hired > 0 || e.recommendations > 0).length === 0 ? (
-                        <p className="text-center text-muted-foreground py-6">Пока нет данных</p>
-                      ) : (
-                        <div className="space-y-4">
-                          {[...employees].sort((a, b) => b.hired - a.hired || b.recommendations - a.recommendations).map((emp, idx) => (
-                            <div key={emp.id} className="flex items-center gap-4">
-                              <div className={`text-lg font-bold w-8 text-center ${idx === 0 ? 'text-yellow-500' : idx === 1 ? 'text-gray-400' : idx === 2 ? 'text-orange-600' : 'text-muted-foreground'}`}>#{idx + 1}</div>
-                              <Avatar className="h-10 w-10">
-                                <AvatarFallback>{emp.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                              </Avatar>
-                              <div className="flex-1">
-                                <div className="font-medium">{emp.name}</div>
-                                <div className="text-sm text-muted-foreground">{emp.hired} найма · {emp.recommendations} рекомендаций</div>
-                              </div>
-                              <Badge variant="secondary">
-                                <Icon name="TrendingUp" className="mr-1" size={14} />
-                                {emp.earnings.toLocaleString()} ₽
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                </>
-              );
-            })()}
-            </>
+            <CompanyStats
+              recommendations={recommendations}
+              employees={employees}
+              vacancies={vacancies}
+              companyName={company?.name}
+            />
           </TabsContent>
 
           <TabsContent value="subscription" className="space-y-4 sm:hidden">
