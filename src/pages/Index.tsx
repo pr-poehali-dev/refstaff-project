@@ -3225,50 +3225,50 @@ function Index() {
                   <DialogTrigger asChild>
                     <Button disabled={isSubscriptionExpired} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">Создать вакансию</Button>
                   </DialogTrigger>
-                <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-                  <DialogHeader>
-                    <DialogTitle className="text-base sm:text-lg">Новая вакансия</DialogTitle>
-                    <DialogDescription className="text-xs sm:text-sm">Создайте новую вакансию для реферального найма</DialogDescription>
+                <DialogContent className="w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-lg rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
+                  <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
+                    <DialogTitle className="text-base">Новая вакансия</DialogTitle>
+                    <DialogDescription className="text-xs">Создайте вакансию для реферального найма</DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label htmlFor="vacancy-title" className="text-xs sm:text-sm">Название должности</Label>
-                        <Input 
-                          id="vacancy-title" 
-                          className="mt-1 text-sm"
-                          placeholder="Senior Frontend Developer"
+                        <Label htmlFor="vacancy-title" className="text-xs">Должность</Label>
+                        <Input
+                          id="vacancy-title"
+                          className="mt-1 h-9 text-sm"
+                          placeholder="Frontend Developer"
                           value={vacancyForm.title}
                           onChange={(e) => setVacancyForm({...vacancyForm, title: e.target.value})}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="department" className="text-xs sm:text-sm">Отдел</Label>
-                        <Input 
-                          id="department" 
-                          className="mt-1 text-sm"
+                        <Label htmlFor="department" className="text-xs">Отдел</Label>
+                        <Input
+                          id="department"
+                          className="mt-1 h-9 text-sm"
                           placeholder="Разработка"
                           value={vacancyForm.department}
                           onChange={(e) => setVacancyForm({...vacancyForm, department: e.target.value})}
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label htmlFor="salary" className="text-xs sm:text-sm">Зарплата</Label>
-                        <Input 
-                          id="salary" 
-                          className="mt-1 text-sm"
+                        <Label htmlFor="salary" className="text-xs">Зарплата</Label>
+                        <Input
+                          id="salary"
+                          className="mt-1 h-9 text-sm"
                           placeholder="250 000 ₽"
                           value={vacancyForm.salary}
                           onChange={(e) => setVacancyForm({...vacancyForm, salary: e.target.value})}
                         />
                       </div>
                       <div>
-                        <Label htmlFor="city" className="text-xs sm:text-sm">Город</Label>
-                        <Input 
-                          id="city" 
-                          className="mt-1 text-sm"
+                        <Label htmlFor="city" className="text-xs">Город</Label>
+                        <Input
+                          id="city"
+                          className="mt-1 h-9 text-sm"
                           placeholder="Москва"
                           value={vacancyForm.city}
                           onChange={(e) => setVacancyForm({...vacancyForm, city: e.target.value})}
@@ -3282,50 +3282,46 @@ function Index() {
                         checked={vacancyForm.isRemote}
                         onCheckedChange={(checked) => setVacancyForm({...vacancyForm, isRemote: checked as boolean, city: checked ? 'Удалённо' : ''})}
                       />
-                      <Label htmlFor="isRemote" className="cursor-pointer text-xs sm:text-sm">
-                        Удалённая работа
-                      </Label>
+                      <Label htmlFor="isRemote" className="cursor-pointer text-xs">Удалённая работа</Label>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                    <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label htmlFor="reward-amount" className="text-xs sm:text-sm">Вознаграждение</Label>
-                        <Input 
-                          id="reward-amount" 
-                          type="number" 
-                          className="mt-1 text-sm"
-                          placeholder="30000" 
+                        <Label htmlFor="reward-amount" className="text-xs">Вознаграждение, ₽</Label>
+                        <Input
+                          id="reward-amount"
+                          type="number"
+                          className="mt-1 h-9 text-sm"
+                          placeholder="30000"
                           value={vacancyForm.reward}
                           onChange={(e) => setVacancyForm({...vacancyForm, reward: e.target.value})}
                         />
-                        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Сумма за успешный найм</p>
                       </div>
                       <div>
-                        <Label htmlFor="payout-delay" className="text-xs sm:text-sm">Срок выплаты</Label>
-                        <Select 
+                        <Label htmlFor="payout-delay" className="text-xs">Срок выплаты</Label>
+                        <Select
                           value={vacancyForm.payoutDelay}
                           onValueChange={(value) => setVacancyForm({...vacancyForm, payoutDelay: value})}
                         >
-                          <SelectTrigger id="payout-delay" className="mt-1 text-sm">
-                            <SelectValue placeholder="Выберите срок" />
+                          <SelectTrigger id="payout-delay" className="mt-1 h-9 text-sm">
+                            <SelectValue placeholder="Выберите" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="0">Сразу после найма</SelectItem>
-                            <SelectItem value="7">Через 7 дней</SelectItem>
-                            <SelectItem value="14">Через 14 дней</SelectItem>
-                            <SelectItem value="30">Через 30 дней</SelectItem>
-                            <SelectItem value="45">Через 45 дней</SelectItem>
-                            <SelectItem value="60">Через 60 дней</SelectItem>
-                            <SelectItem value="90">Через 90 дней (исп. срок)</SelectItem>
+                            <SelectItem value="0">Сразу</SelectItem>
+                            <SelectItem value="7">7 дней</SelectItem>
+                            <SelectItem value="14">14 дней</SelectItem>
+                            <SelectItem value="30">30 дней</SelectItem>
+                            <SelectItem value="45">45 дней</SelectItem>
+                            <SelectItem value="60">60 дней</SelectItem>
+                            <SelectItem value="90">90 дней (исп. срок)</SelectItem>
                           </SelectContent>
                         </Select>
-                        <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Когда выплата после найма</p>
                       </div>
                     </div>
                     <div>
-                      <Label htmlFor="description" className="text-xs sm:text-sm">Описание вакансии</Label>
-                      <Textarea 
-                        id="description" 
-                        placeholder="Расскажите о вакансии, задачах и условиях работы..." 
+                      <Label htmlFor="description" className="text-xs">Описание вакансии</Label>
+                      <Textarea
+                        id="description"
+                        placeholder="Расскажите о вакансии, задачах и условиях..."
                         rows={3}
                         className="mt-1 text-sm"
                         value={vacancyForm.description}
@@ -3333,17 +3329,19 @@ function Index() {
                       />
                     </div>
                     <div>
-                      <Label htmlFor="requirements" className="text-xs sm:text-sm">Требования</Label>
-                      <Textarea 
-                        id="requirements" 
-                        placeholder="Опыт работы от 5 лет, знание React..." 
+                      <Label htmlFor="requirements" className="text-xs">Требования</Label>
+                      <Textarea
+                        id="requirements"
+                        placeholder="Опыт работы от 5 лет, знание React..."
                         rows={3}
                         className="mt-1 text-sm"
                         value={vacancyForm.requirements}
                         onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
                       />
                     </div>
-                    <Button className="w-full text-sm" onClick={handleCreateVacancy}>Создать вакансию</Button>
+                  </div>
+                  <div className="px-4 py-3 border-t shrink-0">
+                    <Button className="w-full" onClick={handleCreateVacancy}>Создать вакансию</Button>
                   </div>
                 </DialogContent>
               </Dialog>
