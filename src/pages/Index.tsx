@@ -5034,97 +5034,93 @@ function Index() {
       </Dialog>
 
       <Dialog open={showRecommendationDetailsDialog} onOpenChange={setShowRecommendationDetailsDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Детали рекомендации</DialogTitle>
-            <DialogDescription>
-              Полная информация о кандидате {activeRecommendation?.candidateName}
+        <DialogContent className="w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-2xl rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
+            <DialogTitle className="text-base">Детали рекомендации</DialogTitle>
+            <DialogDescription className="text-xs">
+              Кандидат: {activeRecommendation?.candidateName}
             </DialogDescription>
           </DialogHeader>
           {activeRecommendation && (
-            <div className="space-y-4 pt-4">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-xs text-muted-foreground">ФИО кандидата</Label>
-                  <p className="font-medium">{activeRecommendation.candidateName}</p>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Вакансия</Label>
-                  <p className="font-medium">{activeRecommendation.vacancy}</p>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Email</Label>
-                  <p className="font-medium">{activeRecommendation.candidateEmail}</p>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Телефон</Label>
-                  <p className="font-medium">{activeRecommendation.candidatePhone || 'Не указан'}</p>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Дата рекомендации</Label>
-                  <p className="font-medium">{new Date(activeRecommendation.date).toLocaleDateString('ru-RU')}</p>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground">Статус </Label>
-                  <Badge variant={
-                    activeRecommendation.status === 'accepted' ? 'default' : 
-                    activeRecommendation.status === 'rejected' ? 'destructive' : 
-                    'secondary'
-                  }>
-                    {activeRecommendation.status === 'accepted' ? 'Принят' : 
-                     activeRecommendation.status === 'rejected' ? 'Отклонён' : 
-                     'На рассмотрении'}
-                  </Badge>
-                </div>
-              </div>
-
-              {activeRecommendation.recommendedBy && (
-                <div>
-                  <Label className="text-xs text-muted-foreground">Рекомендовал</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Avatar className="h-8 w-8">
-                      <AvatarFallback className="text-xs">
-                        {activeRecommendation.recommendedBy.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="font-medium">{activeRecommendation.recommendedBy}</span>
+            <>
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-2.5">
+                  <div className="col-span-2">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">ФИО кандидата</p>
+                    <p className="text-sm font-medium">{activeRecommendation.candidateName}</p>
+                  </div>
+                  <div className="col-span-2">
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Вакансия</p>
+                    <p className="text-sm font-medium">{activeRecommendation.vacancy}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Email</p>
+                    <p className="text-sm font-medium break-all">{activeRecommendation.candidateEmail}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Телефон</p>
+                    <p className="text-sm font-medium">{activeRecommendation.candidatePhone || '—'}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Дата</p>
+                    <p className="text-sm font-medium">{new Date(activeRecommendation.date).toLocaleDateString('ru-RU')}</p>
+                  </div>
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Статус</p>
+                    <Badge className="mt-0.5 text-[10px] px-1.5 py-0.5" variant={
+                      activeRecommendation.status === 'accepted' ? 'default' :
+                      activeRecommendation.status === 'rejected' ? 'destructive' : 'secondary'
+                    }>
+                      {activeRecommendation.status === 'accepted' ? 'Принят' :
+                       activeRecommendation.status === 'rejected' ? 'Отклонён' : 'На рассмотрении'}
+                    </Badge>
                   </div>
                 </div>
-              )}
 
-              <div>
-                <Label className="text-xs text-muted-foreground">Комментарий</Label>
-                <p className="mt-1 p-3 bg-muted rounded-md whitespace-pre-wrap">
-                  {activeRecommendation.comment || 'Комментарий отсутствует'}
-                </p>
-              </div>
+                {activeRecommendation.recommendedBy && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Рекомендовал</p>
+                    <div className="flex items-center gap-2">
+                      <Avatar className="h-7 w-7">
+                        <AvatarFallback className="text-[10px]">
+                          {activeRecommendation.recommendedBy.split(' ').map((n: string) => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span className="text-sm font-medium">{activeRecommendation.recommendedBy}</span>
+                    </div>
+                  </div>
+                )}
 
-              {activeRecommendation.resumeUrl && (
                 <div>
-                  <Label className="text-xs text-muted-foreground">Резюме</Label>
-                  <div className="mt-1">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Комментарий</p>
+                  <p className="text-sm p-2.5 bg-muted rounded-md whitespace-pre-wrap">
+                    {activeRecommendation.comment || 'Комментарий отсутствует'}
+                  </p>
+                </div>
+
+                {activeRecommendation.resumeUrl && (
+                  <div>
+                    <p className="text-[10px] text-muted-foreground uppercase tracking-wide mb-1">Резюме</p>
                     <a href={activeRecommendation.resumeUrl} target="_blank" rel="noopener noreferrer" download>
-                      <Button variant="outline" size="sm" className="gap-2">
-                        <Icon name="Download" size={16} />
+                      <Button variant="outline" size="sm" className="gap-2 text-xs h-8">
+                        <Icon name="Download" size={14} />
                         Скачать резюме
                       </Button>
                     </a>
                   </div>
-                </div>
-              )}
+                )}
 
-              <div>
-                <Label className="text-xs text-muted-foreground">Вознаграждение</Label>
-                <div className="flex items-center gap-2 mt-1">
-                  <Icon name="Award" size={20} className="text-primary" />
-                  <span className="text-xl font-bold">{activeRecommendation.reward.toLocaleString()} ₽</span>
+                <div className="flex items-center gap-2">
+                  <Icon name="Award" size={18} className="text-primary" />
+                  <span className="text-lg font-bold">{activeRecommendation.reward.toLocaleString()} ₽</span>
+                  <span className="text-xs text-muted-foreground">вознаграждение</span>
                 </div>
               </div>
 
               {activeRecommendation.status === 'pending' && (
-                <div className="flex gap-2 pt-4 border-t">
-                  <Button 
-                    variant="outline" 
+                <div className="px-4 py-3 border-t shrink-0 flex gap-2">
+                  <Button
+                    variant="outline"
                     className="flex-1"
                     onClick={() => {
                       handleUpdateRecommendationStatus(activeRecommendation.id, 'rejected');
@@ -5132,10 +5128,10 @@ function Index() {
                     }}
                     disabled={isSubscriptionExpired}
                   >
-                    <Icon name="X" className="mr-2" size={18} />
+                    <Icon name="X" className="mr-1.5" size={16} />
                     Отклонить
                   </Button>
-                  <Button 
+                  <Button
                     className="flex-1"
                     onClick={() => {
                       handleUpdateRecommendationStatus(activeRecommendation.id, 'accepted');
@@ -5143,12 +5139,12 @@ function Index() {
                     }}
                     disabled={isSubscriptionExpired}
                   >
-                    <Icon name="Check" className="mr-2" size={18} />
-                    Принять кандидата
+                    <Icon name="Check" className="mr-1.5" size={16} />
+                    Принять
                   </Button>
                 </div>
               )}
-            </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
