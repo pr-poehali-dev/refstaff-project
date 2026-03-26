@@ -27,6 +27,63 @@ import Onboarding from '@/components/Onboarding';
 import ScrollableTabs from '@/components/ScrollableTabs';
 import GamesTab from '@/components/GamesTab';
 
+const BENEFITS_DATA = [
+  {
+    emoji: '💵', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%', gradient: 'from-green-500 to-emerald-500',
+    details: 'Реферальный найм обходится в разы дешевле агентств и job-досок. Вы платите только за результат — успешный выход кандидата на работу.',
+    examples: [
+      'Компания из 200 человек экономит до 1,5 млн ₽ в год, заменив агентства реферальной программой',
+      'Бонус сотруднику за рекомендацию — 15 000 ₽, тогда как агентство берёт 80 000–150 000 ₽ за ту же позицию',
+      'Ноль затрат на рекламу вакансий — кандидаты приходят через вашу же команду',
+    ]
+  },
+  {
+    emoji: '⚡', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза', gradient: 'from-yellow-500 to-orange-500',
+    details: 'Рекомендованные кандидаты уже знают о компании и мотивированы. Меньше этапов согласования, быстрее выход на работу.',
+    examples: [
+      'Средний срок закрытия вакансии через реферал — 18 дней против 42 дней через обычный рекрутинг',
+      'HR-менеджер IT-компании закрыл 5 вакансий за месяц, запустив реферальную программу через iHUNT',
+      'Кандидаты от сотрудников реже отказываются после оффера — конверсия выше на 35%',
+    ]
+  },
+  {
+    emoji: '🛡️', title: 'Качество кандидатов', desc: 'Рекомендации от проверенных сотрудников', gradient: 'from-blue-500 to-cyan-500',
+    details: 'Сотрудники рекомендуют только тех, кому доверяют — иначе рискуют своей репутацией. Это естественный фильтр качества.',
+    examples: [
+      '92% кандидатов по рекомендациям проходят испытательный срок против 67% с job-досок',
+      'Производственная компания снизила текучку в первые 6 месяцев на 40% после внедрения реферального найма',
+      'Реферальные сотрудники остаются в компании в среднем на 1,5 года дольше',
+    ]
+  },
+  {
+    emoji: '🏆', title: 'Геймификация', desc: 'Вовлечение сотрудников через достижения', gradient: 'from-purple-500 to-pink-500',
+    details: 'Рейтинги, бейджи и достижения превращают рекомендации в увлекательный процесс. Сотрудники соревнуются и активно участвуют.',
+    examples: [
+      'Ежемесячный рейтинг «Лучший рекрутёр месяца» с призом повышает активность участников на 60%',
+      'Торговая сеть запустила соревнование между филиалами — количество рекомендаций выросло в 3 раза за квартал',
+      'Бейдж «Звёздный рекрутёр» в профиле мотивирует даже тех, кто раньше не участвовал в реферальной программе',
+    ]
+  },
+  {
+    emoji: '📊', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса', gradient: 'from-indigo-500 to-purple-500',
+    details: 'Вы видите каждый шаг: кто рекомендовал, на каком этапе кандидат, когда выплатить бонус. Никаких споров и недопониманий.',
+    examples: [
+      'Дашборд в реальном времени показывает воронку: рекомендован → на интервью → оффер → вышел',
+      'Автоматические уведомления сотруднику о статусе его кандидата — HR не тратит время на объяснения',
+      'Отчёт по эффективности реферальной программы за квартал готовится в один клик для руководства',
+    ]
+  },
+  {
+    emoji: '🤝', title: 'Лояльность команды', desc: 'Сотрудники получают бонусы за найм — растёт вовлечённость и удержание', gradient: 'from-teal-500 to-green-500',
+    details: 'Когда сотрудники участвуют в росте компании и получают за это вознаграждение, они чувствуют себя частью команды и реже уходят.',
+    examples: [
+      'Компания с реферальной программой на 20% выше в рейтингах работодателей на hh.ru и Glassdoor',
+      'IT-стартап удержал ключевых сотрудников в кризис — реферальные бонусы стали дополнительной мотивацией',
+      'Сотрудники, которые привели коллег, на 30% реже рассматривают предложения от конкурентов',
+    ]
+  },
+];
+
 function Index() {
   const navigate = useNavigate();
   const [userRole, setUserRole] = useState<UserRole>(() => {
@@ -167,6 +224,7 @@ function Index() {
   const [contactFormSubmitting, setContactFormSubmitting] = useState(false);
   const [contactFormSuccess, setContactFormSuccess] = useState(false);
 
+  const [activeBenefit, setActiveBenefit] = useState<number | null>(null);
   const [showDemoDialog, setShowDemoDialog] = useState(false);
   const [demoForm, setDemoForm] = useState({
     companyName: '',
@@ -1750,34 +1808,53 @@ function Index() {
               </p>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-6xl mx-auto">
-              {[
-                { emoji: '💵', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%', gradient: 'from-green-500 to-emerald-500' },
-                { emoji: '⚡', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза', gradient: 'from-yellow-500 to-orange-500' },
-                { emoji: '🛡️', title: 'Качество кандидатов', desc: 'Рекомендации от проверенных сотрудников', gradient: 'from-blue-500 to-cyan-500' },
-                { emoji: '🏆', title: 'Геймификация', desc: 'Вовлечение сотрудников через достижения', gradient: 'from-purple-500 to-pink-500' },
-                { emoji: '📊', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса', gradient: 'from-indigo-500 to-purple-500' },
-                { emoji: '🤝', title: 'Лояльность команды', desc: 'Сотрудники получают бонусы за найм — растёт вовлечённость и удержание', gradient: 'from-teal-500 to-green-500' },
-              ].map((benefit, i) => (
-                <div key={i} className="group">
+              {BENEFITS_DATA.map((benefit, i) => (
+                <div key={i} className="group cursor-pointer" onClick={() => setActiveBenefit(i)}>
                   <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
                     <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${benefit.gradient}`}></div>
-                    
                     <div className="p-4 sm:p-6 pt-5 sm:pt-8">
                       <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                         <div className={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
                           <span className="text-xl sm:text-2xl">{benefit.emoji}</span>
                         </div>
                       </div>
-                      
                       <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{benefit.title}</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
+                      <p className="text-xs text-primary mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">Подробнее →</p>
                     </div>
-                    
                     <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${benefit.gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
                   </div>
                 </div>
               ))}
             </div>
+            <Dialog open={activeBenefit !== null} onOpenChange={(open) => !open && setActiveBenefit(null)}>
+              <DialogContent className="max-w-lg">
+                {activeBenefit !== null && (
+                  <>
+                    <DialogHeader>
+                      <DialogTitle className="flex items-center gap-3 text-xl">
+                        <span className="text-3xl">{BENEFITS_DATA[activeBenefit].emoji}</span>
+                        {BENEFITS_DATA[activeBenefit].title}
+                      </DialogTitle>
+                      <DialogDescription className="text-base text-gray-700 mt-2 leading-relaxed">
+                        {BENEFITS_DATA[activeBenefit].details}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="mt-4">
+                      <p className="text-sm font-semibold text-gray-900 mb-3">Примеры из практики:</p>
+                      <ul className="space-y-3">
+                        {BENEFITS_DATA[activeBenefit].examples.map((ex, j) => (
+                          <li key={j} className="flex gap-2 text-sm text-muted-foreground">
+                            <span className="mt-0.5 shrink-0 text-primary">✓</span>
+                            <span>{ex}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </>
+                )}
+              </DialogContent>
+            </Dialog>
             <div className="mt-8 sm:mt-12 md:mt-16">
               <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
                 <CardContent className="p-4 sm:p-6 md:p-8">
