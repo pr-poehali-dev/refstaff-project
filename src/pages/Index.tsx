@@ -2159,7 +2159,6 @@ function Index() {
               <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                 <li><a href="#benefits" className="hover:text-primary">Возможности</a></li>
                 <li><a href="#pricing" className="hover:text-primary">Тарифы</a></li>
-                <li><a href="#contact" className="hover:text-primary">API документация</a></li>
               </ul>
             </nav>
             <nav aria-label="Компания">
