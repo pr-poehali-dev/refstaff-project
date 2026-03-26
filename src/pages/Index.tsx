@@ -4658,83 +4658,80 @@ function Index() {
       </Dialog>
 
       <Dialog open={showCompanySettingsDialog} onOpenChange={setShowCompanySettingsDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">Профиль компании</DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm">Управляйте информацией о вашей компании</DialogDescription>
+        <DialogContent className="w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-2xl rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
+            <DialogTitle className="text-base">Профиль компании</DialogTitle>
+            <DialogDescription className="text-xs">Управляйте информацией о вашей компании</DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <Label htmlFor="company-name-edit" className="text-xs sm:text-sm">Название компании</Label>
-                <Input id="company-name-edit" className="mt-1 text-sm" value={company?.name || ''} readOnly disabled />
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
-              </div>
-              <div>
-                <Label htmlFor="company-logo" className="text-xs sm:text-sm">Логотип</Label>
-                <div className="mt-1 flex items-center gap-3">
-                  {(companyLogoPreview || company?.logo_url) && (
-                    <div className="relative">
-                      <img
-                        src={companyLogoPreview || company?.logo_url}
-                        alt="Логотип"
-                        className="h-12 w-12 object-contain rounded border"
-                      />
-                      <button
-                        type="button"
-                        className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-red-700"
-                        onClick={() => {
-                          setCompanyLogoPreview(null);
-                          setCompanyLogoFile(null);
-                          if (company?.logo_url) {
-                            api.updateCompany(currentCompanyId, { logo_url: '' });
-                            setCompany(prev => prev ? { ...prev, logo_url: undefined } : null);
-                          }
-                        }}
-                        title="Удалить логотип"
-                      >✕</button>
-                    </div>
-                  )}
-                  <div className="flex-1">
-                    <Input
-                      id="company-logo"
-                      className="text-sm"
-                      type="file"
-                      accept="image/png,image/jpeg,image/jpg,image/webp"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          if (file.size > 5 * 1024 * 1024) {
-                            alert('Файл слишком большой. Максимум 5 МБ');
-                            e.target.value = '';
-                            return;
-                          }
-                          setCompanyLogoFile(file);
-                          const reader = new FileReader();
-                          reader.onload = (ev) => setCompanyLogoPreview(ev.target?.result as string);
-                          reader.readAsDataURL(file);
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            <div>
+              <Label htmlFor="company-name-edit" className="text-xs">Название компании</Label>
+              <Input id="company-name-edit" className="mt-1 h-9 text-sm" value={company?.name || ''} readOnly disabled />
+            </div>
+            <div>
+              <Label htmlFor="company-logo" className="text-xs">Логотип</Label>
+              <div className="mt-1 flex items-center gap-3">
+                {(companyLogoPreview || company?.logo_url) && (
+                  <div className="relative shrink-0">
+                    <img
+                      src={companyLogoPreview || company?.logo_url}
+                      alt="Логотип"
+                      className="h-10 w-10 object-contain rounded border"
+                    />
+                    <button
+                      type="button"
+                      className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-red-700"
+                      onClick={() => {
+                        setCompanyLogoPreview(null);
+                        setCompanyLogoFile(null);
+                        if (company?.logo_url) {
+                          api.updateCompany(currentCompanyId, { logo_url: '' });
+                          setCompany(prev => prev ? { ...prev, logo_url: undefined } : null);
                         }
                       }}
-                    />
-                    <p className="text-[10px] text-muted-foreground mt-1">PNG, JPG, WebP до 5 МБ. Рекомендуется квадратное изображение от 200×200 пикселей</p>
+                      title="Удалить логотип"
+                    >✕</button>
                   </div>
+                )}
+                <div className="flex-1 min-w-0">
+                  <Input
+                    id="company-logo"
+                    className="text-xs h-9"
+                    type="file"
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 5 * 1024 * 1024) {
+                          alert('Файл слишком большой. Максимум 5 МБ');
+                          e.target.value = '';
+                          return;
+                        }
+                        setCompanyLogoFile(file);
+                        const reader = new FileReader();
+                        reader.onload = (ev) => setCompanyLogoPreview(ev.target?.result as string);
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  <p className="text-[10px] text-muted-foreground mt-0.5">PNG, JPG, WebP до 5 МБ, от 200×200 пикселей</p>
                 </div>
               </div>
             </div>
             <div>
-              <Label htmlFor="company-desc" className="text-xs sm:text-sm">Описание</Label>
-              <Textarea id="company-desc" rows={3} className="mt-1 text-sm" placeholder="Расскажите о вашей компании..." value={companyEditForm.description} onChange={(e) => setCompanyEditForm(f => ({ ...f, description: e.target.value }))} />
+              <Label htmlFor="company-desc" className="text-xs">Описание</Label>
+              <Textarea id="company-desc" rows={2} className="mt-1 text-sm" placeholder="Расскажите о вашей компании..." value={companyEditForm.description} onChange={(e) => setCompanyEditForm(f => ({ ...f, description: e.target.value }))} />
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="company-website" className="text-xs sm:text-sm">Веб-сайт</Label>
-                <Input id="company-website" className="mt-1 text-sm" placeholder="https://example.com" value={companyEditForm.website} onChange={(e) => setCompanyEditForm(f => ({ ...f, website: e.target.value }))} />
+                <Label htmlFor="company-website" className="text-xs">Веб-сайт</Label>
+                <Input id="company-website" className="mt-1 h-9 text-sm" placeholder="https://example.com" value={companyEditForm.website} onChange={(e) => setCompanyEditForm(f => ({ ...f, website: e.target.value }))} />
               </div>
               <div>
-                <Label htmlFor="company-industry" className="text-xs sm:text-sm">Отрасль</Label>
+                <Label htmlFor="company-industry" className="text-xs">Отрасль</Label>
                 <Select value={companyEditForm.industry} onValueChange={(val) => setCompanyEditForm(f => ({ ...f, industry: val }))}>
-                  <SelectTrigger className="mt-1 text-sm">
-                    <SelectValue placeholder="Выберите отрасль" />
+                  <SelectTrigger className="mt-1 h-9 text-sm">
+                    <SelectValue placeholder="Выберите" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="tech">IT и технологии</SelectItem>
@@ -4746,42 +4743,37 @@ function Index() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label htmlFor="company-inn" className="text-xs sm:text-sm">ИНН</Label>
-                <Input id="company-inn" className="mt-1 text-sm" value={company?.inn || ''} readOnly disabled />
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
+                <Label htmlFor="company-inn" className="text-xs">ИНН</Label>
+                <Input id="company-inn" className="mt-1 h-9 text-sm" value={company?.inn || ''} readOnly disabled />
               </div>
               <div>
-                <Label htmlFor="company-employee-count" className="text-xs sm:text-sm">Кол-во сотрудников</Label>
-                <Input id="company-employee-count" className="mt-1 text-sm" type="number" value={company?.employee_count || 0} readOnly disabled />
-                <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">Заполнено при регистрации</p>
+                <Label htmlFor="company-employee-count" className="text-xs">Сотрудников</Label>
+                <Input id="company-employee-count" className="mt-1 h-9 text-sm" type="number" value={company?.employee_count || 0} readOnly disabled />
               </div>
             </div>
-
             <Separator />
-
             <div>
-              <h3 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">Социальные сети</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <p className="text-xs font-semibold mb-2">Социальные сети</p>
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <Label htmlFor="company-telegram" className="text-xs sm:text-sm flex items-center gap-2">
-                    <Icon name="Send" size={14} /> Telegram
+                  <Label htmlFor="company-telegram" className="text-xs flex items-center gap-1">
+                    <Icon name="Send" size={12} /> Telegram
                   </Label>
-                  <Input id="company-telegram" className="mt-1 text-sm" placeholder="@company или t.me/company" value={companyEditForm.telegram} onChange={(e) => setCompanyEditForm(f => ({ ...f, telegram: e.target.value }))} />
+                  <Input id="company-telegram" className="mt-1 h-9 text-sm" placeholder="@company" value={companyEditForm.telegram} onChange={(e) => setCompanyEditForm(f => ({ ...f, telegram: e.target.value }))} />
                 </div>
                 <div>
-                  <Label htmlFor="company-vk" className="text-xs sm:text-sm flex items-center gap-2">
-                    <Icon name="MessageCircle" size={14} /> ВКонтакте
+                  <Label htmlFor="company-vk" className="text-xs flex items-center gap-1">
+                    <Icon name="MessageCircle" size={12} /> ВКонтакте
                   </Label>
-                  <Input id="company-vk" className="mt-1 text-sm" placeholder="vk.com/company" value={companyEditForm.vk} onChange={(e) => setCompanyEditForm(f => ({ ...f, vk: e.target.value }))} />
+                  <Input id="company-vk" className="mt-1 h-9 text-sm" placeholder="vk.com/company" value={companyEditForm.vk} onChange={(e) => setCompanyEditForm(f => ({ ...f, vk: e.target.value }))} />
                 </div>
               </div>
             </div>
-
-            <Separator />
-
-            <Button className="w-full text-sm" size="lg" onClick={handleSaveCompany} disabled={isSavingCompany}>
+          </div>
+          <div className="px-4 py-3 border-t shrink-0">
+            <Button className="w-full" onClick={handleSaveCompany} disabled={isSavingCompany}>
               <Icon name={isSavingCompany ? 'Loader2' : 'Save'} className={`mr-2 ${isSavingCompany ? 'animate-spin' : ''}`} size={16} />
               {isSavingCompany ? 'Сохранение...' : 'Сохранить изменения'}
             </Button>
