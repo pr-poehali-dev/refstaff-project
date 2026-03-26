@@ -5150,21 +5150,21 @@ function Index() {
       </Dialog>
 
       <Dialog open={showCreateNewsDialog} onOpenChange={setShowCreateNewsDialog}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>Создать новость</DialogTitle>
-            <DialogDescription>
-              Опубликуйте новость или объявление для сотрудников компании
+        <DialogContent className="w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-2xl rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
+          <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
+            <DialogTitle className="text-base">Создать новость</DialogTitle>
+            <DialogDescription className="text-xs">
+              Опубликуйте новость или объявление для сотрудников
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             <div>
-              <Label htmlFor="news-category">Категория</Label>
-              <Select 
+              <Label htmlFor="news-category" className="text-xs">Категория</Label>
+              <Select
                 value={newsForm.category}
                 onValueChange={(value) => setNewsForm({...newsForm, category: value as any})}
               >
-                <SelectTrigger id="news-category">
+                <SelectTrigger id="news-category" className="mt-1 h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -5176,46 +5176,45 @@ function Index() {
               </Select>
             </div>
             <div>
-              <Label htmlFor="news-title">Заголовок</Label>
-              <Input 
-                id="news-title" 
+              <Label htmlFor="news-title" className="text-xs">Заголовок</Label>
+              <Input
+                id="news-title"
+                className="mt-1 h-9 text-sm"
                 placeholder="Введите заголовок новости"
                 value={newsForm.title}
                 onChange={(e) => setNewsForm({...newsForm, title: e.target.value})}
               />
             </div>
             <div>
-              <Label htmlFor="news-content">Содержание</Label>
-              <Textarea 
-                id="news-content" 
+              <Label htmlFor="news-content" className="text-xs">Содержание</Label>
+              <Textarea
+                id="news-content"
+                className="mt-1 text-sm"
                 placeholder="Расскажите подробнее..."
-                rows={8}
+                rows={6}
                 value={newsForm.content}
                 onChange={(e) => setNewsForm({...newsForm, content: e.target.value})}
               />
-              <p className="text-xs text-muted-foreground mt-1">
-                Эта новость увидят все сотрудники компании на главной странице
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Новость увидят все сотрудники на главной странице
               </p>
             </div>
-            <div className="flex gap-2 pt-4">
-              <Button 
-                className="flex-1"
-                onClick={handleCreateNews}
-              >
-                <Icon name="Send" className="mr-2" size={18} />
-                Опубликовать
-              </Button>
-              <Button 
-                variant="outline" 
-                className="flex-1"
-                onClick={() => {
-                  setShowCreateNewsDialog(false);
-                  setNewsForm({ title: '', content: '', category: 'news' });
-                }}
-              >
-                Отмена
-              </Button>
-            </div>
+          </div>
+          <div className="px-4 py-3 border-t shrink-0 flex gap-2">
+            <Button className="flex-1" onClick={handleCreateNews}>
+              <Icon name="Send" className="mr-1.5" size={16} />
+              Опубликовать
+            </Button>
+            <Button
+              variant="outline"
+              className="flex-1"
+              onClick={() => {
+                setShowCreateNewsDialog(false);
+                setNewsForm({ title: '', content: '', category: 'news' });
+              }}
+            >
+              Отмена
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
