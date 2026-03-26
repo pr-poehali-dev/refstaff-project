@@ -1700,7 +1700,7 @@ function Index() {
                   { emoji: '🏢', title: 'Регистрация', desc: 'Создайте аккаунт компании и разместите открытые вакансии', color: 'from-blue-500 to-blue-600' },
                   { emoji: '👥', title: 'Приглашение', desc: 'Добавьте своих сотрудников в систему одним кликом', color: 'from-green-500 to-green-600' },
                   { emoji: '🎯', title: 'Рекомендации', desc: 'Получайте качественные кандидатуры от вашей команды', color: 'from-purple-500 to-purple-600' },
-                  { emoji: '💰', title: 'Вознаграждение', desc: 'Автоматически выплачивайте бонусы за найм', color: 'from-orange-500 to-orange-600' },
+                  { emoji: '💰', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за найм', color: 'from-orange-500 to-orange-600' },
                 ].map((step, i) => (
                   <div key={i} className="relative group">
                     <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
