@@ -3504,77 +3504,77 @@ function Index() {
             </div>
 
             <Dialog open={activeVacancy !== null} onOpenChange={(open) => !open && setActiveVacancy(null)}>
-              <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-                <DialogHeader>
-                  <DialogTitle className="text-base sm:text-lg">Редактировать вакансию</DialogTitle>
-                  <DialogDescription className="text-xs sm:text-sm">Обновите информацию о вакансии</DialogDescription>
+              <DialogContent className="w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-lg rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
+                <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
+                  <DialogTitle className="text-base">Редактировать вакансию</DialogTitle>
+                  <DialogDescription className="text-xs">Обновите информацию о вакансии</DialogDescription>
                 </DialogHeader>
-                <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label htmlFor="edit-vacancy-title" className="text-xs sm:text-sm">Название должности</Label>
-                      <Input 
-                        id="edit-vacancy-title" 
-                        className="mt-1 text-sm"
+                      <Label htmlFor="edit-vacancy-title" className="text-xs">Должность</Label>
+                      <Input
+                        id="edit-vacancy-title"
+                        className="mt-1 h-9 text-sm"
                         value={vacancyForm.title}
                         onChange={(e) => setVacancyForm({...vacancyForm, title: e.target.value})}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-department" className="text-xs sm:text-sm">Отдел</Label>
-                      <Input 
-                        id="edit-department" 
-                        className="mt-1 text-sm"
+                      <Label htmlFor="edit-department" className="text-xs">Отдел</Label>
+                      <Input
+                        id="edit-department"
+                        className="mt-1 h-9 text-sm"
                         value={vacancyForm.department}
                         onChange={(e) => setVacancyForm({...vacancyForm, department: e.target.value})}
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <Label htmlFor="edit-salary" className="text-xs sm:text-sm">Зарплата</Label>
-                      <Input 
-                        id="edit-salary" 
-                        className="mt-1 text-sm"
+                      <Label htmlFor="edit-salary" className="text-xs">Зарплата</Label>
+                      <Input
+                        id="edit-salary"
+                        className="mt-1 h-9 text-sm"
                         value={vacancyForm.salary}
                         onChange={(e) => setVacancyForm({...vacancyForm, salary: e.target.value})}
                       />
                     </div>
                     <div>
-                      <Label htmlFor="edit-reward-amount" className="text-xs sm:text-sm">Вознаграждение</Label>
-                      <Input 
-                        id="edit-reward-amount" 
-                        type="number" 
-                        className="mt-1 text-sm"
+                      <Label htmlFor="edit-reward-amount" className="text-xs">Вознаграждение, ₽</Label>
+                      <Input
+                        id="edit-reward-amount"
+                        type="number"
+                        className="mt-1 h-9 text-sm"
                         value={vacancyForm.reward}
                         onChange={(e) => setVacancyForm({...vacancyForm, reward: e.target.value})}
                       />
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="edit-payout-delay" className="text-xs sm:text-sm">Срок выплаты вознаграждения</Label>
-                    <Select 
+                    <Label htmlFor="edit-payout-delay" className="text-xs">Срок выплаты вознаграждения</Label>
+                    <Select
                       value={vacancyForm.payoutDelay}
                       onValueChange={(value) => setVacancyForm({...vacancyForm, payoutDelay: value})}
                     >
-                      <SelectTrigger id="edit-payout-delay" className="mt-1 text-sm">
+                      <SelectTrigger id="edit-payout-delay" className="mt-1 h-9 text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="0">Сразу после найма</SelectItem>
-                        <SelectItem value="7">Через 7 дней</SelectItem>
-                        <SelectItem value="14">Через 14 дней</SelectItem>
-                        <SelectItem value="30">Через 30 дней</SelectItem>
-                        <SelectItem value="45">Через 45 дней</SelectItem>
-                        <SelectItem value="60">Через 60 дней</SelectItem>
-                        <SelectItem value="90">Через 90 дней (испытательный срок)</SelectItem>
+                        <SelectItem value="7">7 дней</SelectItem>
+                        <SelectItem value="14">14 дней</SelectItem>
+                        <SelectItem value="30">30 дней</SelectItem>
+                        <SelectItem value="45">45 дней</SelectItem>
+                        <SelectItem value="60">60 дней</SelectItem>
+                        <SelectItem value="90">90 дней (исп. срок)</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div>
-                    <Label htmlFor="edit-description" className="text-xs sm:text-sm">Описание вакансии</Label>
-                    <Textarea 
-                      id="edit-description" 
+                    <Label htmlFor="edit-description" className="text-xs">Описание вакансии</Label>
+                    <Textarea
+                      id="edit-description"
                       rows={3}
                       className="mt-1 text-sm"
                       value={vacancyForm.description}
@@ -3582,33 +3582,32 @@ function Index() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-requirements" className="text-xs sm:text-sm">Требования</Label>
-                    <Textarea 
-                      id="edit-requirements" 
+                    <Label htmlFor="edit-requirements" className="text-xs">Требования</Label>
+                    <Textarea
+                      id="edit-requirements"
                       rows={3}
                       className="mt-1 text-sm"
                       value={vacancyForm.requirements}
                       onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
                     />
                   </div>
-                  <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
-                    <Button className="flex-1 text-sm" onClick={handleUpdateVacancy}>Сохранить изменения</Button>
-                    {activeVacancy?.status === 'active' && (
-                      <Button 
-                        variant="outline"
-                        className="text-sm"
-                        onClick={() => {
-                          if (activeVacancy) {
-                            handleArchiveVacancy(activeVacancy.id);
-                            setActiveVacancy(null);
-                          }
-                        }}
-                      >
-                        <Icon name="Archive" size={16} className="mr-2" />
-                        В архив
-                      </Button>
-                    )}
-                  </div>
+                </div>
+                <div className="px-4 py-3 border-t shrink-0 flex gap-2">
+                  <Button className="flex-1" onClick={handleUpdateVacancy}>Сохранить</Button>
+                  {activeVacancy?.status === 'active' && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        if (activeVacancy) {
+                          handleArchiveVacancy(activeVacancy.id);
+                          setActiveVacancy(null);
+                        }
+                      }}
+                    >
+                      <Icon name="Archive" size={16} className="mr-1.5" />
+                      В архив
+                    </Button>
+                  )}
                 </div>
               </DialogContent>
             </Dialog>
