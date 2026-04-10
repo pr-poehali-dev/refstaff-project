@@ -624,7 +624,7 @@ function Index() {
           vacancyTitle: r.vacancy_title || '',
           status: r.status as 'pending' | 'interview' | 'hired' | 'rejected' | 'accepted',
           date: new Date(r.created_at).toISOString().split('T')[0],
-          acceptedDate: r.accepted_at ? new Date(r.accepted_at).toISOString().split('T')[0] : undefined,
+          acceptedDate: r.accepted_at ? r.accepted_at : undefined,
           reward: r.reward_amount,
           recommendedBy: r.recommended_by_name,
           employeeId: r.recommended_by,
@@ -6070,10 +6070,10 @@ function Index() {
                       </div>
                       {(rec.status === 'accepted' || rec.status === 'hired') && rec.acceptedDate && (() => {
                         const acceptedDate = new Date(rec.acceptedDate);
+                        const unlockDate = new Date(acceptedDate.getTime() + (rec.payoutDelayDays ?? 30) * 24 * 60 * 60 * 1000);
                         const today = new Date();
-                        const daysPassed = Math.floor((today.getTime() - acceptedDate.getTime()) / (1000 * 60 * 60 * 24));
-                        const delayDays = rec.payoutDelayDays ?? 30;
-                        const daysRemaining = Math.max(0, delayDays - daysPassed);
+                        const msRemaining = unlockDate.getTime() - today.getTime();
+                        const daysRemaining = Math.max(0, Math.ceil(msRemaining / (1000 * 60 * 60 * 24)));
                         
                         return (
                           <div className={`flex items-center gap-1 ${daysRemaining > 0 ? 'text-orange-600' : 'text-green-600'}`}>
