@@ -8,9 +8,9 @@ export default function VacancyQR() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const referralLink: string =
-    (location.state as { referralLink?: string })?.referralLink ||
-    `${window.location.origin}/vacancy/${vacancyId}`;
+  const state = location.state as { referralLink?: string; title?: string } | null;
+  const referralLink: string = state?.referralLink || `${window.location.origin}/vacancy/${vacancyId}`;
+  const title: string = state?.title || '';
 
   const downloadQR = () => {
     const svg = document.getElementById('vacancy-qr-svg');
@@ -41,7 +41,7 @@ export default function VacancyQR() {
         </Button>
 
         <div className="text-center space-y-1">
-          <h1 className="text-xl font-semibold">QR-код вакансии</h1>
+          <h1 className="text-xl font-semibold">{title || 'QR-код вакансии'}</h1>
           <p className="text-sm text-muted-foreground">Отсканируйте для перехода на страницу вакансии</p>
         </div>
 
