@@ -149,7 +149,8 @@ function EmployeeRegister() {
       if (r.ok) {
         localStorage.setItem('authToken', d.token);
         localStorage.setItem('userRole', 'employee');
-        navigate('/employee');
+        localStorage.setItem('showOnboarding', 'true');
+        navigate('/');
       } else {
         setError(d.error || 'Неверный код');
       }
