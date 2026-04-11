@@ -97,7 +97,7 @@ function Index() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem('authToken'));
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
-  const [qrVacancyId, setQrVacancyId] = useState<number | null>(null);
+
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
@@ -6000,18 +6000,11 @@ function Index() {
                           </Button>
                           <Button size="sm" variant="outline" className="px-2 sm:px-3" onClick={(e) => {
                             e.stopPropagation();
-                            setQrVacancyId(qrVacancyId === vacancy.id ? null : vacancy.id);
+                            navigate(`/vacancy/${vacancy.id}/qr`);
                           }}>
                             <Icon name="QrCode" size={14} />
                           </Button>
                         </div>
-                        {qrVacancyId === vacancy.id && vacancy.referralLink && (
-                          <div className="flex flex-col items-center gap-2 pt-2">
-                            <div className="bg-white p-3 rounded-lg border">
-                              <QRCodeSVG value={vacancy.referralLink} size={160} />
-                            </div>
-                          </div>
-                        )}
                         <Button size="sm" className="sm:hidden w-full text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => {
                           e.stopPropagation();
                           const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
