@@ -1,5 +1,5 @@
 '''
-MAX мессенджер авторизация сотрудников: deep link регистрация, webhook бота, вход по коду.
+MAX мессенджер авторизация сотрудников: deep link регистрация, webhook бота, вход по коду. v2
 Флоу регистрации: create_session → deep link в бота → bot_started → бот шлёт код → verify_code → JWT.
 Флоу входа: send_login_code → пользователь пишет боту → получает код → verify_login_code → JWT.
 MAX Bot API: https://platform-api.max.ru
