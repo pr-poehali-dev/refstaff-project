@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,13 +11,13 @@ const AUTH_URL = 'https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67
 const TG_AUTH_URL = 'https://functions.poehali.dev/5c021f8a-5408-4339-bc3e-1fc4dd0b72f5';
 const COMPANY_URL = 'https://functions.poehali.dev/f1f66940-161e-4221-a729-4e0e555af034';
 
-type Step = 'method' | 'email-form' | 'email-verify' | 'tg-form' | 'tg-code';
+type Step = 'method' | 'email-form' | 'email-sent' | 'tg-form' | 'tg-wait' | 'tg-code';
 type Method = 'email' | 'telegram';
 
 function EmployeeRegister() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const inviteToken = searchParams.get('token');
+  const inviteToken = searchParams.get('token') || '';
 
   const [companyName, setCompanyName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
@@ -27,47 +27,59 @@ function EmployeeRegister() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState('');
 
+  // Email-флоу
   const [emailForm, setEmailForm] = useState({
     firstName: '', lastName: '', email: '', password: '', confirmPassword: ''
   });
 
-  const [tgForm, setTgForm] = useState({
-    firstName: '', lastName: '', chatId: ''
-  });
+  // Telegram-флоу
+  const [tgForm, setTgForm] = useState({ firstName: '', lastName: '' });
+  const [sessionToken, setSessionToken] = useState('');
+  const [deepLink, setDeepLink] = useState('');
   const [tgCode, setTgCode] = useState('');
-  const [tgChatId, setTgChatId] = useState('');
+  const [tgStatus, setTgStatus] = useState<'pending' | 'code_sent' | 'completed'>('pending');
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!inviteToken) {
-      alert('Неверная ссылка для регистрации');
-      navigate('/');
-      return;
-    }
+    if (!inviteToken) { alert('Неверная ссылка для регистрации'); navigate('/'); return; }
     fetch(`${COMPANY_URL}?invite_token=${inviteToken}`)
       .then(r => r.ok ? r.json() : Promise.reject())
-      .then(data => setCompanyName(data.company.name))
+      .then(d => setCompanyName(d.company.name))
       .catch(() => { alert('Компания не найдена или ссылка недействительна'); navigate('/'); })
       .finally(() => setIsLoading(false));
   }, [inviteToken, navigate]);
 
+  // Мета-теги
   useEffect(() => {
-    const title = 'Получай вознаграждение за рекомендацию наших вакансий | iHUNT';
-    const desc = 'Зарегистрируйся и рекомендуй вакансии своим знакомым — получай денежное вознаграждение за каждого успешного кандидата.';
-    const image = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/1a4f08a4-f047-444f-aab6-82e0357b0c94.jpg';
-    document.title = title;
-    const setMeta = (attr: string, key: string, value: string) => {
+    document.title = 'Получай вознаграждение за рекомендацию наших вакансий | iHUNT';
+    const img = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/1a4f08a4-f047-444f-aab6-82e0357b0c94.jpg';
+    const setMeta = (attr: string, key: string, val: string) => {
       let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement;
       if (!el) { el = document.createElement('meta'); el.setAttribute(attr, key); document.head.appendChild(el); }
-      el.setAttribute('content', value);
+      el.setAttribute('content', val);
     };
-    setMeta('property', 'og:title', title);
-    setMeta('property', 'og:description', desc);
-    setMeta('property', 'og:image', image);
+    setMeta('property', 'og:image', img);
     setMeta('property', 'og:url', window.location.href);
-    setMeta('property', 'og:type', 'website');
   }, [inviteToken]);
 
-  // ── EMAIL: отправка формы ──────────────────────────────────────────────────
+  // Поллинг статуса сессии
+  useEffect(() => {
+    if (step !== 'tg-wait' || !sessionToken) return;
+    pollRef.current = setInterval(async () => {
+      try {
+        const r = await fetch(TG_AUTH_URL, {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'check_session', session_token: sessionToken })
+        });
+        const d = await r.json();
+        if (r.status === 410) { clearInterval(pollRef.current!); setError('Сессия истекла. Попробуйте ещё раз.'); setStep('tg-form'); return; }
+        if (d.status === 'code_sent') { clearInterval(pollRef.current!); setTgStatus('code_sent'); setStep('tg-code'); }
+      } catch { /* тихо игнорируем */ }
+    }, 2000);
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [step, sessionToken]);
+
+  // ── Email: отправка формы ──────────────────────────────────────────────────
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -76,108 +88,83 @@ function EmployeeRegister() {
     if (!turnstileToken) return setError('Пожалуйста, подтвердите, что вы не робот');
     if (emailForm.password.length < 8) return setError('Пароль должен быть минимум 8 символов');
     if (emailForm.password !== emailForm.confirmPassword) return setError('Пароли не совпадают');
-
     setIsSubmitting(true);
     try {
       const r = await fetch(AUTH_URL, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'register_employee_by_token',
-          email: emailForm.email,
-          password: emailForm.password,
-          first_name: emailForm.firstName,
-          last_name: emailForm.lastName,
-          invite_token: inviteToken,
-          turnstile_token: turnstileToken
+          email: emailForm.email, password: emailForm.password,
+          first_name: emailForm.firstName, last_name: emailForm.lastName,
+          invite_token: inviteToken, turnstile_token: turnstileToken
         })
       });
-      const data = await r.json();
-      if (r.ok) setStep('email-verify');
-      else setError(data.error || 'Ошибка регистрации');
-    } catch {
-      setError('Не удалось зарегистрироваться');
-    } finally {
-      setIsSubmitting(false);
-    }
+      const d = await r.json();
+      if (r.ok) setStep('email-sent');
+      else setError(d.error || 'Ошибка регистрации');
+    } catch { setError('Не удалось зарегистрироваться'); }
+    finally { setIsSubmitting(false); }
   };
 
-  // ── TELEGRAM: отправить код ────────────────────────────────────────────────
-  const handleTgSendCode = async (e: React.FormEvent) => {
+  // ── Telegram: создать сессию и открыть бота ────────────────────────────────
+  const handleTgStart = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!tgForm.firstName || !tgForm.lastName || !tgForm.chatId)
-      return setError('Заполните все поля');
-
-    const chatIdNum = parseInt(tgForm.chatId);
-    if (isNaN(chatIdNum)) return setError('Chat ID должен быть числом');
-
+    if (!tgForm.firstName || !tgForm.lastName) return setError('Введите имя и фамилию');
     setIsSubmitting(true);
     try {
       const r = await fetch(TG_AUTH_URL, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'send_register_code',
-          telegram_chat_id: chatIdNum,
-          first_name: tgForm.firstName,
-          last_name: tgForm.lastName,
+          action: 'create_session',
+          first_name: tgForm.firstName, last_name: tgForm.lastName,
           invite_token: inviteToken
         })
       });
-      const data = await r.json();
+      const d = await r.json();
       if (r.ok) {
-        setTgChatId(tgForm.chatId);
-        setStep('tg-code');
+        setSessionToken(d.session_token);
+        setDeepLink(d.deep_link);
+        setStep('tg-wait');
+        window.open(d.deep_link, '_blank');
       } else {
-        setError(data.error || 'Ошибка отправки кода');
+        setError(d.error || 'Ошибка создания сессии');
       }
-    } catch {
-      setError('Не удалось отправить код');
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch { setError('Не удалось подключиться'); }
+    finally { setIsSubmitting(false); }
   };
 
-  // ── TELEGRAM: подтвердить код ──────────────────────────────────────────────
-  const handleTgVerifyCode = async (e: React.FormEvent) => {
+  // ── Telegram: подтвердить код ──────────────────────────────────────────────
+  const handleTgVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    if (!tgCode.trim()) return setError('Введите код из Telegram');
-
+    if (tgCode.length !== 6) return setError('Введите 6-значный код из Telegram');
     setIsSubmitting(true);
     try {
       const r = await fetch(TG_AUTH_URL, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'verify_register_code',
-          telegram_chat_id: parseInt(tgChatId),
-          code: tgCode.trim()
-        })
+        body: JSON.stringify({ action: 'verify_code', session_token: sessionToken, code: tgCode })
       });
-      const data = await r.json();
+      const d = await r.json();
       if (r.ok) {
-        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('authToken', d.token);
         localStorage.setItem('userRole', 'employee');
         navigate('/employee');
       } else {
-        setError(data.error || 'Неверный код');
+        setError(d.error || 'Неверный код');
       }
-    } catch {
-      setError('Ошибка подтверждения кода');
-    } finally {
-      setIsSubmitting(false);
-    }
+    } catch { setError('Ошибка подтверждения'); }
+    finally { setIsSubmitting(false); }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
-        <div className="text-center">
-          <Icon name="Loader2" className="animate-spin mx-auto mb-4" size={48} />
-          <p className="text-muted-foreground">Загрузка...</p>
-        </div>
+  if (isLoading) return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50">
+      <div className="text-center">
+        <Icon name="Loader2" className="animate-spin mx-auto mb-4" size={48} />
+        <p className="text-muted-foreground">Загрузка...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 p-4">
@@ -205,115 +192,38 @@ function EmployeeRegister() {
           {step === 'method' && (
             <div className="space-y-3">
               <p className="text-sm text-muted-foreground text-center mb-4">Выберите способ регистрации</p>
-              <Button
-                className="w-full h-14 flex items-center gap-3 justify-start px-5"
-                variant="outline"
-                onClick={() => { setMethod('email'); setStep('email-form'); }}
+              <button
+                className="w-full h-16 flex items-center gap-4 px-5 rounded-xl border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left"
+                onClick={() => { setMethod('telegram'); setStep('tg-form'); setError(''); }}
               >
-                <Icon name="Mail" size={20} className="text-primary" />
-                <div className="text-left">
-                  <div className="font-medium">Через Email</div>
-                  <div className="text-xs text-muted-foreground">Код придёт на почту</div>
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                  <Icon name="Send" size={20} className="text-blue-500" />
                 </div>
-              </Button>
-              <Button
-                className="w-full h-14 flex items-center gap-3 justify-start px-5"
-                variant="outline"
-                onClick={() => { setMethod('telegram'); setStep('tg-form'); }}
+                <div>
+                  <div className="font-semibold">Через Telegram</div>
+                  <div className="text-xs text-muted-foreground">Нажмите кнопку — бот пришлёт код</div>
+                </div>
+                <Icon name="ChevronRight" size={18} className="ml-auto text-muted-foreground" />
+              </button>
+              <button
+                className="w-full h-16 flex items-center gap-4 px-5 rounded-xl border-2 border-border hover:border-primary hover:bg-primary/5 transition-all text-left"
+                onClick={() => { setMethod('email'); setStep('email-form'); setError(''); }}
               >
-                <Icon name="Send" size={20} className="text-blue-500" />
-                <div className="text-left">
-                  <div className="font-medium">Через Telegram</div>
-                  <div className="text-xs text-muted-foreground">Код придёт в мессенджер</div>
+                <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                  <Icon name="Mail" size={20} className="text-gray-500" />
                 </div>
-              </Button>
+                <div>
+                  <div className="font-semibold">Через Email</div>
+                  <div className="text-xs text-muted-foreground">Ссылка подтверждения на почту</div>
+                </div>
+                <Icon name="ChevronRight" size={18} className="ml-auto text-muted-foreground" />
+              </button>
             </div>
           )}
 
-          {/* ── Шаг 2а: форма Email ── */}
-          {step === 'email-form' && (
-            <form onSubmit={handleEmailSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">Имя *</Label>
-                  <Input id="firstName" value={emailForm.firstName}
-                    onChange={e => setEmailForm({ ...emailForm, firstName: e.target.value })}
-                    placeholder="Иван" required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Фамилия *</Label>
-                  <Input id="lastName" value={emailForm.lastName}
-                    onChange={e => setEmailForm({ ...emailForm, lastName: e.target.value })}
-                    placeholder="Иванов" required />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="email">Email *</Label>
-                <Input id="email" type="email" value={emailForm.email}
-                  onChange={e => setEmailForm({ ...emailForm, email: e.target.value })}
-                  placeholder="ivan@example.com" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Пароль *</Label>
-                <Input id="password" type="password" value={emailForm.password}
-                  onChange={e => setEmailForm({ ...emailForm, password: e.target.value })}
-                  placeholder="Минимум 8 символов" required minLength={8} />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="confirmPassword">Подтвердите пароль *</Label>
-                <Input id="confirmPassword" type="password" value={emailForm.confirmPassword}
-                  onChange={e => setEmailForm({ ...emailForm, confirmPassword: e.target.value })}
-                  placeholder="Повторите пароль" required />
-              </div>
-              <Turnstile
-                siteKey="0x4AAAAAABhHpkOBbVMj6VZe"
-                onSuccess={setTurnstileToken}
-                onError={() => setTurnstileToken('')}
-                onExpire={() => setTurnstileToken('')}
-              />
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Регистрация...</> : 'Зарегистрироваться'}
-              </Button>
-              <Button type="button" variant="ghost" className="w-full" onClick={() => { setStep('method'); setError(''); }}>
-                ← Назад
-              </Button>
-            </form>
-          )}
-
-          {/* ── Шаг 2б: подтверждение Email ── */}
-          {step === 'email-verify' && (
-            <div className="text-center space-y-4">
-              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
-                <Icon name="Mail" size={32} className="text-green-600" />
-              </div>
-              <h3 className="font-semibold text-lg">Проверьте почту</h3>
-              <p className="text-muted-foreground text-sm">
-                Мы отправили письмо с подтверждением на <strong>{emailForm.email}</strong>.
-                Перейдите по ссылке в письме для активации аккаунта.
-              </p>
-              <Button variant="outline" className="w-full" onClick={() => navigate('/')}>
-                На главную
-              </Button>
-            </div>
-          )}
-
-          {/* ── Шаг 3а: форма Telegram ── */}
+          {/* ── Шаг 2: форма Telegram ── */}
           {step === 'tg-form' && (
-            <form onSubmit={handleTgSendCode} className="space-y-4">
-              <div className="p-3 rounded-md bg-blue-50 border border-blue-200 text-sm text-blue-800 space-y-1">
-                <p className="font-medium flex items-center gap-1.5">
-                  <Icon name="Info" size={14} />
-                  Как найти свой Telegram Chat ID?
-                </p>
-                <p>Напишите боту <a href="https://t.me/userinfobot" target="_blank" rel="noreferrer" className="underline font-medium">@userinfobot</a> — он пришлёт ваш ID в ответ.</p>
-              </div>
-              <div className="p-3 rounded-md bg-amber-50 border border-amber-200 text-sm text-amber-800">
-                <p className="font-medium flex items-center gap-1.5 mb-1">
-                  <Icon name="MessageCircle" size={14} />
-                  Важно: напишите боту iHUNT первым
-                </p>
-                <p>Перед получением кода напишите любое сообщение боту: <strong>@ihunt_auth_bot</strong> (или тому, который указан в инструкции компании).</p>
-              </div>
+            <form onSubmit={handleTgStart} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label>Имя *</Label>
@@ -328,17 +238,10 @@ function EmployeeRegister() {
                     placeholder="Иванов" required />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label>Ваш Telegram Chat ID *</Label>
-                <Input value={tgForm.chatId}
-                  onChange={e => setTgForm({ ...tgForm, chatId: e.target.value })}
-                  placeholder="123456789" required />
-                <p className="text-xs text-muted-foreground">Только цифры, узнайте у @userinfobot</p>
-              </div>
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
+              <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
                 {isSubmitting
-                  ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Отправляем...</>
-                  : <><Icon name="Send" size={16} className="mr-2" />Получить код в Telegram</>}
+                  ? <><Icon name="Loader2" size={18} className="animate-spin mr-2" />Подготавливаем...</>
+                  : <><Icon name="Send" size={18} className="mr-2" />Открыть Telegram и получить код</>}
               </Button>
               <Button type="button" variant="ghost" className="w-full" onClick={() => { setStep('method'); setError(''); }}>
                 ← Назад
@@ -346,39 +249,138 @@ function EmployeeRegister() {
             </form>
           )}
 
-          {/* ── Шаг 3б: ввод кода из Telegram ── */}
-          {step === 'tg-code' && (
-            <form onSubmit={handleTgVerifyCode} className="space-y-4">
-              <div className="text-center">
-                <div className="mx-auto w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-                  <Icon name="Send" size={28} className="text-blue-500" />
-                </div>
+          {/* ── Шаг 3: ожидание подключения к боту ── */}
+          {step === 'tg-wait' && (
+            <div className="space-y-5 text-center">
+              <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+                <Icon name="Send" size={32} className="text-blue-500" />
+              </div>
+              <div>
+                <h3 className="font-semibold text-base mb-1">Откройте Telegram и нажмите /start</h3>
                 <p className="text-sm text-muted-foreground">
-                  Мы отправили 6-значный код в ваш Telegram.<br />
+                  Бот должен был открыться автоматически.<br />
+                  Если нет — нажмите кнопку ниже.
+                </p>
+              </div>
+              <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Icon name="Loader2" size={16} className="animate-spin" />
+                Ожидаем подтверждения...
+              </div>
+              <Button variant="outline" className="w-full" onClick={() => window.open(deepLink, '_blank')}>
+                <Icon name="Send" size={16} className="mr-2 text-blue-500" />
+                Открыть бота снова
+              </Button>
+              <Button variant="ghost" className="w-full text-sm"
+                onClick={() => { setStep('tg-form'); setError(''); if (pollRef.current) clearInterval(pollRef.current); }}>
+                ← Назад
+              </Button>
+            </div>
+          )}
+
+          {/* ── Шаг 4: ввод кода из Telegram ── */}
+          {step === 'tg-code' && (
+            <form onSubmit={handleTgVerify} className="space-y-4">
+              <div className="text-center">
+                <div className="mx-auto w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                  <Icon name="MessageSquare" size={28} className="text-green-600" />
+                </div>
+                <h3 className="font-semibold mb-1">Бот прислал код!</h3>
+                <p className="text-sm text-muted-foreground">
+                  Введите 6-значный код из Telegram.<br />
                   Код действует <strong>10 минут</strong>.
                 </p>
               </div>
               <div className="space-y-2">
-                <Label>Код из Telegram *</Label>
+                <Label>Код из Telegram</Label>
                 <Input
                   value={tgCode}
                   onChange={e => setTgCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   placeholder="123456"
-                  className="text-center text-2xl tracking-[0.4em] font-mono"
+                  className="text-center text-3xl tracking-[0.5em] font-mono h-14"
                   maxLength={6}
-                  required
+                  autoFocus
                 />
               </div>
-              <Button type="submit" className="w-full" disabled={isSubmitting || tgCode.length !== 6}>
+              <Button type="submit" className="w-full h-12" disabled={isSubmitting || tgCode.length !== 6}>
                 {isSubmitting
                   ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</>
-                  : 'Подтвердить и войти'}
+                  : 'Подтвердить и создать аккаунт'}
               </Button>
               <Button type="button" variant="ghost" className="w-full text-sm"
-                onClick={() => { setStep('tg-form'); setTgCode(''); setError(''); }}>
-                ← Изменить данные
+                onClick={() => { setStep('tg-wait'); setTgCode(''); setError(''); }}>
+                ← Назад
               </Button>
             </form>
+          )}
+
+          {/* ── Email: форма ── */}
+          {step === 'email-form' && (
+            <form onSubmit={handleEmailSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Имя *</Label>
+                  <Input value={emailForm.firstName}
+                    onChange={e => setEmailForm({ ...emailForm, firstName: e.target.value })}
+                    placeholder="Иван" required />
+                </div>
+                <div className="space-y-2">
+                  <Label>Фамилия *</Label>
+                  <Input value={emailForm.lastName}
+                    onChange={e => setEmailForm({ ...emailForm, lastName: e.target.value })}
+                    placeholder="Иванов" required />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Email *</Label>
+                <Input type="email" value={emailForm.email}
+                  onChange={e => setEmailForm({ ...emailForm, email: e.target.value })}
+                  placeholder="ivan@example.com" required />
+              </div>
+              <div className="space-y-2">
+                <Label>Пароль *</Label>
+                <Input type="password" value={emailForm.password}
+                  onChange={e => setEmailForm({ ...emailForm, password: e.target.value })}
+                  placeholder="Минимум 8 символов" required minLength={8} />
+              </div>
+              <div className="space-y-2">
+                <Label>Подтвердите пароль *</Label>
+                <Input type="password" value={emailForm.confirmPassword}
+                  onChange={e => setEmailForm({ ...emailForm, confirmPassword: e.target.value })}
+                  placeholder="Повторите пароль" required />
+              </div>
+              <Turnstile
+                siteKey="0x4AAAAAABhHpkOBbVMj6VZe"
+                onSuccess={setTurnstileToken}
+                onError={() => setTurnstileToken('')}
+                onExpire={() => setTurnstileToken('')}
+              />
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting
+                  ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Регистрация...</>
+                  : 'Зарегистрироваться'}
+              </Button>
+              <Button type="button" variant="ghost" className="w-full"
+                onClick={() => { setStep('method'); setError(''); }}>
+                ← Назад
+              </Button>
+            </form>
+          )}
+
+          {/* ── Email: письмо отправлено ── */}
+          {step === 'email-sent' && (
+            <div className="text-center space-y-4">
+              <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                <Icon name="Mail" size={32} className="text-green-600" />
+              </div>
+              <h3 className="font-semibold text-lg">Проверьте почту</h3>
+              <p className="text-muted-foreground text-sm">
+                Мы отправили письмо с подтверждением на <strong>{emailForm.email}</strong>.<br />
+                Перейдите по ссылке в письме для активации аккаунта.
+              </p>
+              <Button variant="outline" className="w-full" onClick={() => navigate('/')}>
+                На главную
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -16,21 +16,30 @@
       "bodyMatcher": "partial"
     },
     {
-      "name": "send_register_code missing fields",
+      "name": "create_session missing fields",
       "method": "POST",
       "path": "/",
-      "body": {"action": "send_register_code"},
+      "body": {"action": "create_session"},
       "expectedStatus": 400,
-      "expectedBody": {"error": "Заполните все поля"},
+      "expectedBody": {"error": "Заполните имя, фамилию и убедитесь что ссылка приглашения действительна"},
       "bodyMatcher": "partial"
     },
     {
-      "name": "send_login_code missing chat_id",
+      "name": "check_session missing token",
       "method": "POST",
       "path": "/",
-      "body": {"action": "send_login_code"},
+      "body": {"action": "check_session"},
       "expectedStatus": 400,
-      "expectedBody": {"error": "Укажите Telegram Chat ID"},
+      "expectedBody": {"error": "session_token обязателен"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "verify_tg_login no data",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "verify_tg_login"},
+      "expectedStatus": 400,
+      "expectedBody": {"error": "Нет данных от Telegram"},
       "bodyMatcher": "partial"
     }
   ]

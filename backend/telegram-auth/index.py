@@ -1,6 +1,7 @@
 '''
-Telegram бот для отправки и проверки кодов авторизации сотрудников.
-Поддерживает: получение кода по chat_id, верификацию кода при регистрации и входе.
+Telegram-авторизация сотрудников: deep link регистрация, webhook бота, Telegram Login Widget вход.
+Флоу регистрации: create_session → deep link в бота → /start → бот шлёт код → verify_code → JWT.
+Флоу входа: Telegram Login Widget → verify_tg_login → JWT.
 '''
 
 import json
@@ -15,18 +16,19 @@ import hashlib
 import hmac
 import base64
 
-
 DB_SCHEMA = 't_p65890965_refstaff_project'
-TELEGRAM_API = 'https://api.telegram.org/bot{token}'
 
 
 def get_db():
     return psycopg2.connect(os.environ['DATABASE_URL'], cursor_factory=RealDictCursor)
 
 
-def tg_send(token: str, chat_id: int, text: str):
+def tg_send(token: str, chat_id: int, text: str, reply_markup: dict = None):
     url = f'https://api.telegram.org/bot{token}/sendMessage'
-    data = json.dumps({'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'}).encode()
+    payload = {'chat_id': chat_id, 'text': text, 'parse_mode': 'HTML'}
+    if reply_markup:
+        payload['reply_markup'] = reply_markup
+    data = json.dumps(payload).encode()
     req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
     with urllib.request.urlopen(req, timeout=10) as resp:
         return json.loads(resp.read())
@@ -34,6 +36,10 @@ def tg_send(token: str, chat_id: int, text: str):
 
 def generate_code() -> str:
     return ''.join(random.choices(string.digits, k=6))
+
+
+def generate_token(n=32) -> str:
+    return os.urandom(n).hex()
 
 
 def create_jwt(user_id: int, email: str, company_id: int, role: str) -> str:
@@ -48,6 +54,16 @@ def create_jwt(user_id: int, email: str, company_id: int, role: str) -> str:
     sig = hmac.new(secret.encode(), message.encode(), hashlib.sha256).digest()
     sig_enc = base64.urlsafe_b64encode(sig).decode().rstrip('=')
     return f"{message}.{sig_enc}"
+
+
+def verify_tg_data(data: dict, bot_token: str) -> bool:
+    """Проверяет подпись данных от Telegram Login Widget."""
+    check_hash = data.pop('hash', '')
+    data_check_arr = [f"{k}={v}" for k, v in sorted(data.items())]
+    data_check_string = '\n'.join(data_check_arr)
+    secret_key = hashlib.sha256(bot_token.encode()).digest()
+    computed = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+    return hmac.compare_digest(computed, check_hash)
 
 
 def cors_headers():
@@ -72,37 +88,96 @@ def handler(event: dict, context) -> dict:
         return {'statusCode': 200, 'headers': cors_headers(), 'body': ''}
 
     bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
-    body = json.loads(event.get('body', '{}'))
+    body = json.loads(event.get('body') or '{}')
     action = body.get('action', '')
 
-    # Быстрые проверки полей до подключения к БД
-    if action == 'send_register_code':
-        _chat_id = body.get('telegram_chat_id')
-        _first = body.get('first_name', '').strip()
-        _last = body.get('last_name', '').strip()
-        _token = body.get('invite_token', '').strip()
-        if not _chat_id or not _first or not _last or not _token:
-            return resp(400, {'error': 'Заполните все поля'})
-    elif action == 'send_login_code':
-        if not body.get('telegram_chat_id'):
-            return resp(400, {'error': 'Укажите Telegram Chat ID'})
-    elif action == 'verify_register_code':
-        if not body.get('telegram_chat_id') or not body.get('code', '').strip():
-            return resp(400, {'error': 'Укажите код'})
-    elif action == 'verify_login_code':
-        if not body.get('telegram_chat_id') or not body.get('code', '').strip():
-            return resp(400, {'error': 'Укажите код'})
+    # ── Webhook от Telegram (когда пользователь пишет боту /start TOKEN) ────────
+    if 'update_id' in body:
+        message = body.get('message', {})
+        text = message.get('text', '')
+        chat_id = message.get('chat', {}).get('id')
+        from_user = message.get('from', {})
+
+        if not chat_id:
+            return {'statusCode': 200, 'body': 'ok'}
+
+        # Обработка /start с session_token
+        if text.startswith('/start'):
+            parts = text.strip().split(' ', 1)
+            session_token = parts[1].strip() if len(parts) > 1 else ''
+
+            if not session_token:
+                tg_send(bot_token, chat_id,
+                    '👋 Привет! Я бот iHUNT.\n\nДля регистрации перейдите по ссылке приглашения от вашей компании.')
+                return {'statusCode': 200, 'body': 'ok'}
+
+            conn = get_db()
+            cursor = conn.cursor()
+            try:
+                cursor.execute(
+                    f"SELECT * FROM {DB_SCHEMA}.tg_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
+                    (session_token,)
+                )
+                session = cursor.fetchone()
+
+                if not session:
+                    tg_send(bot_token, chat_id,
+                        '❌ Ссылка недействительна или истекла.\n\nПожалуйста, вернитесь на страницу регистрации и попробуйте снова.')
+                    return {'statusCode': 200, 'body': 'ok'}
+
+                # Проверяем, не занят ли этот Telegram другим аккаунтом
+                cursor.execute(
+                    f"SELECT id FROM {DB_SCHEMA}.users WHERE telegram_chat_id = %s",
+                    (chat_id,)
+                )
+                if cursor.fetchone():
+                    tg_send(bot_token, chat_id,
+                        '⚠️ Этот Telegram аккаунт уже привязан к другому сотруднику iHUNT.\n\nЕсли это ошибка — обратитесь к администратору компании.')
+                    return {'statusCode': 200, 'body': 'ok'}
+
+                code = generate_code()
+                expires_at = datetime.utcnow() + timedelta(minutes=10)
+
+                cursor.execute(
+                    f"""UPDATE {DB_SCHEMA}.tg_sessions
+                        SET status = 'code_sent', telegram_chat_id = %s, code = %s, expires_at = %s
+                        WHERE session_token = %s""",
+                    (chat_id, code, expires_at, session_token)
+                )
+                conn.commit()
+
+                # Получаем название компании
+                cursor.execute(
+                    f"SELECT name FROM {DB_SCHEMA}.companies WHERE invite_token = %s",
+                    (session['invite_token'],)
+                )
+                company = cursor.fetchone()
+                company_name = company['name'] if company else 'вашей компании'
+
+                tg_send(bot_token, chat_id,
+                    f"✅ Отлично, {from_user.get('first_name', '')}!\n\n"
+                    f"Вы регистрируетесь как сотрудник компании <b>{company_name}</b>.\n\n"
+                    f"🔐 Ваш код подтверждения:\n\n<b>{code}</b>\n\n"
+                    f"Введите этот код на странице регистрации. Код действует <b>10 минут</b>."
+                )
+            finally:
+                cursor.close()
+                conn.close()
+
+        return {'statusCode': 200, 'body': 'ok'}
 
     conn = get_db()
     cursor = conn.cursor()
 
     try:
-        # ─── 1. Отправить код сотруднику при регистрации ────────────────────────
-        if action == 'send_register_code':
-            chat_id = body.get('telegram_chat_id')
+        # ── 1. Создать сессию регистрации (frontend → генерируем deep link) ───────
+        if action == 'create_session':
             first_name = body.get('first_name', '').strip()
             last_name = body.get('last_name', '').strip()
             invite_token = body.get('invite_token', '').strip()
+
+            if not first_name or not last_name or not invite_token:
+                return resp(400, {'error': 'Заполните имя, фамилию и убедитесь что ссылка приглашения действительна'})
 
             # Проверяем invite_token
             cursor.execute(
@@ -113,75 +188,74 @@ def handler(event: dict, context) -> dict:
             if not company:
                 return resp(404, {'error': 'Неверная ссылка приглашения'})
 
-            # Проверяем, не занят ли chat_id другим аккаунтом
-            cursor.execute(
-                f"SELECT id FROM {DB_SCHEMA}.users WHERE telegram_chat_id = %s",
-                (chat_id,)
-            )
-            if cursor.fetchone():
-                return resp(409, {'error': 'Этот Telegram уже привязан к другому аккаунту'})
-
-            code = generate_code()
-            expires_at = datetime.utcnow() + timedelta(minutes=10)
-
-            # Удаляем старые коды для этого chat_id
-            cursor.execute(
-                f"UPDATE {DB_SCHEMA}.telegram_auth_codes SET used = TRUE WHERE telegram_chat_id = %s AND used = FALSE AND purpose = 'register'",
-                (chat_id,)
-            )
+            session_token = generate_token(16)
+            expires_at = datetime.utcnow() + timedelta(minutes=15)
 
             cursor.execute(
-                f"""INSERT INTO {DB_SCHEMA}.telegram_auth_codes
-                    (code, purpose, invite_token, first_name, last_name, telegram_chat_id, expires_at)
-                    VALUES (%s, 'register', %s, %s, %s, %s, %s)""",
-                (code, invite_token, first_name, last_name, chat_id, expires_at)
+                f"""INSERT INTO {DB_SCHEMA}.tg_sessions
+                    (session_token, invite_token, first_name, last_name, status, expires_at)
+                    VALUES (%s, %s, %s, %s, 'pending', %s)""",
+                (session_token, invite_token, first_name, last_name, expires_at)
             )
             conn.commit()
 
-            company_name = company['name']
-            text = (
-                f"🔐 <b>Код подтверждения iHUNT</b>\n\n"
-                f"Вы регистрируетесь как сотрудник компании <b>{company_name}</b>.\n\n"
-                f"Ваш код: <b>{code}</b>\n\n"
-                f"Код действует 10 минут. Не передавайте его никому."
+            bot_username = os.environ.get('TELEGRAM_BOT_USERNAME', '')
+            deep_link = f"https://t.me/{bot_username}?start={session_token}"
+
+            return resp(200, {
+                'session_token': session_token,
+                'deep_link': deep_link,
+                'company_name': company['name']
+            })
+
+        # ── 2. Проверить статус сессии (поллинг с frontend) ─────────────────────
+        elif action == 'check_session':
+            session_token = body.get('session_token', '').strip()
+            if not session_token:
+                return resp(400, {'error': 'session_token обязателен'})
+
+            cursor.execute(
+                f"SELECT * FROM {DB_SCHEMA}.tg_sessions WHERE session_token = %s",
+                (session_token,)
             )
+            session = cursor.fetchone()
+            if not session:
+                return resp(404, {'error': 'Сессия не найдена'})
 
-            try:
-                tg_send(bot_token, int(chat_id), text)
-            except Exception as e:
-                return resp(400, {'error': f'Не удалось отправить сообщение. Убедитесь, что вы написали боту первым. Ошибка: {str(e)}'})
+            if session['expires_at'] < datetime.utcnow():
+                return resp(410, {'error': 'Сессия истекла', 'status': 'expired'})
 
-            return resp(200, {'message': 'Код отправлен в Telegram', 'company_name': company_name})
+            return resp(200, {'status': session['status']})
 
-        # ─── 2. Подтвердить код и зарегистрировать сотрудника ───────────────────
-        elif action == 'verify_register_code':
-            chat_id = body.get('telegram_chat_id')
+        # ── 3. Подтвердить код и зарегистрировать сотрудника ────────────────────
+        elif action == 'verify_code':
+            session_token = body.get('session_token', '').strip()
             code = body.get('code', '').strip()
 
-            if not chat_id or not code:
+            if not session_token or not code:
                 return resp(400, {'error': 'Укажите код'})
 
             cursor.execute(
-                f"""SELECT * FROM {DB_SCHEMA}.telegram_auth_codes
-                    WHERE code = %s AND telegram_chat_id = %s AND purpose = 'register'
-                      AND used = FALSE AND expires_at > CURRENT_TIMESTAMP
-                    ORDER BY created_at DESC LIMIT 1""",
-                (code, chat_id)
+                f"""SELECT * FROM {DB_SCHEMA}.tg_sessions
+                    WHERE session_token = %s AND status = 'code_sent'
+                      AND code = %s AND code_used = FALSE AND expires_at > CURRENT_TIMESTAMP""",
+                (session_token, code)
             )
-            record = cursor.fetchone()
-            if not record:
+            session = cursor.fetchone()
+            if not session:
                 return resp(400, {'error': 'Неверный или истёкший код'})
 
-            # Проверяем invite_token ещё раз
+            # Проверяем invite_token и получаем company_id
             cursor.execute(
                 f"SELECT id FROM {DB_SCHEMA}.companies WHERE invite_token = %s",
-                (record['invite_token'],)
+                (session['invite_token'],)
             )
             company = cursor.fetchone()
             if not company:
                 return resp(404, {'error': 'Компания не найдена'})
 
             company_id = company['id']
+            chat_id = session['telegram_chat_id']
 
             # Проверяем, нет ли уже такого chat_id
             cursor.execute(
@@ -200,128 +274,86 @@ def handler(event: dict, context) -> dict:
                      created_at, updated_at)
                     VALUES (%s, %s, %s, 'employee', 1, 0, 0, 0, 0, 0, 0, FALSE, FALSE, %s, TRUE,
                             CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-                    RETURNING id, email, first_name, last_name, company_id, role""",
-                (company_id, record['first_name'], record['last_name'], chat_id)
+                    RETURNING id, first_name, last_name, company_id, role""",
+                (company_id, session['first_name'], session['last_name'], chat_id)
             )
             user = cursor.fetchone()
 
-            # Помечаем код использованным
+            # Закрываем сессию
             cursor.execute(
-                f"UPDATE {DB_SCHEMA}.telegram_auth_codes SET used = TRUE WHERE id = %s",
-                (record['id'],)
+                f"UPDATE {DB_SCHEMA}.tg_sessions SET code_used = TRUE, status = 'completed', user_id = %s WHERE session_token = %s",
+                (user['id'], session_token)
             )
             conn.commit()
 
-            token = create_jwt(user['id'], user['email'] or '', user['company_id'], user['role'])
+            jwt = create_jwt(user['id'], '', user['company_id'], user['role'])
 
             try:
                 tg_send(bot_token, int(chat_id),
-                        f"✅ <b>Регистрация завершена!</b>\n\nДобро пожаловать в iHUNT, {user['first_name']}!")
+                    f"🎉 <b>Добро пожаловать в iHUNT, {user['first_name']}!</b>\n\nВаш аккаунт успешно создан. Теперь вы можете рекомендовать вакансии и получать вознаграждения!")
             except Exception:
                 pass
 
             return resp(201, {
                 'message': 'Регистрация успешна',
-                'token': token,
+                'token': jwt,
                 'user': {
                     'id': user['id'],
                     'first_name': user['first_name'],
                     'last_name': user['last_name'],
                     'company_id': user['company_id'],
                     'role': user['role'],
-                    'telegram_chat_id': chat_id,
                 }
             })
 
-        # ─── 3. Отправить код для входа ─────────────────────────────────────────
-        elif action == 'send_login_code':
-            chat_id = body.get('telegram_chat_id')
-            if not chat_id:
-                return resp(400, {'error': 'Укажите Telegram Chat ID'})
+        # ── 4. Вход через Telegram Login Widget ─────────────────────────────────
+        elif action == 'verify_tg_login':
+            tg_data = body.get('tg_data', {})
+            if not tg_data:
+                return resp(400, {'error': 'Нет данных от Telegram'})
+
+            tg_data_copy = dict(tg_data)
+            if not verify_tg_data(tg_data_copy, bot_token):
+                return resp(401, {'error': 'Неверная подпись Telegram'})
+
+            # Проверяем свежесть (не старше 5 минут)
+            auth_date = int(tg_data.get('auth_date', 0))
+            if datetime.utcnow().timestamp() - auth_date > 300:
+                return resp(401, {'error': 'Данные авторизации устарели. Попробуйте ещё раз.'})
+
+            tg_id = int(tg_data.get('id', 0))
+            if not tg_id:
+                return resp(400, {'error': 'Нет Telegram ID'})
 
             cursor.execute(
-                f"SELECT id, first_name FROM {DB_SCHEMA}.users WHERE telegram_chat_id = %s AND is_fired = FALSE",
-                (chat_id,)
+                f"""SELECT id, email, first_name, last_name, company_id, role,
+                           position, department, avatar_url, level, is_admin, is_hr_manager
+                    FROM {DB_SCHEMA}.users
+                    WHERE telegram_chat_id = %s AND is_fired = FALSE""",
+                (tg_id,)
             )
             user = cursor.fetchone()
             if not user:
-                return resp(404, {'error': 'Аккаунт с этим Telegram не найден'})
+                return resp(404, {'error': 'Аккаунт с этим Telegram не найден. Сначала зарегистрируйтесь.'})
 
-            code = generate_code()
-            expires_at = datetime.utcnow() + timedelta(minutes=10)
-
-            cursor.execute(
-                f"UPDATE {DB_SCHEMA}.telegram_auth_codes SET used = TRUE WHERE user_id = %s AND used = FALSE AND purpose = 'login'",
-                (user['id'],)
-            )
-            cursor.execute(
-                f"""INSERT INTO {DB_SCHEMA}.telegram_auth_codes
-                    (code, purpose, user_id, telegram_chat_id, expires_at)
-                    VALUES (%s, 'login', %s, %s, %s)""",
-                (code, user['id'], chat_id, expires_at)
-            )
-            conn.commit()
-
-            text = (
-                f"🔐 <b>Код входа iHUNT</b>\n\n"
-                f"Ваш код для входа: <b>{code}</b>\n\n"
-                f"Код действует 10 минут. Не передавайте его никому."
-            )
-
-            try:
-                tg_send(bot_token, int(chat_id), text)
-            except Exception as e:
-                return resp(400, {'error': f'Не удалось отправить сообщение. Убедитесь, что вы написали боту первым. Ошибка: {str(e)}'})
-
-            return resp(200, {'message': 'Код отправлен в Telegram'})
-
-        # ─── 4. Подтвердить код входа ───────────────────────────────────────────
-        elif action == 'verify_login_code':
-            chat_id = body.get('telegram_chat_id')
-            code = body.get('code', '').strip()
-
-            if not chat_id or not code:
-                return resp(400, {'error': 'Укажите код'})
-
-            cursor.execute(
-                f"""SELECT tac.*, u.id as uid, u.email, u.first_name, u.last_name,
-                           u.company_id, u.role, u.position, u.department, u.avatar_url,
-                           u.level, u.is_admin, u.is_hr_manager
-                    FROM {DB_SCHEMA}.telegram_auth_codes tac
-                    JOIN {DB_SCHEMA}.users u ON u.id = tac.user_id
-                    WHERE tac.code = %s AND tac.telegram_chat_id = %s AND tac.purpose = 'login'
-                      AND tac.used = FALSE AND tac.expires_at > CURRENT_TIMESTAMP
-                    ORDER BY tac.created_at DESC LIMIT 1""",
-                (code, chat_id)
-            )
-            record = cursor.fetchone()
-            if not record:
-                return resp(400, {'error': 'Неверный или истёкший код'})
-
-            cursor.execute(
-                f"UPDATE {DB_SCHEMA}.telegram_auth_codes SET used = TRUE WHERE id = %s",
-                (record['id'],)
-            )
-            conn.commit()
-
-            token = create_jwt(record['uid'], record['email'] or '', record['company_id'], record['role'])
+            jwt = create_jwt(user['id'], user['email'] or '', user['company_id'], user['role'])
 
             return resp(200, {
                 'message': 'Вход выполнен',
-                'token': token,
+                'token': jwt,
                 'user': {
-                    'id': record['uid'],
-                    'email': record['email'],
-                    'first_name': record['first_name'],
-                    'last_name': record['last_name'],
-                    'company_id': record['company_id'],
-                    'role': record['role'],
-                    'position': record['position'],
-                    'department': record['department'],
-                    'avatar_url': record['avatar_url'],
-                    'level': record['level'],
-                    'is_admin': record['is_admin'],
-                    'is_hr_manager': record['is_hr_manager'],
+                    'id': user['id'],
+                    'email': user['email'],
+                    'first_name': user['first_name'],
+                    'last_name': user['last_name'],
+                    'company_id': user['company_id'],
+                    'role': user['role'],
+                    'position': user['position'],
+                    'department': user['department'],
+                    'avatar_url': user['avatar_url'],
+                    'level': user['level'],
+                    'is_admin': user['is_admin'],
+                    'is_hr_manager': user['is_hr_manager'],
                 }
             })
 
