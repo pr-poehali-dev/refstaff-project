@@ -18,11 +18,24 @@ import urllib.request
 import boto3
 
 NOTIFY_URL = 'https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be'
+TG_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 def send_notification(payload):
     try:
         data = json.dumps(payload).encode('utf-8')
         req = urllib.request.Request(NOTIFY_URL, data=data, headers={'Content-Type': 'application/json'}, method='POST')
+        urllib.request.urlopen(req, timeout=5)
+    except Exception:
+        pass
+
+def tg_notify(chat_id, text: str):
+    """Отправляет уведомление сотруднику в Telegram."""
+    if not chat_id or not TG_BOT_TOKEN:
+        return
+    try:
+        url = f'https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage'
+        data = json.dumps({'chat_id': int(chat_id), 'text': text, 'parse_mode': 'HTML'}).encode()
+        req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
         urllib.request.urlopen(req, timeout=5)
     except Exception:
         pass
@@ -252,7 +265,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             """
             cur.execute(update_user_stats, (body_data.get('recommended_by'),))
 
-            cur.execute("SELECT first_name, last_name, company_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (body_data.get('recommended_by'),))
+            cur.execute("SELECT first_name, last_name, company_id, telegram_chat_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (body_data.get('recommended_by'),))
             rec_user = cur.fetchone()
             vacancy_title = ''
             if body_data.get('vacancy_id'):
@@ -270,6 +283,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'recommended_by_name': f"{rec_user.get('first_name', '')} {rec_user.get('last_name', '')}",
                     'reward_amount': body_data.get('reward_amount', 30000)
                 })
+            # Telegram-уведомление сотруднику о принятой рекомендации
+            tg_notify(rec_user.get('telegram_chat_id') if rec_user else None,
+                f"📋 <b>Рекомендация отправлена!</b>\n\n"
+                f"Кандидат: <b>{body_data.get('candidate_name', '')}</b>\n"
+                f"Вакансия: <b>{vacancy_title}</b>\n\n"
+                f"Мы уведомим вас об изменении статуса."
+            )
 
             return {
                 'statusCode': 201,
@@ -305,6 +325,23 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(query, (new_status, new_status, recommendation_id))
             updated_recommendation = cur.fetchone()
             
+            # Получаем данные сотрудника и вакансии для уведомлений
+            cur.execute(
+                "SELECT first_name, last_name, telegram_chat_id FROM t_p65890965_refstaff_project.users WHERE id = %s",
+                (current_rec['recommended_by'],)
+            )
+            rec_employee = cur.fetchone()
+            cur.execute(
+                "SELECT v.title, v.payout_delay_days FROM t_p65890965_refstaff_project.vacancies v JOIN t_p65890965_refstaff_project.recommendations r ON r.vacancy_id = v.id WHERE r.id = %s",
+                (recommendation_id,)
+            )
+            rec_vacancy = cur.fetchone()
+            candidate_name = body_data.get('candidate_name', '')
+            cur.execute("SELECT candidate_name FROM t_p65890965_refstaff_project.recommendations WHERE id = %s", (recommendation_id,))
+            rec_row = cur.fetchone()
+            if rec_row:
+                candidate_name = rec_row['candidate_name']
+
             if new_status == 'accepted' and old_status != 'accepted':
                 # Принятие кандидата: начисляем бонус и XP
                 update_user = """
@@ -317,13 +354,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """
                 cur.execute(update_user, (current_rec['reward_amount'], current_rec['recommended_by']))
                 
-                get_vacancy_delay = """
-                    SELECT payout_delay_days FROM t_p65890965_refstaff_project.vacancies
-                    WHERE id = (SELECT vacancy_id FROM t_p65890965_refstaff_project.recommendations WHERE id = %s)
-                """
-                cur.execute(get_vacancy_delay, (recommendation_id,))
-                vacancy_info = cur.fetchone()
-                delay_days = vacancy_info['payout_delay_days'] if vacancy_info else 30
+                delay_days = rec_vacancy['payout_delay_days'] if rec_vacancy else 30
                 
                 create_pending_payout = f"""
                     INSERT INTO t_p65890965_refstaff_project.pending_payouts 
@@ -335,6 +366,32 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     recommendation_id, 
                     current_rec['reward_amount']
                 ))
+
+                reward = int(current_rec['reward_amount'])
+                vac_title = rec_vacancy['title'] if rec_vacancy else 'вакансию'
+                tg_notify(rec_employee.get('telegram_chat_id') if rec_employee else None,
+                    f"🎉 <b>Кандидат принят на работу!</b>\n\n"
+                    f"Кандидат <b>{candidate_name}</b> принят на вакансию «{vac_title}».\n\n"
+                    f"💰 Вознаграждение <b>{reward:,} ₽</b> зачислено в ожидании выплаты.\n"
+                    f"⏳ Выплата будет доступна через {delay_days} дней.\n"
+                    f"✨ +100 очков опыта начислено!"
+                )
+
+            elif new_status == 'rejected' and old_status != 'rejected':
+                vac_title = rec_vacancy['title'] if rec_vacancy else 'вакансию'
+                tg_notify(rec_employee.get('telegram_chat_id') if rec_employee else None,
+                    f"❌ <b>Рекомендация отклонена</b>\n\n"
+                    f"К сожалению, кандидат <b>{candidate_name}</b> на вакансию «{vac_title}» не подошёл.\n\n"
+                    f"Не расстраивайтесь — рекомендуйте других кандидатов!"
+                )
+
+            elif new_status == 'hired' and old_status != 'hired':
+                vac_title = rec_vacancy['title'] if rec_vacancy else 'вакансию'
+                tg_notify(rec_employee.get('telegram_chat_id') if rec_employee else None,
+                    f"🏆 <b>Кандидат вышел на работу!</b>\n\n"
+                    f"<b>{candidate_name}</b> официально приступил к работе на вакансии «{vac_title}».\n\n"
+                    f"Отличная рекомендация!"
+                )
 
             elif old_status == 'accepted' and new_status in ('pending', 'rejected'):
                 # Откат: снимаем бонус, XP и удаляем pending_payout

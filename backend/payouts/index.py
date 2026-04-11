@@ -14,11 +14,24 @@ from psycopg2.extras import RealDictCursor
 import urllib.request
 
 NOTIFY_URL = 'https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be'
+TG_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 def send_notification(payload):
     try:
         data = json.dumps(payload).encode('utf-8')
         req = urllib.request.Request(NOTIFY_URL, data=data, headers={'Content-Type': 'application/json'}, method='POST')
+        urllib.request.urlopen(req, timeout=5)
+    except Exception:
+        pass
+
+def tg_notify(chat_id, text: str):
+    """Отправляет уведомление сотруднику в Telegram."""
+    if not chat_id or not TG_BOT_TOKEN:
+        return
+    try:
+        url = f'https://api.telegram.org/bot{TG_BOT_TOKEN}/sendMessage'
+        data = json.dumps({'chat_id': int(chat_id), 'text': text, 'parse_mode': 'HTML'}).encode()
+        req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
         urllib.request.urlopen(req, timeout=5)
     except Exception:
         pass
@@ -132,7 +145,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             cur.execute(query, (user_id, amount, payment_method, payment_details))
             new_request = cur.fetchone()
 
-            cur.execute("SELECT first_name, last_name, company_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (user_id,))
+            cur.execute("SELECT first_name, last_name, company_id, telegram_chat_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (user_id,))
             payout_user = cur.fetchone()
             if payout_user and payout_user.get('company_id'):
                 send_notification({
@@ -142,6 +155,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'amount': amount,
                     'payment_method': payment_method or 'Не указан'
                 })
+            tg_notify(payout_user.get('telegram_chat_id') if payout_user else None,
+                f"📤 <b>Запрос на выплату отправлен</b>\n\n"
+                f"Сумма: <b>{int(amount):,} ₽</b>\n"
+                f"Способ: {payment_method or 'Не указан'}\n\n"
+                f"Ожидайте подтверждения от администратора компании."
+            )
 
             return {
                 'statusCode': 201,
@@ -189,6 +208,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 user_id = current_request['user_id']
                 old_status = current_request['status']
 
+                # Получаем telegram_chat_id сотрудника
+                cur.execute("SELECT telegram_chat_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (user_id,))
+                payout_employee = cur.fetchone()
+                tg_chat = payout_employee.get('telegram_chat_id') if payout_employee else None
+
                 if status == 'paid' and old_status != 'paid':
                     # Переносим из pending в balance + записываем транзакцию
                     cur.execute("""
@@ -203,8 +227,26 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                         (user_id, amount, type, description)
                         VALUES (%s, %s, 'payout', 'Выплата по запросу #' || %s)
                     """, (user_id, payout_amount, request_id))
+                    tg_notify(tg_chat,
+                        f"💸 <b>Выплата произведена!</b>\n\n"
+                        f"На ваш счёт зачислено <b>{int(payout_amount):,} ₽</b>.\n"
+                        f"{'Комментарий: ' + admin_comment if admin_comment else ''}"
+                    )
+
+                elif status == 'approved' and old_status != 'approved':
+                    tg_notify(tg_chat,
+                        f"✅ <b>Запрос на выплату одобрен</b>\n\n"
+                        f"Сумма <b>{int(payout_amount):,} ₽</b> одобрена к выплате.\n"
+                        f"Средства поступят в ближайшее время."
+                    )
 
                 elif status == 'rejected' and old_status in ('pending', 'approved'):
+                    tg_notify(tg_chat,
+                        f"❌ <b>Запрос на выплату отклонён</b>\n\n"
+                        f"Сумма: {int(payout_amount):,} ₽\n"
+                        f"{'Причина: ' + admin_comment if admin_comment else 'Причина не указана'}\n\n"
+                        f"Обратитесь к администратору компании за подробностями."
+                    )
                     # При отклонении — убираем из wallet_pending если было pending
                     if old_status == 'pending':
                         cur.execute("""
