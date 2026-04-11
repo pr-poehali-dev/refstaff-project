@@ -309,6 +309,11 @@ function Index() {
   const [activeRecommendation, setActiveRecommendation] = useState<Recommendation | null>(null);
   const [showRecommendationDetailsDialog, setShowRecommendationDetailsDialog] = useState(false);
   const [loginType, setLoginType] = useState<'employer' | 'employee'>('employer');
+  const [tgLoginStep, setTgLoginStep] = useState<'chat_id' | 'code'>('chat_id');
+  const [tgLoginChatId, setTgLoginChatId] = useState('');
+  const [tgLoginCode, setTgLoginCode] = useState('');
+  const [isTgLoginLoading, setIsTgLoginLoading] = useState(false);
+  const [tgLoginError, setTgLoginError] = useState('');
   const [employeeToEditRoles, setEmployeeToEditRoles] = useState<Employee | null>(null);
   const [showEditRolesDialog, setShowEditRolesDialog] = useState(false);
   const [rolesForm, setRolesForm] = useState({
@@ -1335,6 +1340,63 @@ function Index() {
     }
   };
 
+  const handleTgSendLoginCode = async () => {
+    setTgLoginError('');
+    const chatIdNum = parseInt(tgLoginChatId);
+    if (!tgLoginChatId || isNaN(chatIdNum)) {
+      setTgLoginError('Введите корректный Telegram Chat ID (только цифры)');
+      return;
+    }
+    setIsTgLoginLoading(true);
+    try {
+      const r = await fetch('https://functions.poehali.dev/5c021f8a-5408-4339-bc3e-1fc4dd0b72f5', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'send_login_code', telegram_chat_id: chatIdNum })
+      });
+      const data = await r.json();
+      if (r.ok) setTgLoginStep('code');
+      else setTgLoginError(data.error || 'Ошибка отправки кода');
+    } catch {
+      setTgLoginError('Не удалось отправить код');
+    } finally {
+      setIsTgLoginLoading(false);
+    }
+  };
+
+  const handleTgVerifyLoginCode = async () => {
+    setTgLoginError('');
+    if (!tgLoginCode.trim()) { setTgLoginError('Введите код'); return; }
+    setIsTgLoginLoading(true);
+    try {
+      const r = await fetch('https://functions.poehali.dev/5c021f8a-5408-4339-bc3e-1fc4dd0b72f5', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'verify_login_code',
+          telegram_chat_id: parseInt(tgLoginChatId),
+          code: tgLoginCode.trim()
+        })
+      });
+      const data = await r.json();
+      if (r.ok) {
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userRole', 'employee');
+        setAuthToken(data.token);
+        setCurrentUser(data.user);
+        setUserRole('employee');
+        setShowLoginDialog(false);
+        setTgLoginChatId(''); setTgLoginCode(''); setTgLoginStep('chat_id');
+        if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'login');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else {
+        setTgLoginError(data.error || 'Неверный код');
+      }
+    } catch {
+      setTgLoginError('Ошибка подтверждения');
+    } finally {
+      setIsTgLoginLoading(false);
+    }
+  };
+
   const handleLogin = async () => {
     if (!loginForm.email || !loginForm.password) {
       alert('Введите email и пароль');
@@ -2346,7 +2408,7 @@ function Index() {
                   type="button"
                   variant={loginType === 'employer' ? 'default' : 'outline'}
                   className="w-full"
-                  onClick={() => setLoginType('employer')}
+                  onClick={() => { setLoginType('employer'); setTgLoginStep('chat_id'); setTgLoginCode(''); setTgLoginChatId(''); setTgLoginError(''); }}
                 >
                   <Icon name="Building2" className="mr-2" size={18} />
                   Компания
@@ -2355,7 +2417,7 @@ function Index() {
                   type="button"
                   variant={loginType === 'employee' ? 'default' : 'outline'}
                   className="w-full"
-                  onClick={() => setLoginType('employee')}
+                  onClick={() => { setLoginType('employee'); setTgLoginStep('chat_id'); setTgLoginCode(''); setTgLoginError(''); }}
                 >
                   <Icon name="User" className="mr-2" size={18} />
                   Сотрудник
@@ -2363,45 +2425,116 @@ function Index() {
               </div>
             </div>
 
-            <div>
-              <Label htmlFor="login-email">Email</Label>
-              <Input 
-                id="login-email" 
-                type="email" 
-                placeholder="ivan@company.ru" 
-                value={loginForm.email}
-                onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="login-password">Пароль</Label>
-              <Input 
-                id="login-password" 
-                type="password" 
-                placeholder="Ваш пароль" 
-                value={loginForm.password}
-                onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
-                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
-              />
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" className="rounded" />
-                Запомнить меня
-              </label>
-              <button 
-                onClick={() => {
-                  setShowLoginDialog(false);
-                  setShowForgotPasswordDialog(true);
-                }}
-                className="text-sm text-primary hover:underline"
-              >
-                Забыли пароль?
-              </button>
-            </div>
-            <Button className="w-full" onClick={handleLogin} disabled={isAuthLoading}>
-              {isAuthLoading ? 'Вход...' : 'Войти'}
-            </Button>
+            {/* Telegram-вход для сотрудников */}
+            {loginType === 'employee' ? (
+              <div className="space-y-4">
+                {tgLoginError && (
+                  <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm flex gap-2">
+                    <Icon name="AlertCircle" size={15} className="mt-0.5 shrink-0" />
+                    <span>{tgLoginError}</span>
+                  </div>
+                )}
+                {tgLoginStep === 'chat_id' ? (
+                  <>
+                    <div className="p-3 rounded-md bg-blue-50 border border-blue-200 text-sm text-blue-800">
+                      <p className="font-medium flex items-center gap-1.5 mb-1">
+                        <Icon name="Send" size={14} />
+                        Вход через Telegram
+                      </p>
+                      <p>Узнайте свой Chat ID у бота <strong>@userinfobot</strong> и введите ниже.</p>
+                    </div>
+                    <div>
+                      <Label htmlFor="tg-chat-id">Ваш Telegram Chat ID</Label>
+                      <Input
+                        id="tg-chat-id"
+                        placeholder="123456789"
+                        value={tgLoginChatId}
+                        onChange={(e) => setTgLoginChatId(e.target.value.replace(/\D/g, ''))}
+                        onKeyDown={(e) => e.key === 'Enter' && handleTgSendLoginCode()}
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">Только цифры — узнайте у @userinfobot</p>
+                    </div>
+                    <Button className="w-full" onClick={handleTgSendLoginCode} disabled={isTgLoginLoading}>
+                      {isTgLoginLoading
+                        ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Отправляем...</>
+                        : <><Icon name="Send" size={16} className="mr-2" />Получить код в Telegram</>}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-center">
+                      <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                        <Icon name="Send" size={22} className="text-blue-500" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">Код отправлен в Telegram. Действует 10 минут.</p>
+                    </div>
+                    <div>
+                      <Label>Код из Telegram</Label>
+                      <Input
+                        value={tgLoginCode}
+                        onChange={(e) => setTgLoginCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        placeholder="123456"
+                        className="text-center text-2xl tracking-[0.4em] font-mono"
+                        maxLength={6}
+                        onKeyDown={(e) => e.key === 'Enter' && handleTgVerifyLoginCode()}
+                      />
+                    </div>
+                    <Button className="w-full" onClick={handleTgVerifyLoginCode}
+                      disabled={isTgLoginLoading || tgLoginCode.length !== 6}>
+                      {isTgLoginLoading
+                        ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</>
+                        : 'Войти'}
+                    </Button>
+                    <Button variant="ghost" className="w-full text-sm"
+                      onClick={() => { setTgLoginStep('chat_id'); setTgLoginCode(''); setTgLoginError(''); }}>
+                      ← Изменить Chat ID
+                    </Button>
+                  </>
+                )}
+              </div>
+            ) : (
+              <>
+                <div>
+                  <Label htmlFor="login-email">Email</Label>
+                  <Input 
+                    id="login-email" 
+                    type="email" 
+                    placeholder="ivan@company.ru" 
+                    value={loginForm.email}
+                    onChange={(e) => setLoginForm({...loginForm, email: e.target.value})}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="login-password">Пароль</Label>
+                  <Input 
+                    id="login-password" 
+                    type="password" 
+                    placeholder="Ваш пароль" 
+                    value={loginForm.password}
+                    onChange={(e) => setLoginForm({...loginForm, password: e.target.value})}
+                    onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input type="checkbox" className="rounded" />
+                    Запомнить меня
+                  </label>
+                  <button 
+                    onClick={() => {
+                      setShowLoginDialog(false);
+                      setShowForgotPasswordDialog(true);
+                    }}
+                    className="text-sm text-primary hover:underline"
+                  >
+                    Забыли пароль?
+                  </button>
+                </div>
+                <Button className="w-full" onClick={handleLogin} disabled={isAuthLoading}>
+                  {isAuthLoading ? 'Вход...' : 'Войти'}
+                </Button>
+              </>
+            )}
             
             {resendVerificationEmail && (
               <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg space-y-2">
