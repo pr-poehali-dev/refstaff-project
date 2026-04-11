@@ -6000,7 +6000,7 @@ function Index() {
                           </Button>
                           <Button size="sm" variant="outline" className="px-2 sm:px-3" onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/vacancy/${vacancy.id}/qr`);
+                            navigate(`/vacancy/${vacancy.id}/qr`, { state: { referralLink: vacancy.referralLink } });
                           }}>
                             <Icon name="QrCode" size={14} />
                           </Button>

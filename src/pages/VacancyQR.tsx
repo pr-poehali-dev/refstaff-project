@@ -1,15 +1,16 @@
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 export default function VacancyQR() {
-  const { vacancyId, token } = useParams<{ vacancyId: string; token: string }>();
+  const { vacancyId } = useParams<{ vacancyId: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const referralLink = token
-    ? `${window.location.origin}/r/${token}`
-    : `${window.location.origin}/vacancy/${vacancyId}`;
+  const referralLink: string =
+    (location.state as { referralLink?: string })?.referralLink ||
+    `${window.location.origin}/vacancy/${vacancyId}`;
 
   const downloadQR = () => {
     const svg = document.getElementById('vacancy-qr-svg');
