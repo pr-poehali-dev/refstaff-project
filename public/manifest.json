@@ -1,8 +1,9 @@
 {
-  "name": "RefStaff — Реферальный рекрутинг",
-  "short_name": "RefStaff",
+  "name": "iHUNT — Реферальный рекрутинг",
+  "short_name": "iHUNT",
   "description": "Платформа реферального рекрутинга с геймификацией",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0EA5E9",
@@ -10,6 +11,7 @@
   "categories": ["business", "productivity"],
   "lang": "ru",
   "dir": "ltr",
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/favicon.svg",
