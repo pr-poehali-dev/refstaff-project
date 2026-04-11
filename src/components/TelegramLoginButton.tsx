@@ -22,7 +22,7 @@ declare global {
   }
 }
 
-const BOT_USERNAME = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || '';
+const BOT_USERNAME = import.meta.env.VITE_TELEGRAM_BOT_USERNAME || 'i_hunt_bot';
 
 export function TelegramLoginButton({ onAuth, loading }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
