@@ -310,8 +310,14 @@ function Index() {
   const [activeRecommendation, setActiveRecommendation] = useState<Recommendation | null>(null);
   const [showRecommendationDetailsDialog, setShowRecommendationDetailsDialog] = useState(false);
   const [loginType, setLoginType] = useState<'employer' | 'employee'>('employer');
+  const [employeeLoginMethod, setEmployeeLoginMethod] = useState<'telegram' | 'max'>('telegram');
   const [isTgLoginLoading, setIsTgLoginLoading] = useState(false);
   const [tgLoginError, setTgLoginError] = useState('');
+  const [isMaxLoginLoading, setIsMaxLoginLoading] = useState(false);
+  const [maxLoginError, setMaxLoginError] = useState('');
+  const [maxLoginStep, setMaxLoginStep] = useState<'input' | 'code'>('input');
+  const [maxLoginUserId, setMaxLoginUserId] = useState('');
+  const [maxLoginCode, setMaxLoginCode] = useState('');
   const [employeeToEditRoles, setEmployeeToEditRoles] = useState<Employee | null>(null);
   const [showEditRolesDialog, setShowEditRolesDialog] = useState(false);
   const [rolesForm, setRolesForm] = useState({
@@ -1366,6 +1372,47 @@ function Index() {
     }
   };
 
+  const handleMaxSendLoginCode = async () => {
+    setMaxLoginError('');
+    if (!maxLoginUserId || isNaN(parseInt(maxLoginUserId))) { setMaxLoginError('Введите корректный MAX User ID'); return; }
+    setIsMaxLoginLoading(true);
+    try {
+      const r = await fetch('https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'send_login_code', max_user_id: parseInt(maxLoginUserId) })
+      });
+      const data = await r.json();
+      if (r.ok) setMaxLoginStep('code');
+      else setMaxLoginError(data.error || 'Ошибка отправки кода');
+    } catch { setMaxLoginError('Не удалось отправить код'); }
+    finally { setIsMaxLoginLoading(false); }
+  };
+
+  const handleMaxVerifyLoginCode = async () => {
+    setMaxLoginError('');
+    if (!maxLoginCode.trim()) { setMaxLoginError('Введите код'); return; }
+    setIsMaxLoginLoading(true);
+    try {
+      const r = await fetch('https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verify_login_code', max_user_id: parseInt(maxLoginUserId), code: maxLoginCode.trim() })
+      });
+      const data = await r.json();
+      if (r.ok) {
+        localStorage.setItem('authToken', data.token);
+        localStorage.setItem('userRole', 'employee');
+        setAuthToken(data.token);
+        setCurrentUser(data.user);
+        setUserRole('employee');
+        setShowLoginDialog(false);
+        setMaxLoginUserId(''); setMaxLoginCode(''); setMaxLoginStep('input');
+        if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'login');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else { setMaxLoginError(data.error || 'Неверный код'); }
+    } catch { setMaxLoginError('Ошибка входа'); }
+    finally { setIsMaxLoginLoading(false); }
+  };
+
   const handleLogin = async () => {
     if (!loginForm.email || !loginForm.password) {
       alert('Введите email и пароль');
@@ -2394,24 +2441,75 @@ function Index() {
               </div>
             </div>
 
-            {/* Telegram-вход для сотрудников */}
+            {/* Вход для сотрудников */}
             {loginType === 'employee' ? (
-              <div className="space-y-4">
-                {tgLoginError && (
-                  <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm flex gap-2">
-                    <Icon name="AlertCircle" size={15} className="mt-0.5 shrink-0" />
-                    <span>{tgLoginError}</span>
+              <div className="space-y-3">
+                {/* Переключатель мессенджера */}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    className={`flex items-center justify-center gap-2 h-10 rounded-lg border-2 text-sm font-medium transition-all ${employeeLoginMethod === 'telegram' ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-border text-muted-foreground hover:border-muted-foreground'}`}
+                    onClick={() => { setEmployeeLoginMethod('telegram'); setTgLoginError(''); setMaxLoginError(''); }}
+                  >
+                    <Icon name="Send" size={15} />Telegram
+                  </button>
+                  <button
+                    className={`flex items-center justify-center gap-2 h-10 rounded-lg border-2 text-sm font-medium transition-all ${employeeLoginMethod === 'max' ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-border text-muted-foreground hover:border-muted-foreground'}`}
+                    onClick={() => { setEmployeeLoginMethod('max'); setTgLoginError(''); setMaxLoginError(''); }}
+                  >
+                    <Icon name="MessageCircle" size={15} />MAX
+                  </button>
+                </div>
+
+                {/* Telegram */}
+                {employeeLoginMethod === 'telegram' && (
+                  <div className="space-y-3">
+                    {tgLoginError && <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm flex gap-2"><Icon name="AlertCircle" size={15} className="mt-0.5 shrink-0" /><span>{tgLoginError}</span></div>}
+                    <div className="text-center space-y-3 py-1">
+                      <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <Icon name="Send" size={24} className="text-blue-500" />
+                      </div>
+                      <p className="text-sm text-muted-foreground">Нажмите кнопку — Telegram подтвердит вашу личность автоматически</p>
+                      <TelegramLoginButton onAuth={handleTgVerifyLoginCode} loading={isTgLoginLoading} />
+                    </div>
                   </div>
                 )}
-                <div className="text-center space-y-3 py-2">
-                  <div className="mx-auto w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Icon name="Send" size={28} className="text-blue-500" />
+
+                {/* MAX */}
+                {employeeLoginMethod === 'max' && (
+                  <div className="space-y-3">
+                    {maxLoginError && <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm flex gap-2"><Icon name="AlertCircle" size={15} className="mt-0.5 shrink-0" /><span>{maxLoginError}</span></div>}
+                    {maxLoginStep === 'input' ? (
+                      <>
+                        <div className="p-3 rounded-md bg-purple-50 border border-purple-200 text-sm text-purple-800">
+                          <p className="font-medium flex items-center gap-1.5 mb-1"><Icon name="MessageCircle" size={14} />Вход через MAX</p>
+                          <p>Узнайте свой User ID: откройте бота <strong>@id7329031742_bot</strong> и отправьте <strong>/myid</strong></p>
+                        </div>
+                        <div>
+                          <Label>Ваш MAX User ID</Label>
+                          <Input placeholder="123456789" value={maxLoginUserId} onChange={e => setMaxLoginUserId(e.target.value.replace(/\D/g, ''))} onKeyDown={e => e.key === 'Enter' && handleMaxSendLoginCode()} />
+                        </div>
+                        <Button className="w-full" onClick={handleMaxSendLoginCode} disabled={isMaxLoginLoading}>
+                          {isMaxLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Отправляем...</> : <><Icon name="MessageCircle" size={16} className="mr-2" />Получить код в MAX</>}
+                        </Button>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-center">
+                          <div className="mx-auto w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-2"><Icon name="MessageCircle" size={22} className="text-purple-500" /></div>
+                          <p className="text-sm text-muted-foreground">Код отправлен в MAX. Действует 10 минут.</p>
+                        </div>
+                        <div>
+                          <Label>Код из MAX</Label>
+                          <Input value={maxLoginCode} onChange={e => setMaxLoginCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="123456" className="text-center text-2xl tracking-[0.4em] font-mono" maxLength={6} onKeyDown={e => e.key === 'Enter' && handleMaxVerifyLoginCode()} />
+                        </div>
+                        <Button className="w-full" onClick={handleMaxVerifyLoginCode} disabled={isMaxLoginLoading || maxLoginCode.length !== 6}>
+                          {isMaxLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</> : 'Войти'}
+                        </Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setMaxLoginStep('input'); setMaxLoginCode(''); setMaxLoginError(''); }}>← Изменить ID</Button>
+                      </>
+                    )}
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Нажмите кнопку — Telegram подтвердит вашу личность автоматически
-                  </p>
-                  <TelegramLoginButton onAuth={handleTgVerifyLoginCode} loading={isTgLoginLoading} />
-                </div>
+                )}
               </div>
             ) : (
               <>

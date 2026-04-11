@@ -1,4 +1,6 @@
 {
+  "setup-max-webhook": "https://functions.poehali.dev/be60b574-3ead-40fe-bf23-0210615d477d",
+  "max-auth": "https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4",
   "telegram-auth": "https://functions.poehali.dev/5c021f8a-5408-4339-bc3e-1fc4dd0b72f5",
   "upload-avatar": "https://functions.poehali.dev/5166b7c1-bbcb-454c-90c7-70522447c174",
   "admin": "https://functions.poehali.dev/e7549642-317b-4f05-b0f9-2c056de3cef0",

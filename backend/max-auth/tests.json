@@ -1,0 +1,46 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "Unknown action returns 400",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "unknown"},
+      "expectedStatus": 400,
+      "expectedBody": {"error": "Неизвестный action"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "create_session missing fields",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "create_session"},
+      "expectedStatus": 400,
+      "expectedBody": {"error": "Заполните имя, фамилию и убедитесь что ссылка действительна"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "check_session missing token",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "check_session"},
+      "expectedStatus": 400,
+      "expectedBody": {"error": "session_token обязателен"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "send_login_code missing max_user_id",
+      "method": "POST",
+      "path": "/",
+      "body": {"action": "send_login_code"},
+      "expectedStatus": 400,
+      "expectedBody": {"error": "Укажите MAX User ID"},
+      "bodyMatcher": "partial"
+    }
+  ]
+}
