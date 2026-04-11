@@ -1,5 +1,5 @@
 '''
-MAX мессенджер авторизация сотрудников: deep link регистрация, webhook бота, вход по коду. v2
+MAX мессенджер авторизация сотрудников: deep link регистрация, webhook бота, вход по коду. v3
 Флоу регистрации: create_session → deep link в бота → bot_started → бот шлёт код → verify_code → JWT.
 Флоу входа: send_login_code → пользователь пишет боту → получает код → verify_login_code → JWT.
 MAX Bot API: https://platform-api.max.ru
@@ -419,6 +419,27 @@ def handler(event: dict, context) -> dict:
                     'is_hr_manager': record['is_hr_manager'],
                 }
             })
+
+        # ── Временный: установка webhook ─────────────────────────────────────
+        elif action == 'setup_webhook':
+            webhook_url = 'https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4'
+            result = {'token_len': len(bot_token), 'token_prefix': bot_token[:8] + '...'}
+            try:
+                req_me = urllib.request.Request('https://platform-api.max.ru/me',
+                    headers={'Authorization': f'Bearer {bot_token}'})
+                with urllib.request.urlopen(req_me, timeout=10) as r:
+                    result['bot_info'] = json.loads(r.read())
+            except Exception as e:
+                result['bot_error'] = str(e)
+            try:
+                data = json.dumps({'url': webhook_url}).encode()
+                req_wh = urllib.request.Request('https://platform-api.max.ru/subscriptions', data=data,
+                    headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {bot_token}'}, method='POST')
+                with urllib.request.urlopen(req_wh, timeout=10) as r:
+                    result['webhook_set'] = json.loads(r.read())
+            except Exception as e:
+                result['webhook_error'] = str(e)
+            return resp(200, result)
 
         return resp(400, {'error': 'Неизвестный action'})
 
