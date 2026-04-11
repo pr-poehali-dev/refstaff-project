@@ -315,8 +315,9 @@ function Index() {
   const [tgLoginError, setTgLoginError] = useState('');
   const [isMaxLoginLoading, setIsMaxLoginLoading] = useState(false);
   const [maxLoginError, setMaxLoginError] = useState('');
-  const [maxLoginStep, setMaxLoginStep] = useState<'input' | 'code'>('input');
-  const [maxLoginUserId, setMaxLoginUserId] = useState('');
+  const [maxLoginStep, setMaxLoginStep] = useState<'input' | 'wait' | 'code'>('input');
+  const [maxLoginSession, setMaxLoginSession] = useState('');
+  const [maxLoginDeepLink, setMaxLoginDeepLink] = useState('');
   const [maxLoginCode, setMaxLoginCode] = useState('');
   const [employeeToEditRoles, setEmployeeToEditRoles] = useState<Employee | null>(null);
   const [showEditRolesDialog, setShowEditRolesDialog] = useState(false);
@@ -1374,17 +1375,32 @@ function Index() {
 
   const handleMaxSendLoginCode = async () => {
     setMaxLoginError('');
-    if (!maxLoginUserId || isNaN(parseInt(maxLoginUserId))) { setMaxLoginError('Введите корректный MAX User ID'); return; }
     setIsMaxLoginLoading(true);
     try {
       const r = await fetch('https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'send_login_code', max_user_id: parseInt(maxLoginUserId) })
+        body: JSON.stringify({ action: 'create_login_session' })
       });
       const data = await r.json();
-      if (r.ok) setMaxLoginStep('code');
-      else setMaxLoginError(data.error || 'Ошибка отправки кода');
-    } catch { setMaxLoginError('Не удалось отправить код'); }
+      if (r.ok) {
+        setMaxLoginSession(data.session_token);
+        setMaxLoginDeepLink(data.deep_link);
+        setMaxLoginStep('wait');
+        window.open(data.deep_link, '_blank');
+        // Поллинг статуса
+        const poll = setInterval(async () => {
+          try {
+            const pr = await fetch('https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'check_login_session', session_token: data.session_token })
+            });
+            const pd = await pr.json();
+            if (pr.status === 410) { clearInterval(poll); setMaxLoginError('Сессия истекла. Попробуйте снова.'); setMaxLoginStep('input'); return; }
+            if (pd.status === 'code_sent') { clearInterval(poll); setMaxLoginStep('code'); }
+          } catch { /* ignore */ }
+        }, 2000);
+      } else { setMaxLoginError(data.error || 'Ошибка'); }
+    } catch { setMaxLoginError('Не удалось создать сессию'); }
     finally { setIsMaxLoginLoading(false); }
   };
 
@@ -1395,7 +1411,7 @@ function Index() {
     try {
       const r = await fetch('https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'verify_login_code', max_user_id: parseInt(maxLoginUserId), code: maxLoginCode.trim() })
+        body: JSON.stringify({ action: 'verify_login_code', session_token: maxLoginSession, code: maxLoginCode.trim() })
       });
       const data = await r.json();
       if (r.ok) {
@@ -1405,7 +1421,7 @@ function Index() {
         setCurrentUser(data.user);
         setUserRole('employee');
         setShowLoginDialog(false);
-        setMaxLoginUserId(''); setMaxLoginCode(''); setMaxLoginStep('input');
+        setMaxLoginSession(''); setMaxLoginCode(''); setMaxLoginStep('input');
         if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'login');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else { setMaxLoginError(data.error || 'Неверный код'); }
@@ -2479,24 +2495,34 @@ function Index() {
                   <div className="space-y-3">
                     {maxLoginError && <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm flex gap-2"><Icon name="AlertCircle" size={15} className="mt-0.5 shrink-0" /><span>{maxLoginError}</span></div>}
                     {maxLoginStep === 'input' ? (
-                      <>
-                        <div className="p-3 rounded-md bg-purple-50 border border-purple-200 text-sm text-purple-800">
-                          <p className="font-medium flex items-center gap-1.5 mb-1"><Icon name="MessageCircle" size={14} />Вход через MAX</p>
-                          <p>Узнайте свой User ID: откройте бота <strong>@id7329031742_bot</strong> и отправьте <strong>/myid</strong></p>
+                      <div className="text-center space-y-3 py-1">
+                        <div className="mx-auto w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Icon name="MessageCircle" size={24} className="text-purple-500" />
                         </div>
-                        <div>
-                          <Label>Ваш MAX User ID</Label>
-                          <Input placeholder="123456789" value={maxLoginUserId} onChange={e => setMaxLoginUserId(e.target.value.replace(/\D/g, ''))} onKeyDown={e => e.key === 'Enter' && handleMaxSendLoginCode()} />
-                        </div>
+                        <p className="text-sm text-muted-foreground">Нажмите кнопку — откроется бот MAX, нажмите /start и получите код</p>
                         <Button className="w-full" onClick={handleMaxSendLoginCode} disabled={isMaxLoginLoading}>
-                          {isMaxLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Отправляем...</> : <><Icon name="MessageCircle" size={16} className="mr-2" />Получить код в MAX</>}
+                          {isMaxLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Открываем...</> : <><Icon name="MessageCircle" size={16} className="mr-2" />Войти через MAX</>}
                         </Button>
-                      </>
+                      </div>
+                    ) : maxLoginStep === 'wait' ? (
+                      <div className="text-center space-y-3 py-1">
+                        <div className="mx-auto w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                          <Icon name="MessageCircle" size={24} className="text-purple-500" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">Откройте MAX и нажмите <strong>/start</strong> в боте</p>
+                        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                          <Icon name="Loader2" size={14} className="animate-spin" />Ожидаем подтверждения...
+                        </div>
+                        <Button variant="outline" size="sm" className="w-full" onClick={() => window.open(maxLoginDeepLink, '_blank')}>
+                          Открыть бота снова
+                        </Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setMaxLoginStep('input'); setMaxLoginError(''); }}>← Назад</Button>
+                      </div>
                     ) : (
                       <>
                         <div className="text-center">
                           <div className="mx-auto w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-2"><Icon name="MessageCircle" size={22} className="text-purple-500" /></div>
-                          <p className="text-sm text-muted-foreground">Код отправлен в MAX. Действует 10 минут.</p>
+                          <p className="text-sm text-muted-foreground">Бот прислал код в MAX. Действует 10 минут.</p>
                         </div>
                         <div>
                           <Label>Код из MAX</Label>
@@ -2505,7 +2531,7 @@ function Index() {
                         <Button className="w-full" onClick={handleMaxVerifyLoginCode} disabled={isMaxLoginLoading || maxLoginCode.length !== 6}>
                           {isMaxLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</> : 'Войти'}
                         </Button>
-                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setMaxLoginStep('input'); setMaxLoginCode(''); setMaxLoginError(''); }}>← Изменить ID</Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setMaxLoginStep('wait'); setMaxLoginCode(''); setMaxLoginError(''); }}>← Назад</Button>
                       </>
                     )}
                   </div>

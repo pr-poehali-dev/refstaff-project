@@ -90,23 +90,57 @@ def handler(event: dict, context) -> dict:
     update_type = body.get('update_type', '')
 
     if update_type == 'bot_started':
-        # Пользователь нажал /start с payload
         user = body.get('user', {})
         max_user_id = user.get('user_id')
         user_name = user.get('name', '')
-        payload = body.get('payload', '')  # наш session_token
+        payload = body.get('payload', '')  # session_token (регистрация или вход)
 
         if not max_user_id:
             return {'statusCode': 200, 'body': 'ok'}
 
         if not payload:
             max_send(bot_token, max_user_id,
-                '👋 Привет! Я бот iHUNT.\n\nДля регистрации перейди по ссылке приглашения от твоей компании.')
+                '👋 Привет! Я бот iHUNT.\n\nДля входа или регистрации перейди по ссылке на сайте.')
             return {'statusCode': 200, 'body': 'ok'}
 
         conn = get_db()
         cursor = conn.cursor()
         try:
+            code = generate_code()
+            expires_at = datetime.utcnow() + timedelta(minutes=10)
+
+            # Сначала проверяем — это сессия входа?
+            cursor.execute(
+                f"SELECT * FROM {DB_SCHEMA}.max_login_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
+                (payload,)
+            )
+            login_session = cursor.fetchone()
+
+            if login_session:
+                # Проверяем что пользователь зарегистрирован
+                cursor.execute(
+                    f"SELECT id, first_name FROM {DB_SCHEMA}.users WHERE max_user_id = %s AND is_fired = FALSE",
+                    (max_user_id,)
+                )
+                user_row = cursor.fetchone()
+                if not user_row:
+                    max_send(bot_token, max_user_id,
+                        '❌ Аккаунт с этим MAX не найден.\n\nСначала зарегистрируйтесь по ссылке приглашения от компании.')
+                    return {'statusCode': 200, 'body': 'ok'}
+
+                cursor.execute(
+                    f"""UPDATE {DB_SCHEMA}.max_login_sessions
+                        SET status = 'code_sent', max_user_id = %s, code = %s, expires_at = %s
+                        WHERE session_token = %s""",
+                    (max_user_id, code, expires_at, payload)
+                )
+                conn.commit()
+                max_send(bot_token, max_user_id,
+                    f"🔐 Код входа iHUNT\n\nВаш код: {code}\n\nКод действует 10 минут. Не передавайте его никому."
+                )
+                return {'statusCode': 200, 'body': 'ok'}
+
+            # Иначе — сессия регистрации
             cursor.execute(
                 f"SELECT * FROM {DB_SCHEMA}.max_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
                 (payload,)
@@ -115,21 +149,14 @@ def handler(event: dict, context) -> dict:
 
             if not session:
                 max_send(bot_token, max_user_id,
-                    '❌ Ссылка недействительна или истекла.\n\nВернись на страницу регистрации и попробуй снова.')
+                    '❌ Ссылка недействительна или истекла.\n\nВернись на страницу и попробуй снова.')
                 return {'statusCode': 200, 'body': 'ok'}
 
-            # Проверяем, не занят ли max_user_id
-            cursor.execute(
-                f"SELECT id FROM {DB_SCHEMA}.users WHERE max_user_id = %s",
-                (max_user_id,)
-            )
+            cursor.execute(f"SELECT id FROM {DB_SCHEMA}.users WHERE max_user_id = %s", (max_user_id,))
             if cursor.fetchone():
                 max_send(bot_token, max_user_id,
-                    '⚠️ Этот аккаунт MAX уже привязан к другому сотруднику iHUNT.\n\nЕсли это ошибка — обратитесь к администратору.')
+                    '⚠️ Этот аккаунт MAX уже привязан к другому сотруднику iHUNT.')
                 return {'statusCode': 200, 'body': 'ok'}
-
-            code = generate_code()
-            expires_at = datetime.utcnow() + timedelta(minutes=10)
 
             cursor.execute(
                 f"""UPDATE {DB_SCHEMA}.max_sessions
@@ -139,11 +166,7 @@ def handler(event: dict, context) -> dict:
             )
             conn.commit()
 
-            # Получаем название компании
-            cursor.execute(
-                f"SELECT name FROM {DB_SCHEMA}.companies WHERE invite_token = %s",
-                (session['invite_token'],)
-            )
+            cursor.execute(f"SELECT name FROM {DB_SCHEMA}.companies WHERE invite_token = %s", (session['invite_token'],))
             company = cursor.fetchone()
             company_name = company['name'] if company else 'вашей компании'
 
@@ -188,13 +211,15 @@ def handler(event: dict, context) -> dict:
     elif action == 'verify_code':
         if not body.get('session_token', '').strip() or not body.get('code', '').strip():
             return resp(400, {'error': 'Укажите код'})
-    elif action == 'send_login_code':
-        if not body.get('max_user_id'):
-            return resp(400, {'error': 'Укажите MAX User ID'})
+    elif action == 'create_login_session':
+        pass  # без параметров — создаём сессию входа
+    elif action == 'check_login_session':
+        if not body.get('session_token', '').strip():
+            return resp(400, {'error': 'session_token обязателен'})
     elif action == 'verify_login_code':
-        if not body.get('max_user_id') or not body.get('code', '').strip():
+        if not body.get('session_token', '').strip() or not body.get('code', '').strip():
             return resp(400, {'error': 'Укажите код'})
-    elif update_type == '':
+    elif action not in ('send_login_code',):
         return resp(400, {'error': 'Неизвестный action'})
 
     conn = get_db()
@@ -321,59 +346,56 @@ def handler(event: dict, context) -> dict:
                 }
             })
 
-        # ── 4. Отправить код для входа ────────────────────────────────────────
-        elif action == 'send_login_code':
-            max_uid = int(body.get('max_user_id'))
+        # ── 4. Создать сессию входа → deep link в бота ───────────────────────
+        elif action == 'create_login_session':
+            session_token = generate_token(16)
+            expires_at = datetime.utcnow() + timedelta(minutes=15)
             cursor.execute(
-                f"SELECT id, first_name FROM {DB_SCHEMA}.users WHERE max_user_id = %s AND is_fired = FALSE",
-                (max_uid,)
-            )
-            user = cursor.fetchone()
-            if not user:
-                return resp(404, {'error': 'Аккаунт с этим MAX ID не найден. Сначала зарегистрируйтесь.'})
-
-            code = generate_code()
-            expires_at = datetime.utcnow() + timedelta(minutes=10)
-
-            cursor.execute(
-                f"""INSERT INTO {DB_SCHEMA}.telegram_auth_codes
-                    (code, purpose, user_id, telegram_chat_id, expires_at)
-                    VALUES (%s, 'max_login', %s, %s, %s)""",
-                (code, user['id'], max_uid, expires_at)
+                f"""INSERT INTO {DB_SCHEMA}.max_login_sessions
+                    (session_token, status, expires_at) VALUES (%s, 'pending', %s)""",
+                (session_token, expires_at)
             )
             conn.commit()
+            deep_link = f"https://max.ru/{bot_username}?start={session_token}"
+            return resp(200, {'session_token': session_token, 'deep_link': deep_link})
 
-            try:
-                max_send(bot_token, max_uid,
-                    f"🔐 Код входа iHUNT\n\nВаш код: {code}\n\nКод действует 10 минут. Не передавайте его никому.")
-            except Exception as e:
-                return resp(400, {'error': f'Не удалось отправить сообщение в MAX: {str(e)}'})
+        # ── 5. Проверить статус login-сессии (поллинг) ───────────────────────
+        elif action == 'check_login_session':
+            session_token = body.get('session_token', '').strip()
+            cursor.execute(
+                f"SELECT status, expires_at FROM {DB_SCHEMA}.max_login_sessions WHERE session_token = %s",
+                (session_token,)
+            )
+            session = cursor.fetchone()
+            if not session:
+                return resp(404, {'error': 'Сессия не найдена'})
+            if session['expires_at'] < datetime.utcnow():
+                return resp(410, {'error': 'Сессия истекла', 'status': 'expired'})
+            return resp(200, {'status': session['status']})
 
-            return resp(200, {'message': 'Код отправлен в MAX'})
-
-        # ── 5. Подтвердить код входа ──────────────────────────────────────────
+        # ── 6. Подтвердить код входа через сессию ────────────────────────────
         elif action == 'verify_login_code':
-            max_uid = int(body.get('max_user_id'))
+            session_token = body.get('session_token', '').strip()
             code = body.get('code', '').strip()
 
             cursor.execute(
-                f"""SELECT tac.*, u.id as uid, u.email, u.first_name, u.last_name,
+                f"""SELECT mls.*, u.id as uid, u.email, u.first_name, u.last_name,
                            u.company_id, u.role, u.position, u.department, u.avatar_url,
                            u.level, u.is_admin, u.is_hr_manager
-                    FROM {DB_SCHEMA}.telegram_auth_codes tac
-                    JOIN {DB_SCHEMA}.users u ON u.id = tac.user_id
-                    WHERE tac.code = %s AND tac.telegram_chat_id = %s AND tac.purpose = 'max_login'
-                      AND tac.used = FALSE AND tac.expires_at > CURRENT_TIMESTAMP
-                    ORDER BY tac.created_at DESC LIMIT 1""",
-                (code, max_uid)
+                    FROM {DB_SCHEMA}.max_login_sessions mls
+                    JOIN {DB_SCHEMA}.users u ON u.max_user_id = mls.max_user_id
+                    WHERE mls.session_token = %s AND mls.status = 'code_sent'
+                      AND mls.code = %s AND mls.code_used = FALSE
+                      AND mls.expires_at > CURRENT_TIMESTAMP""",
+                (session_token, code)
             )
             record = cursor.fetchone()
             if not record:
                 return resp(400, {'error': 'Неверный или истёкший код'})
 
             cursor.execute(
-                f"UPDATE {DB_SCHEMA}.telegram_auth_codes SET used = TRUE WHERE id = %s",
-                (record['id'],)
+                f"UPDATE {DB_SCHEMA}.max_login_sessions SET code_used = TRUE, status = 'completed' WHERE session_token = %s",
+                (session_token,)
             )
             conn.commit()
 

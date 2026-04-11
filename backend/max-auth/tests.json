@@ -34,12 +34,12 @@
       "bodyMatcher": "partial"
     },
     {
-      "name": "send_login_code missing max_user_id",
+      "name": "check_login_session missing token",
       "method": "POST",
       "path": "/",
-      "body": {"action": "send_login_code"},
+      "body": {"action": "check_login_session"},
       "expectedStatus": 400,
-      "expectedBody": {"error": "Укажите MAX User ID"},
+      "expectedBody": {"error": "session_token обязателен"},
       "bodyMatcher": "partial"
     }
   ]
