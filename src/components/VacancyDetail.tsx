@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import type { Vacancy } from '@/types';
+import { useState, useRef } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface VacancyDetailProps {
   vacancy: Vacancy | null;
@@ -16,6 +18,29 @@ interface VacancyDetailProps {
 }
 
 export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRestore, showRecommendButton = true, showPublicLink = true }: VacancyDetailProps) {
+  const [showQR, setShowQR] = useState(false);
+  const qrRef = useRef<SVGSVGElement>(null);
+
+  const downloadQR = () => {
+    const svg = qrRef.current;
+    if (!svg) return;
+    const serializer = new XMLSerializer();
+    const svgStr = serializer.serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    canvas.width = 300;
+    canvas.height = 300;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = () => {
+      ctx?.drawImage(img, 0, 0, 300, 300);
+      const a = document.createElement('a');
+      a.download = `qr-vacancy-${vacancy?.id}.png`;
+      a.href = canvas.toDataURL('image/png');
+      a.click();
+    };
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
+  };
+
   if (!vacancy) return null;
 
   return (
@@ -176,7 +201,32 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRest
                     <Icon name="Copy" size={14} className="mr-2" />
                     Копировать
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setShowQR(!showQR)}
+                    className="w-full sm:w-auto"
+                  >
+                    <Icon name="QrCode" size={14} className="mr-2" />
+                    QR-код
+                  </Button>
                 </div>
+                {showQR && (
+                  <div className="flex flex-col items-center gap-3 pt-2">
+                    <div className="bg-white p-3 rounded-lg border">
+                      <QRCodeSVG
+                        ref={qrRef}
+                        value={vacancy.referralLink}
+                        size={180}
+                        includeMargin={false}
+                      />
+                    </div>
+                    <Button size="sm" variant="outline" onClick={downloadQR}>
+                      <Icon name="Download" size={14} className="mr-2" />
+                      Скачать PNG
+                    </Button>
+                  </div>
+                )}
               </div>
             </>
           )}
