@@ -265,17 +265,18 @@ def handler(event: dict, context) -> dict:
             if cursor.fetchone():
                 return resp(409, {'error': 'Этот Telegram уже зарегистрирован'})
 
-            # Создаём пользователя
+            # Создаём пользователя (email пустой — вход только через Telegram)
+            tg_email = f"tg_{chat_id}@telegram.local"
             cursor.execute(
                 f"""INSERT INTO {DB_SCHEMA}.users
-                    (company_id, first_name, last_name, role, level, experience_points,
+                    (company_id, email, first_name, last_name, role, level, experience_points,
                      total_recommendations, successful_hires, total_earnings, wallet_balance,
                      wallet_pending, is_admin, is_hr_manager, telegram_chat_id, email_verified,
                      created_at, updated_at)
-                    VALUES (%s, %s, %s, 'employee', 1, 0, 0, 0, 0, 0, 0, FALSE, FALSE, %s, TRUE,
+                    VALUES (%s, %s, %s, %s, 'employee', 1, 0, 0, 0, 0, 0, 0, FALSE, FALSE, %s, TRUE,
                             CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                     RETURNING id, first_name, last_name, company_id, role""",
-                (company_id, session['first_name'], session['last_name'], chat_id)
+                (company_id, tg_email, session['first_name'], session['last_name'], chat_id)
             )
             user = cursor.fetchone()
 
