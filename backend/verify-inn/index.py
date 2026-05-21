@@ -45,7 +45,7 @@ def handler(event: dict, context) -> dict:
             'body': json.dumps({'error': 'DaData API key not configured'})
         }
 
-    body_data = json.loads(event.get('body') or '{}')
+    body_data = json.loads(event.get('body', '{}'))
     inn = body_data.get('inn', '').strip()
 
     if not inn:
