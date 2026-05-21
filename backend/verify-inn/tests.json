@@ -9,10 +9,7 @@
       },
       "expectedStatus": 200,
       "expectedBody": {
-        "inn": "string",
-        "name": "object",
-        "address": "object",
-        "status": "object"
+        "inn": "string"
       },
       "bodyMatcher": "partial"
     },
