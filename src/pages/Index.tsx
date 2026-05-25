@@ -366,8 +366,14 @@ function Index() {
     if (resetToken) {
       setResetPasswordForm({ token: resetToken, password: '', confirmPassword: '' });
       setShowResetPasswordDialog(true);
-      // Очищаем URL от токена
       window.history.replaceState({}, document.title, window.location.pathname);
+    }
+
+    // Редирект после подтверждения email — скроллим вверх к ЛК
+    const verified = urlParams.get('verified');
+    if (verified === '1') {
+      window.history.replaceState({}, document.title, window.location.pathname);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }, []);
 

@@ -45,9 +45,9 @@ export default function VerifyEmail() {
           localStorage.setItem('userRole', uiRole);
           localStorage.setItem('showOnboarding', 'true');
           
-          // Автоматически перенаправляем через 2 секунды с полной перезагрузкой
+          // Автоматически перенаправляем через 2 секунды в ЛК
           setTimeout(() => {
-            window.location.href = '/'; // Редирект с перезагрузкой страницы
+            window.location.href = '/?verified=1';
           }, 2000);
         } else {
           setStatus('error');
@@ -114,7 +114,7 @@ export default function VerifyEmail() {
           )}
 
           {status === 'success' && (
-            <Button onClick={() => window.location.href = '/'} className="w-full">
+            <Button onClick={() => window.location.href = '/?verified=1'} className="w-full">
               <Icon name="ArrowRight" className="w-4 h-4 mr-2" />
               Перейти в личный кабинет
             </Button>
