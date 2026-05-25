@@ -1449,7 +1449,7 @@ function Index() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'login',
-          email: loginForm.email,
+          email: loginForm.email.trim().toLowerCase(),
           password: loginForm.password,
           userType: loginType
         })
@@ -1471,8 +1471,10 @@ function Index() {
       } else if (response.status === 403) {
         setResendVerificationEmail(loginForm.email);
         alert('❌ Email не подтверждён!\n\nМы отправили письмо с подтверждением на вашу почту при регистрации.\nПожалуйста, проверьте почту (в том числе папку "Спам") и перейдите по ссылке в письме для активации аккаунта.');
+      } else if (response.status === 401) {
+        alert('Неверный email или пароль. Проверьте данные и попробуйте снова.');
       } else {
-        alert(data.error || 'Неверный email или пароль');
+        alert(data.error || 'Не удалось войти. Попробуйте ещё раз.');
       }
     } catch (error) {
       console.error('Ошибка входа:', error);
