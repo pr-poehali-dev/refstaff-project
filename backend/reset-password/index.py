@@ -1,6 +1,7 @@
 import json
 import os
 import hashlib
+import hmac
 from datetime import datetime
 import psycopg2
 
@@ -82,8 +83,10 @@ def handler(event: dict, context) -> dict:
                 'body': json.dumps({'error': 'Токен истек. Запросите восстановление пароля снова'})
             }
         
-        # Хешируем новый пароль
-        password_hash = hashlib.sha256(new_password.encode()).hexdigest()
+        # Хешируем новый пароль — pbkdf2 + соль, как в auth/index.py
+        salt = os.urandom(32).hex()
+        pwd_hash = hashlib.pbkdf2_hmac('sha256', new_password.encode('utf-8'), salt.encode('utf-8'), 100000).hex()
+        password_hash = f"{pwd_hash}:{salt}"
         
         # Обновляем пароль пользователя
         cur.execute(
