@@ -13,7 +13,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 import urllib.request
 
-NOTIFY_URL = 'https://functions.poehali.dev/271cd5d9-0140-4c60-9689-1fd5d74409be'
+NOTIFY_URL = 'https://functions.poehali.dev/3c081b85-b149-4f98-a70a-f773cb440d06'
 TG_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 
 def send_notification(payload):

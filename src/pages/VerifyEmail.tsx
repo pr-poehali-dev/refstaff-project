@@ -22,7 +22,7 @@ export default function VerifyEmail() {
       }
 
       try {
-        const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+        const response = await fetch('https://functions.poehali.dev/c6b69066-22c2-4545-bd88-10571ecd9140', {
           method: 'POST',
           mode: 'cors',
           headers: { 'Content-Type': 'application/json' },

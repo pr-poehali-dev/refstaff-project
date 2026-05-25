@@ -1,5 +1,5 @@
-const API_URL = 'https://functions.poehali.dev/30d9dba4-a499-4866-8ccc-ea7addf62b16';
-const UPLOAD_RESUME_URL = 'https://functions.poehali.dev/369f37fd-9898-42bb-9c4c-3bf096f5da1b';
+const API_URL = 'https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a';
+const UPLOAD_RESUME_URL = 'https://functions.poehali.dev/af75d541-e9f2-47be-8c54-ace29e2d6f9f';
 
 export interface Vacancy {
   id: number;

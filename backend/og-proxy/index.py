@@ -8,7 +8,7 @@ import json
 import os
 import urllib.request
 
-API_URL = 'https://functions.poehali.dev/30d9dba4-a499-4866-8ccc-ea7addf62b16'
+API_URL = 'https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a'
 APP_URL = 'https://refstaff.poehali.dev'
 
 VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/527161af-5ca6-4a19-a62f-86e2a76c97b8.jpg'
