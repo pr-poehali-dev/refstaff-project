@@ -1,5 +1,5 @@
 '''
-MAX мессенджер авторизация сотрудников: deep link регистрация, webhook бота, вход по коду. v3
+MAX мессенджер авторизация сотрудников: deep link регистрация, webhook бота, вход по коду. v5
 Флоу регистрации: create_session → deep link в бота → bot_started → бот шлёт код → verify_code → JWT.
 Флоу входа: send_login_code → пользователь пишет боту → получает код → verify_login_code → JWT.
 MAX Bot API: https://platform-api.max.ru
@@ -14,6 +14,8 @@ from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
 import urllib.request
 import urllib.parse
+import urllib.error
+import http.client
 import hashlib
 import hmac
 import base64
@@ -26,17 +28,47 @@ def get_db():
     return psycopg2.connect(os.environ['DATABASE_URL'], cursor_factory=RealDictCursor)
 
 
+def max_api_request(token: str, method: str, path: str, payload: dict = None):
+    """Выполняет запрос к MAX API с поддержкой unicode-токенов."""
+    import ssl
+    body = json.dumps(payload).encode('utf-8') if payload is not None else b''
+    auth_header = f'Bearer {token}'.encode('utf-8')
+    # Формируем HTTP запрос вручную как bytes
+    host = 'platform-api.max.ru'
+    request_line = f'{method} {path} HTTP/1.1\r\n'.encode('utf-8')
+    headers_bytes = (
+        f'Host: {host}\r\n'.encode('utf-8') +
+        b'Content-Type: application/json\r\n' +
+        b'Authorization: ' + auth_header + b'\r\n' +
+        f'Content-Length: {len(body)}\r\n'.encode('utf-8') +
+        b'Connection: close\r\n\r\n'
+    )
+    ctx = ssl.create_default_context()
+    import socket
+    with socket.create_connection((host, 443), timeout=10) as sock:
+        with ctx.wrap_socket(sock, server_hostname=host) as ssock:
+            ssock.sendall(request_line + headers_bytes + body)
+            raw = b''
+            while True:
+                chunk = ssock.recv(4096)
+                if not chunk:
+                    break
+                raw += chunk
+    # Парсим ответ
+    header_end = raw.find(b'\r\n\r\n')
+    header_part = raw[:header_end].decode('utf-8')
+    body_part = raw[header_end + 4:]
+    status_line = header_part.split('\r\n')[0]
+    status_code = int(status_line.split(' ')[1])
+    result = json.loads(body_part.decode('utf-8'))
+    if status_code >= 400:
+        raise Exception(f'HTTP {status_code}: {result}')
+    return result
+
+
 def max_send(token: str, user_id: int, text: str):
     """Отправляет сообщение пользователю в MAX."""
-    url = f'{MAX_API}/messages?user_id={user_id}'
-    payload = {'text': text}
-    data = json.dumps(payload).encode()
-    req = urllib.request.Request(
-        url, data=data,
-        headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {token}'}
-    )
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        return json.loads(resp.read())
+    return max_api_request(token, 'POST', f'/messages?user_id={user_id}', {'text': text})
 
 
 def generate_code() -> str:
@@ -423,20 +455,13 @@ def handler(event: dict, context) -> dict:
         # ── Временный: установка webhook ─────────────────────────────────────
         elif action == 'setup_webhook':
             webhook_url = 'https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce'
-            result = {'token_len': len(bot_token), 'token_prefix': bot_token[:8] + '...', 'token_suffix': '...' + bot_token[-8:], 'token_mid': bot_token[8:16]}
+            result = {'token_len': len(bot_token), 'token_ascii': bot_token.encode('ascii', errors='replace').decode('ascii')[:20]}
             try:
-                req_me = urllib.request.Request('https://platform-api.max.ru/me',
-                    headers={'Authorization': f'Bearer {bot_token}'})
-                with urllib.request.urlopen(req_me, timeout=10) as r:
-                    result['bot_info'] = json.loads(r.read())
+                result['bot_info'] = max_api_request(bot_token, 'GET', '/me')
             except Exception as e:
                 result['bot_error'] = str(e)
             try:
-                data = json.dumps({'url': webhook_url}).encode()
-                req_wh = urllib.request.Request('https://platform-api.max.ru/subscriptions', data=data,
-                    headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {bot_token}'}, method='POST')
-                with urllib.request.urlopen(req_wh, timeout=10) as r:
-                    result['webhook_set'] = json.loads(r.read())
+                result['webhook_set'] = max_api_request(bot_token, 'POST', '/subscriptions', {'url': webhook_url})
             except Exception as e:
                 result['webhook_error'] = str(e)
             return resp(200, result)
