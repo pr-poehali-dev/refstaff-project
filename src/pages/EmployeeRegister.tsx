@@ -7,10 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Icon from '@/components/ui/icon';
 import { Turnstile } from '@marsidev/react-turnstile';
 
-const AUTH_URL = 'https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa';
-const TG_AUTH_URL = 'https://functions.poehali.dev/5c021f8a-5408-4339-bc3e-1fc4dd0b72f5';
-const MAX_AUTH_URL = 'https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4';
-const COMPANY_URL = 'https://functions.poehali.dev/f1f66940-161e-4221-a729-4e0e555af034';
+const AUTH_URL = 'https://functions.poehali.dev/c6b69066-22c2-4545-bd88-10571ecd9140';
+const TG_AUTH_URL = 'https://functions.poehali.dev/c412b453-2112-4882-aaa5-64d3d6f3a3c6';
+const MAX_AUTH_URL = 'https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce';
+const COMPANY_URL = 'https://functions.poehali.dev/1a920c87-b714-4ccf-add3-78f9e520001c';
 
 type Method = 'email' | 'telegram' | 'max';
 type Step =

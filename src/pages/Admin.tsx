@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 
-const ADMIN_URL = 'https://functions.poehali.dev/e7549642-317b-4f05-b0f9-2c056de3cef0';
+const ADMIN_URL = 'https://functions.poehali.dev/89a9ad66-d40d-42cf-bc67-de5c6f29af53';
 
 async function adminFetch(secret: string, path: string, method = 'GET', body?: object) {
   const base = ADMIN_URL;

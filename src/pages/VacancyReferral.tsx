@@ -40,7 +40,7 @@ function VacancyReferral() {
     if (vacancy) {
       const ogImageUrl = `https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/032a8a8d-15a3-4c23-85e1-3c02c8f864c7.jpg`;
       const refParam = referrerId ? `&ref=${referrerId}` : '';
-      const proxyUrl = `https://functions.poehali.dev/44878f98-7873-41f8-a3b0-f47731016858?type=referral&id=${token}${refParam}`;
+      const proxyUrl = `https://functions.poehali.dev/a7ef69a9-2736-4504-ac24-54132c34d646?type=referral&id=${token}${refParam}`;
       const vacancyUrl = `${window.location.origin}/r/${token}${referrerId ? `?ref=${referrerId}` : ''}`;
       
       document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;

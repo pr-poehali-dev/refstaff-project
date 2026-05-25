@@ -373,7 +373,7 @@ function Index() {
 
   const verifyToken = async () => {
     try {
-      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+      const response = await fetch('https://functions.poehali.dev/c6b69066-22c2-4545-bd88-10571ecd9140', {
         method: 'GET',
         mode: 'cors',
         headers: {
@@ -584,7 +584,7 @@ function Index() {
           : api.getRecommendations(currentCompanyId, undefined, currentEmployeeId).catch(() => []),
         api.getCompany(currentCompanyId).catch(() => null),
         userRole === 'employer' 
-          ? fetch(`https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901?company_id=${currentCompanyId}`)
+          ? fetch(`https://functions.poehali.dev/f31523e1-66d9-4d65-8966-76cbff949641?company_id=${currentCompanyId}`)
               .then(res => res.json()).catch(() => [])
           : Promise.resolve([]),
         userRole === 'employer' && currentUser?.id
@@ -1124,7 +1124,7 @@ function Index() {
 
     setIsAuthLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+      const response = await fetch('https://functions.poehali.dev/c6b69066-22c2-4545-bd88-10571ecd9140', {
         method: 'POST',
         mode: 'cors',
         headers: { 
@@ -1229,7 +1229,7 @@ function Index() {
     }
     setDemoFormSubmitting(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/7316b3af-fb17-41b7-a4f3-9195c9f48288', {
+      const response = await fetch('https://functions.poehali.dev/f58cb721-86b3-42c5-a5c1-c608cf9ee264', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1264,7 +1264,7 @@ function Index() {
     setContactFormSuccess(false);
 
     try {
-      const response = await fetch('https://functions.poehali.dev/7316b3af-fb17-41b7-a4f3-9195c9f48288', {
+      const response = await fetch('https://functions.poehali.dev/f58cb721-86b3-42c5-a5c1-c608cf9ee264', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1311,7 +1311,7 @@ function Index() {
 
     setIsAuthLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+      const response = await fetch('https://functions.poehali.dev/c6b69066-22c2-4545-bd88-10571ecd9140', {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
@@ -1349,7 +1349,7 @@ function Index() {
     setTgLoginError('');
     setIsTgLoginLoading(true);
     try {
-      const r = await fetch('https://functions.poehali.dev/5c021f8a-5408-4339-bc3e-1fc4dd0b72f5', {
+      const r = await fetch('https://functions.poehali.dev/c412b453-2112-4882-aaa5-64d3d6f3a3c6', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'verify_tg_login', tg_data: tgUser })
       });
@@ -1377,7 +1377,7 @@ function Index() {
     setMaxLoginError('');
     setIsMaxLoginLoading(true);
     try {
-      const r = await fetch('https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4', {
+      const r = await fetch('https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'create_login_session' })
       });
@@ -1390,7 +1390,7 @@ function Index() {
         // Поллинг статуса
         const poll = setInterval(async () => {
           try {
-            const pr = await fetch('https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4', {
+            const pr = await fetch('https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ action: 'check_login_session', session_token: data.session_token })
             });
@@ -1409,7 +1409,7 @@ function Index() {
     if (!maxLoginCode.trim()) { setMaxLoginError('Введите код'); return; }
     setIsMaxLoginLoading(true);
     try {
-      const r = await fetch('https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4', {
+      const r = await fetch('https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'verify_login_code', session_token: maxLoginSession, code: maxLoginCode.trim() })
       });
@@ -1437,7 +1437,7 @@ function Index() {
 
     setIsAuthLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+      const response = await fetch('https://functions.poehali.dev/c6b69066-22c2-4545-bd88-10571ecd9140', {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
@@ -1489,7 +1489,7 @@ function Index() {
 
     setIsResendingVerification(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/acbe95f3-fa47-4ba2-bd00-aba68c67fafa', {
+      const response = await fetch('https://functions.poehali.dev/c6b69066-22c2-4545-bd88-10571ecd9140', {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
@@ -1523,7 +1523,7 @@ function Index() {
 
     setIsAuthLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/ec8d2e7d-ee4d-47cc-86ee-91464da954c3', {
+      const response = await fetch('https://functions.poehali.dev/edea8e05-e989-4719-81d8-5c546d5ff771', {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
@@ -1558,7 +1558,7 @@ function Index() {
 
     setIsAuthLoading(true);
     try {
-      const response = await fetch('https://functions.poehali.dev/490186ec-0761-4387-8b05-813aea3e8f94', {
+      const response = await fetch('https://functions.poehali.dev/fccc90bf-440b-44ed-95d7-cae0af39adfe', {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
@@ -5544,7 +5544,7 @@ function Index() {
                   const period = demoForm.employeeCount === '365' ? '1 год (202 980 ₽)' : demoForm.employeeCount === '30' ? '30 дней (19 900 ₽)' : 'не выбран';
                   setDemoFormSubmitting(true);
                   try {
-                    await fetch('https://functions.poehali.dev/7316b3af-fb17-41b7-a4f3-9195c9f48288', {
+                    await fetch('https://functions.poehali.dev/f58cb721-86b3-42c5-a5c1-c608cf9ee264', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({

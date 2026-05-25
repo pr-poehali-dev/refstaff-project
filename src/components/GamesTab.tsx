@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
-const GAME_SCORES_URL = 'https://functions.poehali.dev/be3440bd-7b48-44a5-9e9b-442a9c17d5a8';
+const GAME_SCORES_URL = 'https://functions.poehali.dev/3d0d6f47-623a-421f-b26b-742ea13a85da';
 
 const GAME_META: Record<string, { unit: string; biggerIsBetter: boolean }> = {
   memory:    { unit: 'ходов',   biggerIsBetter: false },
