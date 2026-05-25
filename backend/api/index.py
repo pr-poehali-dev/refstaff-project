@@ -1259,6 +1259,96 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 'isBase64Encoded': False
             }
 
+        # ── NEWS ──────────────────────────────────────────────────────────────────
+        if resource == 'news':
+            if method == 'GET':
+                company_id = query_params.get('company_id')
+                if not company_id:
+                    return {'statusCode': 400, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'company_id обязателен'}), 'isBase64Encoded': False}
+                cur.execute("""
+                    SELECT n.id, n.title, n.content, n.category, n.created_at, n.updated_at,
+                           u.first_name || ' ' || u.last_name as author,
+                           (SELECT COUNT(*) FROM t_p65890965_refstaff_project.news_likes WHERE news_id = n.id) as likes,
+                           (SELECT json_agg(json_build_object('id', nc.id, 'author_name', nc.author_name, 'text', nc.text, 'created_at', nc.created_at) ORDER BY nc.created_at)
+                            FROM t_p65890965_refstaff_project.news_comments nc WHERE nc.news_id = n.id) as comments
+                    FROM t_p65890965_refstaff_project.news n
+                    LEFT JOIN t_p65890965_refstaff_project.users u ON n.author_id = u.id
+                    WHERE n.company_id = %s
+                    ORDER BY n.created_at DESC
+                """, (company_id,))
+                rows = cur.fetchall()
+                result = []
+                for row in rows:
+                    r = dict(row)
+                    r['comments'] = r['comments'] or []
+                    r['likes'] = int(r['likes'])
+                    result.append(r)
+                return {'statusCode': 200, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps(result, default=str), 'isBase64Encoded': False}
+
+            if method == 'POST':
+                body_data = json.loads(event.get('body') or '{}')
+                news_action = body_data.get('action', 'create')
+
+                if news_action == 'create':
+                    company_id = body_data.get('company_id')
+                    author_id = body_data.get('author_id')
+                    title = body_data.get('title', '').strip()
+                    content = body_data.get('content', '').strip()
+                    category = body_data.get('category', 'news')
+                    if not title or not content or not company_id:
+                        return {'statusCode': 400, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Заполните все поля'}), 'isBase64Encoded': False}
+                    cur.execute("""
+                        INSERT INTO t_p65890965_refstaff_project.news (company_id, author_id, title, content, category)
+                        VALUES (%s, %s, %s, %s, %s) RETURNING id, title, content, category, created_at
+                    """, (company_id, author_id, title, content, category))
+                    row = cur.fetchone()
+                    conn.commit()
+                    return {'statusCode': 201, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps(dict(row), default=str), 'isBase64Encoded': False}
+
+                if news_action == 'update':
+                    news_id = body_data.get('news_id')
+                    title = body_data.get('title', '').strip()
+                    content = body_data.get('content', '').strip()
+                    category = body_data.get('category', 'news')
+                    cur.execute("""
+                        UPDATE t_p65890965_refstaff_project.news SET title=%s, content=%s, category=%s, updated_at=NOW()
+                        WHERE id=%s RETURNING id
+                    """, (title, content, category, news_id))
+                    conn.commit()
+                    return {'statusCode': 200, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'ok': True}), 'isBase64Encoded': False}
+
+                if news_action == 'remove':
+                    news_id = body_data.get('news_id')
+                    cur.execute("UPDATE t_p65890965_refstaff_project.news SET content='[удалено]' WHERE id=%s", (news_id,))
+                    conn.commit()
+                    return {'statusCode': 200, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'ok': True}), 'isBase64Encoded': False}
+
+                if news_action == 'like':
+                    news_id = body_data.get('news_id')
+                    user_id = body_data.get('user_id')
+                    try:
+                        cur.execute("INSERT INTO t_p65890965_refstaff_project.news_likes (news_id, user_id) VALUES (%s, %s)", (news_id, user_id))
+                    except Exception:
+                        cur.execute("UPDATE t_p65890965_refstaff_project.news_likes SET news_id=news_id WHERE news_id=%s AND user_id=%s", (news_id, user_id))
+                    conn.commit()
+                    cur.execute("SELECT COUNT(*) as cnt FROM t_p65890965_refstaff_project.news_likes WHERE news_id=%s", (news_id,))
+                    return {'statusCode': 200, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'likes': int(cur.fetchone()['cnt'])}), 'isBase64Encoded': False}
+
+                if news_action == 'comment':
+                    news_id = body_data.get('news_id')
+                    author_id = body_data.get('author_id')
+                    author_name = body_data.get('author_name', '')
+                    text = body_data.get('text', '').strip()
+                    if not text:
+                        return {'statusCode': 400, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Текст комментария пуст'}), 'isBase64Encoded': False}
+                    cur.execute("""
+                        INSERT INTO t_p65890965_refstaff_project.news_comments (news_id, author_id, author_name, text)
+                        VALUES (%s, %s, %s, %s) RETURNING id, author_name, text, created_at
+                    """, (news_id, author_id, author_name, text))
+                    row = cur.fetchone()
+                    conn.commit()
+                    return {'statusCode': 201, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps(dict(row), default=str), 'isBase64Encoded': False}
+
         cur.close()
         conn.close()
         

@@ -586,7 +586,7 @@ function Index() {
     try {
       if (!silent) setIsLoading(true);
       const vacancyStatus = userRole === 'employer' ? 'all' : 'active';
-      const [vacanciesData, employeesData, recommendationsData, companyData, payoutsData, chatsData] = await Promise.all([
+      const [vacanciesData, employeesData, recommendationsData, companyData, payoutsData, chatsData, newsData] = await Promise.all([
         api.getVacancies(currentCompanyId, vacancyStatus).catch(() => []),
         api.getEmployees(currentCompanyId).catch(() => []),
         userRole === 'employer'
@@ -599,6 +599,10 @@ function Index() {
           : Promise.resolve([]),
         userRole === 'employer' && currentUser?.id
           ? api.getChats(currentUser.id, currentCompanyId).catch(() => [])
+          : Promise.resolve([]),
+        currentCompanyId
+          ? fetch(`https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news&company_id=${currentCompanyId}`)
+              .then(res => res.json()).catch(() => [])
           : Promise.resolve([])
       ]);
 
@@ -878,6 +882,24 @@ function Index() {
           }, ...prev]);
         }
       }
+      // Загружаем новости
+      if (Array.isArray(newsData)) {
+        const mappedNews = newsData.map((n: any) => ({
+          id: n.id,
+          title: n.title,
+          content: n.content,
+          author: n.author || 'Администратор',
+          date: n.created_at ? new Date(n.created_at).toISOString().split('T')[0] : '',
+          category: n.category || 'news',
+          likes: n.likes || 0,
+          comments: (n.comments || []).map((c: any) => ({
+            id: c.id, newsId: n.id, authorName: c.author_name, comment: c.text,
+            date: c.created_at ? new Date(c.created_at).toISOString().split('T')[0] : ''
+          }))
+        }));
+        setNewsPosts(mappedNews);
+      }
+
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
     } finally {
@@ -1633,79 +1655,87 @@ function Index() {
     }
   };
 
-  const handleCreateNews = () => {
+  const handleCreateNews = async () => {
     if (!newsForm.title || !newsForm.content) {
       alert('Заполните все поля');
       return;
     }
-
-    const newPost: NewsPost = {
-      id: newsPosts.length + 1,
-      title: newsForm.title,
-      content: newsForm.content,
-      author: company?.name || 'Администратор',
-      date: new Date().toISOString().split('T')[0],
-      category: newsForm.category,
-      likes: 0,
-      comments: []
-    };
-
-    setNewsPosts([newPost, ...newsPosts]);
-    setNewsForm({ title: '', content: '', category: 'news' });
-    setShowCreateNewsDialog(false);
-    alert('Новость успешно опубликована!');
+    try {
+      const r = await fetch('https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'create', company_id: currentCompanyId, author_id: currentUser?.id, title: newsForm.title, content: newsForm.content, category: newsForm.category })
+      });
+      if (r.ok) {
+        setNewsForm({ title: '', content: '', category: 'news' });
+        setShowCreateNewsDialog(false);
+        loadData(true);
+      } else {
+        const d = await r.json();
+        alert(d.error || 'Ошибка публикации');
+      }
+    } catch { alert('Ошибка соединения'); }
   };
 
-  const handleUpdateNews = () => {
+  const handleUpdateNews = async () => {
     if (!newsToEdit || !newsForm.title || !newsForm.content) {
       alert('Заполните все поля');
       return;
     }
-
-    setNewsPosts(newsPosts.map(post => 
-      post.id === newsToEdit.id 
-        ? { ...post, title: newsForm.title, content: newsForm.content, category: newsForm.category }
-        : post
-    ));
-    setNewsForm({ title: '', content: '', category: 'news' });
-    setShowEditNewsDialog(false);
-    setNewsToEdit(null);
-    alert('Новость успешно обновлена!');
+    try {
+      const r = await fetch('https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update', news_id: newsToEdit.id, title: newsForm.title, content: newsForm.content, category: newsForm.category })
+      });
+      if (r.ok) {
+        setNewsForm({ title: '', content: '', category: 'news' });
+        setShowEditNewsDialog(false);
+        setNewsToEdit(null);
+        loadData(true);
+      }
+    } catch { alert('Ошибка обновления'); }
   };
 
-  const handleDeleteNews = (id: number) => {
-    setNewsPosts(newsPosts.filter(post => post.id !== id));
-    alert('Новость удалена');
+  const handleDeleteNews = async (id: number) => {
+    try {
+      await fetch('https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'remove', news_id: id })
+      });
+      loadData(true);
+    } catch { alert('Ошибка удаления'); }
   };
 
-  const handleLikeNews = (newsId: number) => {
-    setNewsPosts(newsPosts.map(post => 
-      post.id === newsId ? { ...post, likes: post.likes + 1 } : post
-    ));
+  const handleLikeNews = async (newsId: number) => {
+    try {
+      const r = await fetch('https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'like', news_id: newsId, user_id: currentUser?.id })
+      });
+      if (r.ok) {
+        const d = await r.json();
+        setNewsPosts(newsPosts.map(post => post.id === newsId ? { ...post, likes: d.likes } : post));
+      }
+    } catch { /* ignore */ }
   };
 
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (!activeNewsPost || !newComment.trim()) {
       alert('Напишите комментарий');
       return;
     }
-
-    const comment: NewsComment = {
-      id: Date.now(),
-      newsId: activeNewsPost.id,
-      authorName: 'Анна Смирнова',
-      comment: newComment,
-      date: new Date().toISOString().split('T')[0]
-    };
-
-    setNewsPosts(newsPosts.map(post => 
-      post.id === activeNewsPost.id 
-        ? { ...post, comments: [...post.comments, comment] }
-        : post
-    ));
-
-    setNewComment('');
-    setActiveNewsPost({ ...activeNewsPost, comments: [...activeNewsPost.comments, comment] });
+    try {
+      const r = await fetch('https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'comment', news_id: activeNewsPost.id, author_id: currentUser?.id, author_name: currentUser ? `${currentUser.first_name} ${currentUser.last_name}` : 'Сотрудник', text: newComment })
+      });
+      if (r.ok) {
+        const c = await r.json();
+        const comment: NewsComment = { id: c.id, newsId: activeNewsPost.id, authorName: c.author_name, comment: c.text, date: c.created_at ? new Date(c.created_at).toISOString().split('T')[0] : '' };
+        setNewsPosts(newsPosts.map(post => post.id === activeNewsPost.id ? { ...post, comments: [...post.comments, comment] } : post));
+        setNewComment('');
+        setActiveNewsPost({ ...activeNewsPost, comments: [...activeNewsPost.comments, comment] });
+      }
+    } catch { alert('Ошибка комментария'); }
   };
 
   const handleDeleteComment = (commentId: number) => {
