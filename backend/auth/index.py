@@ -200,7 +200,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 import urllib.request
                 import urllib.parse
                 
-                send_email_url = 'https://functions.poehali.dev/f3ec5cfe-f5d1-4d21-9161-70bd08bed000'
+                send_email_url = 'https://functions.poehali.dev/268341d7-c5b3-4c4f-a5fb-50277c318250'
                 email_data = {
                     'to_email': email,
                     'user_name': f"{first_name} {last_name}",
@@ -418,7 +418,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 import urllib.request
                 
-                send_email_url = 'https://functions.poehali.dev/f3ec5cfe-f5d1-4d21-9161-70bd08bed000'
+                send_email_url = 'https://functions.poehali.dev/268341d7-c5b3-4c4f-a5fb-50277c318250'
                 email_data = {
                     'to_email': email,
                     'user_name': f"{first_name} {last_name}",
@@ -511,7 +511,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 
                 import urllib.request
                 
-                send_email_url = 'https://functions.poehali.dev/f3ec5cfe-f5d1-4d21-9161-70bd08bed000'
+                send_email_url = 'https://functions.poehali.dev/268341d7-c5b3-4c4f-a5fb-50277c318250'
                 email_data = {
                     'to_email': email,
                     'user_name': f"{user['first_name']} {user['last_name']}",
