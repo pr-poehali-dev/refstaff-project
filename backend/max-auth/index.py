@@ -219,7 +219,7 @@ def handler(event: dict, context) -> dict:
     elif action == 'verify_login_code':
         if not body.get('session_token', '').strip() or not body.get('code', '').strip():
             return resp(400, {'error': 'Укажите код'})
-    elif action not in ('send_login_code',):
+    elif action not in ('send_login_code', 'setup_webhook'):
         return resp(400, {'error': 'Неизвестный action'})
 
     conn = get_db()
@@ -422,7 +422,7 @@ def handler(event: dict, context) -> dict:
 
         # ── Временный: установка webhook ─────────────────────────────────────
         elif action == 'setup_webhook':
-            webhook_url = 'https://functions.poehali.dev/1c0d254b-96a5-4bfe-8255-0c39014a62b4'
+            webhook_url = 'https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce'
             result = {'token_len': len(bot_token), 'token_prefix': bot_token[:8] + '...'}
             try:
                 req_me = urllib.request.Request('https://platform-api.max.ru/me',
