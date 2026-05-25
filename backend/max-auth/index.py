@@ -423,7 +423,7 @@ def handler(event: dict, context) -> dict:
         # ── Временный: установка webhook ─────────────────────────────────────
         elif action == 'setup_webhook':
             webhook_url = 'https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce'
-            result = {'token_len': len(bot_token), 'token_prefix': bot_token[:8] + '...'}
+            result = {'token_len': len(bot_token), 'token_prefix': bot_token[:8] + '...', 'token_suffix': '...' + bot_token[-8:], 'token_mid': bot_token[8:16]}
             try:
                 req_me = urllib.request.Request('https://platform-api.max.ru/me',
                     headers={'Authorization': f'Bearer {bot_token}'})
