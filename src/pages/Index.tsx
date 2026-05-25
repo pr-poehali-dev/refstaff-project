@@ -1180,7 +1180,7 @@ function Index() {
     });
 
     try {
-      const response = await fetch('https://functions.poehali.dev/822a1d32-f349-4962-9727-e0f529a73b8e', {
+      const response = await fetch('https://functions.poehali.dev/92a2d1b3-cdee-48b2-9883-c3df1bf50f52', {
         method: 'POST',
         mode: 'cors',
         headers: { 'Content-Type': 'application/json' },
