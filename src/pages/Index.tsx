@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -157,14 +157,17 @@ function Index() {
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
-  const [prevRecommendationsCount, setPrevRecommendationsCount] = useState<number>(0);
+  const prevRecommendationsCount = useRef<number>(0);
   const [newRecommendationsCount, setNewRecommendationsCount] = useState<number>(0);
-  const [prevEmployeesCount, setPrevEmployeesCount] = useState<number>(0);
+  const prevEmployeesCount = useRef<number>(0);
   const [newEmployeesCount, setNewEmployeesCount] = useState<number>(0);
-  const [prevPayoutsCount, setPrevPayoutsCount] = useState<number>(0);
+  const prevPayoutsCount = useRef<number>(0);
   const [newPayoutsCount, setNewPayoutsCount] = useState<number>(0);
-  const [prevVacanciesCount, setPrevVacanciesCount] = useState<number>(0);
+  const prevVacanciesCount = useRef<number>(0);
   const [newVacanciesCount, setNewVacanciesCount] = useState<number>(0);
+  const prevRecommendationsRef = useRef<Recommendation[]>([]);
+  const prevEmployeesRef = useRef<Employee[]>([]);
+  const prevPayoutsRef = useRef<PayoutRequest[]>([]);
   const [newNewsCount, setNewNewsCount] = useState<number>(() => 0);
   const [newNotificationsCount, setNewNotificationsCount] = useState<number>(() => 0);
   const [employeeTabsInitialized, setEmployeeTabsInitialized] = useState(false);
@@ -660,8 +663,8 @@ function Index() {
       });
 
       if (userRole === 'employee') {
-        if (prevVacanciesCount > 0) {
-          const vacDiff = mappedVacancies.length - prevVacanciesCount;
+        if (prevVacanciesCount.current > 0) {
+          const vacDiff = mappedVacancies.length - prevVacanciesCount.current;
           if (vacDiff > 0) {
             setNewVacanciesCount(prev => prev + vacDiff);
             const newVacs = mappedVacancies.slice(mappedVacancies.length - vacDiff);
@@ -677,12 +680,11 @@ function Index() {
             ]);
           }
         }
-        setPrevVacanciesCount(mappedVacancies.length);
+        prevVacanciesCount.current = mappedVacancies.length;
 
-        if (prevRecommendationsCount > 0) {
-          const prevRecs = recommendations;
+        if (prevRecommendationsCount.current > 0) {
           mappedRecommendations.forEach((rec) => {
-            const prevRec = prevRecs.find(r => r.id === rec.id);
+            const prevRec = prevRecommendationsRef.current.find((r: Recommendation) => r.id === rec.id);
             if (prevRec && prevRec.status !== rec.status) {
               const statusLabels: Record<string, string> = {
                 pending: 'На рассмотрении',
@@ -704,18 +706,20 @@ function Index() {
       }
       setVacancies(mappedVacancies);
 
-      if (prevEmployeesCount > 0) {
-        const empDiff = mappedEmployees.length - prevEmployeesCount;
+      if (prevEmployeesCount.current > 0) {
+        const empDiff = mappedEmployees.length - prevEmployeesCount.current;
         if (empDiff > 0) setNewEmployeesCount(prev => prev + empDiff);
       }
-      setPrevEmployeesCount(mappedEmployees.length);
+      prevEmployeesCount.current = mappedEmployees.length;
+      prevEmployeesRef.current = mappedEmployees;
       setEmployees(mappedEmployees);
 
-      if (prevRecommendationsCount > 0) {
-        const recDiff = mappedRecommendations.length - prevRecommendationsCount;
+      if (prevRecommendationsCount.current > 0) {
+        const recDiff = mappedRecommendations.length - prevRecommendationsCount.current;
         if (recDiff > 0) setNewRecommendationsCount(prev => prev + recDiff);
       }
-      setPrevRecommendationsCount(mappedRecommendations.length);
+      prevRecommendationsCount.current = mappedRecommendations.length;
+      prevRecommendationsRef.current = mappedRecommendations;
       setRecommendations(mappedRecommendations);
       setCompany(companyData);
       if (companyData?.subscription_tier === 'none' || !companyData?.subscription_expires_at) {
@@ -743,11 +747,11 @@ function Index() {
           reviewedBy: p.reviewed_by
         }));
 
-        if (prevPayoutsCount > 0) {
-          const payDiff = mappedPayouts.length - prevPayoutsCount;
+        if (prevPayoutsCount.current > 0) {
+          const payDiff = mappedPayouts.length - prevPayoutsCount.current;
           if (payDiff > 0) {
             setNewPayoutsCount(prev => prev + payDiff);
-            const newPays = mappedPayouts.filter(p => !payoutRequests.find(ex => ex.id === p.id));
+            const newPays = mappedPayouts.filter(p => !prevPayoutsRef.current.find(ex => ex.id === p.id));
             newPays.forEach((pay, i) => {
               setNotifications(prev => [{
                 id: Date.now() + 60 + i,
@@ -759,14 +763,15 @@ function Index() {
             });
           }
         }
-        setPrevPayoutsCount(mappedPayouts.length);
+        prevPayoutsCount.current = mappedPayouts.length;
+        prevPayoutsRef.current = mappedPayouts;
         setPayoutRequests(mappedPayouts);
       }
 
       if (Array.isArray(chatsData) && chatsData.length > 0) {
         setChats(chatsData);
         const totalUnread = chatsData.reduce((sum: number, c: Chat) => sum + (c.unread_count || 0), 0);
-        if (userRole === 'employer' && totalUnread > unreadMessagesCount && prevRecommendationsCount > 0) {
+        if (userRole === 'employer' && totalUnread > unreadMessagesCount && prevRecommendationsCount.current > 0) {
           setNotifications(prev => [{
             id: Date.now() + 10,
             type: 'chat',
@@ -779,8 +784,8 @@ function Index() {
       }
 
       if (userRole === 'employer') {
-        if (prevEmployeesCount > 0) {
-          const newEmps = mappedEmployees.filter(e => !employees.find(ex => ex.id === e.id));
+        if (prevEmployeesCount.current > 0) {
+          const newEmps = mappedEmployees.filter(e => !prevEmployeesRef.current.find(ex => ex.id === e.id));
           newEmps.forEach((emp, i) => {
             setNotifications(prev => [{
               id: Date.now() + 20 + i,
@@ -792,8 +797,8 @@ function Index() {
           });
         }
 
-        if (prevRecommendationsCount > 0) {
-          const newRecs = mappedRecommendations.filter(r => !recommendations.find(ex => ex.id === r.id));
+        if (prevRecommendationsCount.current > 0) {
+          const newRecs = mappedRecommendations.filter(r => !prevRecommendationsRef.current.find(ex => ex.id === r.id));
           newRecs.forEach((rec, i) => {
             setNotifications(prev => [{
               id: Date.now() + 30 + i,
@@ -809,7 +814,7 @@ function Index() {
             rejected: 'Отклонён', hired: 'Нанят', interview: 'На собеседовании'
           };
           mappedRecommendations.forEach((rec, i) => {
-            const prevRec = recommendations.find(r => r.id === rec.id);
+            const prevRec = prevRecommendationsRef.current.find(r => r.id === rec.id);
             if (prevRec && prevRec.status !== rec.status) {
               setNotifications(prev => [{
                 id: Date.now() + 40 + i,
