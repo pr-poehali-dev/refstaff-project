@@ -358,6 +358,31 @@ def handler(event: dict, context) -> dict:
                 }
             })
 
+        # ── Установка webhook ────────────────────────────────────────────────────
+        elif action == 'setup_webhook':
+            webhook_url = 'https://functions.poehali.dev/c412b453-2112-4882-aaa5-64d3d6f3a3c6'
+            result = {'bot_token_len': len(bot_token), 'bot_token_prefix': bot_token[:8] + '...' if bot_token else 'EMPTY'}
+            try:
+                req = urllib.request.Request(
+                    f'https://api.telegram.org/bot{bot_token}/getMe',
+                    headers={'Content-Type': 'application/json'}
+                )
+                with urllib.request.urlopen(req, timeout=10) as r:
+                    result['bot_info'] = json.loads(r.read())
+            except Exception as e:
+                result['bot_info_error'] = str(e)
+            try:
+                data = json.dumps({'url': webhook_url}).encode()
+                req = urllib.request.Request(
+                    f'https://api.telegram.org/bot{bot_token}/setWebhook',
+                    data=data, headers={'Content-Type': 'application/json'}, method='POST'
+                )
+                with urllib.request.urlopen(req, timeout=10) as r:
+                    result['webhook_result'] = json.loads(r.read())
+            except Exception as e:
+                result['webhook_error'] = str(e)
+            return resp(200, result)
+
         return resp(400, {'error': 'Неизвестный action'})
 
     finally:
