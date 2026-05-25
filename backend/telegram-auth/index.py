@@ -108,12 +108,48 @@ def handler(event: dict, context) -> dict:
 
             if not session_token:
                 tg_send(bot_token, chat_id,
-                    '👋 Привет! Я бот iHUNT.\n\nДля регистрации перейдите по ссылке приглашения от вашей компании.')
+                    '👋 Привет! Я бот iHUNT.\n\nДля регистрации перейдите по ссылке приглашения от вашей компании.\nДля входа — нажмите кнопку "Войти через Telegram" на сайте.')
                 return {'statusCode': 200, 'body': 'ok'}
 
             conn = get_db()
             cursor = conn.cursor()
             try:
+                # Проверяем login-сессию
+                cursor.execute(
+                    f"SELECT * FROM {DB_SCHEMA}.tg_login_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
+                    (session_token,)
+                )
+                login_session = cursor.fetchone()
+
+                if login_session:
+                    # Проверяем что пользователь зарегистрирован
+                    cursor.execute(
+                        f"SELECT id, first_name FROM {DB_SCHEMA}.users WHERE telegram_chat_id = %s AND is_fired = FALSE",
+                        (chat_id,)
+                    )
+                    user = cursor.fetchone()
+                    if not user:
+                        tg_send(bot_token, chat_id,
+                            '❌ Аккаунт с этим Telegram не найден.\n\nСначала зарегистрируйтесь по ссылке приглашения от компании.')
+                        return {'statusCode': 200, 'body': 'ok'}
+
+                    code = generate_code()
+                    expires_at = datetime.utcnow() + timedelta(minutes=10)
+                    cursor.execute(
+                        f"""UPDATE {DB_SCHEMA}.tg_login_sessions
+                            SET status = 'code_sent', telegram_chat_id = %s, code = %s, expires_at = %s
+                            WHERE session_token = %s""",
+                        (chat_id, code, expires_at, session_token)
+                    )
+                    conn.commit()
+                    tg_send(bot_token, chat_id,
+                        f"🔐 Привет, {user['first_name']}!\n\n"
+                        f"Ваш код для входа в iHUNT:\n\n<b>{code}</b>\n\n"
+                        f"Введите этот код на странице входа. Код действует <b>10 минут</b>."
+                    )
+                    return {'statusCode': 200, 'body': 'ok'}
+
+                # Проверяем регистрационную сессию
                 cursor.execute(
                     f"SELECT * FROM {DB_SCHEMA}.tg_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
                     (session_token,)
@@ -146,7 +182,6 @@ def handler(event: dict, context) -> dict:
                 )
                 conn.commit()
 
-                # Получаем название компании
                 cursor.execute(
                     f"SELECT name FROM {DB_SCHEMA}.companies WHERE invite_token = %s",
                     (session['invite_token'],)
@@ -355,6 +390,81 @@ def handler(event: dict, context) -> dict:
                     'level': user['level'],
                     'is_admin': user['is_admin'],
                     'is_hr_manager': user['is_hr_manager'],
+                }
+            })
+
+        # ── Создать сессию входа ─────────────────────────────────────────────────
+        elif action == 'create_login_session':
+            session_token = generate_token(16)
+            expires_at = datetime.utcnow() + timedelta(minutes=15)
+            cursor.execute(
+                f"INSERT INTO {DB_SCHEMA}.tg_login_sessions (session_token, status, expires_at) VALUES (%s, 'pending', %s)",
+                (session_token, expires_at)
+            )
+            conn.commit()
+            bot_username = os.environ.get('TELEGRAM_BOT_USERNAME', '')
+            deep_link = f"https://t.me/{bot_username}?start={session_token}"
+            return resp(200, {'session_token': session_token, 'deep_link': deep_link})
+
+        # ── Проверить статус login-сессии ─────────────────────────────────────
+        elif action == 'check_login_session':
+            session_token = body.get('session_token', '').strip()
+            if not session_token:
+                return resp(400, {'error': 'session_token обязателен'})
+            cursor.execute(
+                f"SELECT * FROM {DB_SCHEMA}.tg_login_sessions WHERE session_token = %s",
+                (session_token,)
+            )
+            session = cursor.fetchone()
+            if not session:
+                return resp(404, {'error': 'Сессия не найдена'})
+            if session['expires_at'] < datetime.utcnow():
+                return resp(410, {'error': 'Сессия истекла', 'status': 'expired'})
+            return resp(200, {'status': session['status']})
+
+        # ── Подтвердить код входа ─────────────────────────────────────────────
+        elif action == 'verify_login_code':
+            session_token = body.get('session_token', '').strip()
+            code = body.get('code', '').strip()
+            if not session_token or not code:
+                return resp(400, {'error': 'Укажите код'})
+            cursor.execute(
+                f"""SELECT * FROM {DB_SCHEMA}.tg_login_sessions
+                    WHERE session_token = %s AND status = 'code_sent'
+                      AND code = %s AND code_used = FALSE AND expires_at > CURRENT_TIMESTAMP""",
+                (session_token, code)
+            )
+            login_session = cursor.fetchone()
+            if not login_session:
+                return resp(400, {'error': 'Неверный или истёкший код'})
+
+            cursor.execute(
+                f"""SELECT id, email, first_name, last_name, company_id, role,
+                           position, department, avatar_url, level, is_admin, is_hr_manager
+                    FROM {DB_SCHEMA}.users
+                    WHERE telegram_chat_id = %s AND is_fired = FALSE""",
+                (login_session['telegram_chat_id'],)
+            )
+            user = cursor.fetchone()
+            if not user:
+                return resp(404, {'error': 'Пользователь не найден'})
+
+            cursor.execute(
+                f"UPDATE {DB_SCHEMA}.tg_login_sessions SET code_used = TRUE, status = 'completed' WHERE session_token = %s",
+                (session_token,)
+            )
+            conn.commit()
+
+            jwt = create_jwt(user['id'], user['email'] or '', user['company_id'], user['role'])
+            return resp(200, {
+                'message': 'Вход выполнен',
+                'token': jwt,
+                'user': {
+                    'id': user['id'], 'email': user['email'], 'first_name': user['first_name'],
+                    'last_name': user['last_name'], 'company_id': user['company_id'], 'role': user['role'],
+                    'position': user['position'], 'department': user['department'],
+                    'avatar_url': user['avatar_url'], 'level': user['level'],
+                    'is_admin': user['is_admin'], 'is_hr_manager': user['is_hr_manager'],
                 }
             })
 

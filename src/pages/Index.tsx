@@ -313,6 +313,10 @@ function Index() {
   const [employeeLoginMethod, setEmployeeLoginMethod] = useState<'telegram' | 'max'>('telegram');
   const [isTgLoginLoading, setIsTgLoginLoading] = useState(false);
   const [tgLoginError, setTgLoginError] = useState('');
+  const [tgLoginStep, setTgLoginStep] = useState<'input' | 'wait' | 'code'>('input');
+  const [tgLoginSession, setTgLoginSession] = useState('');
+  const [tgLoginDeepLink, setTgLoginDeepLink] = useState('');
+  const [tgLoginCode, setTgLoginCode] = useState('');
   const [isMaxLoginLoading, setIsMaxLoginLoading] = useState(false);
   const [maxLoginError, setMaxLoginError] = useState('');
   const [maxLoginStep, setMaxLoginStep] = useState<'input' | 'wait' | 'code'>('input');
@@ -1351,13 +1355,44 @@ function Index() {
     }
   };
 
-  const handleTgVerifyLoginCode = async (tgUser: { id: number; first_name: string; last_name?: string; username?: string; auth_date: number; hash: string }) => {
+  const handleTgSendLoginCode = async () => {
     setTgLoginError('');
     setIsTgLoginLoading(true);
     try {
       const r = await fetch('https://functions.poehali.dev/c412b453-2112-4882-aaa5-64d3d6f3a3c6', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'verify_tg_login', tg_data: tgUser })
+        body: JSON.stringify({ action: 'create_login_session' })
+      });
+      const data = await r.json();
+      if (r.ok) {
+        setTgLoginSession(data.session_token);
+        setTgLoginDeepLink(data.deep_link);
+        setTgLoginStep('wait');
+        window.open(data.deep_link, '_blank');
+        const poll = setInterval(async () => {
+          try {
+            const pr = await fetch('https://functions.poehali.dev/c412b453-2112-4882-aaa5-64d3d6f3a3c6', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ action: 'check_login_session', session_token: data.session_token })
+            });
+            const pd = await pr.json();
+            if (pr.status === 410) { clearInterval(poll); setTgLoginError('Сессия истекла. Попробуйте снова.'); setTgLoginStep('input'); return; }
+            if (pd.status === 'code_sent') { clearInterval(poll); setTgLoginStep('code'); }
+          } catch { /* ignore */ }
+        }, 2000);
+      } else { setTgLoginError(data.error || 'Ошибка'); }
+    } catch { setTgLoginError('Не удалось создать сессию'); }
+    finally { setIsTgLoginLoading(false); }
+  };
+
+  const handleTgVerifyLoginCode = async () => {
+    setTgLoginError('');
+    if (!tgLoginCode.trim()) { setTgLoginError('Введите код'); return; }
+    setIsTgLoginLoading(true);
+    try {
+      const r = await fetch('https://functions.poehali.dev/c412b453-2112-4882-aaa5-64d3d6f3a3c6', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'verify_login_code', session_token: tgLoginSession, code: tgLoginCode.trim() })
       });
       const data = await r.json();
       if (r.ok) {
@@ -1367,10 +1402,11 @@ function Index() {
         setCurrentUser(data.user);
         setUserRole('employee');
         setShowLoginDialog(false);
+        setTgLoginStep('input'); setTgLoginCode('');
         if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'login');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else {
-        setTgLoginError(data.error || 'Аккаунт не найден. Сначала зарегистрируйтесь.');
+        setTgLoginError(data.error || 'Неверный код или аккаунт не найден');
       }
     } catch {
       setTgLoginError('Ошибка входа через Telegram');
@@ -2488,13 +2524,44 @@ function Index() {
                 {employeeLoginMethod === 'telegram' && (
                   <div className="space-y-3">
                     {tgLoginError && <div className="p-3 rounded-md bg-red-50 border border-red-200 text-red-700 text-sm flex gap-2"><Icon name="AlertCircle" size={15} className="mt-0.5 shrink-0" /><span>{tgLoginError}</span></div>}
-                    <div className="text-center space-y-3 py-1">
-                      <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                        <Icon name="Send" size={24} className="text-blue-500" />
+                    {tgLoginStep === 'input' ? (
+                      <div className="text-center space-y-3 py-1">
+                        <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Icon name="Send" size={24} className="text-blue-500" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">Нажмите кнопку — откроется бот Telegram, нажмите /start и получите код</p>
+                        <Button className="w-full bg-blue-500 hover:bg-blue-600" onClick={handleTgSendLoginCode} disabled={isTgLoginLoading}>
+                          {isTgLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Открываем...</> : <><Icon name="Send" size={16} className="mr-2" />Войти через Telegram</>}
+                        </Button>
                       </div>
-                      <p className="text-sm text-muted-foreground">Нажмите кнопку — Telegram подтвердит вашу личность автоматически</p>
-                      <TelegramLoginButton onAuth={handleTgVerifyLoginCode} loading={isTgLoginLoading} />
-                    </div>
+                    ) : tgLoginStep === 'wait' ? (
+                      <div className="text-center space-y-3 py-1">
+                        <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                          <Icon name="Send" size={24} className="text-blue-500" />
+                        </div>
+                        <p className="text-sm text-muted-foreground">Откройте Telegram и нажмите <strong>/start</strong> в боте</p>
+                        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                          <Icon name="Loader2" size={14} className="animate-spin" />Ожидаем подтверждения...
+                        </div>
+                        <Button variant="outline" size="sm" className="w-full" onClick={() => window.open(tgLoginDeepLink, '_blank')}>Открыть бота снова</Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setTgLoginStep('input'); setTgLoginError(''); }}>← Назад</Button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="text-center">
+                          <div className="mx-auto w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2"><Icon name="Send" size={22} className="text-blue-500" /></div>
+                          <p className="text-sm text-muted-foreground">Бот прислал код в Telegram. Действует 10 минут.</p>
+                        </div>
+                        <div>
+                          <Label>Код из Telegram</Label>
+                          <Input value={tgLoginCode} onChange={e => setTgLoginCode(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="123456" className="text-center text-2xl tracking-[0.4em] font-mono" maxLength={6} onKeyDown={e => e.key === 'Enter' && handleTgVerifyLoginCode()} />
+                        </div>
+                        <Button className="w-full" onClick={handleTgVerifyLoginCode} disabled={isTgLoginLoading || tgLoginCode.length !== 6}>
+                          {isTgLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</> : 'Войти'}
+                        </Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setTgLoginStep('wait'); setTgLoginCode(''); setTgLoginError(''); }}>← Назад</Button>
+                      </>
+                    )}
                   </div>
                 )}
 
