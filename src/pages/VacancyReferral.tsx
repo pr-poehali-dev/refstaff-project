@@ -172,7 +172,7 @@ function VacancyReferral() {
             <CardDescription>Возможно, ссылка устарела или вакансия закрыта</CardDescription>
           </CardHeader>
           <CardContent>
-            <Button className="w-full" onClick={() => window.location.href = '/'}>
+            <Button className="w-full" onClick={() => navigate('/')}>
               Вернуться на главную
             </Button>
           </CardContent>
@@ -198,7 +198,7 @@ function VacancyReferral() {
               <p className="font-semibold text-lg">{vacancy.title}</p>
               <p className="text-sm text-muted-foreground">{company?.name}</p>
             </div>
-            <Button className="w-full" onClick={() => window.location.href = '/'}>
+            <Button className="w-full" onClick={() => navigate('/')}>
               Посмотреть другие вакансии
             </Button>
           </CardContent>

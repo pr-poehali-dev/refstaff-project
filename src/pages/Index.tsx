@@ -129,6 +129,8 @@ function Index() {
   const [activeChatId, setActiveChatId] = useState<number | null>(null);
   const [isSendingMessage, setIsSendingMessage] = useState(false);
   const chatPollRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const tgLoginPollRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
+  const maxLoginPollRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const chatMessagesEndRef = React.useRef<HTMLDivElement>(null);
   const [newReward, setNewReward] = useState('30000');
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
@@ -539,6 +541,13 @@ function Index() {
       chatPollRef.current = null;
     }
   }, [showChatDialog, activeChatEmployee?.id]);
+
+  useEffect(() => {
+    if (!showLoginDialog) {
+      if (tgLoginPollRef.current) { clearInterval(tgLoginPollRef.current); tgLoginPollRef.current = null; }
+      if (maxLoginPollRef.current) { clearInterval(maxLoginPollRef.current); maxLoginPollRef.current = null; }
+    }
+  }, [showLoginDialog]);
 
   useEffect(() => {
     if ((userRole === 'employer' || userRole === 'employee') && currentUser) {
@@ -1396,15 +1405,16 @@ function Index() {
         setTgLoginDeepLink(data.deep_link);
         setTgLoginStep('wait');
         window.open(data.deep_link, '_blank');
-        const poll = setInterval(async () => {
+        if (tgLoginPollRef.current) clearInterval(tgLoginPollRef.current);
+        tgLoginPollRef.current = setInterval(async () => {
           try {
             const pr = await fetch('https://functions.poehali.dev/c412b453-2112-4882-aaa5-64d3d6f3a3c6', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ action: 'check_login_session', session_token: data.session_token })
             });
             const pd = await pr.json();
-            if (pr.status === 410) { clearInterval(poll); setTgLoginError('Сессия истекла. Попробуйте снова.'); setTgLoginStep('input'); return; }
-            if (pd.status === 'code_sent') { clearInterval(poll); setTgLoginStep('code'); }
+            if (pr.status === 410) { clearInterval(tgLoginPollRef.current!); tgLoginPollRef.current = null; setTgLoginError('Сессия истекла. Попробуйте снова.'); setTgLoginStep('input'); return; }
+            if (pd.status === 'code_sent') { clearInterval(tgLoginPollRef.current!); tgLoginPollRef.current = null; setTgLoginStep('code'); }
           } catch { /* ignore */ }
         }, 2000);
       } else { setTgLoginError(data.error || 'Ошибка'); }
@@ -1456,16 +1466,16 @@ function Index() {
         setMaxLoginDeepLink(data.deep_link);
         setMaxLoginStep('wait');
         window.open(data.deep_link, '_blank');
-        // Поллинг статуса
-        const poll = setInterval(async () => {
+        if (maxLoginPollRef.current) clearInterval(maxLoginPollRef.current);
+        maxLoginPollRef.current = setInterval(async () => {
           try {
             const pr = await fetch('https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce', {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ action: 'check_login_session', session_token: data.session_token })
             });
             const pd = await pr.json();
-            if (pr.status === 410) { clearInterval(poll); setMaxLoginError('Сессия истекла. Попробуйте снова.'); setMaxLoginStep('input'); return; }
-            if (pd.status === 'code_sent') { clearInterval(poll); setMaxLoginStep('code'); }
+            if (pr.status === 410) { clearInterval(maxLoginPollRef.current!); maxLoginPollRef.current = null; setMaxLoginError('Сессия истекла. Попробуйте снова.'); setMaxLoginStep('input'); return; }
+            if (pd.status === 'code_sent') { clearInterval(maxLoginPollRef.current!); maxLoginPollRef.current = null; setMaxLoginStep('code'); }
           } catch { /* ignore */ }
         }, 2000);
       } else { setMaxLoginError(data.error || 'Ошибка'); }

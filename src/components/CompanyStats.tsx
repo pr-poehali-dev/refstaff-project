@@ -321,14 +321,12 @@ export default function CompanyStats({ recommendations, employees, vacancies, co
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-4">
-                  <ResponsiveContainer width={140} height={140}>
-                    <PieChart>
-                      <Pie data={statusData} cx={65} cy={65} innerRadius={35} outerRadius={60} dataKey="value" paddingAngle={2}>
-                        {statusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
-                      </Pie>
-                      <Tooltip formatter={(v, _, p) => [v, p.payload.name]} />
-                    </PieChart>
-                  </ResponsiveContainer>
+                  <PieChart width={140} height={140}>
+                    <Pie data={statusData} cx={65} cy={65} innerRadius={35} outerRadius={60} dataKey="value" paddingAngle={2}>
+                      {statusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                    </Pie>
+                    <Tooltip formatter={(v, _, p) => [v, p.payload.name]} />
+                  </PieChart>
                   <div className="space-y-1.5 flex-1">
                     {statusData.map(s => (
                       <div key={s.name} className="flex items-center justify-between text-xs">
