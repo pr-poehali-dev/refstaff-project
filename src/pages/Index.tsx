@@ -577,6 +577,14 @@ function Index() {
     }
   }, [showNotificationsDialog]);
 
+  const [activeEmployeeTab, setActiveEmployeeTab] = useState('news');
+
+  useEffect(() => {
+    if (activeEmployeeTab === 'notifications') return;
+    const unread = notifications.filter(n => !n.read).length;
+    setNewNotificationsCount(unread);
+  }, [notifications, activeEmployeeTab]);
+
   useEffect(() => {
     if (userRole === 'employee' && !isLoading && !employeeTabsInitialized && currentEmployeeId) {
       const readIds = getReadNotifIds();
@@ -6026,6 +6034,7 @@ function Index() {
         </div>
 
         <Tabs defaultValue="news" className="space-y-4 sm:space-y-6" onValueChange={(tab) => {
+          setActiveEmployeeTab(tab);
           if (tab === 'vacancies') setNewVacanciesCount(0);
           if (tab === 'news') setNewNewsCount(0);
           if (tab === 'my-recommendations') setNewRecommendationsCount(0);
