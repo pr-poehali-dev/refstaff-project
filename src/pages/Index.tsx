@@ -591,11 +591,11 @@ function Index() {
       api.getNotifications(currentEmployeeId)
         .then(notifs => {
           const mapped = notifs.map(n => {
-            const strId = String(n.id);
-            return { ...n, id: typeof n.id === 'string' ? parseInt(n.id.replace(/\D/g, '')) || Date.now() : n.id, read: n.read || readIds.has(strId) };
+            const rawId = String(n.id);
+            const numericId = typeof n.id === 'string' ? parseInt(n.id.replace(/\D/g, '')) || Date.now() : n.id;
+            return { ...n, id: numericId, read: n.read || readIds.has(rawId) || readIds.has(String(numericId)) };
           });
           setNotifications(mapped);
-          setNewNotificationsCount(mapped.filter(n => !n.read).length);
         })
         .catch(() => {});
       setEmployeeTabsInitialized(true);
