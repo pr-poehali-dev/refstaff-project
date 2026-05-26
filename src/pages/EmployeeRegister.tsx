@@ -19,6 +19,56 @@ type Step =
   | 'tg-form' | 'tg-wait' | 'tg-code'
   | 'max-form' | 'max-wait' | 'max-code';
 
+const WaitScreen = ({ deepLink, onBack, onReopen, messenger }: { deepLink: string; onBack: () => void; onReopen: () => void; messenger: string }) => (
+  <div className="space-y-5 text-center">
+    <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+      <Icon name="Send" size={32} className="text-blue-500" />
+    </div>
+    <div>
+      <h3 className="font-semibold text-base mb-1">Откройте {messenger} и нажмите /start</h3>
+      <p className="text-sm text-muted-foreground">Бот должен был открыться автоматически.<br />Если нет — нажмите кнопку ниже.</p>
+    </div>
+    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+      <Icon name="Loader2" size={16} className="animate-spin" />Ожидаем подтверждения...
+    </div>
+    <Button variant="outline" className="w-full" onClick={onReopen}><Icon name="Send" size={16} className="mr-2 text-blue-500" />Открыть бота снова</Button>
+    <Button variant="ghost" className="w-full text-sm" onClick={onBack}>← Назад</Button>
+  </div>
+);
+
+const CodeScreen = ({ code, onChange, onSubmit, onBack, isSubmitting }: { code: string; onChange: (v: string) => void; onSubmit: (e: React.FormEvent) => void; onBack: () => void; isSubmitting: boolean }) => (
+  <form onSubmit={onSubmit} className="space-y-4">
+    <div className="text-center">
+      <div className="mx-auto w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-3">
+        <Icon name="MessageSquare" size={28} className="text-green-600" />
+      </div>
+      <h3 className="font-semibold mb-1">Бот прислал код!</h3>
+      <p className="text-sm text-muted-foreground">Введите 6-значный код из мессенджера.<br />Код действует <strong>10 минут</strong>.</p>
+    </div>
+    <div className="space-y-2">
+      <Label>Код</Label>
+      <Input value={code} onChange={e => onChange(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="123456" className="text-center text-3xl tracking-[0.5em] font-mono h-14" maxLength={6} autoFocus />
+    </div>
+    <Button type="submit" className="w-full h-12" disabled={isSubmitting || code.length !== 6}>
+      {isSubmitting ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</> : 'Подтвердить и создать аккаунт'}
+    </Button>
+    <Button type="button" variant="ghost" className="w-full text-sm" onClick={onBack}>← Назад</Button>
+  </form>
+);
+
+const NameForm = ({ form, onChange, onSubmit, messenger, color, isSubmitting, onBack }: { form: { firstName: string; lastName: string }; onChange: (f: { firstName: string; lastName: string }) => void; onSubmit: (e: React.FormEvent) => void; messenger: string; color: string; isSubmitting: boolean; onBack: () => void }) => (
+  <form onSubmit={onSubmit} className="space-y-4">
+    <div className="grid grid-cols-2 gap-4">
+      <div className="space-y-2"><Label>Имя *</Label><Input value={form.firstName} onChange={e => onChange({ ...form, firstName: e.target.value })} placeholder="Иван" required /></div>
+      <div className="space-y-2"><Label>Фамилия *</Label><Input value={form.lastName} onChange={e => onChange({ ...form, lastName: e.target.value })} placeholder="Иванов" required /></div>
+    </div>
+    <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
+      {isSubmitting ? <><Icon name="Loader2" size={18} className="animate-spin mr-2" />Подготавливаем...</> : <><Icon name="Send" size={18} className={`mr-2 ${color}`} />Открыть {messenger} и получить код</>}
+    </Button>
+    <Button type="button" variant="ghost" className="w-full" onClick={onBack}>← Назад</Button>
+  </form>
+);
+
 function EmployeeRegister() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -169,59 +219,6 @@ function EmployeeRegister() {
     </div>
   );
 
-  // Переиспользуемый компонент ожидания
-  const WaitScreen = ({ deepLink, onBack, onReopen, messenger }: { deepLink: string; onBack: () => void; onReopen: () => void; messenger: string }) => (
-    <div className="space-y-5 text-center">
-      <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-        <Icon name="Send" size={32} className="text-blue-500" />
-      </div>
-      <div>
-        <h3 className="font-semibold text-base mb-1">Откройте {messenger} и нажмите /start</h3>
-        <p className="text-sm text-muted-foreground">Бот должен был открыться автоматически.<br />Если нет — нажмите кнопку ниже.</p>
-      </div>
-      <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-        <Icon name="Loader2" size={16} className="animate-spin" />Ожидаем подтверждения...
-      </div>
-      <Button variant="outline" className="w-full" onClick={onReopen}><Icon name="Send" size={16} className="mr-2 text-blue-500" />Открыть бота снова</Button>
-      <Button variant="ghost" className="w-full text-sm" onClick={onBack}>← Назад</Button>
-    </div>
-  );
-
-  // Переиспользуемая форма кода
-  const CodeScreen = ({ code, onChange, onSubmit, onBack }: { code: string; onChange: (v: string) => void; onSubmit: (e: React.FormEvent) => void; onBack: () => void }) => (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div className="text-center">
-        <div className="mx-auto w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-3">
-          <Icon name="MessageSquare" size={28} className="text-green-600" />
-        </div>
-        <h3 className="font-semibold mb-1">Бот прислал код!</h3>
-        <p className="text-sm text-muted-foreground">Введите 6-значный код из мессенджера.<br />Код действует <strong>10 минут</strong>.</p>
-      </div>
-      <div className="space-y-2">
-        <Label>Код</Label>
-        <Input value={code} onChange={e => onChange(e.target.value.replace(/\D/g, '').slice(0, 6))} placeholder="123456" className="text-center text-3xl tracking-[0.5em] font-mono h-14" maxLength={6} autoFocus />
-      </div>
-      <Button type="submit" className="w-full h-12" disabled={isSubmitting || code.length !== 6}>
-        {isSubmitting ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</> : 'Подтвердить и создать аккаунт'}
-      </Button>
-      <Button type="button" variant="ghost" className="w-full text-sm" onClick={onBack}>← Назад</Button>
-    </form>
-  );
-
-  // Переиспользуемая форма имени
-  const NameForm = ({ form, onChange, onSubmit, messenger, color }: { form: { firstName: string; lastName: string }; onChange: (f: { firstName: string; lastName: string }) => void; onSubmit: (e: React.FormEvent) => void; messenger: string; color: string }) => (
-    <form onSubmit={onSubmit} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2"><Label>Имя *</Label><Input value={form.firstName} onChange={e => onChange({ ...form, firstName: e.target.value })} placeholder="Иван" required /></div>
-        <div className="space-y-2"><Label>Фамилия *</Label><Input value={form.lastName} onChange={e => onChange({ ...form, lastName: e.target.value })} placeholder="Иванов" required /></div>
-      </div>
-      <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
-        {isSubmitting ? <><Icon name="Loader2" size={18} className="animate-spin mr-2" />Подготавливаем...</> : <><Icon name="Send" size={18} className={`mr-2 ${color}`} />Открыть {messenger} и получить код</>}
-      </Button>
-      <Button type="button" variant="ghost" className="w-full" onClick={() => goBack('method')}>← Назад</Button>
-    </form>
-  );
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-white to-gray-50 p-4">
       <Card className="w-full max-w-md">
@@ -264,14 +261,14 @@ function EmployeeRegister() {
           )}
 
           {/* ── Telegram флоу ── */}
-          {step === 'tg-form' && <NameForm form={tgForm} onChange={setTgForm} onSubmit={handleTgStart} messenger="Telegram" color="text-blue-500" />}
+          {step === 'tg-form' && <NameForm form={tgForm} onChange={setTgForm} onSubmit={handleTgStart} messenger="Telegram" color="text-blue-500" isSubmitting={isSubmitting} onBack={() => goBack('method')} />}
           {step === 'tg-wait' && <WaitScreen deepLink={tgDeepLink} messenger="Telegram" onReopen={() => window.open(tgDeepLink, '_blank')} onBack={() => { goBack('tg-form'); if (tgPollRef.current) clearInterval(tgPollRef.current); }} />}
-          {step === 'tg-code' && <CodeScreen code={tgCode} onChange={setTgCode} onSubmit={handleTgVerify} onBack={() => goBack('tg-wait')} />}
+          {step === 'tg-code' && <CodeScreen code={tgCode} onChange={setTgCode} onSubmit={handleTgVerify} onBack={() => goBack('tg-wait')} isSubmitting={isSubmitting} />}
 
           {/* ── MAX флоу ── */}
-          {step === 'max-form' && <NameForm form={maxForm} onChange={setMaxForm} onSubmit={handleMaxStart} messenger="MAX" color="text-purple-500" />}
+          {step === 'max-form' && <NameForm form={maxForm} onChange={setMaxForm} onSubmit={handleMaxStart} messenger="MAX" color="text-purple-500" isSubmitting={isSubmitting} onBack={() => goBack('method')} />}
           {step === 'max-wait' && <WaitScreen deepLink={maxDeepLink} messenger="MAX" onReopen={() => window.open(maxDeepLink, '_blank')} onBack={() => { goBack('max-form'); if (maxPollRef.current) clearInterval(maxPollRef.current); }} />}
-          {step === 'max-code' && <CodeScreen code={maxCode} onChange={setMaxCode} onSubmit={handleMaxVerify} onBack={() => goBack('max-wait')} />}
+          {step === 'max-code' && <CodeScreen code={maxCode} onChange={setMaxCode} onSubmit={handleMaxVerify} onBack={() => goBack('max-wait')} isSubmitting={isSubmitting} />}
 
           {/* ── Email флоу ── */}
           {step === 'email-form' && (
