@@ -12,13 +12,10 @@ import string
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from datetime import datetime, timedelta
-import urllib.request
-import urllib.parse
-import urllib.error
-import http.client
 import hashlib
 import hmac
 import base64
+import requests as http_requests
 
 DB_SCHEMA = 't_p65890965_refstaff_project'
 MAX_API = 'https://platform-api.max.ru'
@@ -29,41 +26,13 @@ def get_db():
 
 
 def max_api_request(token: str, method: str, path: str, payload: dict = None):
-    """Выполняет запрос к MAX API с поддержкой unicode-токенов."""
-    import ssl
-    body = json.dumps(payload).encode('utf-8') if payload is not None else b''
-    auth_header = f'Bearer {token}'.encode('utf-8')
-    # Формируем HTTP запрос вручную как bytes
-    host = 'platform-api.max.ru'
-    request_line = f'{method} {path} HTTP/1.1\r\n'.encode('utf-8')
-    headers_bytes = (
-        f'Host: {host}\r\n'.encode('utf-8') +
-        b'Content-Type: application/json\r\n' +
-        b'Authorization: ' + auth_header + b'\r\n' +
-        f'Content-Length: {len(body)}\r\n'.encode('utf-8') +
-        b'Connection: close\r\n\r\n'
-    )
-    ctx = ssl.create_default_context()
-    import socket
-    with socket.create_connection((host, 443), timeout=10) as sock:
-        with ctx.wrap_socket(sock, server_hostname=host) as ssock:
-            ssock.sendall(request_line + headers_bytes + body)
-            raw = b''
-            while True:
-                chunk = ssock.recv(4096)
-                if not chunk:
-                    break
-                raw += chunk
-    # Парсим ответ
-    header_end = raw.find(b'\r\n\r\n')
-    header_part = raw[:header_end].decode('utf-8')
-    body_part = raw[header_end + 4:]
-    status_line = header_part.split('\r\n')[0]
-    status_code = int(status_line.split(' ')[1])
-    result = json.loads(body_part.decode('utf-8'))
-    if status_code >= 400:
-        raise Exception(f'HTTP {status_code}: {result}')
-    return result
+    """Выполняет запрос к MAX API."""
+    url = f'https://platform-api.max.ru{path}'
+    headers = {'Authorization': token, 'Content-Type': 'application/json'}
+    r = http_requests.request(method, url, json=payload, headers=headers, timeout=10)
+    if r.status_code >= 400:
+        raise Exception(f'HTTP {r.status_code}: {r.text}')
+    return r.json()
 
 
 def max_send(token: str, user_id: int, text: str):
@@ -455,7 +424,7 @@ def handler(event: dict, context) -> dict:
         # ── Временный: установка webhook ─────────────────────────────────────
         elif action == 'setup_webhook':
             webhook_url = 'https://functions.poehali.dev/42b7f6c0-39d7-4274-a41b-2223268f44ce'
-            result = {'token_len': len(bot_token), 'token_ascii': bot_token.encode('ascii', errors='replace').decode('ascii')[:20]}
+            result = {'token_len': len(bot_token)}
             try:
                 result['bot_info'] = max_api_request(bot_token, 'GET', '/me')
             except Exception as e:
