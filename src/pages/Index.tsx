@@ -4543,7 +4543,10 @@ function Index() {
               <span className="sm:hidden">Чаты</span>
             </h2>
             <div className="grid gap-3">
-              {(chats.length > 0 ? chats : employees.slice(0, 3).map(emp => ({ employee_id: emp.id, unread_count: 0 }))).map((chat) => {
+              {(chats.length > 0
+                ? chats.filter((chat, idx, arr) => arr.findIndex(c => c.employee_id === chat.employee_id) === idx)
+                : employees.slice(0, 3).map(emp => ({ employee_id: emp.id, unread_count: 0 }))
+              ).map((chat) => {
                 const emp = employees.find(e => e.id === chat.employee_id);
                 if (!emp) return null;
                 const unread = chat.unread_count || 0;
