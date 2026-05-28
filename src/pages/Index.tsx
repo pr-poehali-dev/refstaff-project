@@ -7781,6 +7781,14 @@ function Index() {
             ) : (
               <>
                 <div>
+                  <Label>ФИО держателя карты <span className="text-destructive">*</span></Label>
+                  <Input
+                    placeholder="Иванов Иван Иванович"
+                    value={withdrawForm.accountFullName}
+                    onChange={(e) => setWithdrawForm({...withdrawForm, accountFullName: e.target.value})}
+                  />
+                </div>
+                <div>
                   <Label>Реквизиты <span className="text-destructive">*</span></Label>
                   <Input
                     placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
