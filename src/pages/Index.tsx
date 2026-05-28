@@ -3758,7 +3758,7 @@ function Index() {
                           }}
                           className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                         >
-                          <Icon name="ClipboardList" size={12} className="sm:mr-1" />
+                          <span className="mr-1">📋</span>
                           <span className="hidden sm:inline">Тест</span>
                         </Button>
                         <Button 
@@ -3781,7 +3781,7 @@ function Index() {
                           }}
                           className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                         >
-                          <Icon name="Pencil" size={12} className="sm:mr-1" />
+                          <span className="mr-1">✏️</span>
                           <span className="hidden sm:inline">Ред.</span>
                         </Button>
                         {vacancy.status === 'active' && (
@@ -3791,7 +3791,7 @@ function Index() {
                             onClick={() => handleArchiveVacancy(vacancy.id)}
                             className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                           >
-                            <Icon name="Archive" size={12} className="sm:mr-1" />
+                            <span className="mr-1">📦</span>
                             <span className="hidden sm:inline">В архив</span>
                           </Button>
                         )}
@@ -3803,7 +3803,7 @@ function Index() {
                               onClick={() => handleRestoreVacancy(vacancy.id)}
                               className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
-                              <Icon name="RotateCcw" size={12} className="sm:mr-1" />
+                              <span className="mr-1">✅</span>
                               <span>Активировать</span>
                             </Button>
                             <Button 
@@ -3816,7 +3816,7 @@ function Index() {
                               }}
                               className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                             >
-                              <Icon name="Trash2" size={12} className="sm:mr-1" />
+                              <span className="mr-1">🗑️</span>
                               <span className="hidden sm:inline">Удалить</span>
                             </Button>
                           </>
