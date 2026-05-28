@@ -12,6 +12,7 @@ import urllib.request
 SCHEMA = 't_p65890965_refstaff_project'
 POLZA_BASE_URL = 'https://api.polza.ai/api/v1'
 DEFAULT_MODEL = 'openai/gpt-4o-mini'
+SEND_EMAIL_URL = 'https://functions.poehali.dev/268341d7-c5b3-4c4f-a5fb-50277c318250'
 
 CORS_HEADERS = {
     'Content-Type': 'application/json',
@@ -25,6 +26,70 @@ def get_db():
     conn = psycopg2.connect(os.environ['DATABASE_URL'], cursor_factory=RealDictCursor)
     conn.autocommit = True
     return conn
+
+
+def send_test_result_email(to_email, company_name, candidate_name, vacancy_title, score, total, percentage):
+    subject = f'Кандидат прошёл тест: {candidate_name}'
+    score_color = '#22c55e' if percentage >= 70 else '#f59e0b' if percentage >= 40 else '#ef4444'
+    html = f"""<!DOCTYPE html>
+<html lang="ru">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:#f5f5f5;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 20px;">
+  <tr><td align="center">
+    <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;box-shadow:0 4px 6px rgba(0,0,0,0.1);overflow:hidden;">
+      <tr><td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:32px 30px;text-align:center;">
+        <h1 style="margin:0;color:#fff;font-size:26px;font-weight:600;">🎯 iHUNT</h1>
+        <p style="margin:8px 0 0;color:rgba(255,255,255,0.9);font-size:15px;">Платформа поиска талантов</p>
+      </td></tr>
+      <tr><td style="padding:36px 30px;">
+        <h2 style="margin:0 0 16px;color:#1a1a1a;font-size:22px;">Новый результат теста 📋</h2>
+        <p style="margin:0 0 24px;color:#4a5568;font-size:16px;line-height:1.6;">
+          Кандидат <strong>{candidate_name}</strong> прошёл тест по вакансии <strong>«{vacancy_title}»</strong>.
+        </p>
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;padding:20px;margin-bottom:24px;">
+          <tr>
+            <td style="padding:8px 0;color:#718096;font-size:14px;">Кандидат</td>
+            <td style="padding:8px 0;color:#2d3748;font-size:14px;font-weight:600;text-align:right;">{candidate_name}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#718096;font-size:14px;border-top:1px solid #e2e8f0;">Вакансия</td>
+            <td style="padding:8px 0;color:#2d3748;font-size:14px;font-weight:600;text-align:right;border-top:1px solid #e2e8f0;">{vacancy_title}</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 0;color:#718096;font-size:14px;border-top:1px solid #e2e8f0;">Результат</td>
+            <td style="padding:8px 0;font-size:14px;font-weight:700;text-align:right;border-top:1px solid #e2e8f0;color:{score_color};">{score} / {total} ({percentage}%)</td>
+          </tr>
+        </table>
+        <p style="margin:0;color:#718096;font-size:13px;line-height:1.5;">
+          Посмотрите детальные результаты в личном кабинете iHUNT в разделе «Вакансии» → «Тесты».
+        </p>
+      </td></tr>
+      <tr><td style="background:#f8fafc;padding:20px 30px;text-align:center;border-top:1px solid #e2e8f0;">
+        <p style="margin:0;color:#a0aec0;font-size:12px;">© iHUNT — Платформа рекомендательного найма</p>
+      </td></tr>
+    </table>
+  </td></tr>
+</table>
+</body></html>"""
+
+    payload = {
+        'to_email': to_email,
+        'subject': subject,
+        'html_content': html,
+        'action': 'custom',
+    }
+    data = json.dumps(payload).encode('utf-8')
+    req = urllib.request.Request(
+        SEND_EMAIL_URL,
+        data=data,
+        headers={'Content-Type': 'application/json'},
+        method='POST'
+    )
+    try:
+        urllib.request.urlopen(req, timeout=10)
+    except Exception as e:
+        print(f'Email send error: {e}')
 
 
 def resp(status, body):
@@ -263,7 +328,12 @@ def handler(event: dict, context) -> dict:
             return resp(400, {'error': 'token and candidate_name required'})
 
         cur.execute(
-            f"SELECT id, questions FROM {SCHEMA}.vacancy_tests WHERE token = %s AND is_active = true",
+            f"""SELECT vt.id, vt.questions, vt.company_id, vt.vacancy_id,
+                       v.title as vacancy_title, c.name as company_name, c.email as company_email
+                FROM {SCHEMA}.vacancy_tests vt
+                JOIN {SCHEMA}.vacancies v ON v.id = vt.vacancy_id
+                JOIN {SCHEMA}.companies c ON c.id = vt.company_id
+                WHERE vt.token = %s AND vt.is_active = true""",
             (token,)
         )
         test = cur.fetchone()
@@ -286,7 +356,20 @@ def handler(event: dict, context) -> dict:
              json.dumps(answers), score, len(questions))
         )
         result = dict(cur.fetchone())
-        result['percentage'] = round(score / len(questions) * 100) if questions else 0
+        percentage = round(score / len(questions) * 100) if questions else 0
+        result['percentage'] = percentage
+
+        if test.get('company_email'):
+            send_test_result_email(
+                to_email=test['company_email'],
+                company_name=test['company_name'],
+                candidate_name=candidate_name,
+                vacancy_title=test['vacancy_title'],
+                score=score,
+                total=len(questions),
+                percentage=percentage,
+            )
+
         return resp(201, result)
 
     # GET /vacancy-tests?action=results&test_id=X&company_id=Y — результаты теста

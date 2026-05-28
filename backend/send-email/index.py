@@ -55,28 +55,46 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
     body_data = json.loads(event.get('body', '{}'))
     to_email = body_data.get('to_email')
-    user_name = body_data.get('user_name', '')
-    verification_token = body_data.get('verification_token')
-    base_url = body_data.get('base_url', 'https://i-hunt.ru')
-    user_type = body_data.get('user_type', 'employee')  # 'company' или 'employee'
+    action = body_data.get('action', 'verify')
 
-    if not to_email or not verification_token:
+    if not to_email:
         return {
             'statusCode': 400,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json.dumps({'error': 'Missing required fields'}),
+            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+            'body': json.dumps({'error': 'Missing to_email'}),
             'isBase64Encoded': False
         }
 
-    verification_url = f"{base_url}/verify-email?token={verification_token}"
+    if action == 'custom':
+        subject = body_data.get('subject', 'Уведомление iHUNT')
+        html_content = body_data.get('html_content', '')
+        if not html_content:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Missing html_content'}),
+                'isBase64Encoded': False
+            }
+    else:
+        user_name = body_data.get('user_name', '')
+        verification_token = body_data.get('verification_token')
+        base_url = body_data.get('base_url', 'https://i-hunt.ru')
+        user_type = body_data.get('user_type', 'employee')
 
-    html_content = create_verification_email_html(user_name, verification_url, user_type)
+        if not verification_token:
+            return {
+                'statusCode': 400,
+                'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
+                'body': json.dumps({'error': 'Missing required fields'}),
+                'isBase64Encoded': False
+            }
+
+        verification_url = f"{base_url}/verify-email?token={verification_token}"
+        html_content = create_verification_email_html(user_name, verification_url, user_type)
+        subject = 'Подтвердите вашу электронную почту'
 
     msg = MIMEMultipart('alternative')
-    msg['Subject'] = 'Подтвердите вашу электронную почту'
+    msg['Subject'] = subject
     msg['From'] = smtp_user
     msg['To'] = to_email
 
