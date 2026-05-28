@@ -251,6 +251,7 @@ function Index() {
     salary: '',
     description: '',
     requirements: '',
+    motivation: '',
     reward: '30000',
     payoutDelay: '30',
     city: '',
@@ -3632,6 +3633,17 @@ function Index() {
                         className="mt-1 text-sm"
                         value={vacancyForm.requirements}
                         onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="motivation" className="text-xs">Мотивация</Label>
+                      <Textarea
+                        id="motivation"
+                        placeholder="Что мы предлагаем: ДМС, гибкий график, обучение..."
+                        rows={3}
+                        className="mt-1 text-sm"
+                        value={vacancyForm.motivation}
+                        onChange={(e) => setVacancyForm({...vacancyForm, motivation: e.target.value})}
                       />
                     </div>
                   </div>
