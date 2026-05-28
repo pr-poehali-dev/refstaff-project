@@ -137,6 +137,12 @@
   }
 }
 
+@media (orientation: landscape) and (max-height: 500px) {
+  .tab-label {
+    display: none;
+  }
+}
+
 @layer utilities {
   .safe-area-inset-top {
     padding-top: env(safe-area-inset-top);

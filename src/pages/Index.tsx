@@ -5951,15 +5951,34 @@ function Index() {
         }}>
           <ScrollableTabs>
             <TabsList className="inline-flex w-max gap-1">
-              <TabsTrigger value="news" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">📢 Новости{newNewsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-purple-500 text-white border-0 leading-4">+{newNewsCount}</Badge>}</TabsTrigger>
-              <TabsTrigger value="vacancies" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">💼 Вакансии{newVacanciesCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-green-500 text-white border-0 leading-4">+{newVacanciesCount}</Badge>}</TabsTrigger>
-              <TabsTrigger value="my-recommendations" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">⭐ Рекомендации{newRecommendationsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-orange-500 text-white border-0 leading-4">+{newRecommendationsCount}</Badge>}</TabsTrigger>
-              <TabsTrigger value="achievements" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🏆 Рейтинг</TabsTrigger>
-              <TabsTrigger value="notifications" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2 relative">🔔 Уведомления{newNotificationsCount > 0 && <Badge className="ml-1.5 px-1.5 py-0 text-[10px] bg-red-500 text-white border-0 leading-4">+{newNotificationsCount}</Badge>}</TabsTrigger>
-              <TabsTrigger value="wallet-history" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">💳 История</TabsTrigger>
-              <TabsTrigger value="help" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">❓ Помощь</TabsTrigger>
-              <TabsTrigger value="games" className="text-xs sm:text-sm whitespace-nowrap px-3 py-2">🎮 Игры</TabsTrigger>
-
+              <TabsTrigger value="news" className="text-xs whitespace-nowrap px-2 py-1.5 relative">
+                <span>📢</span><span className="tab-label ml-1">Новости</span>
+                {newNewsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-purple-500 text-white border-0 leading-4">+{newNewsCount}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="vacancies" className="text-xs whitespace-nowrap px-2 py-1.5 relative">
+                <span>💼</span><span className="tab-label ml-1">Вакансии</span>
+                {newVacanciesCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-green-500 text-white border-0 leading-4">+{newVacanciesCount}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="my-recommendations" className="text-xs whitespace-nowrap px-2 py-1.5 relative">
+                <span>⭐</span><span className="tab-label ml-1">Рекомендации</span>
+                {newRecommendationsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-orange-500 text-white border-0 leading-4">+{newRecommendationsCount}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="achievements" className="text-xs whitespace-nowrap px-2 py-1.5">
+                <span>🏆</span><span className="tab-label ml-1">Рейтинг</span>
+              </TabsTrigger>
+              <TabsTrigger value="notifications" className="text-xs whitespace-nowrap px-2 py-1.5 relative">
+                <span>🔔</span><span className="tab-label ml-1">Уведомления</span>
+                {newNotificationsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-red-500 text-white border-0 leading-4">+{newNotificationsCount}</Badge>}
+              </TabsTrigger>
+              <TabsTrigger value="wallet-history" className="text-xs whitespace-nowrap px-2 py-1.5">
+                <span>💳</span><span className="tab-label ml-1">История</span>
+              </TabsTrigger>
+              <TabsTrigger value="help" className="text-xs whitespace-nowrap px-2 py-1.5">
+                <span>❓</span><span className="tab-label ml-1">Помощь</span>
+              </TabsTrigger>
+              <TabsTrigger value="games" className="text-xs whitespace-nowrap px-2 py-1.5">
+                <span>🎮</span><span className="tab-label ml-1">Игры</span>
+              </TabsTrigger>
             </TabsList>
           </ScrollableTabs>
 
