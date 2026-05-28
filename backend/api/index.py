@@ -81,7 +81,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if vacancy_id:
                 cur.execute(
                     f"""SELECT v.id, v.title, v.department, v.salary_display, v.status,
-                               v.reward_amount, v.payout_delay_days, v.requirements, v.description,
+                               v.reward_amount, v.payout_delay_days, v.requirements, v.description, v.motivation,
                                v.referral_token, v.created_at, v.company_id, 0 as recommendations_count,
                                c.name as company_name, c.description as company_description,
                                c.website as company_website, c.industry as company_industry,
@@ -102,7 +102,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if referral_token:
                 cur.execute(
                     f"""SELECT v.id, v.title, v.department, v.salary_display, v.status,
-                               v.reward_amount, v.payout_delay_days, v.requirements, v.description,
+                               v.reward_amount, v.payout_delay_days, v.requirements, v.description, v.motivation,
                                v.referral_token, v.created_at, v.company_id, 0 as recommendations_count,
                                c.name as company_name, c.description as company_description,
                                c.website as company_website, c.industry as company_industry,
@@ -129,7 +129,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             query = f"""
                 SELECT v.id, v.title, v.department, v.salary_display, v.status, 
-                       v.reward_amount, v.payout_delay_days, v.requirements, v.description,
+                       v.reward_amount, v.payout_delay_days, v.requirements, v.description, v.motivation,
                        v.referral_token, v.created_at,
                        COUNT(r.id) as recommendations_count,
                        u.first_name || ' ' || u.last_name as created_by_name
@@ -165,9 +165,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             query = """
                 INSERT INTO t_p65890965_refstaff_project.vacancies 
-                (company_id, title, department, salary_display, requirements, description, reward_amount, payout_delay_days, created_by, referral_token)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, substring(md5(random()::text), 1, 12))
-                RETURNING id, title, department, salary_display, status, reward_amount, payout_delay_days, referral_token, created_at
+                (company_id, title, department, salary_display, requirements, description, motivation, reward_amount, payout_delay_days, created_by, referral_token)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, substring(md5(random()::text), 1, 12))
+                RETURNING id, title, department, salary_display, status, reward_amount, payout_delay_days, referral_token, requirements, description, motivation, created_at
             """
             
             cur.execute(query, (
@@ -177,6 +177,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 body_data.get('salary_display'),
                 body_data.get('requirements', ''),
                 body_data.get('description', ''),
+                body_data.get('motivation', ''),
                 body_data.get('reward_amount', 30000),
                 body_data.get('payout_delay_days', 30),
                 body_data.get('created_by', 1)
@@ -459,6 +460,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if 'description' in body_data:
                 update_fields.append('description = %s')
                 params.append(body_data['description'])
+            if 'motivation' in body_data:
+                update_fields.append('motivation = %s')
+                params.append(body_data['motivation'])
             if 'reward_amount' in body_data:
                 update_fields.append('reward_amount = %s')
                 params.append(body_data['reward_amount'])

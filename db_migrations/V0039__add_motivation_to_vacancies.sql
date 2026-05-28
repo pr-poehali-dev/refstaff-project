@@ -1,0 +1,1 @@
+ALTER TABLE t_p65890965_refstaff_project.vacancies ADD COLUMN motivation text NULL;
