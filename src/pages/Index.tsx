@@ -6157,7 +6157,7 @@ function Index() {
                             setActiveVacancy(vacancy);
                           }}
                         >
-                          <span className="text-[10px]">👤➕</span>
+                          <Icon name="UserPlus" size={18} />
                         </Button>
                       </DialogTrigger>
                       <DialogContent onClick={(e) => e.stopPropagation()}>
@@ -6287,13 +6287,13 @@ function Index() {
                             navigator.clipboard.writeText(vacancy.referralLink || '');
                             alert('Ссылка скопирована');
                           }}>
-                            <span>📋</span>
+                            <Icon name="Copy" size={14} />
                           </Button>
                           <Button size="sm" variant="outline" className="px-2 sm:px-3" onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/vacancy/${vacancy.id}/qr`, { state: { referralLink: vacancy.referralLink, title: vacancy.title } });
                           }}>
-                            <span>🔲</span>
+                            <Icon name="QrCode" size={14} />
                           </Button>
                         </div>
                         <Button size="sm" className="sm:hidden w-full text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => {
@@ -6310,7 +6310,7 @@ function Index() {
                             alert('Текст скопирован');
                           }
                         }}>
-                          <span className="mr-2">📤</span>
+                          <Icon name="Share2" size={14} className="mr-2" />
                           Поделиться вакансией
                         </Button>
                       </div>
