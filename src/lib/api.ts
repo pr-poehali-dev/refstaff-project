@@ -9,6 +9,7 @@ export interface Vacancy {
   salary_display: string;
   requirements?: string;
   description?: string;
+  motivation?: string;
   status: 'active' | 'archived';
   reward_amount: number;
   payout_delay_days?: number;

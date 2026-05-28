@@ -280,34 +280,6 @@ function VacancyApply() {
               </CardContent>
             </Card>
 
-            {vacancy.requirements && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Icon name="CheckCircle" size={18} />
-                    Требования
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm whitespace-pre-wrap">{vacancy.requirements}</p>
-                </CardContent>
-              </Card>
-            )}
-
-            {vacancy.description && (
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Icon name="FileText" size={18} />
-                    Описание вакансии
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm whitespace-pre-wrap">{vacancy.description}</p>
-                </CardContent>
-              </Card>
-            )}
-
             {company && (
               <Card>
                 <CardHeader>
@@ -342,6 +314,48 @@ function VacancyApply() {
                       </a>
                     </div>
                   )}
+                </CardContent>
+              </Card>
+            )}
+
+            {vacancy.description && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Icon name="FileText" size={18} />
+                    Описание вакансии
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm whitespace-pre-wrap">{vacancy.description}</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {vacancy.requirements && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Icon name="CheckCircle" size={18} />
+                    Требования
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm whitespace-pre-wrap">{vacancy.requirements}</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {vacancy.motivation && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Icon name="Sparkles" size={18} />
+                    Мотивация
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm whitespace-pre-wrap">{vacancy.motivation}</p>
                 </CardContent>
               </Card>
             )}
