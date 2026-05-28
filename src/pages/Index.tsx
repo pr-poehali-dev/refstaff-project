@@ -7247,15 +7247,6 @@ function Index() {
                   onChange={(e) => setEditProfileForm({...editProfileForm, position: e.target.value})}
                 />
               </div>
-              <div>
-                <Label htmlFor="department" className="text-xs sm:text-sm">Отдел</Label>
-                <Input 
-                  id="department" 
-                  className="mt-1 text-sm"
-                  value={editProfileForm.department}
-                  onChange={(e) => setEditProfileForm({...editProfileForm, department: e.target.value})}
-                />
-              </div>
             </div>
             <div className="border-t pt-3 sm:pt-4">
               <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3">Контактная информация</h3>
