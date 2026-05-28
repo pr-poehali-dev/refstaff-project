@@ -2352,10 +2352,9 @@ function Index() {
             <nav aria-label="Компания">
               <h4 className="font-semibold mb-2 text-sm">Компания</h4>
               <ul className="space-y-1.5 text-xs text-muted-foreground">
-                <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">
-О нас</button></li>
                 <li><a href="https://t.me/i_hunt_ru" target="_blank" rel="noopener noreferrer" className="hover:text-primary">Блог</a></li>
                 <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
+                <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
               </ul>
             </nav>
             <nav aria-label="Правовая информация" className="col-span-2 sm:col-span-1">
