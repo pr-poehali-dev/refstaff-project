@@ -59,8 +59,7 @@ def handler(event: dict, context) -> dict:
         Bucket='files',
         Key=unique_name,
         Body=file_bytes,
-        ContentType=content_type,
-        ContentDisposition=f'attachment; filename="{file_name}"'
+        ContentType=content_type
     )
 
     resume_url = f"https://cdn.poehali.dev/projects/{os.environ['AWS_ACCESS_KEY_ID']}/bucket/{unique_name}"
