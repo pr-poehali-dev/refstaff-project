@@ -56,11 +56,19 @@ const CodeScreen = ({ code, onChange, onSubmit, onBack, isSubmitting }: { code: 
   </form>
 );
 
-const NameForm = ({ form, onChange, onSubmit, messenger, color, isSubmitting, onBack }: { form: { firstName: string; lastName: string }; onChange: (f: { firstName: string; lastName: string }) => void; onSubmit: (e: React.FormEvent) => void; messenger: string; color: string; isSubmitting: boolean; onBack: () => void }) => (
-  <form onSubmit={onSubmit} className="space-y-4">
-    <div className="grid grid-cols-2 gap-4">
-      <div className="space-y-2"><Label>Имя *</Label><Input value={form.firstName} onChange={e => onChange({ ...form, firstName: e.target.value })} placeholder="Иван" required /></div>
-      <div className="space-y-2"><Label>Фамилия *</Label><Input value={form.lastName} onChange={e => onChange({ ...form, lastName: e.target.value })} placeholder="Иванов" required /></div>
+const NameForm = ({ form, onChange, onSubmit, messenger, color, isSubmitting, onBack }: { form: { firstName: string; lastName: string; position: string; phone: string }; onChange: (f: { firstName: string; lastName: string; position: string; phone: string }) => void; onSubmit: (e: React.FormEvent) => void; messenger: string; color: string; isSubmitting: boolean; onBack: () => void }) => (
+  <form onSubmit={onSubmit} className="space-y-3">
+    <div className="grid grid-cols-2 gap-3">
+      <div className="space-y-1.5"><Label className="text-xs">Имя *</Label><Input value={form.firstName} onChange={e => onChange({ ...form, firstName: e.target.value })} placeholder="Иван" required /></div>
+      <div className="space-y-1.5"><Label className="text-xs">Фамилия *</Label><Input value={form.lastName} onChange={e => onChange({ ...form, lastName: e.target.value })} placeholder="Иванов" required /></div>
+    </div>
+    <div className="space-y-1.5">
+      <Label className="text-xs">Должность *</Label>
+      <Input value={form.position} onChange={e => onChange({ ...form, position: e.target.value })} placeholder="Frontend Developer" required />
+    </div>
+    <div className="space-y-1.5">
+      <Label className="text-xs">Телефон *</Label>
+      <Input type="tel" value={form.phone} onChange={e => onChange({ ...form, phone: e.target.value })} placeholder="+7 (999) 123-45-67" required />
     </div>
     <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
       {isSubmitting ? <><Icon name="Loader2" size={18} className="animate-spin mr-2" />Подготавливаем...</> : <><Icon name="Send" size={18} className={`mr-2 ${color}`} />Открыть {messenger} и получить код</>}
@@ -85,14 +93,14 @@ function EmployeeRegister() {
   const [emailForm, setEmailForm] = useState({ firstName: '', lastName: '', email: '', password: '', confirmPassword: '' });
 
   // Telegram
-  const [tgForm, setTgForm] = useState({ firstName: '', lastName: '' });
+  const [tgForm, setTgForm] = useState({ firstName: '', lastName: '', position: '', phone: '' });
   const [tgSession, setTgSession] = useState('');
   const [tgDeepLink, setTgDeepLink] = useState('');
   const [tgCode, setTgCode] = useState('');
   const tgPollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // MAX
-  const [maxForm, setMaxForm] = useState({ firstName: '', lastName: '' });
+  const [maxForm, setMaxForm] = useState({ firstName: '', lastName: '', position: '', phone: '' });
   const [maxSession, setMaxSession] = useState('');
   const [maxDeepLink, setMaxDeepLink] = useState('');
   const [maxCode, setMaxCode] = useState('');
@@ -160,10 +168,10 @@ function EmployeeRegister() {
   // ── Telegram: создать сессию ───────────────────────────────────────────────
   const handleTgStart = async (e: React.FormEvent) => {
     e.preventDefault(); setError('');
-    if (!tgForm.firstName || !tgForm.lastName) return setError('Введите имя и фамилию');
+    if (!tgForm.firstName || !tgForm.lastName || !tgForm.position || !tgForm.phone) return setError('Заполните все обязательные поля');
     setIsSubmitting(true);
     try {
-      const r = await fetch(TG_AUTH_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create_session', first_name: tgForm.firstName, last_name: tgForm.lastName, invite_token: inviteToken }) });
+      const r = await fetch(TG_AUTH_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create_session', first_name: tgForm.firstName, last_name: tgForm.lastName, position: tgForm.position, phone: tgForm.phone, invite_token: inviteToken }) });
       const d = await r.json();
       if (r.ok) { setTgSession(d.session_token); setTgDeepLink(d.deep_link); setStep('tg-wait'); window.open(d.deep_link, '_blank'); }
       else setError(d.error || 'Ошибка создания сессии');
@@ -188,10 +196,10 @@ function EmployeeRegister() {
   // ── MAX: создать сессию ────────────────────────────────────────────────────
   const handleMaxStart = async (e: React.FormEvent) => {
     e.preventDefault(); setError('');
-    if (!maxForm.firstName || !maxForm.lastName) return setError('Введите имя и фамилию');
+    if (!maxForm.firstName || !maxForm.lastName || !maxForm.position || !maxForm.phone) return setError('Заполните все обязательные поля');
     setIsSubmitting(true);
     try {
-      const r = await fetch(MAX_AUTH_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create_session', first_name: maxForm.firstName, last_name: maxForm.lastName, invite_token: inviteToken }) });
+      const r = await fetch(MAX_AUTH_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'create_session', first_name: maxForm.firstName, last_name: maxForm.lastName, position: maxForm.position, phone: maxForm.phone, invite_token: inviteToken }) });
       const d = await r.json();
       if (r.ok) { setMaxSession(d.session_token); setMaxDeepLink(d.deep_link); setStep('max-wait'); window.open(d.deep_link, '_blank'); }
       else setError(d.error || 'Ошибка создания сессии');
