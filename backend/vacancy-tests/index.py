@@ -10,8 +10,7 @@ from psycopg2.extras import RealDictCursor
 import urllib.request
 
 SCHEMA = 't_p65890965_refstaff_project'
-POLZA_BASE_URL = 'https://api.polza.ai/api/v1'
-DEFAULT_MODEL = 'openai/gpt-4o-mini'
+CHATGPT_URL = 'https://functions.poehali.dev/13c7d269-1c74-4047-8fe9-92d9dc5c8cb4'
 
 CORS_HEADERS = {
     'Content-Type': 'application/json',
@@ -61,32 +60,35 @@ def gpt_generate_questions(vacancy_title, description, requirements, difficulty,
 
 correct_index — индекс правильного ответа (0-3). Вопросы должны быть релевантны вакансии."""
 
-    api_key = os.environ.get('POLZA_AI_API_KEY', '')
-    if not api_key:
-        raise ValueError('POLZA_AI_API_KEY not configured')
-
     payload = {
-        'model': DEFAULT_MODEL,
         'messages': [{'role': 'user', 'content': prompt}],
+        'model': 'openai/gpt-4o-mini',
         'temperature': 0.7,
         'max_tokens': 4000,
     }
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(
-        f'{POLZA_BASE_URL}/chat/completions',
+        f'{CHATGPT_URL}?action=generate',
         data=data,
-        headers={'Content-Type': 'application/json', 'Authorization': f'Bearer {api_key}'},
+        headers={'Content-Type': 'application/json'},
         method='POST'
     )
     with urllib.request.urlopen(req, timeout=60) as r:
         result = json.loads(r.read())
 
-    content = result['choices'][0]['message']['content'].strip()
+    content = result.get('content', '').strip()
+    if not content:
+        raise ValueError('Empty response from GPT')
     # Убираем возможные markdown-блоки
-    if content.startswith('```'):
-        content = content.split('```')[1]
-        if content.startswith('json'):
-            content = content[4:]
+    if '```' in content:
+        parts = content.split('```')
+        for part in parts:
+            if part.startswith('json'):
+                content = part[4:].strip()
+                break
+            elif '{' in part:
+                content = part.strip()
+                break
     parsed = json.loads(content)
     return parsed.get('questions', [])
 
