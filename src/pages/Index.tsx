@@ -982,6 +982,7 @@ function Index() {
         salary_display: vacancyForm.salary,
         description: vacancyForm.description,
         requirements: vacancyForm.requirements,
+        motivation: vacancyForm.motivation,
         reward_amount: parseInt(vacancyForm.reward),
         payout_delay_days: parseInt(vacancyForm.payoutDelay),
         created_by: currentEmployeeId,
@@ -989,11 +990,11 @@ function Index() {
         is_remote: vacancyForm.isRemote
       });
       await loadData();
-      setVacancyForm({ title: '', department: '', salary: '', description: '', requirements: '', reward: '30000', payoutDelay: '30', city: '', isRemote: false });
+      setVacancyForm({ title: '', department: '', salary: '', description: '', requirements: '', motivation: '', reward: '30000', payoutDelay: '30', city: '', isRemote: false });
       alert('Вакансия успешно создана!');
     } catch (error) {
       console.error('Ошибка создания вакансии:', error);
-      alert('Не удалось создать вакансию');
+      alert('Ошибка при создании вакансии. Попробуйте обновить страницу и войти заново.');
     }
   };
 
