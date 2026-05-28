@@ -184,6 +184,7 @@ function Index() {
   const [newNotificationsCount, setNewNotificationsCount] = useState<number>(() => 0);
   const [employeeTabsInitialized, setEmployeeTabsInitialized] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
+  const [payoutMethodsCollapsed, setPayoutMethodsCollapsed] = useState(false);
   const [walletData, setWalletData] = useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
@@ -4428,42 +4429,52 @@ function Index() {
               </p>
             </div>
             <Card className="mb-4 sm:mb-6">
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm sm:text-base flex items-center gap-2">
-                  <span>⚙️</span> Доступные методы выплат
+              <CardHeader
+                className="pb-3 cursor-pointer select-none"
+                onClick={() => setPayoutMethodsCollapsed(v => !v)}
+              >
+                <CardTitle className="text-sm sm:text-base flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <span>⚙️</span> Доступные методы выплат
+                  </div>
+                  <Icon name={payoutMethodsCollapsed ? 'ChevronDown' : 'ChevronUp'} size={16} className="text-muted-foreground" />
                 </CardTitle>
-                <CardDescription className="text-xs">Выберите способы, которые сотрудники смогут использовать для получения вознаграждений</CardDescription>
+                {!payoutMethodsCollapsed && (
+                  <CardDescription className="text-xs">Выберите способы, которые сотрудники смогут использовать для получения вознаграждений</CardDescription>
+                )}
               </CardHeader>
-              <CardContent className="space-y-2">
-                {[
-                  { key: 'cash', label: 'Наличными', emoji: '💵' },
-                  { key: 'card', label: 'На карту', emoji: '💳' },
-                  { key: 'sbp', label: 'По СБП', emoji: '📱' },
-                  { key: 'bank', label: 'По реквизитам на счёт', emoji: '🏦' },
-                ].map(({ key, label, emoji }) => {
-                  const methods: string[] = company?.payout_methods ?? ['card', 'sbp', 'cash', 'bank'];
-                  const enabled = methods.includes(key);
-                  return (
-                    <div key={key} className="flex items-center justify-between py-1">
-                      <div className="flex items-center gap-2 text-sm">
-                        <span>{emoji}</span>
-                        <span>{label}</span>
+              {!payoutMethodsCollapsed && (
+                <CardContent className="space-y-2">
+                  {[
+                    { key: 'cash', label: 'Наличными', emoji: '💵' },
+                    { key: 'card', label: 'На карту', emoji: '💳' },
+                    { key: 'sbp', label: 'По СБП', emoji: '📱' },
+                    { key: 'bank', label: 'По реквизитам на счёт', emoji: '🏦' },
+                  ].map(({ key, label, emoji }) => {
+                    const methods: string[] = company?.payout_methods ?? ['card', 'sbp', 'cash', 'bank'];
+                    const enabled = methods.includes(key);
+                    return (
+                      <div key={key} className="flex items-center justify-between py-1" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center gap-2 text-sm">
+                          <span>{emoji}</span>
+                          <span>{label}</span>
+                        </div>
+                        <Checkbox
+                          checked={enabled}
+                          onCheckedChange={async (checked) => {
+                            const current: string[] = company?.payout_methods ?? ['card', 'sbp', 'cash', 'bank'];
+                            const updated = checked
+                              ? [...current, key]
+                              : current.filter(m => m !== key);
+                            await api.updateCompany(currentCompanyId, { payout_methods: updated });
+                            setCompany(prev => prev ? { ...prev, payout_methods: updated } : null);
+                          }}
+                        />
                       </div>
-                      <Checkbox
-                        checked={enabled}
-                        onCheckedChange={async (checked) => {
-                          const current: string[] = company?.payout_methods ?? ['card', 'sbp', 'cash', 'bank'];
-                          const updated = checked
-                            ? [...current, key]
-                            : current.filter(m => m !== key);
-                          await api.updateCompany(currentCompanyId, { payout_methods: updated });
-                          setCompany(prev => prev ? { ...prev, payout_methods: updated } : null);
-                        }}
-                      />
-                    </div>
-                  );
-                })}
-              </CardContent>
+                    );
+                  })}
+                </CardContent>
+              )}
             </Card>
 
             <PayoutRequests 
