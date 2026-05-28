@@ -6151,13 +6151,13 @@ function Index() {
                         <Button 
                           size="icon" 
                           variant="ghost"
-                          className="absolute top-2 right-2 h-8 w-8"
+                          className="absolute top-2 right-2 h-8 w-8 text-base"
                           onClick={(e) => {
                             e.stopPropagation();
                             setActiveVacancy(vacancy);
                           }}
                         >
-                          <Icon name="UserPlus" size={18} />
+                          👤➕
                         </Button>
                       </DialogTrigger>
                       <DialogContent onClick={(e) => e.stopPropagation()}>
@@ -6287,13 +6287,13 @@ function Index() {
                             navigator.clipboard.writeText(vacancy.referralLink || '');
                             alert('Ссылка скопирована');
                           }}>
-                            <Icon name="Copy" size={14} />
+                            <span>📋</span>
                           </Button>
                           <Button size="sm" variant="outline" className="px-2 sm:px-3" onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/vacancy/${vacancy.id}/qr`, { state: { referralLink: vacancy.referralLink, title: vacancy.title } });
                           }}>
-                            <Icon name="QrCode" size={14} />
+                            <span>🔲</span>
                           </Button>
                         </div>
                         <Button size="sm" className="sm:hidden w-full text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => {
@@ -6310,7 +6310,7 @@ function Index() {
                             alert('Текст скопирован');
                           }
                         }}>
-                          <Icon name="Share2" size={14} className="mr-2" />
+                          <span className="mr-2">📤</span>
                           Поделиться вакансией
                         </Button>
                       </div>
