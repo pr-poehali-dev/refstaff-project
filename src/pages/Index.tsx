@@ -7362,9 +7362,21 @@ function Index() {
             <div>
               <Label className="text-xs">Фото профиля</Label>
               <div className="flex items-center gap-3 mt-1">
-                {profileForm.avatar && (
+                {profileForm.avatar ? (
+                  <div className="relative shrink-0">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={profileForm.avatar} />
+                      <AvatarFallback>{editProfileForm.firstName?.[0]}{editProfileForm.lastName?.[0]}</AvatarFallback>
+                    </Avatar>
+                    <button
+                      type="button"
+                      className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-red-700"
+                      onClick={() => setProfileForm(f => ({...f, avatar: ''}))}
+                      title="Удалить фото"
+                    >✕</button>
+                  </div>
+                ) : (
                   <Avatar className="h-12 w-12 shrink-0">
-                    <AvatarImage src={profileForm.avatar} />
                     <AvatarFallback>{editProfileForm.firstName?.[0]}{editProfileForm.lastName?.[0]}</AvatarFallback>
                   </Avatar>
                 )}
@@ -7398,9 +7410,7 @@ function Index() {
                     }}
                     className="cursor-pointer text-xs h-9"
                   />
-                  <p className="text-[10px] text-muted-foreground mt-1">
-                    {(profileForm as {avatarUploading?: boolean}).avatarUploading ? '⏳ Загрузка...' : 'Выберите изображение'}
-                  </p>
+                  <p className="text-[10px] text-muted-foreground mt-1">Выберите изображение</p>
                 </div>
               </div>
             </div>
