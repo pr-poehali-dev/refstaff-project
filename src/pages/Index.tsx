@@ -7209,82 +7209,82 @@ function Index() {
     </div>
 
       <Dialog open={showEditProfileDialog} onOpenChange={setShowEditProfileDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6">
-          <DialogHeader>
-            <DialogTitle className="text-base sm:text-lg">Изменить профиль</DialogTitle>
-            <DialogDescription className="text-xs sm:text-sm">
+        <DialogContent className="w-[calc(100vw-16px)] max-w-lg max-h-[92dvh] overflow-y-auto p-4">
+          <DialogHeader className="pb-1">
+            <DialogTitle className="text-base">Изменить профиль</DialogTitle>
+            <DialogDescription className="text-xs">
               Обновите информацию о вашем профиле и контакты
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+          <div className="space-y-3 pt-1">
+            <div className="grid grid-cols-2 gap-2">
               <div>
-                <Label htmlFor="firstName" className="text-xs sm:text-sm">Имя</Label>
+                <Label htmlFor="firstName" className="text-xs">Имя</Label>
                 <Input 
                   id="firstName" 
-                  className="mt-1 text-sm"
+                  className="mt-1 h-9 text-sm"
                   value={editProfileForm.firstName}
                   onChange={(e) => setEditProfileForm({...editProfileForm, firstName: e.target.value})}
                 />
               </div>
               <div>
-                <Label htmlFor="lastName" className="text-xs sm:text-sm">Фамилия</Label>
+                <Label htmlFor="lastName" className="text-xs">Фамилия</Label>
                 <Input 
                   id="lastName" 
-                  className="mt-1 text-sm"
+                  className="mt-1 h-9 text-sm"
                   value={editProfileForm.lastName}
                   onChange={(e) => setEditProfileForm({...editProfileForm, lastName: e.target.value})}
                 />
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <div>
-                <Label htmlFor="position" className="text-xs sm:text-sm">Должность</Label>
-                <Input 
-                  id="position" 
-                  className="mt-1 text-sm"
-                  value={editProfileForm.position}
-                  onChange={(e) => setEditProfileForm({...editProfileForm, position: e.target.value})}
-                />
-              </div>
+            <div>
+              <Label htmlFor="position" className="text-xs">Должность</Label>
+              <Input 
+                id="position" 
+                className="mt-1 h-9 text-sm"
+                value={editProfileForm.position}
+                onChange={(e) => setEditProfileForm({...editProfileForm, position: e.target.value})}
+              />
             </div>
-            <div className="border-t pt-3 sm:pt-4">
-              <h3 className="text-xs sm:text-sm font-medium mb-2 sm:mb-3">Контактная информация</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            <div className="border-t pt-3">
+              <h3 className="text-xs font-medium mb-2">Контактная информация</h3>
+              <div className="space-y-2">
                 <div>
-                  <Label className="text-xs sm:text-sm">Телефон</Label>
+                  <Label className="text-xs">Телефон</Label>
                   <Input
-                    className="mt-1 text-sm"
+                    className="mt-1 h-9 text-sm"
                     placeholder="+7 (900) 123-45-67"
                     value={profileForm.phone}
                     onChange={(e) => setProfileForm({...profileForm, phone: e.target.value})}
                   />
                 </div>
-                <div>
-                  <Label className="text-xs sm:text-sm">Telegram</Label>
-                  <Input
-                    className="mt-1 text-sm"
-                    placeholder="@username"
-                    value={profileForm.telegram}
-                    onChange={(e) => setProfileForm({...profileForm, telegram: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs sm:text-sm">ВКонтакте</Label>
-                  <Input
-                    className="mt-1 text-sm"
-                    placeholder="vk.com/username"
-                    value={profileForm.vk}
-                    onChange={(e) => setProfileForm({...profileForm, vk: e.target.value})}
-                  />
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <Label className="text-xs">Telegram</Label>
+                    <Input
+                      className="mt-1 h-9 text-sm"
+                      placeholder="@username"
+                      value={profileForm.telegram}
+                      onChange={(e) => setProfileForm({...profileForm, telegram: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">ВКонтакте</Label>
+                    <Input
+                      className="mt-1 h-9 text-sm"
+                      placeholder="vk.com/id"
+                      value={profileForm.vk}
+                      onChange={(e) => setProfileForm({...profileForm, vk: e.target.value})}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
             <div>
-              <Label className="text-xs sm:text-sm">Фото профиля</Label>
+              <Label className="text-xs">Фото профиля</Label>
               <div className="flex items-center gap-3 mt-1">
                 {profileForm.avatar && (
-                  <Avatar className="h-12 w-12 sm:h-16 sm:w-16 shrink-0">
+                  <Avatar className="h-12 w-12 shrink-0">
                     <AvatarImage src={profileForm.avatar} />
                     <AvatarFallback>{editProfileForm.firstName?.[0]}{editProfileForm.lastName?.[0]}</AvatarFallback>
                   </Avatar>
@@ -7321,17 +7321,17 @@ function Index() {
                         reader.readAsDataURL(file);
                       }
                     }}
-                    className="cursor-pointer text-sm"
+                    className="cursor-pointer text-xs h-9"
                   />
-                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-                    {(profileForm as {avatarUploading?: boolean}).avatarUploading ? '⏳ Загрузка фото...' : 'Выберите изображение'}
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {(profileForm as {avatarUploading?: boolean}).avatarUploading ? '⏳ Загрузка...' : 'Выберите изображение'}
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-col-reverse sm:flex-row gap-2 pt-2">
+            <div className="flex gap-2 pt-1">
               <Button 
-                className="flex-1 text-sm"
+                className="flex-1 h-10 text-sm"
                 onClick={async () => {
                   try {
                     await api.updateEmployee(currentEmployeeId, {
@@ -7356,7 +7356,7 @@ function Index() {
               </Button>
               <Button 
                 variant="outline" 
-                className="flex-1 text-sm"
+                className="flex-1 h-10 text-sm"
                 onClick={() => setShowEditProfileDialog(false)}
               >
                 Отмена
