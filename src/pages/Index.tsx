@@ -2357,7 +2357,7 @@ function Index() {
               <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Компания</h4>
               <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
                 <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
-                <li><a href="#contact" className="hover:text-primary">Блог</a></li>
+                <li><a href="https://t.me/i_hunt_ru" target="_blank" rel="noopener noreferrer" className="hover:text-primary">Блог</a></li>
                 <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
               </ul>
             </nav>
