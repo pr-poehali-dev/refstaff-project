@@ -4863,7 +4863,7 @@ function Index() {
       </Dialog>
 
       <Dialog open={showCompanySettingsDialog} onOpenChange={setShowCompanySettingsDialog}>
-        <DialogContent className="w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-2xl rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
+        <DialogContent className="w-[calc(100vw-16px)] max-w-2xl max-h-[92dvh] flex flex-col p-0 overflow-hidden">
           <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
             <DialogTitle className="text-base">Профиль компании</DialogTitle>
             <DialogDescription className="text-xs">Управляйте информацией о вашей компании</DialogDescription>
