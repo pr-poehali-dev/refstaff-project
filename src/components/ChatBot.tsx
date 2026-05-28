@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Icon from '@/components/ui/icon';
 
+const GPT_URL = 'https://functions.poehali.dev/13c7d269-1c74-4047-8fe9-92d9dc5c8cb4';
+
 interface Message {
   id: string;
   text: string;
@@ -15,167 +17,100 @@ interface ChatBotProps {
   userRole?: 'employer' | 'employee' | 'guest';
 }
 
-const EMPLOYEE_FAQ = [
-  {
-    keywords: ['как работает', 'как использовать', 'что такое', 'для чего'],
-    answer: 'В вашем кабинете вы можете просматривать вакансии компании и рекомендовать подходящих кандидатов за вознаграждение. За каждую успешную рекомендацию вы получите деньги.'
-  },
-  {
-    keywords: ['рекомендовать', 'предложить', 'кандидат', 'отправить резюме'],
-    answer: 'Чтобы рекомендовать кандидата: откройте вакансию, нажмите "Рекомендовать кандидата", заполните информацию о нём (ФИО, контакты, резюме) и отправьте. HR-отдел рассмотрит рекомендацию.'
-  },
-  {
-    keywords: ['вознаграждение', 'выплата', 'деньги', 'получить', 'заработать', 'сколько'],
-    answer: 'Размер вознаграждения указан на каждой вакансии. Вы получите выплату после того, как ваш кандидат успешно пройдёт собеседование и выйдет на работу. Срок выплаты также указан в вакансии.'
-  },
-  {
-    keywords: ['мои рекомендации', 'статус', 'проверить', 'отследить'],
-    answer: 'Перейдите во вкладку "Мои рекомендации" в личном кабинете. Там вы увидите все ваши рекомендации и их статусы: "На рассмотрении", "Принят" или "Отклонён".'
-  },
-  {
-    keywords: ['вакансии', 'посмотреть', 'найти', 'доступные'],
-    answer: 'Все доступные вакансии отображаются на главной странице вашего кабинета. Используйте вкладки "Активные" и "Все" для фильтрации. Кликните на вакансию, чтобы увидеть подробное описание.'
-  },
-  {
-    keywords: ['поделиться', 'отправить', 'другу', 'знакомому'],
-    answer: 'Вы можете поделиться вакансией через Telegram, ВКонтакте или WhatsApp. Нажмите соответствующую кнопку под вакансией — так ваши знакомые смогут увидеть предложение.'
-  },
-  {
-    keywords: ['профиль', 'данные', 'изменить', 'редактировать'],
-    answer: 'Чтобы изменить данные профиля, нажмите на ваш аватар в правом верхнем углу и выберите "Мой профиль". Там можно обновить контактную информацию.'
-  },
-  {
-    keywords: ['кошелёк', 'баланс', 'вывод', 'запрос'],
-    answer: 'Во вкладке "Кошелёк" вы увидите ваш баланс и историю выплат. Когда баланс будет доступен для вывода, вы сможете создать запрос на выплату, указав реквизиты.'
-  },
-  {
-    keywords: ['новости', 'объявления', 'что нового'],
-    answer: 'Во вкладке "Новости" публикуются объявления и новости компании. Здесь вы узнаете о новых вакансиях, изменениях в программе рекомендаций и других важных событиях.'
-  },
-  {
-    keywords: ['помощь', 'поддержка', 'вопрос', 'связаться'],
-    answer: 'Если у вас остались вопросы по работе кабинета, обратитесь к вашему HR-менеджеру или в службу поддержки компании. Контакты обычно указаны в разделе "Контакты".'
-  }
-];
+const SYSTEM_PROMPT_EMPLOYER = `Ты — умный помощник платформы iHUNT (i-hunt.ru). Отвечай кратко, по делу, на русском языке.
 
-const EMPLOYER_FAQ = [
-  {
-    keywords: ['как работает', 'как использовать', 'что такое', 'для чего', 'платформа'],
-    answer: 'Платформа помогает находить кандидатов через рекомендации ваших сотрудников. Вы создаёте вакансию с вознаграждением, сотрудники рекомендуют знакомых, а вы получаете проверенных кандидатов.'
-  },
-  {
-    keywords: ['создать вакансию', 'добавить вакансию', 'разместить', 'опубликовать'],
-    answer: 'Нажмите "+ Создать вакансию" на главной странице. Укажите должность, зарплату, требования, город и размер вознаграждения. После публикации вакансия станет доступна всем сотрудникам компании.'
-  },
-  {
-    keywords: ['вознаграждение', 'выплата', 'деньги', 'оплата', 'сколько платить'],
-    answer: 'Вы сами устанавливаете размер вознаграждения при создании вакансии. Выплата происходит после успешного найма кандидата через указанный срок (обычно 30-90 дней после выхода на работу).'
-  },
-  {
-    keywords: ['рекомендации', 'отклики', 'кандидаты', 'смотреть', 'где посмотреть'],
-    answer: 'Все рекомендации отображаются во вкладке "Рекомендации". Там вы видите информацию о кандидате, кто рекомендовал, резюме и контакты. Вы можете принять или отклонить рекомендацию.'
-  },
-  {
-    keywords: ['сотрудники', 'команда', 'пригласить', 'добавить'],
-    answer: 'Во вкладке "Команда" нажмите "Пригласить сотрудника". Укажите email и имя — сотрудник получит приглашение. После регистрации он сможет рекомендовать кандидатов на ваши вакансии.'
-  },
-  {
-    keywords: ['редактировать', 'изменить', 'вакансию', 'обновить'],
-    answer: 'Откройте вакансию и нажмите "Редактировать". Вы можете изменить описание, зарплату, требования и размер вознаграждения. Изменения сохранятся автоматически.'
-  },
-  {
-    keywords: ['архив', 'закрыть', 'удалить', 'скрыть'],
-    answer: 'Нажмите "Архив" на карточке вакансии, чтобы скрыть её от сотрудников. Архивные вакансии можно восстановить в любой момент. Удаление вакансии — необратимое действие.'
-  },
-  {
-    keywords: ['поделиться', 'отправить', 'распространить', 'соцсети'],
-    answer: 'Под каждой вакансией есть кнопки для публикации в Telegram, ВКонтакте и WhatsApp. Так вы можете распространять вакансии не только среди сотрудников, но и в соцсетях.'
-  },
-  {
-    keywords: ['новости', 'объявление', 'опубликовать', 'сообщение'],
-    answer: 'Во вкладке "Новости" нажмите "+ Создать новость". Выберите тип (новость, достижение, объявление), напишите текст и опубликуйте. Все сотрудники увидят это в своих кабинетах.'
-  },
-  {
-    keywords: ['настройки', 'компания', 'профиль', 'изменить данные'],
-    answer: 'В настройках компании (значок шестерёнки в шапке) вы можете обновить название, описание, логотип и контактную информацию компании.'
-  },
-  {
-    keywords: ['выплаты', 'запросы', 'кошелёк', 'баланс'],
-    answer: 'Во вкладке "Выплаты" отображаются все запросы на выплату от сотрудников. Вы можете одобрить или отклонить запрос после проверки реквизитов.'
-  },
-  {
-    keywords: ['помощь', 'поддержка', 'вопрос', 'связаться'],
-    answer: 'Если возникли сложности, свяжитесь с технической поддержкой через форму обратной связи или напишите на почту support@company.com'
-  }
-];
+iHUNT — реферальная HR-платформа для работодателей. Сотрудники компании рекомендуют знакомых на вакансии и получают денежное вознаграждение за успешный найм.
 
-const EMPLOYEE_INITIAL_MESSAGE: Message = {
-  id: '0',
-  text: 'Привет! 👋 Я помогу разобраться с функционалом личного кабинета сотрудника. Спрашивайте о рекомендациях кандидатов, вознаграждениях, вакансиях и работе с кабинетом.',
-  sender: 'bot',
-  timestamp: new Date()
-};
+Возможности кабинета РАБОТОДАТЕЛЯ:
+- Вакансии: создание, редактирование, архивирование, удаление. Для каждой вакансии задаётся зарплата, требования, описание, вознаграждение и срок выплаты (0–90 дней после выхода кандидата).
+- Тесты: для каждой вакансии можно создать тест с помощью ИИ (кнопка "Тест" в карточке вакансии). Выбирается сложность (Лёгкий/Средний/Сложный) и количество вопросов (10/20/30). После генерации тест можно редактировать. Ссылку на тест отправляют кандидату.
+- Рекомендации: просмотр всех рекомендаций от сотрудников, смена статуса (На рассмотрении → Принят → Вышел на работу / Отклонён). При принятии кандидата сотруднику начисляется вознаграждение в "ожидание выплаты".
+- Команда: приглашение сотрудников по реферальной ссылке или QR-коду. Управление ролями (обычный/администратор), увольнение.
+- Выплаты: просмотр и обработка запросов на выплату от сотрудников (одобрить / отклонить с комментарием / выплатить).
+- Новости: публикация объявлений, достижений и новостей для всех сотрудников.
+- Настройки компании: логотип, описание, сайт, соцсети, ИНН.
+- Статистика: дашборд с ключевыми метриками компании.
+- Уведомления: на email приходят уведомления о новых сотрудниках, рекомендациях и запросах на выплату.
 
-const EMPLOYER_INITIAL_MESSAGE: Message = {
-  id: '0',
-  text: 'Здравствуйте! 👋 Я помогу разобраться с работой платформы для работодателей. Задавайте вопросы о создании вакансий, управлении рекомендациями, работе с командой и всех возможностях сервиса.',
-  sender: 'bot',
-  timestamp: new Date()
-};
+Отвечай только на вопросы о платформе iHUNT. Если вопрос не по теме — вежливо предложи обратиться в поддержку: https://poehali.dev/help`;
+
+const SYSTEM_PROMPT_EMPLOYEE = `Ты — умный помощник платформы iHUNT (i-hunt.ru). Отвечай кратко, по делу, на русском языке.
+
+iHUNT — реферальная HR-платформа. Ты помогаешь СОТРУДНИКАМ компании.
+
+Возможности кабинета СОТРУДНИКА:
+- Вакансии: просмотр активных вакансий компании. По каждой — зарплата, вознаграждение, описание и требования. Можно поделиться вакансией через реферальную ссылку.
+- Рекомендации: кнопка "Рекомендовать кандидата" открывает форму — ФИО, телефон, email, резюме, комментарий. После отправки рекомендация уходит HR-отделу. Статусы: На рассмотрении → Принят → Вышел на работу / Отклонён.
+- Тесты: работодатель может создать тест для вакансии. Ссылку на тест можно отправить кандидату — он проходит тест, указывает ФИО и телефон, результат видит работодатель.
+- Кошелёк: баланс (доступно к выводу) и ожидание (деньги заморожены до истечения срока). Можно создать запрос на выплату — выбрать сумму, способ (карта / СБП / расчётный счёт) и реквизиты.
+- Рейтинг: уровень, очки опыта (+100 XP за каждого принятого кандидата), место среди коллег.
+- Новости: объявления и новости от компании.
+- Профиль: фото, телефон, Telegram, ВКонтакте.
+- Уведомления в Telegram/MAX: бот присылает уведомления о статусах рекомендаций и выплатах.
+
+Отвечай только на вопросы о платформе iHUNT. Если вопрос не по теме — вежливо предложи обратиться в поддержку: https://poehali.dev/help`;
+
+const INITIAL_TEXT_EMPLOYER = 'Здравствуйте! 👋 Я помощник платформы iHUNT. Задайте вопрос о вакансиях, тестах, рекомендациях, выплатах или любой другой функции кабинета работодателя.';
+const INITIAL_TEXT_EMPLOYEE = 'Привет! 👋 Я помощник платформы iHUNT. Спрашивайте о вакансиях, рекомендациях, кошельке, тестах и любых функциях личного кабинета.';
 
 export default function ChatBot({ userRole = 'guest' }: ChatBotProps) {
-  const FAQ = userRole === 'employer' ? EMPLOYER_FAQ : EMPLOYEE_FAQ;
-  const INITIAL_MESSAGE = userRole === 'employer' ? EMPLOYER_INITIAL_MESSAGE : EMPLOYEE_INITIAL_MESSAGE;
+  const systemPrompt = userRole === 'employer' ? SYSTEM_PROMPT_EMPLOYER : SYSTEM_PROMPT_EMPLOYEE;
+  const initialText = userRole === 'employer' ? INITIAL_TEXT_EMPLOYER : INITIAL_TEXT_EMPLOYEE;
+
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
+  const [messages, setMessages] = useState<Message[]>([
+    { id: '0', text: initialText, sender: 'bot', timestamp: new Date() }
+  ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isTyping]);
 
-  const findAnswer = (question: string): string => {
-    const lowerQuestion = question.toLowerCase();
-    
-    for (const faq of FAQ) {
-      if (faq.keywords.some(keyword => lowerQuestion.includes(keyword))) {
-        return faq.answer;
-      }
-    }
-    
-    return 'Спасибо за вопрос! К сожалению, я не нашёл точного ответа. Попробуйте переформулировать вопрос или свяжитесь с нашей поддержкой для получения более детальной помощи.';
-  };
+  const handleSend = async () => {
+    const text = input.trim();
+    if (!text || isTyping) return;
 
-  const handleSend = () => {
-    if (!input.trim()) return;
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      text: input,
-      sender: 'user',
-      timestamp: new Date()
-    };
-
-    setMessages(prev => [...prev, userMessage]);
+    const userMsg: Message = { id: Date.now().toString(), text, sender: 'user', timestamp: new Date() };
+    setMessages(prev => [...prev, userMsg]);
     setInput('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      const botResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        text: findAnswer(input),
+    // Формируем историю для GPT (последние 10 сообщений)
+    const history = [...messages, userMsg]
+      .filter(m => m.id !== '0')
+      .slice(-10)
+      .map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', content: m.text }));
+
+    try {
+      const res = await fetch(`${GPT_URL}?action=generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'openai/gpt-4o-mini',
+          messages: [
+            { role: 'system', content: systemPrompt },
+            ...history,
+          ],
+          temperature: 0.6,
+          max_tokens: 500,
+        }),
+      });
+      const data = await res.json();
+      const reply = data.content || 'Извините, не удалось получить ответ. Попробуйте ещё раз.';
+      setMessages(prev => [...prev, { id: Date.now().toString(), text: reply, sender: 'bot', timestamp: new Date() }]);
+    } catch {
+      setMessages(prev => [...prev, {
+        id: Date.now().toString(),
+        text: 'Ошибка соединения. Проверьте интернет и попробуйте снова.',
         sender: 'bot',
         timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botResponse]);
+      }]);
+    } finally {
       setIsTyping(false);
-    }, 1000);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -205,8 +140,8 @@ export default function ChatBot({ userRole = 'guest' }: ChatBotProps) {
                 <Icon name="Bot" size={20} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm">Помощник</h3>
-                <p className="text-xs opacity-90">Онлайн</p>
+                <h3 className="font-semibold text-sm">Помощник iHUNT</h3>
+                <p className="text-xs opacity-90">на базе ChatGPT</p>
               </div>
             </div>
             <Button
@@ -221,17 +156,10 @@ export default function ChatBot({ userRole = 'guest' }: ChatBotProps) {
 
           <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-muted/20">
             {messages.map((message) => (
-              <div
-                key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[80%] rounded-lg p-3 ${
-                    message.sender === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-background border'
-                  }`}
-                >
+              <div key={message.id} className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] rounded-lg p-3 ${
+                  message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-background border'
+                }`}>
                   <p className="text-sm whitespace-pre-wrap">{message.text}</p>
                   <p className="text-[10px] mt-1 opacity-70">
                     {message.timestamp.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })}
@@ -239,7 +167,7 @@ export default function ChatBot({ userRole = 'guest' }: ChatBotProps) {
                 </div>
               </div>
             ))}
-            
+
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-background border rounded-lg p-3">
@@ -251,7 +179,7 @@ export default function ChatBot({ userRole = 'guest' }: ChatBotProps) {
                 </div>
               </div>
             )}
-            
+
             <div ref={messagesEndRef} />
           </div>
 
@@ -263,8 +191,9 @@ export default function ChatBot({ userRole = 'guest' }: ChatBotProps) {
                 onKeyPress={handleKeyPress}
                 placeholder="Напишите ваш вопрос..."
                 className="flex-1"
+                disabled={isTyping}
               />
-              <Button onClick={handleSend} size="sm" disabled={!input.trim()}>
+              <Button onClick={handleSend} size="sm" disabled={!input.trim() || isTyping}>
                 <Icon name="Send" size={18} />
               </Button>
             </div>
