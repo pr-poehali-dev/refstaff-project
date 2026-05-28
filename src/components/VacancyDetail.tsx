@@ -45,7 +45,7 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRest
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-[calc(100vw-16px)] max-w-3xl max-h-[92dvh] overflow-y-auto p-4">
+      <DialogContent className="w-[calc(100vw-16px)] max-w-3xl max-h-[92dvh] overflow-y-auto p-3 sm:p-4">
         <DialogHeader className="pb-1">
           <div className="flex items-center gap-2 flex-wrap">
             <DialogTitle className="text-base sm:text-xl">{vacancy.title}</DialogTitle>
@@ -131,18 +131,18 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRest
                   <Icon name="ExternalLink" size={14} />
                   Ссылка на вакансию
                 </h3>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2">
                   <input
                     type="text"
                     value={`${window.location.origin}/vacancy/${vacancy.id}`}
                     readOnly
-                    className="flex-1 px-2 py-1.5 text-xs border rounded-md bg-background min-w-0"
+                    className="w-full px-2 py-1.5 text-xs border rounded-md bg-background"
                   />
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => navigator.clipboard.writeText(`${window.location.origin}/vacancy/${vacancy.id}`)}
-                    className="shrink-0"
+                    className="w-full"
                   >
                     <Icon name="Copy" size={14} className="mr-1" />
                     Копировать
@@ -160,30 +160,32 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRest
                   <Icon name="Link" size={14} />
                   Реферальная ссылка
                 </h3>
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2">
                   <input
                     type="text"
                     value={vacancy.referralLink}
                     readOnly
-                    className="flex-1 px-2 py-1.5 text-xs border rounded-md bg-background min-w-0"
+                    className="w-full px-2 py-1.5 text-xs border rounded-md bg-background"
                   />
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => navigator.clipboard.writeText(vacancy.referralLink || '')}
-                    className="shrink-0"
-                  >
-                    <Icon name="Copy" size={14} className="mr-1" />
-                    Копировать
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => setShowQR(!showQR)}
-                    className="shrink-0"
-                  >
-                    <Icon name="QrCode" size={14} />
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => navigator.clipboard.writeText(vacancy.referralLink || '')}
+                      className="flex-1"
+                    >
+                      <Icon name="Copy" size={14} className="mr-1" />
+                      Копировать
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setShowQR(!showQR)}
+                      className="shrink-0"
+                    >
+                      <Icon name="QrCode" size={14} />
+                    </Button>
+                  </div>
                 </div>
                 {showQR && (
                   <div className="flex flex-col items-center gap-3 pt-2">
