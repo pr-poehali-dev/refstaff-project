@@ -82,6 +82,7 @@ export interface Company {
   created_at: string;
   subscription_tier?: string;
   subscription_expires_at?: string;
+  payout_methods?: string[];
 }
 
 export interface Wallet {
