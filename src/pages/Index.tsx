@@ -3544,16 +3544,6 @@ function Index() {
                           onChange={(e) => setVacancyForm({...vacancyForm, title: e.target.value})}
                         />
                       </div>
-                      <div>
-                        <Label htmlFor="department" className="text-xs">Отдел</Label>
-                        <Input
-                          id="department"
-                          className="mt-1 h-9 text-sm"
-                          placeholder="Разработка"
-                          value={vacancyForm.department}
-                          onChange={(e) => setVacancyForm({...vacancyForm, department: e.target.value})}
-                        />
-                      </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
