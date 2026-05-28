@@ -58,8 +58,7 @@ export function MessengerDialog({ open, onOpenChange, employees, currentUserId, 
 
   const filteredEmployees = employees.filter(emp => 
     emp.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    emp.position.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    emp.department.toLowerCase().includes(searchQuery.toLowerCase())
+    emp.position.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const getUnreadCount = (employeeId: number) => {

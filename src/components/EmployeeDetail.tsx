@@ -40,10 +40,6 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Должность</p>
               <p className="text-sm font-medium">{employee.position}</p>
             </div>
-            <div>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Отдел</p>
-              <p className="text-sm font-medium">{employee.department}</p>
-            </div>
             <div className="col-span-2">
               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Email</p>
               <p className="text-sm font-medium break-all">{employee.email}</p>

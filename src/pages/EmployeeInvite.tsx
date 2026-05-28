@@ -20,8 +20,7 @@ function EmployeeInvite() {
     lastName: '',
     email: '',
     phone: '',
-    position: '',
-    department: ''
+    position: ''
   });
 
   useEffect(() => {
@@ -39,7 +38,7 @@ function EmployeeInvite() {
   }, [token]);
 
   const handleSubmit = async () => {
-    if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.position || !form.department) {
+    if (!form.firstName || !form.lastName || !form.email || !form.phone || !form.position) {
       setError('Заполните все обязательные поля');
       return;
     }
@@ -49,8 +48,7 @@ function EmployeeInvite() {
         first_name: form.firstName,
         last_name: form.lastName,
         email: form.email,
-        position: form.position,
-        department: form.department
+        position: form.position
       });
       setSuccess(true);
       setTimeout(() => navigate('/'), 2000);
@@ -171,16 +169,6 @@ function EmployeeInvite() {
                 placeholder="Frontend Developer"
                 value={form.position}
                 onChange={(e) => setForm({...form, position: e.target.value})}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="department">Отдел *</Label>
-              <Input 
-                id="department" 
-                placeholder="Разработка"
-                value={form.department}
-                onChange={(e) => setForm({...form, department: e.target.value})}
               />
             </div>
 

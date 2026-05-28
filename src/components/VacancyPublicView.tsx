@@ -65,10 +65,6 @@ export function VacancyPublicView({ vacancy, open, onOpenChange }: VacancyPublic
                   <DialogTitle className="text-3xl mb-3">{vacancy.title}</DialogTitle>
                   <div className="flex flex-wrap items-center gap-4 text-muted-foreground text-sm">
                     <div className="flex items-center gap-1.5">
-                      <Icon name="Building2" size={16} />
-                      <span>{vacancy.department}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
                       <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={16} />
                       <span>{vacancy.city || 'Не указано'}</span>
                     </div>

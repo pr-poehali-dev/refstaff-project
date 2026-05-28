@@ -43,16 +43,16 @@ function VacancyReferral() {
       const proxyUrl = `https://functions.poehali.dev/a7ef69a9-2736-4504-ac24-54132c34d646?type=referral&id=${token}${refParam}`;
       const vacancyUrl = `${window.location.origin}/r/${token}${referrerId ? `?ref=${referrerId}` : ''}`;
       
-      document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
+      document.title = `${vacancy.title} | iHUNT`;
       
-      updateMetaTag('og:title', `${vacancy.title} — ${vacancy.department}`);
+      updateMetaTag('og:title', vacancy.title);
       updateMetaTag('og:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title} в компании. Заработная плата: ${vacancy.salary_display}. Вознаграждение за рекомендацию: ${vacancy.reward_amount.toLocaleString()} ₽`);
       updateMetaTag('og:image', ogImageUrl);
       updateMetaTag('og:url', vacancyUrl);
       updateMetaTag('og:type', 'website');
       
       updateMetaTag('twitter:card', 'summary_large_image');
-      updateMetaTag('twitter:title', `${vacancy.title} — ${vacancy.department}`);
+      updateMetaTag('twitter:title', vacancy.title);
       updateMetaTag('twitter:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title}`);
       updateMetaTag('twitter:image', ogImageUrl);
 
@@ -244,12 +244,7 @@ function VacancyReferral() {
                   <Icon name="Building2" size={18} />
                   <span>{company?.name}</span>
                 </div>
-                {vacancy.department && (
-                  <div className="flex items-center gap-2">
-                    <Icon name="Users" size={18} />
-                    <span>{vacancy.department}</span>
-                  </div>
-                )}
+
                 {vacancy.salary_display && (
                   <div className="flex items-center gap-2">
                     <Icon name="Wallet" size={18} />

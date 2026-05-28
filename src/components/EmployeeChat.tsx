@@ -11,7 +11,6 @@ interface Colleague {
   first_name: string;
   last_name: string;
   position: string;
-  department: string;
   avatar_url?: string;
 }
 
@@ -168,7 +167,7 @@ export default function EmployeeChat({ currentUserId, companyId }: EmployeeChatP
     const fullName = `${c.first_name} ${c.last_name}`.toLowerCase();
     return fullName.includes(searchQuery.toLowerCase()) ||
       (c.position || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (c.department || '').toLowerCase().includes(searchQuery.toLowerCase());
+      false;
   });
 
   const filteredChats = chats.filter(c =>
@@ -237,7 +236,7 @@ export default function EmployeeChat({ currentUserId, companyId }: EmployeeChatP
                         {colleague.first_name} {colleague.last_name}
                       </div>
                       <div className="text-xs text-muted-foreground truncate">
-                        {colleague.position || colleague.department || 'Сотрудник'}
+                        {colleague.position || 'Сотрудник'}
                       </div>
                     </div>
                     <Icon name="MessageSquarePlus" size={16} className="text-muted-foreground" />

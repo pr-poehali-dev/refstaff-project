@@ -60,9 +60,7 @@ export function EmployeeProfileDialog({
                 {employeeData.position && (
                   <p className="text-sm font-medium mt-1">{employeeData.position}</p>
                 )}
-                {employeeData.department && (
-                  <p className="text-sm text-muted-foreground">{employeeData.department}</p>
-                )}
+
               </div>
             </div>
 

@@ -55,10 +55,7 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRest
                   {vacancy.status === 'active' ? 'Активна' : 'Архив'}
                 </Badge>
               </div>
-              <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Icon name="Building2" size={14} />
-                <span>{vacancy.department}</span>
-              </div>
+
             </div>
           </div>
         </DialogHeader>

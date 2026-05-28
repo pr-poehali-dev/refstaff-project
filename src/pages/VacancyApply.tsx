@@ -39,16 +39,16 @@ function VacancyApply() {
       const proxyUrl = `https://functions.poehali.dev/a7ef69a9-2736-4504-ac24-54132c34d646?type=vacancy&id=${vacancy.id}`;
       const vacancyUrl = `${window.location.origin}/vacancy/${vacancy.id}`;
       
-      document.title = `${vacancy.title} — ${vacancy.department} | iHUNT`;
+      document.title = `${vacancy.title} | iHUNT`;
       
-      updateMetaTag('og:title', `${vacancy.title} — ${vacancy.department}`);
+      updateMetaTag('og:title', vacancy.title);
       updateMetaTag('og:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title} в компании. Заработная плата: ${vacancy.salary_display}`);
       updateMetaTag('og:image', ogImageUrl);
       updateMetaTag('og:url', vacancyUrl);
       updateMetaTag('og:type', 'website');
       
       updateMetaTag('twitter:card', 'summary_large_image');
-      updateMetaTag('twitter:title', `${vacancy.title} — ${vacancy.department}`);
+      updateMetaTag('twitter:title', vacancy.title);
       updateMetaTag('twitter:description', vacancy.requirements?.substring(0, 160) || `Вакансия ${vacancy.title}`);
       updateMetaTag('twitter:image', ogImageUrl);
 
@@ -228,7 +228,7 @@ function VacancyApply() {
             className="md:hidden"
             onClick={() => {
               const vacancyUrl = `${window.location.origin}/vacancy/${vacancy.id}`;
-              const text = `${vacancy.title} — ${vacancy.department}\n${vacancy.salary_display}`;
+              const text = `${vacancy.title}\n${vacancy.salary_display}`;
               
               if (navigator.share) {
                 navigator.share({
@@ -259,7 +259,7 @@ function VacancyApply() {
                   />
                 )}
                 <CardTitle className="text-2xl">{vacancy.title}</CardTitle>
-                <CardDescription className="text-base">{vacancy.department}</CardDescription>
+
                 <div className="flex gap-2 mt-3">
                   <Badge variant="secondary">
                     {vacancy.status === 'active' ? 'Активна' : 'Закрыта'}
