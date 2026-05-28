@@ -256,6 +256,32 @@ function VacancyReferral() {
 
             <Separator />
 
+            {company && (
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Icon name="Building2" size={20} />
+                  О компании
+                </h3>
+                {company.description && (
+                  <p className="text-muted-foreground mb-3">{company.description}</p>
+                )}
+                <div className="flex flex-wrap gap-3 text-sm">
+                  {company.industry && (
+                    <Badge variant="outline">
+                      <Icon name="Briefcase" className="mr-1" size={12} />
+                      {company.industry}
+                    </Badge>
+                  )}
+                  {company.employee_count && (
+                    <Badge variant="outline">
+                      <Icon name="Users" className="mr-1" size={12} />
+                      {company.employee_count}+ сотрудников
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            )}
+
             {vacancy.description && (
               <div>
                 <h3 className="font-semibold mb-3 flex items-center gap-2">
@@ -276,33 +302,14 @@ function VacancyReferral() {
               </div>
             )}
 
-            {company && (
-              <>
-                <Separator />
-                <div>
-                  <h3 className="font-semibold mb-3 flex items-center gap-2">
-                    <Icon name="Building2" size={20} />
-                    О компании
-                  </h3>
-                  {company.description && (
-                    <p className="text-muted-foreground mb-3">{company.description}</p>
-                  )}
-                  <div className="flex flex-wrap gap-3 text-sm">
-                    {company.industry && (
-                      <Badge variant="outline">
-                        <Icon name="Briefcase" className="mr-1" size={12} />
-                        {company.industry}
-                      </Badge>
-                    )}
-                    {company.employee_count && (
-                      <Badge variant="outline">
-                        <Icon name="Users" className="mr-1" size={12} />
-                        {company.employee_count}+ сотрудников
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              </>
+            {vacancy.motivation && (
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Icon name="Star" size={20} />
+                  Мотивация
+                </h3>
+                <p className="text-muted-foreground whitespace-pre-wrap">{vacancy.motivation}</p>
+              </div>
             )}
 
 
