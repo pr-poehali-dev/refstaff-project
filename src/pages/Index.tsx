@@ -5088,17 +5088,25 @@ function Index() {
                       <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 sm:hidden" onClick={() => setActiveChatEmployee(null)}>
                         <Icon name="ArrowLeft" size={18} />
                       </Button>
-                      {activeChatEmployee.avatar ? (
-                        <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover shrink-0" />
-                      ) : (
-                        <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <Icon name="User" size={18} className="text-primary" />
+                      <button
+                        className="flex items-center gap-3 min-w-0 flex-1 text-left hover:opacity-80 transition-opacity"
+                        onClick={() => {
+                          setSelectedEmployee(activeChatEmployee);
+                          setShowEmployeeDetail(true);
+                        }}
+                      >
+                        {activeChatEmployee.avatar ? (
+                          <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover shrink-0" />
+                        ) : (
+                          <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <Icon name="User" size={18} className="text-primary" />
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1">
+                          <h3 className="font-semibold text-sm sm:text-base truncate">{activeChatEmployee.name}</h3>
+                          <p className="text-xs sm:text-sm text-muted-foreground truncate">{activeChatEmployee.position}</p>
                         </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <h3 className="font-semibold text-sm sm:text-base truncate">{activeChatEmployee.name}</h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground truncate">{activeChatEmployee.position}</p>
-                      </div>
+                      </button>
                       <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 sm:hidden" onClick={() => setShowChatDialog(false)}>
                         <Icon name="X" size={18} />
                       </Button>
