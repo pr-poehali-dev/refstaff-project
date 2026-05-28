@@ -11,6 +11,9 @@ export interface Vacancy {
   payoutDelayDays: number;
   description?: string;
   requirements?: string;
+  motivation?: string;
+  companyDescription?: string;
+  companyName?: string;
   referralLink?: string;
   city?: string;
   isRemote?: boolean;

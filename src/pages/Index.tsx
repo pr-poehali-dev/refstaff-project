@@ -641,6 +641,9 @@ function Index() {
         payoutDelayDays: v.payout_delay_days || 30,
         description: v.description || '',
         requirements: v.requirements || '',
+        motivation: (v as any).motivation || '',
+        companyDescription: (v as any).company_description || '',
+        companyName: (v as any).company_name || '',
         referralLink: v.referral_token && userRole === 'employee' ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
 

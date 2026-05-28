@@ -97,19 +97,32 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRest
 
           <Separator />
 
-          {vacancy.description ? (
+          {vacancy.companyDescription ? (
             <div className="space-y-1.5">
               <h3 className="font-semibold text-sm flex items-center gap-2">
-                <Icon name="FileText" size={16} />
-                Описание вакансии
+                <Icon name="Building2" size={16} />
+                О компании
               </h3>
-              <p className="text-muted-foreground text-sm whitespace-pre-wrap">{vacancy.description}</p>
+              <p className="text-muted-foreground text-sm whitespace-pre-wrap">{vacancy.companyDescription}</p>
             </div>
+          ) : null}
+
+          {vacancy.description ? (
+            <>
+              {vacancy.companyDescription && <Separator />}
+              <div className="space-y-1.5">
+                <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <Icon name="FileText" size={16} />
+                  Описание вакансии
+                </h3>
+                <p className="text-muted-foreground text-sm whitespace-pre-wrap">{vacancy.description}</p>
+              </div>
+            </>
           ) : null}
 
           {vacancy.requirements ? (
             <>
-              {vacancy.description && <Separator />}
+              {(vacancy.companyDescription || vacancy.description) && <Separator />}
               <div className="space-y-1.5">
                 <h3 className="font-semibold text-sm flex items-center gap-2">
                   <Icon name="ClipboardList" size={16} />
@@ -120,8 +133,21 @@ export function VacancyDetail({ vacancy, open, onOpenChange, onRecommend, onRest
             </>
           ) : null}
 
-          {!vacancy.description && !vacancy.requirements ? (
-            <p className="text-muted-foreground text-sm italic">Описание и требования не заполнены</p>
+          {vacancy.motivation ? (
+            <>
+              <Separator />
+              <div className="space-y-1.5">
+                <h3 className="font-semibold text-sm flex items-center gap-2">
+                  <Icon name="Sparkles" size={16} />
+                  Мотивация
+                </h3>
+                <p className="text-muted-foreground text-sm whitespace-pre-wrap">{vacancy.motivation}</p>
+              </div>
+            </>
+          ) : null}
+
+          {!vacancy.companyDescription && !vacancy.description && !vacancy.requirements && !vacancy.motivation ? (
+            <p className="text-muted-foreground text-sm italic">Описание вакансии не заполнено</p>
           ) : null}
 
           {showPublicLink && (
