@@ -5198,14 +5198,6 @@ function Index() {
                 onChange={(e) => setEmployeeEditForm({...employeeEditForm, position: e.target.value})}
               />
             </div>
-            <div>
-              <Label htmlFor="emp-department">Отдел</Label>
-              <Input 
-                id="emp-department" 
-                value={employeeEditForm.department}
-                onChange={(e) => setEmployeeEditForm({...employeeEditForm, department: e.target.value})}
-              />
-            </div>
             <div className="flex gap-2 pt-4">
               <Button 
                 className="flex-1"
