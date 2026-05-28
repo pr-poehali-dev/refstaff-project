@@ -7714,13 +7714,19 @@ function Index() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="card">Банковская карта</SelectItem>
-                  <SelectItem value="sbp">СБП</SelectItem>
-                  <SelectItem value="account">Расчётный счёт</SelectItem>
+                  {(company?.payout_methods ?? ['card', 'sbp', 'bank', 'cash']).map((m) => {
+                    const labels: Record<string, string> = {
+                      card: '💳 Банковская карта',
+                      sbp: '📱 СБП',
+                      bank: '🏦 По реквизитам на счёт',
+                      cash: '💵 Наличными',
+                    };
+                    return <SelectItem key={m} value={m}>{labels[m] ?? m}</SelectItem>;
+                  })}
                 </SelectContent>
               </Select>
             </div>
-            {withdrawForm.paymentMethod === 'account' ? (
+            {withdrawForm.paymentMethod === 'bank' ? (
               <>
                 <div>
                   <Label>ФИО получателя <span className="text-destructive">*</span></Label>
@@ -7757,6 +7763,10 @@ function Index() {
                   />
                 </div>
               </>
+            ) : withdrawForm.paymentMethod === 'cash' ? (
+              <p className="text-sm text-muted-foreground bg-muted rounded-lg p-3">
+                💵 Выплата будет произведена наличными. Уточните детали у вашего работодателя.
+              </p>
             ) : (
               <>
                 <div>
