@@ -1054,8 +1054,8 @@ function Index() {
   };
 
   const handleUpdateVacancy = async () => {
-    if (!activeVacancy || !vacancyForm.title || !vacancyForm.department || !vacancyForm.salary) {
-      alert('Заполните обязательные поля');
+    if (!activeVacancy || !vacancyForm.title || !vacancyForm.salary) {
+      alert('Заполните обязательные поля: Должность и Зарплата');
       return;
     }
     
@@ -1066,12 +1066,13 @@ function Index() {
         salary_display: vacancyForm.salary,
         description: vacancyForm.description,
         requirements: vacancyForm.requirements,
+        motivation: vacancyForm.motivation,
         reward_amount: parseInt(vacancyForm.reward),
         payout_delay_days: parseInt(vacancyForm.payoutDelay)
       });
       await loadData();
       setActiveVacancy(null);
-      setVacancyForm({ title: '', department: '', salary: '', description: '', requirements: '', reward: '30000', payoutDelay: '30', city: '', isRemote: false });
+      setVacancyForm({ title: '', department: '', salary: '', description: '', requirements: '', motivation: '', reward: '30000', payoutDelay: '30', city: '', isRemote: false });
       alert('Вакансия успешно обновлена!');
     } catch (error) {
       console.error('Ошибка обновления вакансии:', error);
@@ -3771,6 +3772,7 @@ function Index() {
                               salary: vacancy.salary,
                               description: vacancy.description || '',
                               requirements: vacancy.requirements || '',
+                              motivation: vacancy.motivation || '',
                               reward: vacancy.reward.toString(),
                               payoutDelay: vacancy.payoutDelayDays.toString(),
                               city: vacancy.city || '',
@@ -3903,6 +3905,17 @@ function Index() {
                       className="mt-1 text-sm"
                       value={vacancyForm.requirements}
                       onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-motivation" className="text-xs">Мотивация</Label>
+                    <Textarea
+                      id="edit-motivation"
+                      rows={3}
+                      className="mt-1 text-sm"
+                      placeholder="Что мы предлагаем: ДМС, гибкий график, обучение..."
+                      value={vacancyForm.motivation}
+                      onChange={(e) => setVacancyForm({...vacancyForm, motivation: e.target.value})}
                     />
                   </div>
                 </div>
