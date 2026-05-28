@@ -7375,15 +7375,23 @@ function Index() {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        if (file.size > 2 * 1024 * 1024) {
-                          alert('Файл слишком большой. Максимум 2 МБ');
-                          e.target.value = '';
-                          return;
-                        }
                         const reader = new FileReader();
                         reader.onloadend = () => {
-                          const base64 = reader.result as string;
-                          setProfileForm(f => ({...f, avatar: base64}));
+                          const img = new Image();
+                          img.onload = () => {
+                            const canvas = document.createElement('canvas');
+                            const size = 200;
+                            canvas.width = size;
+                            canvas.height = size;
+                            const ctx = canvas.getContext('2d')!;
+                            const scale = Math.max(size / img.width, size / img.height);
+                            const x = (size - img.width * scale) / 2;
+                            const y = (size - img.height * scale) / 2;
+                            ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                            const compressed = canvas.toDataURL('image/jpeg', 0.8);
+                            setProfileForm(f => ({...f, avatar: compressed}));
+                          };
+                          img.src = reader.result as string;
                         };
                         reader.readAsDataURL(file);
                       }
@@ -7409,6 +7417,7 @@ function Index() {
                       phone: profileForm.phone,
                       telegram: profileForm.telegram,
                       vk: profileForm.vk,
+                      ...(profileForm.avatar ? { avatar_url: profileForm.avatar } : {})
                     });
                     await loadData();
                     setShowEditProfileDialog(false);
