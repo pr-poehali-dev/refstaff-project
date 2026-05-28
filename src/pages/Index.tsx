@@ -959,7 +959,12 @@ function Index() {
       setIsSavingCompany(true);
       let logoUrl: string | undefined;
       if (companyLogoFile) {
-        logoUrl = await api.uploadResume(companyLogoFile);
+        logoUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(companyLogoFile);
+        });
       }
       await api.updateCompany(currentCompanyId, {
         description: companyEditForm.description,
