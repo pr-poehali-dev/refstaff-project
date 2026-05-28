@@ -2334,43 +2334,41 @@ function Index() {
         </section>
       </main>
 
-      <footer className="border-t bg-gray-50 py-8 sm:py-10 md:py-12 px-3 sm:px-4 lg:px-6" role="contentinfo">
+      <footer className="border-t bg-gray-50 py-6 px-3 sm:px-4 lg:px-6" role="contentinfo">
         <div className="container mx-auto max-w-6xl">
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Icon name="Rocket" className="text-primary" size={24} />
-                <span className="text-base sm:text-lg font-bold">iHUNT</span>
+          <div className="flex flex-wrap gap-x-12 gap-y-6 items-start justify-between">
+            <div className="min-w-[140px]">
+              <div className="flex items-center gap-2 mb-2">
+                <Icon name="Rocket" className="text-primary" size={20} />
+                <span className="text-base font-bold">iHUNT</span>
               </div>
-              <p className="text-sm text-muted-foreground">
-                Платформа реферального рекрутинга с геймификацией
-              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">Платформа реферального<br/>рекрутинга с геймификацией</p>
             </div>
             <nav aria-label="Продукт">
-              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Продукт</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
+              <h4 className="font-semibold mb-2 text-sm">Продукт</h4>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
                 <li><a href="#benefits" className="hover:text-primary">Возможности</a></li>
                 <li><a href="#pricing" className="hover:text-primary">Тарифы</a></li>
               </ul>
             </nav>
             <nav aria-label="Компания">
-              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Компания</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
+              <h4 className="font-semibold mb-2 text-sm">Компания</h4>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
                 <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
                 <li><a href="https://t.me/i_hunt_ru" target="_blank" rel="noopener noreferrer" className="hover:text-primary">Блог</a></li>
                 <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
               </ul>
             </nav>
             <nav aria-label="Правовая информация">
-              <h4 className="font-semibold mb-3 sm:mb-4 text-sm sm:text-base">Правовая информация</h4>
-              <ul className="space-y-2 text-xs sm:text-sm text-muted-foreground">
+              <h4 className="font-semibold mb-2 text-sm">Правовая информация</h4>
+              <ul className="space-y-1.5 text-xs text-muted-foreground">
                 <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary">Политика конфиденциальности</button></li>
                 <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary">Пользовательское соглашение</button></li>
                 <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary">Обработка персональных данных</button></li>
               </ul>
             </nav>
           </div>
-          <div className="mt-8 sm:mt-10 md:mt-12 pt-6 sm:pt-8 border-t text-center text-xs sm:text-sm text-muted-foreground">© 2026 iHUNT. Все права защищены.</div>
+          <div className="mt-5 pt-4 border-t text-center text-xs text-muted-foreground">© 2026 iHUNT. Все права защищены.</div>
         </div>
       </footer>
 
