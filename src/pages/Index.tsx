@@ -27,6 +27,7 @@ import Onboarding from '@/components/Onboarding';
 import ScrollableTabs from '@/components/ScrollableTabs';
 import GamesTab from '@/components/GamesTab';
 import TelegramLoginButton from '@/components/TelegramLoginButton';
+import { VacancyTestManager } from '@/components/VacancyTestManager';
 
 const BENEFITS_DATA = [
   {
@@ -179,6 +180,8 @@ function Index() {
   const [payoutRequests, setPayoutRequests] = useState<PayoutRequest[]>([]);
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [showEmployeeDetail, setShowEmployeeDetail] = useState(false);
+  const [showTestManager, setShowTestManager] = useState(false);
+  const [testManagerVacancy, setTestManagerVacancy] = useState<{ id: number; title: string } | null>(null);
   const [employeeSearchQuery, setEmployeeSearchQuery] = useState('');
   const [employeeStatusFilter, setEmployeeStatusFilter] = useState<'all' | 'active' | 'fired' | 'admin'>('active');
   const [selectedVacancyDetail, setSelectedVacancyDetail] = useState<Vacancy | null>(null);
@@ -3729,6 +3732,18 @@ function Index() {
                         </div>
                       </div>
                       <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setTestManagerVacancy({ id: vacancy.id, title: vacancy.title });
+                            setShowTestManager(true);
+                          }}
+                          className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
+                        >
+                          <Icon name="ClipboardList" size={12} className="sm:mr-1" />
+                          <span className="hidden sm:inline">Тест</span>
+                        </Button>
                         <Button 
                           variant="outline" 
                           size="sm"
@@ -7792,6 +7807,16 @@ function Index() {
         onOpenChange={setShowEmployeeDetail}
         recommendations={recommendations}
       />
+
+      {testManagerVacancy && currentCompanyId && (
+        <VacancyTestManager
+          open={showTestManager}
+          onOpenChange={setShowTestManager}
+          vacancyId={testManagerVacancy.id}
+          vacancyTitle={testManagerVacancy.title}
+          companyId={currentCompanyId}
+        />
+      )}
 
       {/* Диалог реферальной ссылки с QR-кодом */}
       <Dialog open={showReferralLinkDialog} onOpenChange={setShowReferralLinkDialog}>

@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 import type { Vacancy } from '@/types';
 import { useState, useRef } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
+import { VacancyTestManager } from '@/components/VacancyTestManager';
 
 interface VacancyDetailProps {
   vacancy: Vacancy | null;
