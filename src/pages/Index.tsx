@@ -7789,7 +7789,7 @@ function Index() {
                   />
                 </div>
                 <div>
-                  <Label>Реквизиты <span className="text-destructive">*</span></Label>
+                  <Label>{withdrawForm.paymentMethod === 'card' ? 'Номер банковской карты' : 'Номер телефона СБП'} <span className="text-destructive">*</span></Label>
                   <Input
                     placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
                     value={withdrawForm.paymentDetails}
