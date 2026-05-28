@@ -6151,13 +6151,13 @@ function Index() {
                         <Button 
                           size="icon" 
                           variant="ghost"
-                          className="absolute top-2 right-2 h-8 w-8 text-base"
+                          className="absolute top-2 right-2 h-8 w-8"
                           onClick={(e) => {
                             e.stopPropagation();
                             setActiveVacancy(vacancy);
                           }}
                         >
-                          👤➕
+                          <span className="text-[10px]">👤➕</span>
                         </Button>
                       </DialogTrigger>
                       <DialogContent onClick={(e) => e.stopPropagation()}>
