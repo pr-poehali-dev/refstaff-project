@@ -6964,7 +6964,7 @@ function Index() {
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-bold">{company?.name || '—'}</h3>
-                <p className="text-muted-foreground">{company?.industry || ''}</p>
+                <p className="text-muted-foreground">{{ tech: 'IT и технологии', finance: 'Финансы', retail: 'Розничная торговля', manufacturing: 'Производство', services: 'Услуги' }[company?.industry || ''] || company?.industry || ''}</p>
               </div>
             </div>
             <Separator />
