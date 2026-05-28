@@ -1880,9 +1880,9 @@ function Index() {
                 <h1 id="hero-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight">
                   Нанимайте лучших кандидатов через своих сотрудников
                 </h1>
-                <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-4 sm:mb-6 md:mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+                <h2 className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-4 sm:mb-6 md:mb-8 animate-slide-up font-normal" style={{ animationDelay: '0.1s' }}>
                   Платформа для реферального найма с геймификацией
-                </p>
+                </h2>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center lg:justify-start">
                   <Button size="default" className="animate-scale-in shadow-lg shadow-primary/25 text-sm sm:text-base" style={{ animationDelay: '0.2s' }} onClick={() => { setShowRegisterDialog(true); if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'click_cta_hero'); }} aria-label="Начать бесплатный пробный период на 14 дней">
                     <Icon name="Rocket" className="mr-2" size={18} aria-hidden="true" />
