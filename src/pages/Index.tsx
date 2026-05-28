@@ -4042,7 +4042,7 @@ function Index() {
                           }}
                           className="flex-1 sm:flex-none text-xs sm:text-sm"
                         >
-                          <Icon name="MessageCircle" className="sm:mr-1" size={16} />
+                          <span className="sm:mr-1">💬</span>
                           <span className="hidden sm:inline">Написать</span>
                         </Button>
                         <Button 
@@ -4062,7 +4062,7 @@ function Index() {
                           }}
                           className="flex-1 sm:flex-none text-xs sm:text-sm"
                         >
-                          <Icon name="Edit" size={16} />
+                          <span>✏️</span>
                         </Button>
                         <Dialog open={showEditRolesDialog && employeeToEditRoles?.id === employee.id} onOpenChange={(open) => {
                           if (!open) {
@@ -4079,7 +4079,7 @@ function Index() {
                               });
                               setShowEditRolesDialog(true);
                             }} className="flex-1 sm:flex-none text-xs sm:text-sm">
-                              <Icon name="Shield" size={16} />
+                              <span>🛡️</span>
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
