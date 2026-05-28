@@ -5264,7 +5264,39 @@ function Index() {
                           {activeRecommendation.recommendedBy.split(' ').map((n: string) => n[0]).join('')}
                         </AvatarFallback>
                       </Avatar>
-                      <span className="text-sm font-medium">{activeRecommendation.recommendedBy}</span>
+                      <span className="text-sm font-medium flex-1">{activeRecommendation.recommendedBy}</span>
+                      {activeRecommendation.employeeId && (() => {
+                        const emp = employees.find(e => e.id === activeRecommendation.employeeId);
+                        if (!emp) return null;
+                        return (
+                          <div className="flex gap-1">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2"
+                              title="Написать"
+                              onClick={() => {
+                                setActiveChatEmployee(emp);
+                                setShowChatDialog(true);
+                              }}
+                            >
+                              <Icon name="MessageCircle" size={14} />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="h-7 px-2"
+                              title="Профиль"
+                              onClick={() => {
+                                setSelectedEmployee(emp);
+                                setShowEmployeeDetail(true);
+                              }}
+                            >
+                              <Icon name="User" size={14} />
+                            </Button>
+                          </div>
+                        );
+                      })()}
                     </div>
                   </div>
                 )}
