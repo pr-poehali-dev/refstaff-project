@@ -3596,7 +3596,7 @@ function Index() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div>
-                        <Label htmlFor="reward-amount" className="text-xs">Вознаграждение за рекомендацию, ₽</Label>
+                        <Label htmlFor="reward-amount" className="text-xs">Бонус за рекомендацию ₽</Label>
                         <Input
                           id="reward-amount"
                           type="number"
