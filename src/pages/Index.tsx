@@ -969,8 +969,8 @@ function Index() {
   };
 
   const handleCreateVacancy = async () => {
-    if (!vacancyForm.title || !vacancyForm.department || !vacancyForm.salary) {
-      alert('Заполните обязательные поля');
+    if (!vacancyForm.title || !vacancyForm.salary) {
+      alert('Заполните обязательные поля: Должность и Зарплата');
       return;
     }
     
