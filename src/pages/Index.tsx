@@ -413,14 +413,9 @@ function Index() {
       if (response.ok) {
         const data = await response.json();
         setCurrentUser(data.user);
-        if (data.user?.role !== 'admin') {
-          if (data.user?.is_admin) {
-            setUserRole('employer');
-            localStorage.setItem('userRole', 'employer');
-          } else {
-            setUserRole('employee');
-          }
-        }
+        const newRole: UserRole = data.user?.is_admin ? 'employer' : 'employee';
+        setUserRole(newRole);
+        localStorage.setItem('userRole', newRole);
       } else {
         handleLogout();
       }
