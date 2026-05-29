@@ -1806,6 +1806,14 @@ function Index() {
     try {
       await api.updateEmployeeRole(employeeToEditRoles.id, undefined, rolesForm.isAdmin);
       await loadData();
+
+      if (employeeToEditRoles.id === currentEmployeeId) {
+        const newRole: UserRole = rolesForm.isAdmin ? 'employer' : 'employee';
+        setUserRole(newRole);
+        localStorage.setItem('userRole', newRole);
+        setCurrentUser((prev: unknown) => ({ ...(prev as object), is_admin: rolesForm.isAdmin, role: rolesForm.isAdmin ? 'admin' : 'employee' }));
+      }
+
       setShowEditRolesDialog(false);
       setEmployeeToEditRoles(null);
       alert('Права сотрудника обновлены!');
