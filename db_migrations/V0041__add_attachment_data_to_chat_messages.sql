@@ -1,0 +1,1 @@
+ALTER TABLE t_p65890965_refstaff_project.chat_messages ADD COLUMN IF NOT EXISTS attachment_data text NULL;
