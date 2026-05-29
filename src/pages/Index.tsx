@@ -107,6 +107,7 @@ function Index() {
   });
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem('authToken'));
+  const [isVerifying, setIsVerifying] = useState<boolean>(() => !!localStorage.getItem('authToken'));
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
 
   const [showRegisterDialog, setShowRegisterDialog] = useState(false);
@@ -422,6 +423,8 @@ function Index() {
     } catch (error) {
       console.error('Ошибка проверки токена:', error);
       handleLogout();
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -7913,6 +7916,14 @@ function Index() {
     window.addEventListener('hashchange', handleHashNavigation);
     return () => window.removeEventListener('hashchange', handleHashNavigation);
   }, []);
+
+  if (isVerifying) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <>
