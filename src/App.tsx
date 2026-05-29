@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 import Index from "./pages/Index";
 import VacancyReferral from "./pages/VacancyReferral";
 import VacancyApply from "./pages/VacancyApply";
@@ -14,32 +15,36 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import VacancyQR from "./pages/VacancyQR";
 import VacancyTest from "./pages/VacancyTest";
+import CityLanding from "./pages/CityLanding";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/r/:token" element={<VacancyReferral />} />
-          <Route path="/vacancy/:vacancyId" element={<VacancyApply />} />
-          <Route path="/invite/:token" element={<EmployeeInvite />} />
-          <Route path="/employee-register" element={<EmployeeRegister />} />
-          <Route path="/verify-email" element={<VerifyEmail />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="/vacancy/:vacancyId/qr" element={<VacancyQR />} />
-          <Route path="/vacancy/:vacancyId/qr/:token" element={<VacancyQR />} />
-          <Route path="/test/:token" element={<VacancyTest />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <HelmetProvider>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Index />} />
+            <Route path="/r/:token" element={<VacancyReferral />} />
+            <Route path="/vacancy/:vacancyId" element={<VacancyApply />} />
+            <Route path="/invite/:token" element={<EmployeeInvite />} />
+            <Route path="/employee-register" element={<EmployeeRegister />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/vacancy/:vacancyId/qr" element={<VacancyQR />} />
+            <Route path="/vacancy/:vacancyId/qr/:token" element={<VacancyQR />} />
+            <Route path="/test/:token" element={<VacancyTest />} />
+            <Route path="/:city" element={<CityLanding />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </HelmetProvider>
 );
 
 export default App;
