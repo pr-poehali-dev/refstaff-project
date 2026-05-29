@@ -42,7 +42,7 @@ export function EmployeeDetail({ employee, open, onOpenChange, recommendations }
             </div>
             <div className="col-span-2">
               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Email</p>
-              <p className="text-sm font-medium break-all">{employee.email}</p>
+              <p className="text-sm font-medium break-all">{employee.email?.endsWith('@telegram.local') ? '—' : (employee.email || '—')}</p>
             </div>
             <div>
               <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Телефон</p>
