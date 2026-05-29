@@ -1024,7 +1024,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             }
 
         elif method == 'POST' and resource == 'messages':
-            body_data = json.loads(event.get('body', '{}'))
+            body_raw = event.get('body', '{}')
+            print(f"[messages POST] body size: {len(body_raw)} bytes")
+            body_data = json.loads(body_raw)
             
             attachment_url = None
             attachment_name = None
@@ -1033,6 +1035,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             if body_data.get('attachment_data'):
                 att_data = body_data['attachment_data']
+                print(f"[messages POST] attachment name={att_data.get('name')}, mime={att_data.get('mime_type')}, base64_len={len(att_data.get('base64',''))}")
                 file_bytes = base64.b64decode(att_data['base64'])
                 ext = att_data.get('name', 'file').rsplit('.', 1)[-1].lower()
                 key = f"chat-attachments/{uuid.uuid4()}.{ext}"
@@ -1370,6 +1373,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
         
     except Exception as e:
+        import traceback
+        print(f"ERROR: {str(e)}")
+        print(traceback.format_exc())
         return {
             'statusCode': 500,
             'headers': {
