@@ -1463,11 +1463,12 @@ function Index() {
       });
       const data = await r.json();
       if (r.ok) {
+        const tgRole: UserRole = data.user?.is_admin ? 'employer' : 'employee';
         localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userRole', 'employee');
+        localStorage.setItem('userRole', tgRole);
         setAuthToken(data.token);
         setCurrentUser(data.user);
-        setUserRole('employee');
+        setUserRole(tgRole);
         setShowLoginDialog(false);
         setTgLoginStep('input'); setTgLoginCode('');
         if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'login');
@@ -1524,11 +1525,12 @@ function Index() {
       });
       const data = await r.json();
       if (r.ok) {
+        const maxRole: UserRole = data.user?.is_admin ? 'employer' : 'employee';
         localStorage.setItem('authToken', data.token);
-        localStorage.setItem('userRole', 'employee');
+        localStorage.setItem('userRole', maxRole);
         setAuthToken(data.token);
         setCurrentUser(data.user);
-        setUserRole('employee');
+        setUserRole(maxRole);
         setShowLoginDialog(false);
         setMaxLoginSession(''); setMaxLoginCode(''); setMaxLoginStep('input');
         if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'login');
