@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,83 +17,23 @@ import Icon from '@/components/ui/icon';
 import { QRCodeSVG } from 'qrcode.react';
 import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Recommendation as ApiRecommendation, type Company, type WalletData, type Chat } from '@/lib/api';
 import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment, PayoutRequest } from '@/types';
-import { EmployeeDetail } from '@/components/EmployeeDetail';
-import { PayoutRequests } from '@/components/PayoutRequests';
-import { VacancyDetail } from '@/components/VacancyDetail';
-import { CandidateDetail } from '@/components/CandidateDetail';
-import { SubscriptionExpiredBlock } from '@/components/SubscriptionExpiredBlock';
-import CompanyStats from '@/components/CompanyStats';
-import Onboarding from '@/components/Onboarding';
 import ScrollableTabs from '@/components/ScrollableTabs';
-import GamesTab from '@/components/GamesTab';
 import TelegramLoginButton from '@/components/TelegramLoginButton';
-import { VacancyTestManager } from '@/components/VacancyTestManager';
+import { BENEFITS_DATA } from '@/data/benefitsData';
 
-const BENEFITS_DATA = [
-  {
-    emoji: '💵', title: 'Экономия бюджета', desc: 'Снижение затрат на рекрутинг до 70%', gradient: 'from-green-500 to-emerald-500',
-    details: 'Реферальный найм обходится в разы дешевле агентств и job-досок. Вы платите только за результат — успешный выход кандидата на работу.',
-    examples: [
-      'Компания из 200 человек экономит до 1,5 млн ₽ в год, заменив агентства реферальной программой',
-      'Бонус сотруднику за рекомендацию — 15 000 ₽, тогда как агентство берёт 80 000–150 000 ₽ за ту же позицию',
-      'Ноль затрат на рекламу вакансий — кандидаты приходят через вашу же команду',
-    ]
-  },
-  {
-    emoji: '⚡', title: 'Быстрый найм', desc: 'Сокращение времени закрытия вакансий в 2 раза', gradient: 'from-yellow-500 to-orange-500',
-    details: 'Рекомендованные кандидаты уже знают о компании и мотивированы. Меньше этапов согласования, быстрее выход на работу.',
-    examples: [
-      'Средний срок закрытия вакансии через реферал — 18 дней против 42 дней через обычный рекрутинг',
-      'HR-менеджер IT-компании закрыл 5 вакансий за месяц, запустив реферальную программу через iHUNT',
-      'Кандидаты от сотрудников реже отказываются после оффера — конверсия выше на 35%',
-    ]
-  },
-  {
-    emoji: '🛡️', title: 'Качество кандидатов', desc: 'Рекомендации от проверенных сотрудников', gradient: 'from-blue-500 to-cyan-500',
-    details: 'Сотрудники рекомендуют только тех, кому доверяют — иначе рискуют своей репутацией. Это естественный фильтр качества.',
-    examples: [
-      '92% кандидатов по рекомендациям проходят испытательный срок против 67% с job-досок',
-      'Производственная компания снизила текучку в первые 6 месяцев на 40% после внедрения реферального найма',
-      'Реферальные сотрудники остаются в компании в среднем на 1,5 года дольше',
-    ]
-  },
-  {
-    emoji: '🏆', title: 'Геймификация', desc: 'Вовлечение сотрудников через достижения', gradient: 'from-purple-500 to-pink-500',
-    details: 'Рейтинги, бейджи и достижения превращают рекомендации в увлекательный процесс. Сотрудники соревнуются и активно участвуют.',
-    examples: [
-      'Ежемесячный рейтинг «Лучший рекрутёр месяца» с призом повышает активность участников на 60%',
-      'Торговая сеть запустила соревнование между филиалами — количество рекомендаций выросло в 3 раза за квартал',
-      'Бейдж «Звёздный рекрутёр» в профиле мотивирует даже тех, кто раньше не участвовал в реферальной программе',
-    ]
-  },
-  {
-    emoji: '📊', title: 'Прозрачность', desc: 'Полная статистика и аналитика процесса', gradient: 'from-indigo-500 to-purple-500',
-    details: 'Вы видите каждый шаг: кто рекомендовал, на каком этапе кандидат, когда выплатить бонус. Никаких споров и недопониманий.',
-    examples: [
-      'Дашборд в реальном времени показывает воронку: рекомендован → на интервью → оффер → вышел',
-      'Автоматические уведомления сотруднику о статусе его кандидата — HR не тратит время на объяснения',
-      'Отчёт по эффективности реферальной программы за квартал готовится в один клик для руководства',
-    ]
-  },
-  {
-    emoji: '🤝', title: 'Лояльность команды', desc: 'Сотрудники получают бонусы за найм — растёт вовлечённость и удержание', gradient: 'from-teal-500 to-green-500',
-    details: 'Когда сотрудники участвуют в росте компании и получают за это вознаграждение, они чувствуют себя частью команды и реже уходят.',
-    examples: [
-      'Компания с реферальной программой на 20% выше в рейтингах работодателей на hh.ru и Glassdoor',
-      'IT-стартап удержал ключевых сотрудников в кризис — реферальные бонусы стали дополнительной мотивацией',
-      'Сотрудники, которые привели коллег, на 30% реже рассматривают предложения от конкурентов',
-    ]
-  },
-  {
-    emoji: '🧠', title: 'AI-тесты для кандидатов', desc: 'Автоматическая проверка знаний с помощью искусственного интеллекта', gradient: 'from-violet-500 to-fuchsia-500',
-    details: 'Создавайте профессиональные тесты по вакансии за секунды. ИИ генерирует релевантные вопросы на основе требований — вы сразу видите, кто знает дело.',
-    examples: [
-      'Тест из 10 вопросов по вакансии «Бухгалтер» генерируется за 15 секунд — не нужен специалист по оценке',
-      'HR получает результаты на почту сразу после прохождения теста кандидатом',
-      'Кандидаты проходят тест по уникальной ссылке — без регистрации, с любого устройства',
-    ]
-  },
-];
+const EmployeeDetail = lazy(() => import('@/components/EmployeeDetail').then(m => ({ default: m.EmployeeDetail })));
+const PayoutRequests = lazy(() => import('@/components/PayoutRequests').then(m => ({ default: m.PayoutRequests })));
+const VacancyDetail = lazy(() => import('@/components/VacancyDetail').then(m => ({ default: m.VacancyDetail })));
+const CandidateDetail = lazy(() => import('@/components/CandidateDetail').then(m => ({ default: m.CandidateDetail })));
+const SubscriptionExpiredBlock = lazy(() => import('@/components/SubscriptionExpiredBlock').then(m => ({ default: m.SubscriptionExpiredBlock })));
+const CompanyStats = lazy(() => import('@/components/CompanyStats'));
+const Onboarding = lazy(() => import('@/components/Onboarding'));
+const GamesTab = lazy(() => import('@/components/GamesTab'));
+const VacancyTestManager = lazy(() => import('@/components/VacancyTestManager').then(m => ({ default: m.VacancyTestManager })));
+
+const LazyFallback = () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+
+
 
 function Index() {
   const navigate = useNavigate();
@@ -1942,6 +1882,8 @@ function Index() {
                   <img 
                     src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/e96124dc-c09c-454b-a967-49eff0e74945.jpg" 
                     alt="Команда сотрудников работает вместе"
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-auto"
                   />
                 </div>
@@ -4264,7 +4206,7 @@ function Index() {
 
           <TabsContent value="recommendations" className="space-y-4">
             {isSubscriptionExpired ? (
-              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+              <Suspense fallback={<LazyFallback />}><SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /></Suspense>
             ) : (
               <>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
@@ -4423,7 +4365,7 @@ function Index() {
 
           <TabsContent value="payouts" className="space-y-4">
             {isSubscriptionExpired ? (
-              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+              <Suspense fallback={<LazyFallback />}><SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /></Suspense>
             ) : (
             <>
             <div className="mb-4 sm:mb-6">
@@ -4485,7 +4427,7 @@ function Index() {
               )}
             </Card>
 
-            <PayoutRequests 
+            <Suspense fallback={<LazyFallback />}><PayoutRequests 
               requests={payoutRequests}
               companyId={currentCompanyId}
               onUpdateStatus={async (requestId, status, comment) => {
@@ -4519,13 +4461,13 @@ function Index() {
                   setShowVacancyDetail(true);
                 }
               }}
-            />
+            /></Suspense>
             </>
             )}
           </TabsContent>
 
           <TabsContent value="news" className="space-y-4">
-            {isSubscriptionExpired ? <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /> : <>
+            {isSubscriptionExpired ? <Suspense fallback={<LazyFallback />}><SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /></Suspense> : <>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
               <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
                 <span>📢</span>
@@ -4627,7 +4569,7 @@ function Index() {
 
           <TabsContent value="chats" className="space-y-4">
             {isSubscriptionExpired ? (
-              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
+              <Suspense fallback={<LazyFallback />}><SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /></Suspense>
             ) : (
               <>
             <h2 className="text-xl sm:text-2xl font-semibold mb-4 flex items-center gap-2">
@@ -4669,12 +4611,14 @@ function Index() {
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">
-            <CompanyStats
-              recommendations={recommendations}
-              employees={employees}
-              vacancies={vacancies}
-              companyName={company?.name}
-            />
+            <Suspense fallback={<LazyFallback />}>
+              <CompanyStats
+                recommendations={recommendations}
+                employees={employees}
+                vacancies={vacancies}
+                companyName={company?.name}
+              />
+            </Suspense>
           </TabsContent>
 
           <TabsContent value="subscription" className="space-y-4 sm:hidden">
@@ -5800,12 +5744,14 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <VacancyDetail
-        vacancy={selectedVacancyDetail}
-        open={showVacancyDetail}
-        onOpenChange={setShowVacancyDetail}
-        showRecommendButton={false}
-      />
+      <Suspense fallback={null}>
+        <VacancyDetail
+          vacancy={selectedVacancyDetail}
+          open={showVacancyDetail}
+          onOpenChange={setShowVacancyDetail}
+          showRecommendButton={false}
+        />
+      </Suspense>
 
       <Dialog open={showCommentsDialog} onOpenChange={setShowCommentsDialog}>
         <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col">
@@ -6863,7 +6809,7 @@ function Index() {
           <TabsContent value="games" className="space-y-6">
             <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">🎮 Мини-игры</h2>
             <p className="text-sm text-muted-foreground">Отдохни — здесь можно поиграть в перерыве</p>
-            <GamesTab />
+            <Suspense fallback={<LazyFallback />}><GamesTab /></Suspense>
           </TabsContent>
 
           {currentUser?.is_hr_manager && (
@@ -7574,19 +7520,21 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <VacancyDetail
-        vacancy={selectedVacancyDetail}
-        open={showVacancyDetail}
-        onOpenChange={setShowVacancyDetail}
-        showRecommendButton={userRole === 'employee'}
-        showPublicLink={userRole === 'employer'}
-        onRecommend={() => {
-          if (selectedVacancyDetail) {
-            setShowRecommendDialog(true);
-          }
-        }}
-        onRestore={userRole === 'employer' ? (id) => { handleRestoreVacancy(id); setShowVacancyDetail(false); } : undefined}
-      />
+      <Suspense fallback={null}>
+        <VacancyDetail
+          vacancy={selectedVacancyDetail}
+          open={showVacancyDetail}
+          onOpenChange={setShowVacancyDetail}
+          showRecommendButton={userRole === 'employee'}
+          showPublicLink={userRole === 'employer'}
+          onRecommend={() => {
+            if (selectedVacancyDetail) {
+              setShowRecommendDialog(true);
+            }
+          }}
+          onRestore={userRole === 'employer' ? (id) => { handleRestoreVacancy(id); setShowVacancyDetail(false); } : undefined}
+        />
+      </Suspense>
 
       <Dialog open={showRecommendDialog} onOpenChange={setShowRecommendDialog}>
         <DialogContent className="max-w-md">
@@ -7930,30 +7878,36 @@ function Index() {
       {userRole === 'employee' && renderEmployeeDashboard()}
 
       {showOnboarding && userRole !== 'guest' && (
-        <Onboarding
-          role={userRole}
-          onComplete={() => {
-            setShowOnboarding(false);
-            localStorage.removeItem('showOnboarding');
-          }}
-        />
+        <Suspense fallback={null}>
+          <Onboarding
+            role={userRole}
+            onComplete={() => {
+              setShowOnboarding(false);
+              localStorage.removeItem('showOnboarding');
+            }}
+          />
+        </Suspense>
       )}
-      
-      <EmployeeDetail
-        employee={selectedEmployee}
-        open={showEmployeeDetail}
-        onOpenChange={setShowEmployeeDetail}
-        recommendations={recommendations}
-      />
+
+      <Suspense fallback={null}>
+        <EmployeeDetail
+          employee={selectedEmployee}
+          open={showEmployeeDetail}
+          onOpenChange={setShowEmployeeDetail}
+          recommendations={recommendations}
+        />
+      </Suspense>
 
       {testManagerVacancy && currentCompanyId && (
-        <VacancyTestManager
-          open={showTestManager}
-          onOpenChange={setShowTestManager}
-          vacancyId={testManagerVacancy.id}
-          vacancyTitle={testManagerVacancy.title}
-          companyId={currentCompanyId}
-        />
+        <Suspense fallback={null}>
+          <VacancyTestManager
+            open={showTestManager}
+            onOpenChange={setShowTestManager}
+            vacancyId={testManagerVacancy.id}
+            vacancyTitle={testManagerVacancy.title}
+            companyId={currentCompanyId}
+          />
+        </Suspense>
       )}
 
       {/* Диалог реферальной ссылки с QR-кодом */}
