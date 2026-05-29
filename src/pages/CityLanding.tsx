@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import Icon from '@/components/ui/icon';
 import { getCityBySlug, CITIES } from '@/data/cities';
-import NotFound from './webapp/NotFound';
+import NotFound from './NotFound';
 
 const BENEFITS = [
   { icon: 'Users', title: 'Реферальный найм', desc: 'Сотрудники рекомендуют знакомых и получают бонус за успешный наём' },
