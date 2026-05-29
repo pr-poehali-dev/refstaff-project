@@ -5233,23 +5233,19 @@ function Index() {
                       </div>
                     )}
                     <div className="flex gap-1 sm:gap-2">
-                      <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileSelect}
-                        multiple
-                        className="hidden"
-                        accept="image/*,.pdf,.doc,.docx"
-                      />
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8 sm:h-10 sm:w-10 shrink-0"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Icon name="Paperclip" size={14} className="sm:hidden" />
-                        <Icon name="Paperclip" size={18} className="hidden sm:block" />
-                      </Button>
+                      <label className="cursor-pointer">
+                        <input
+                          type="file"
+                          onChange={handleFileSelect}
+                          multiple
+                          className="hidden"
+                          accept="image/*,.pdf,.doc,.docx"
+                        />
+                        <span className="inline-flex items-center justify-center h-8 w-8 sm:h-10 sm:w-10 shrink-0 rounded-md border border-input bg-background hover:bg-accent hover:text-accent-foreground">
+                          <Icon name="Paperclip" size={14} className="sm:hidden" />
+                          <Icon name="Paperclip" size={18} className="hidden sm:block" />
+                        </span>
+                      </label>
                       <Input 
                         placeholder={activeChatId ? "Сообщение..." : "Загрузка чата..."}
                         value={newMessage}
