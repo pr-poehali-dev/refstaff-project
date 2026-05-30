@@ -15,17 +15,20 @@ const SUGGESTIONS = [
   'Как настроить выплаты?',
 ];
 
-interface Message {
+export interface AiMessage {
   role: 'user' | 'assistant';
   content: string;
 }
 
+type Message = AiMessage;
+
 interface Props {
   companyId: number;
+  messages: Message[];
+  setMessages: (msgs: Message[] | ((prev: Message[]) => Message[])) => void;
 }
 
-export default function AiAssistantTab({ companyId }: Props) {
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function AiAssistantTab({ companyId, messages, setMessages }: Props) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);

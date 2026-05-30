@@ -19,7 +19,7 @@ import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Rec
 import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment, PayoutRequest } from '@/types';
 import ScrollableTabs from '@/components/ScrollableTabs';
 import TelegramLoginButton from '@/components/TelegramLoginButton';
-import AiAssistantTab from '@/components/AiAssistantTab';
+import AiAssistantTab, { type AiMessage } from '@/components/AiAssistantTab';
 import { BENEFITS_DATA } from '@/data/benefitsData';
 
 const EmployeeDetail = lazy(() => import('@/components/EmployeeDetail').then(m => ({ default: m.EmployeeDetail })));
@@ -238,6 +238,8 @@ function Index() {
     error: null,
     companyData: null
   });
+
+  const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
 
   const [loginForm, setLoginForm] = useState({
     email: '',
@@ -4895,7 +4897,7 @@ function Index() {
 
 
           <TabsContent value="ai-assistant" className="space-y-4">
-            <AiAssistantTab companyId={currentCompanyId} />
+            <AiAssistantTab companyId={currentCompanyId} messages={aiMessages} setMessages={setAiMessages} />
           </TabsContent>
 
         </Tabs>
