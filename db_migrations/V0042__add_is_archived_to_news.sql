@@ -1,0 +1,1 @@
+ALTER TABLE t_p65890965_refstaff_project.news ADD COLUMN IF NOT EXISTS is_archived boolean NOT NULL DEFAULT false;

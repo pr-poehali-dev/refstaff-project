@@ -623,7 +623,7 @@ function Index() {
           ? api.getChats(currentUser.id, currentCompanyId).catch(() => [])
           : Promise.resolve([]),
         currentCompanyId
-          ? fetch(`https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news&company_id=${currentCompanyId}`)
+          ? fetch(`https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news&company_id=${currentCompanyId}&role=${userRole}`)
               .then(res => res.json()).catch(() => [])
           : Promise.resolve([])
       ]);
@@ -919,6 +919,7 @@ function Index() {
           date: n.created_at ? new Date(n.created_at).toISOString().split('T')[0] : '',
           category: n.category || 'news',
           likes: n.likes || 0,
+          isArchived: n.is_archived || false,
           comments: (n.comments || []).map((c: any) => ({
             id: c.id, newsId: n.id, authorName: c.author_name, comment: c.text,
             date: c.created_at ? new Date(c.created_at).toISOString().split('T')[0] : ''
@@ -1740,6 +1741,16 @@ function Index() {
       });
       loadData(true);
     } catch { alert('Ошибка удаления'); }
+  };
+
+  const handleArchiveNews = async (id: number, isArchived: boolean) => {
+    try {
+      await fetch('https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'archive', news_id: id, is_archived: isArchived })
+      });
+      loadData(true);
+    } catch { alert('Ошибка архивирования'); }
   };
 
   const handleLikeNews = async (newsId: number) => {
@@ -4532,7 +4543,7 @@ function Index() {
 
             <div className="grid gap-4">
               {newsPosts.map((post) => (
-                <Card key={post.id} className="hover:shadow-md transition-shadow">
+                <Card key={post.id} className={`hover:shadow-md transition-shadow ${post.isArchived ? 'opacity-60 border-dashed' : ''}`}>
                   <CardHeader>
                     <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
                       <div className="flex-1 min-w-0">
@@ -4555,9 +4566,12 @@ function Index() {
                         <CardTitle className="text-base sm:text-xl">{post.title}</CardTitle>
                         <CardDescription className="mt-1 text-xs sm:text-sm truncate">Автор: {post.author}</CardDescription>
                       </div>
-                      <div className="flex gap-1 sm:gap-2 flex-shrink-0">
-                        <Button 
-                          variant="ghost" 
+                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+                        {post.isArchived && (
+                          <Badge variant="secondary" className="text-[10px] hidden sm:inline-flex">Архив</Badge>
+                        )}
+                        <Button
+                          variant="ghost"
                           size="sm"
                           onClick={() => {
                             setNewsToEdit(post);
@@ -4569,14 +4583,25 @@ function Index() {
                             setShowEditNewsDialog(true);
                           }}
                           className="h-8 w-8 p-0"
+                          title="Редактировать"
                         >
                           <Icon name="Edit" size={14} />
                         </Button>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleArchiveNews(post.id, !post.isArchived)}
+                          className="h-8 w-8 p-0"
+                          title={post.isArchived ? 'Вернуть из архива' : 'В архив'}
+                        >
+                          <Icon name={post.isArchived ? 'ArchiveRestore' : 'Archive'} size={14} className="text-muted-foreground" />
+                        </Button>
+                        <Button
+                          variant="ghost"
                           size="sm"
                           onClick={() => handleDeleteNews(post.id)}
                           className="h-8 w-8 p-0"
+                          title="Удалить"
                         >
                           <Icon name="Trash2" size={14} className="text-destructive" />
                         </Button>

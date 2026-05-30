@@ -1268,16 +1268,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 company_id = query_params.get('company_id')
                 if not company_id:
                     return {'statusCode': 400, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'company_id обязателен'}), 'isBase64Encoded': False}
-                cur.execute("""
+                # role=employer видит все новости включая архивные, остальные — только активные
+                role = query_params.get('role', 'employee')
+                archived_filter = "" if role == 'employer' else "AND n.is_archived = false"
+                cur.execute(f"""
                     SELECT n.id, n.title, n.content, n.category, n.created_at, n.updated_at,
+                           n.is_archived,
                            u.first_name || ' ' || u.last_name as author,
                            (SELECT COUNT(*) FROM t_p65890965_refstaff_project.news_likes WHERE news_id = n.id) as likes,
                            (SELECT json_agg(json_build_object('id', nc.id, 'author_name', nc.author_name, 'text', nc.text, 'created_at', nc.created_at) ORDER BY nc.created_at)
                             FROM t_p65890965_refstaff_project.news_comments nc WHERE nc.news_id = n.id) as comments
                     FROM t_p65890965_refstaff_project.news n
                     LEFT JOIN t_p65890965_refstaff_project.users u ON n.author_id = u.id
-                    WHERE n.company_id = %s
-                    ORDER BY n.created_at DESC
+                    WHERE n.company_id = %s {archived_filter}
+                    ORDER BY n.is_archived ASC, n.created_at DESC
                 """, (company_id,))
                 rows = cur.fetchall()
                 result = []
@@ -1323,6 +1327,13 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 if news_action == 'remove':
                     news_id = body_data.get('news_id')
                     cur.execute("UPDATE t_p65890965_refstaff_project.news SET content='[удалено]' WHERE id=%s", (news_id,))
+                    conn.commit()
+                    return {'statusCode': 200, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'ok': True}), 'isBase64Encoded': False}
+
+                if news_action == 'archive':
+                    news_id = body_data.get('news_id')
+                    is_archived = body_data.get('is_archived', True)
+                    cur.execute("UPDATE t_p65890965_refstaff_project.news SET is_archived=%s WHERE id=%s", (is_archived, news_id))
                     conn.commit()
                     return {'statusCode': 200, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'ok': True}), 'isBase64Encoded': False}
 
