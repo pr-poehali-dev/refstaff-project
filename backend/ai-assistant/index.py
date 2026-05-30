@@ -125,10 +125,10 @@ def get_company_context(company_id: int) -> str:
     cur.execute("""
         SELECT
             COUNT(*) as total,
-            COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending,
-            COUNT(CASE WHEN status IN ('accepted', 'hired') THEN 1 END) as accepted,
-            COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected,
-            COALESCE(SUM(CASE WHEN status IN ('accepted', 'hired') THEN reward_amount ELSE 0 END), 0) as total_rewards
+            COUNT(CASE WHEN r.status = 'pending' THEN 1 END) as pending,
+            COUNT(CASE WHEN r.status IN ('accepted', 'hired') THEN 1 END) as accepted,
+            COUNT(CASE WHEN r.status = 'rejected' THEN 1 END) as rejected,
+            COALESCE(SUM(CASE WHEN r.status IN ('accepted', 'hired') THEN r.reward_amount ELSE 0 END), 0) as total_rewards
         FROM t_p65890965_refstaff_project.recommendations r
         JOIN t_p65890965_refstaff_project.vacancies v ON r.vacancy_id = v.id
         WHERE v.company_id = %s
