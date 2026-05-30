@@ -37,6 +37,10 @@ export default function AiAssistantTab({ companyId, messages, setMessages }: Pro
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
+  useEffect(() => {
+    try { localStorage.setItem('ai_chat_history', JSON.stringify(messages.slice(-50))); } catch (e) { /* ignore */ }
+  }, [messages]);
+
   const send = async (question: string) => {
     if (!question.trim() || loading) return;
     const userMsg: Message = { role: 'user', content: question.trim() };
@@ -134,7 +138,7 @@ export default function AiAssistantTab({ companyId, messages, setMessages }: Pro
             variant="ghost"
             size="icon"
             className="shrink-0 h-10 w-10"
-            onClick={() => setMessages([])}
+            onClick={() => { setMessages([]); try { localStorage.removeItem('ai_chat_history'); } catch (e) { /* ignore */ } }}
             title="Очистить диалог"
           >
             <Icon name="Trash2" size={16} className="text-muted-foreground" />

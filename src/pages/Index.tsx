@@ -239,7 +239,9 @@ function Index() {
     companyData: null
   });
 
-  const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
+  const [aiMessages, setAiMessages] = useState<AiMessage[]>(() => {
+    try { return JSON.parse(localStorage.getItem('ai_chat_history') || '[]'); } catch { return []; }
+  });
 
   const [loginForm, setLoginForm] = useState({
     email: '',
