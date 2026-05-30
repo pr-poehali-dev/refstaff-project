@@ -431,25 +431,68 @@ function Index() {
     }
   };
 
+  const MAX_FILE_SIZE_MB = 4;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+  const compressImage = (file: File, maxSizeMB = 3): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        const maxDim = 1600;
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width = Math.round(width * ratio);
+          height = Math.round(height * ratio);
+        }
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext('2d')!.drawImage(img, 0, 0, width, height);
+        let quality = 0.85;
+        const tryEncode = () => {
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          const bytes = (dataUrl.length * 3) / 4;
+          if (bytes > maxSizeMB * 1024 * 1024 && quality > 0.4) {
+            quality -= 0.1;
+            tryEncode();
+          } else {
+            resolve(dataUrl.split(',')[1]);
+          }
+        };
+        tryEncode();
+      };
+      img.onerror = reject;
+      img.src = url;
+    });
+
   const handleSendMessage = async () => {
     if ((!newMessage.trim() && selectedFiles.length === 0) || !activeChatId || isSendingMessage) return;
     setIsSendingMessage(true);
     try {
       if (selectedFiles.length > 0) {
         for (const file of selectedFiles) {
-          const base64 = await new Promise<string>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => {
-              const result = reader.result as string;
-              resolve(result.split(',')[1]);
-            };
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-          });
+          let base64: string;
+          let mime_type = file.type;
+
+          if (file.type.startsWith('image/')) {
+            base64 = await compressImage(file);
+            mime_type = 'image/jpeg';
+          } else {
+            base64 = await new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve((reader.result as string).split(',')[1]);
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            });
+          }
+
           await api.sendMessage(activeChatId, currentUser?.id || 0, newMessage.trim(), {
             base64,
             name: file.name,
-            mime_type: file.type,
+            mime_type,
           });
         }
       } else {
@@ -460,15 +503,22 @@ function Index() {
       await loadChatMessages(activeChatId);
     } catch (e) {
       console.error('Failed to send message:', e);
+      alert('Не удалось отправить файл. Попробуйте файл меньшего размера.');
     } finally {
       setIsSendingMessage(false);
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      setSelectedFiles(Array.from(e.target.files));
+    if (!e.target.files) return;
+    const files = Array.from(e.target.files);
+    const tooBig = files.filter(f => f.size > MAX_FILE_SIZE_BYTES);
+    if (tooBig.length > 0) {
+      alert(`Файл "${tooBig[0].name}" слишком большой. Максимальный размер — ${MAX_FILE_SIZE_MB} МБ.`);
+      e.target.value = '';
+      return;
     }
+    setSelectedFiles(files);
   };
 
   const removeFile = (index: number) => {
