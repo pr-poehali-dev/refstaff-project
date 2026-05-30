@@ -113,6 +113,7 @@ function Index() {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const prevRecommendationsCount = useRef<number>(0);
   const [newRecommendationsCount, setNewRecommendationsCount] = useState<number>(0);
+  const [activeTab, setActiveTab] = useState<string>(() => localStorage.getItem('active_tab') || 'vacancies');
   const prevEmployeesCount = useRef<number>(0);
   const [newEmployeesCount, setNewEmployeesCount] = useState<number>(0);
   const prevPayoutsCount = useRef<number>(0);
@@ -3533,7 +3534,9 @@ function Index() {
             </div>
           </div>
         ) : (
-        <Tabs defaultValue="vacancies" className="space-y-6" onValueChange={(val) => {
+        <Tabs value={activeTab} className="space-y-6" onValueChange={(val) => {
+          setActiveTab(val);
+          localStorage.setItem('active_tab', val);
           if (val === 'recommendations') setNewRecommendationsCount(0);
           if (val === 'employees') setNewEmployeesCount(0);
           if (val === 'payouts') setNewPayoutsCount(0);
