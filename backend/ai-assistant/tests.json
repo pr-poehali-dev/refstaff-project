@@ -1,0 +1,13 @@
+{
+  "tests": [
+    {
+      "name": "Тест вопроса помощнику",
+      "method": "POST",
+      "path": "/",
+      "body": {"question": "Сколько активных вакансий?", "company_id": 1, "history": []},
+      "expectedStatus": 200,
+      "expectedBody": {"answer": "string"},
+      "bodyMatcher": "partial"
+    }
+  ]
+}

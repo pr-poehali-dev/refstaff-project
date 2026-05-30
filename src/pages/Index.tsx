@@ -19,6 +19,7 @@ import { api, type Vacancy as ApiVacancy, type Employee as ApiEmployee, type Rec
 import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, NewsComment, PayoutRequest } from '@/types';
 import ScrollableTabs from '@/components/ScrollableTabs';
 import TelegramLoginButton from '@/components/TelegramLoginButton';
+import AiAssistantTab from '@/components/AiAssistantTab';
 import { BENEFITS_DATA } from '@/data/benefitsData';
 
 const EmployeeDetail = lazy(() => import('@/components/EmployeeDetail').then(m => ({ default: m.EmployeeDetail })));
@@ -3545,6 +3546,7 @@ function Index() {
               <TabsTrigger value="stats">📊 Статистика</TabsTrigger>
               <TabsTrigger value="subscription" className="sm:hidden">💳 Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
               <TabsTrigger value="help">❓ Помощь</TabsTrigger>
+              <TabsTrigger value="ai-assistant">🤖 Помощник</TabsTrigger>
             </TabsList>
           </ScrollableTabs>
 
@@ -4891,6 +4893,10 @@ function Index() {
             </div>
           </TabsContent>
 
+
+          <TabsContent value="ai-assistant" className="space-y-4">
+            <AiAssistantTab companyId={currentCompanyId} />
+          </TabsContent>
 
         </Tabs>
         )}
