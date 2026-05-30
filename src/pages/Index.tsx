@@ -3550,7 +3550,7 @@ function Index() {
               <TabsTrigger value="stats">📊 Статистика</TabsTrigger>
               <TabsTrigger value="subscription" className="sm:hidden">💳 Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
               <TabsTrigger value="help">❓ Помощь</TabsTrigger>
-              <TabsTrigger value="ai-assistant">🤖 Помощник</TabsTrigger>
+              <TabsTrigger value="ai-assistant">🤖 ИИ-чат</TabsTrigger>
             </TabsList>
           </ScrollableTabs>
 
