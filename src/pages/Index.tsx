@@ -4596,15 +4596,7 @@ function Index() {
                         >
                           <Icon name={post.isArchived ? 'ArchiveRestore' : 'Archive'} size={14} className="text-muted-foreground" />
                         </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteNews(post.id)}
-                          className="h-8 w-8 p-0"
-                          title="Удалить"
-                        >
-                          <Icon name="Trash2" size={14} className="text-destructive" />
-                        </Button>
+
                       </div>
                     </div>
                   </CardHeader>
