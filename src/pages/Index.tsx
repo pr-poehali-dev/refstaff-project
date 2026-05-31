@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -2134,6 +2134,25 @@ function Index() {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Калькулятор CTA */}
+        <section className="py-10 sm:py-14 px-3 sm:px-4 lg:px-6">
+          <div className="container mx-auto max-w-4xl">
+            <div className="rounded-2xl bg-gradient-to-r from-primary/10 via-secondary/10 to-primary/10 border border-primary/20 p-7 sm:p-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10">
+              <div className="text-4xl sm:text-5xl select-none">🧮</div>
+              <div className="flex-1 text-center sm:text-left">
+                <h2 className="text-xl sm:text-2xl font-bold mb-2">Сколько вы тратите на найм?</h2>
+                <p className="text-muted-foreground text-sm sm:text-base">Бесплатный калькулятор покажет реальные затраты на рекрутинг и потенциальную экономию</p>
+              </div>
+              <Link to="/calculator" className="shrink-0">
+                <Button size="lg" className="shadow-lg shadow-primary/25 whitespace-nowrap">
+                  <Icon name="Calculator" size={18} className="mr-2" />
+                  Рассчитать
+                </Button>
+              </Link>
             </div>
           </div>
         </section>
