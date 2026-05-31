@@ -329,11 +329,14 @@ def handler(event: dict, context) -> dict:
 
         cur.execute(
             f"""SELECT vt.id, vt.questions, vt.company_id, vt.vacancy_id,
-                       v.title as vacancy_title, c.name as company_name, c.email as company_email
+                       v.title as vacancy_title, c.name as company_name,
+                       u.email as company_email
                 FROM {SCHEMA}.vacancy_tests vt
                 JOIN {SCHEMA}.vacancies v ON v.id = vt.vacancy_id
                 JOIN {SCHEMA}.companies c ON c.id = vt.company_id
-                WHERE vt.token = %s AND vt.is_active = true""",
+                LEFT JOIN {SCHEMA}.users u ON u.company_id = c.id AND u.is_hr_manager = true
+                WHERE vt.token = %s AND vt.is_active = true
+                LIMIT 1""",
             (token,)
         )
         test = cur.fetchone()
