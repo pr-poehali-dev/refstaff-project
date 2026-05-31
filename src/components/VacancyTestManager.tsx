@@ -264,18 +264,18 @@ export function VacancyTestManager({ open, onOpenChange, vacancyId, vacancyTitle
                   </Badge>
                 </div>
 
-                <div className="flex gap-2 flex-wrap">
-                  <Button size="sm" variant="outline" className="flex-1 min-w-0" onClick={() => copyLink(test.token)}>
-                    <Icon name="Copy" size={13} className="mr-1" />
-                    Ссылка
+                <div className="grid grid-cols-3 gap-2">
+                  <Button size="sm" variant="outline" className="w-full px-2" onClick={() => copyLink(test.token)}>
+                    <Icon name="Copy" size={13} className="mr-1 shrink-0" />
+                    <span className="truncate">Ссылка</span>
                   </Button>
-                  <Button size="sm" variant="outline" className="flex-1 min-w-0" onClick={() => openEdit(test)}>
-                    <Icon name="Pencil" size={13} className="mr-1" />
-                    Редактировать
+                  <Button size="sm" variant="outline" className="w-full px-2" onClick={() => openEdit(test)}>
+                    <Icon name="Pencil" size={13} className="mr-1 shrink-0" />
+                    <span className="truncate">Изменить</span>
                   </Button>
-                  <Button size="sm" variant="outline" className="flex-1 min-w-0" onClick={() => openResults(test)}>
-                    <Icon name="BarChart2" size={13} className="mr-1" />
-                    Результаты
+                  <Button size="sm" variant="outline" className="w-full px-2" onClick={() => openResults(test)}>
+                    <Icon name="BarChart2" size={13} className="mr-1 shrink-0" />
+                    <span className="truncate">Итоги</span>
                   </Button>
                   <Button size="sm" variant="ghost" onClick={() => toggleActive(test)} className="shrink-0">
                     <Icon name={test.is_active ? 'EyeOff' : 'Eye'} size={14} />
