@@ -334,8 +334,9 @@ def handler(event: dict, context) -> dict:
                 FROM {SCHEMA}.vacancy_tests vt
                 JOIN {SCHEMA}.vacancies v ON v.id = vt.vacancy_id
                 JOIN {SCHEMA}.companies c ON c.id = vt.company_id
-                LEFT JOIN {SCHEMA}.users u ON u.company_id = c.id AND u.is_hr_manager = true
+                LEFT JOIN {SCHEMA}.users u ON u.company_id = c.id AND (u.is_hr_manager = true OR u.role = 'admin')
                 WHERE vt.token = %s AND vt.is_active = true
+                ORDER BY (u.is_hr_manager IS TRUE) DESC, (u.role = 'admin') DESC
                 LIMIT 1""",
             (token,)
         )
