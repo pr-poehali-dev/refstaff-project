@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -43,6 +43,60 @@ export default function CreateTest() {
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  // JSON-LD разметка для поисковиков
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.type = 'application/ld+json';
+    script.id = 'create-test-jsonld';
+    script.text = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      'name': 'AI Конструктор тестов для кандидатов — iHUNT',
+      'url': 'https://i-hunt.ru/create-test',
+      'description': 'Бесплатный инструмент для HR и рекрутеров: создайте профессиональный тест для отбора кандидатов за 1 минуту с помощью искусственного интеллекта.',
+      'applicationCategory': 'BusinessApplication',
+      'operatingSystem': 'Web',
+      'offers': { '@type': 'Offer', 'price': '0', 'priceCurrency': 'RUB' },
+      'featureList': [
+        'Генерация вопросов по описанию вакансии с помощью ИИ',
+        'Редактирование вопросов и вариантов ответов',
+        'Уникальная ссылка для кандидатов',
+        'Автоматическая отправка результатов на email рекрутера',
+        'Поддержка любых вакансий и специальностей',
+        'Настройка сложности и количества вопросов',
+      ],
+      'provider': { '@type': 'Organization', 'name': 'iHUNT', 'url': 'https://i-hunt.ru' },
+    });
+    document.head.appendChild(script);
+    return () => { document.getElementById('create-test-jsonld')?.remove(); };
+  }, []);
+
+  // SEO мета-теги
+  useEffect(() => {
+    const prev = {
+      title: document.title,
+      desc: document.querySelector('meta[name="description"]')?.getAttribute('content') || '',
+      canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href') || '',
+    };
+    document.title = 'AI Тест для кандидатов — создать тест по вакансии бесплатно | iHUNT';
+    const desc = document.querySelector('meta[name="description"]');
+    if (desc) desc.setAttribute('content', 'Создайте профессиональный тест для отбора кандидатов за 1 минуту с помощью ИИ. Введите описание вакансии — ИИ сгенерирует вопросы. Бесплатно для HR и рекрутеров. Результаты автоматически на email.');
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if (canonical) canonical.setAttribute('href', 'https://i-hunt.ru/create-test');
+    // OG теги
+    const ogTitle = document.querySelector('meta[property="og:title"]');
+    if (ogTitle) ogTitle.setAttribute('content', 'AI Тест для кандидатов — создать тест по вакансии | iHUNT');
+    const ogDesc = document.querySelector('meta[property="og:description"]');
+    if (ogDesc) ogDesc.setAttribute('content', 'Создайте тест для отбора кандидатов за 1 минуту с помощью ИИ. Бесплатно для HR и рекрутеров.');
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute('content', 'https://i-hunt.ru/create-test');
+    return () => {
+      document.title = prev.title;
+      if (desc) desc.setAttribute('content', prev.desc);
+      if (canonical) canonical.setAttribute('href', prev.canonical);
+    };
+  }, []);
 
   // Форма
   const [jobTitle, setJobTitle] = useState('');
@@ -249,6 +303,31 @@ export default function CreateTest() {
               </Button>
 
               <p className="text-center text-xs text-muted-foreground">Лимит: 3 теста в день с одного устройства</p>
+            </div>
+
+            {/* SEO-блок: виден поисковикам, ненавязчив для пользователей */}
+            <div className="bg-white rounded-2xl border p-6 space-y-4">
+              <h2 className="font-semibold text-base text-foreground">Как создать тест для отбора кандидатов с ИИ</h2>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {[
+                  { icon: 'FileText', title: 'Опишите вакансию', text: 'Введите название должности и требования — ИИ сам сформирует релевантные вопросы' },
+                  { icon: 'Pencil', title: 'Отредактируйте', text: 'Проверьте и скорректируйте вопросы под специфику вашей компании' },
+                  { icon: 'Send', title: 'Отправьте кандидатам', text: 'Поделитесь ссылкой — результаты автоматически придут вам на email' },
+                ].map((item) => (
+                  <div key={item.title} className="flex gap-3">
+                    <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                      <Icon name={item.icon as 'FileText'} size={16} className="text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">{item.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{item.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-muted-foreground border-t pt-3">
+                Инструмент подходит для HR-менеджеров, рекрутеров и руководителей, которые хотят быстро и объективно оценить профессиональные знания кандидата перед собеседованием. Поддерживает любые вакансии: разработчики, бухгалтеры, менеджеры по продажам, юристы и другие специальности.
+              </p>
             </div>
           </>
         )}
