@@ -114,25 +114,29 @@ def generate_pdf(job_title, candidate_name, candidate_phone, candidate_email,
     import io
     import urllib.request as ur
 
-    # Загружаем кириллический шрифт (кэшируем в /tmp)
+    # Загружаем кириллический шрифт Roboto с Google Fonts (кэшируем в /tmp)
+    import os as _os
     FONT = 'Helvetica'
     FONT_BOLD = 'Helvetica-Bold'
+    FONT_SOURCES = [
+        ('Roboto', '/tmp/roboto.ttf',
+         'https://fonts.gstatic.com/s/roboto/v32/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2',
+         'https://raw.githubusercontent.com/google/fonts/main/apache/roboto/static/Roboto-Regular.ttf'),
+        ('RobotoBold', '/tmp/robotob.ttf',
+         'https://fonts.gstatic.com/s/roboto/v32/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.woff2',
+         'https://raw.githubusercontent.com/google/fonts/main/apache/roboto/static/Roboto-Bold.ttf'),
+    ]
     try:
-        import os as _os
-        path_r = '/tmp/dvu.ttf'
-        path_b = '/tmp/dvub.ttf'
-        if not _os.path.exists(path_r):
-            data = ur.urlopen('https://github.com/dejavu-fonts/dejavu-fonts/raw/refs/heads/master/ttf/DejaVuSans.ttf', timeout=20).read()
-            with open(path_r, 'wb') as f: f.write(data)
-        if not _os.path.exists(path_b):
-            data = ur.urlopen('https://github.com/dejavu-fonts/dejavu-fonts/raw/refs/heads/master/ttf/DejaVuSans-Bold.ttf', timeout=20).read()
-            with open(path_b, 'wb') as f: f.write(data)
-        pdfmetrics.registerFont(TTFont('DejaVu', path_r))
-        pdfmetrics.registerFont(TTFont('DejaVuBold', path_b))
-        FONT = 'DejaVu'
-        FONT_BOLD = 'DejaVuBold'
+        for fname, fpath, _, fallback_url in FONT_SOURCES:
+            if not _os.path.exists(fpath):
+                data = ur.urlopen(fallback_url, timeout=20).read()
+                with open(fpath, 'wb') as f:
+                    f.write(data)
+            pdfmetrics.registerFont(TTFont(fname, fpath))
+        FONT = 'Roboto'
+        FONT_BOLD = 'RobotoBold'
     except Exception as fe:
-        print(f'Font load error (fallback to Helvetica): {fe}')
+        print(f'Font load error: {fe}')
 
     score_hex = '#22c55e' if percentage >= 70 else '#f59e0b' if percentage >= 40 else '#ef4444'
     score_color = colors.HexColor(score_hex)
