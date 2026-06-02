@@ -142,12 +142,12 @@ export default function CreateTest() {
       {/* Шапка */}
       <div className="bg-white border-b">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center">
-              <Icon name="Target" size={16} className="text-white" />
+          <a href="/" className="flex items-center gap-2 cursor-pointer">
+            <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
+              <Icon name="Rocket" size={18} className="text-white" />
             </div>
-            <span className="font-bold text-lg">iHUNT</span>
-          </div>
+            <span className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
+          </a>
           <span className="text-sm text-muted-foreground">Конструктор тестов</span>
         </div>
       </div>

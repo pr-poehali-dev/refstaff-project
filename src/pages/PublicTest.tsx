@@ -129,11 +129,13 @@ export default function PublicTest() {
         <div className="max-w-2xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg flex items-center justify-center shrink-0">
-                <Icon name="Target" size={15} className="text-white" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground">iHUNT</p>
+              <a href="/" className="flex items-center gap-2 shrink-0">
+                <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
+                  <Icon name="Rocket" size={16} className="text-white" />
+                </div>
+                <span className="text-base font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
+              </a>
+              <div className="min-w-0 border-l pl-2">
                 <h1 className="font-semibold text-sm truncate">{test.job_title}</h1>
               </div>
             </div>
