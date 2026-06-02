@@ -16,6 +16,8 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const Admin = lazy(() => import("./pages/Admin"));
 const VacancyQR = lazy(() => import("./pages/VacancyQR"));
 const VacancyTest = lazy(() => import("./pages/VacancyTest"));
+const PublicTest = lazy(() => import("./pages/PublicTest"));
+const CreateTest = lazy(() => import("./pages/CreateTest"));
 const CityLanding = lazy(() => import("./pages/CityLanding"));
 
 const PageLoader = () => (
@@ -45,6 +47,8 @@ const App = () => (
               <Route path="/vacancy/:vacancyId/qr" element={<VacancyQR />} />
               <Route path="/vacancy/:vacancyId/qr/:token" element={<VacancyQR />} />
               <Route path="/test/:token" element={<VacancyTest />} />
+              <Route path="/test-public/:token" element={<PublicTest />} />
+              <Route path="/create-test" element={<CreateTest />} />
               <Route path="/:city" element={<CityLanding />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
