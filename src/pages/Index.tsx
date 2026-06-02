@@ -1902,7 +1902,7 @@ function Index() {
             <a href="/create-test" target="_blank" className="text-xs lg:text-sm hover:text-primary transition-colors font-medium">✨ AI тесты</a>
           </nav>
           <div className="flex items-center gap-2">
-            <a href="/create-test" target="_blank" className="md:hidden text-[11px] font-medium px-2 py-1 rounded-md border border-primary/30 text-primary hover:bg-primary/5 transition-colors">✨ AI</a>
+            <a href="/create-test" target="_blank" className="md:hidden inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg border border-primary/40 text-primary bg-primary/5 active:bg-primary/10 transition-colors whitespace-nowrap leading-none">✨ AI</a>
             <Button variant="ghost" onClick={() => setShowLoginDialog(true)} aria-label="Войти в систему" size="sm" className="text-xs sm:text-sm">Вход</Button>
             <Button onClick={() => setShowRegisterDialog(true)} aria-label="Зарегистрировать компанию" size="sm" className="text-xs">
               <span className="hidden sm:inline">Зарегистрировать</span>
