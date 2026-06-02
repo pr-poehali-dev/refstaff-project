@@ -30,6 +30,14 @@ interface VacancyTest {
   results_count?: number;
 }
 
+interface AnswerDetail {
+  question: string;
+  options: string[];
+  correct_index: number;
+  selected_index: number;
+  is_correct: boolean;
+}
+
 interface TestResult {
   id: number;
   candidate_name: string;
@@ -39,6 +47,7 @@ interface TestResult {
   total_questions: number;
   percentage: number;
   completed_at: string;
+  answers_detail?: AnswerDetail[];
 }
 
 interface Props {
@@ -62,6 +71,7 @@ export function VacancyTestManager({ open, onOpenChange, vacancyId, vacancyTitle
   const [tests, setTests] = useState<VacancyTest[]>([]);
   const [selectedTest, setSelectedTest] = useState<VacancyTest | null>(null);
   const [results, setResults] = useState<TestResult[]>([]);
+  const [expandedResult, setExpandedResult] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -425,23 +435,67 @@ export function VacancyTestManager({ open, onOpenChange, vacancyId, vacancyTitle
             )}
 
             {results.map(r => (
-              <div key={r.id} className="border rounded-xl p-4 space-y-2">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="font-medium text-sm">{r.candidate_name}</p>
-                    {r.candidate_phone && <p className="text-xs text-muted-foreground">{r.candidate_phone}</p>}
-                    {r.candidate_email && <p className="text-xs text-muted-foreground">{r.candidate_email}</p>}
+              <div key={r.id} className="border rounded-xl overflow-hidden">
+                <div className="p-4 space-y-2">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-medium text-sm">{r.candidate_name}</p>
+                      {r.candidate_phone && <p className="text-xs text-muted-foreground">{r.candidate_phone}</p>}
+                      {r.candidate_email && <p className="text-xs text-muted-foreground">{r.candidate_email}</p>}
+                      <p className="text-xs text-muted-foreground">{new Date(r.completed_at).toLocaleString('ru')}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <span className={`text-xl font-bold ${r.percentage >= 70 ? 'text-green-600' : r.percentage >= 40 ? 'text-yellow-600' : 'text-red-500'}`}>
+                        {r.percentage}%
+                      </span>
+                      <p className="text-xs text-muted-foreground">{r.score}/{r.total_questions}</p>
+                    </div>
                   </div>
-                  <div className="text-right shrink-0">
-                    <span className={`text-xl font-bold ${r.percentage >= 70 ? 'text-green-600' : r.percentage >= 40 ? 'text-yellow-600' : 'text-red-500'}`}>
-                      {r.percentage}%
-                    </span>
-                    <p className="text-xs text-muted-foreground">{r.score}/{r.total_questions}</p>
-                  </div>
+                  {r.answers_detail && r.answers_detail.length > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full text-xs h-7 text-muted-foreground"
+                      onClick={() => setExpandedResult(expandedResult === r.id ? null : r.id)}
+                    >
+                      <Icon name={expandedResult === r.id ? 'ChevronUp' : 'ChevronDown'} size={13} className="mr-1" />
+                      {expandedResult === r.id ? 'Скрыть ответы' : 'Посмотреть ответы'}
+                    </Button>
+                  )}
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {new Date(r.completed_at).toLocaleString('ru')}
-                </p>
+
+                {expandedResult === r.id && r.answers_detail && (
+                  <div className="border-t bg-muted/30 divide-y">
+                    {r.answers_detail.map((a, i) => (
+                      <div key={i} className="p-3 space-y-1.5">
+                        <div className="flex gap-2">
+                          <span className={`mt-0.5 shrink-0 ${a.is_correct ? 'text-green-600' : 'text-red-500'}`}>
+                            <Icon name={a.is_correct ? 'CheckCircle' : 'XCircle'} size={14} />
+                          </span>
+                          <p className="text-xs font-medium leading-snug">{i + 1}. {a.question}</p>
+                        </div>
+                        <div className="ml-5 space-y-1">
+                          {a.options.map((opt, oi) => {
+                            const isSelected = oi === a.selected_index;
+                            const isCorrect = oi === a.correct_index;
+                            return (
+                              <div key={oi} className={`text-xs px-2 py-1 rounded flex items-center gap-1.5 ${
+                                isCorrect ? 'bg-green-100 text-green-800' :
+                                isSelected && !isCorrect ? 'bg-red-100 text-red-700' :
+                                'text-muted-foreground'
+                              }`}>
+                                {isCorrect && <Icon name="Check" size={11} />}
+                                {isSelected && !isCorrect && <Icon name="X" size={11} />}
+                                {!isSelected && !isCorrect && <span className="w-[11px]" />}
+                                {opt}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
           </div>

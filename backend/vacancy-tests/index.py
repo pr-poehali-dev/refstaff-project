@@ -388,14 +388,33 @@ def handler(event: dict, context) -> dict:
             return resp(403, {'error': 'Access denied'})
 
         cur.execute(
+            f"SELECT questions FROM {SCHEMA}.vacancy_tests WHERE id = %s",
+            (test_id,)
+        )
+        test_row = cur.fetchone()
+        questions = test_row['questions'] if test_row else []
+
+        cur.execute(
             f"""SELECT id, candidate_name, candidate_email, candidate_phone,
-                       score, total_questions, completed_at
+                       score, total_questions, completed_at, answers
                 FROM {SCHEMA}.test_results WHERE test_id = %s ORDER BY completed_at DESC""",
             (test_id,)
         )
         results = [dict(r) for r in cur.fetchall()]
         for r in results:
             r['percentage'] = round(r['score'] / r['total_questions'] * 100) if r['total_questions'] else 0
+            answers_map = {a['question_id']: a['selected_index'] for a in (r['answers'] or [])}
+            r['answers_detail'] = [
+                {
+                    'question': q['text'],
+                    'options': q['options'],
+                    'correct_index': q['correct_index'],
+                    'selected_index': answers_map.get(q['id'], -1),
+                    'is_correct': answers_map.get(q['id'], -1) == q['correct_index'],
+                }
+                for q in questions
+            ]
+            del r['answers']
         return resp(200, results)
 
     return resp(404, {'error': 'Unknown action'})
