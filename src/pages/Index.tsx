@@ -1902,6 +1902,7 @@ function Index() {
             <a href="/create-test" target="_blank" className="text-xs lg:text-sm hover:text-primary transition-colors font-medium">✨ AI тесты</a>
           </nav>
           <div className="flex items-center gap-2">
+            <a href="/create-test" target="_blank" className="md:hidden text-xs font-medium px-3 py-1.5 rounded-lg border border-primary/30 text-primary hover:bg-primary/5 transition-colors">✨ AI тесты</a>
             <Button variant="ghost" onClick={() => setShowLoginDialog(true)} aria-label="Войти в систему" size="sm" className="text-xs sm:text-sm">Вход</Button>
             <Button onClick={() => setShowRegisterDialog(true)} aria-label="Зарегистрировать компанию" size="sm" className="text-xs">
               <span className="hidden sm:inline">Зарегистрировать</span>
