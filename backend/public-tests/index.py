@@ -309,7 +309,18 @@ def handler(event: dict, context) -> dict:
 
     # POST ?action=generate — создать тест по описанию вакансии
     if method == 'POST' and action == 'generate':
-        ip = (event.get('requestContext') or {}).get('identity', {}).get('sourceIp', 'unknown')
+        # Пробуем разные способы получить IP
+        request_context = event.get('requestContext') or {}
+        identity = request_context.get('identity') or {}
+        headers = event.get('headers') or {}
+        ip = (
+            identity.get('sourceIp')
+            or headers.get('x-forwarded-for', '').split(',')[0].strip()
+            or headers.get('X-Forwarded-For', '').split(',')[0].strip()
+            or headers.get('x-real-ip')
+            or 'unknown'
+        )
+        print(f'[LIMIT] IP={ip}, identity={identity}, x-forwarded-for={headers.get("x-forwarded-for")}')
         employer_email = body.get('employer_email', '').strip()
         job_title = body.get('job_title', '').strip()
         job_description = body.get('job_description', '').strip()
