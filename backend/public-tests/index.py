@@ -6,11 +6,9 @@ PDF-отчёт работодателю на email. Лимит: 3 генерац
 import json
 import os
 import smtplib
-import base64
 import urllib.request
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
@@ -100,139 +98,9 @@ correct_index — индекс правильного ответа (0-3). Воп
     return parsed.get('questions', [])
 
 
-def generate_pdf(job_title, candidate_name, candidate_phone, candidate_email,
-                 score, total, percentage, answers_detail, completed_at):
-    """Генерирует PDF-отчёт через reportlab с поддержкой кириллицы, возвращает bytes."""
-    from reportlab.lib.pagesizes import A4
-    from reportlab.lib import colors
-    from reportlab.lib.units import mm
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-    from reportlab.pdfbase import pdfmetrics
-    from reportlab.pdfbase.ttfonts import TTFont
-    from reportlab.lib.enums import TA_CENTER, TA_LEFT
-    import io
-    import urllib.request as ur
-
-    # Загружаем кириллический шрифт Roboto с Google Fonts (кэшируем в /tmp)
-    import os as _os
-    FONT = 'Helvetica'
-    FONT_BOLD = 'Helvetica-Bold'
-    FONT_SOURCES = [
-        ('Roboto', '/tmp/roboto.ttf',
-         'https://fonts.gstatic.com/s/roboto/v32/KFOmCnqEu92Fr1Mu4mxKKTU1Kg.woff2',
-         'https://raw.githubusercontent.com/google/fonts/main/apache/roboto/static/Roboto-Regular.ttf'),
-        ('RobotoBold', '/tmp/robotob.ttf',
-         'https://fonts.gstatic.com/s/roboto/v32/KFOlCnqEu92Fr1MmWUlfBBc4AMP6lQ.woff2',
-         'https://raw.githubusercontent.com/google/fonts/main/apache/roboto/static/Roboto-Bold.ttf'),
-    ]
-    try:
-        for fname, fpath, _, fallback_url in FONT_SOURCES:
-            if not _os.path.exists(fpath):
-                data = ur.urlopen(fallback_url, timeout=20).read()
-                with open(fpath, 'wb') as f:
-                    f.write(data)
-            pdfmetrics.registerFont(TTFont(fname, fpath))
-        FONT = 'Roboto'
-        FONT_BOLD = 'RobotoBold'
-    except Exception as fe:
-        print(f'Font load error: {fe}')
-
-    score_hex = '#22c55e' if percentage >= 70 else '#f59e0b' if percentage >= 40 else '#ef4444'
-    score_color = colors.HexColor(score_hex)
-
-    buf = io.BytesIO()
-    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=20*mm, rightMargin=20*mm,
-                            topMargin=20*mm, bottomMargin=20*mm)
-
-    styles = getSampleStyleSheet()
-    normal = ParagraphStyle('n', fontName=FONT, fontSize=10, leading=14)
-    bold = ParagraphStyle('b', fontName=FONT_BOLD, fontSize=10, leading=14)
-    title_style = ParagraphStyle('t', fontName=FONT_BOLD, fontSize=18, leading=22,
-                                 textColor=colors.HexColor('#1a1a1a'))
-    sub_style = ParagraphStyle('s', fontName=FONT, fontSize=11, leading=15,
-                               textColor=colors.HexColor('#4a5568'))
-    score_style = ParagraphStyle('sc', fontName=FONT_BOLD, fontSize=36, leading=44,
-                                 alignment=TA_CENTER, textColor=score_color)
-    section_style = ParagraphStyle('sec', fontName=FONT_BOLD, fontSize=13, leading=18,
-                                   textColor=colors.HexColor('#1a1a1a'))
-
-    story = []
-
-    # Заголовок
-    story.append(Paragraph('iHUNT — Результат теста', title_style))
-    story.append(Spacer(1, 4*mm))
-    story.append(Paragraph(f'Вакансия: {job_title}', sub_style))
-    story.append(Spacer(1, 8*mm))
-
-    # Данные кандидата
-    story.append(Paragraph('Кандидат', section_style))
-    story.append(Spacer(1, 3*mm))
-    table_data = [
-        [Paragraph('Имя', bold), Paragraph(candidate_name, normal)],
-        [Paragraph('Телефон', bold), Paragraph(candidate_phone or '—', normal)],
-        [Paragraph('Email', bold), Paragraph(candidate_email or '—', normal)],
-        [Paragraph('Дата', bold), Paragraph(str(completed_at)[:16].replace('T', ' '), normal)],
-    ]
-    t = Table(table_data, colWidths=[40*mm, 130*mm])
-    t.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f8fafc')),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
-        ('TOPPADDING', (0, 0), (-1, -1), 5),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
-        ('LEFTPADDING', (0, 0), (-1, -1), 8),
-    ]))
-    story.append(t)
-    story.append(Spacer(1, 8*mm))
-
-    # Результат
-    story.append(Paragraph('Результат', section_style))
-    story.append(Spacer(1, 2*mm))
-    story.append(Paragraph(f'{percentage}%', score_style))
-    story.append(Paragraph(f'{score} правильных из {total}', ParagraphStyle(
-        'sc2', fontName=FONT, fontSize=12, alignment=TA_CENTER,
-        textColor=colors.HexColor('#718096'))))
-    story.append(Spacer(1, 8*mm))
-
-    # Разбор ответов
-    story.append(Paragraph('Разбор ответов', section_style))
-    story.append(Spacer(1, 3*mm))
-
-    for i, a in enumerate(answers_detail):
-        is_correct = a.get('is_correct', False)
-        mark = '[OK]' if is_correct else '[X]'
-        mark_clr = colors.HexColor('#22c55e') if is_correct else colors.HexColor('#ef4444')
-        q_style = ParagraphStyle('q', fontName=FONT_BOLD, fontSize=10, leading=14,
-                                 textColor=mark_clr)
-        story.append(Paragraph(f'{mark} {i+1}. {a.get("question", "")}', q_style))
-
-        options = a.get('options', [])
-        correct_idx = a.get('correct_index', -1)
-        selected_idx = a.get('selected_index', -1)
-
-        for oi, opt in enumerate(options):
-            is_opt_correct = oi == correct_idx
-            is_opt_selected = oi == selected_idx
-            if is_opt_correct:
-                opt_clr = colors.HexColor('#22c55e')
-                prefix = '✓'
-            elif is_opt_selected:
-                opt_clr = colors.HexColor('#ef4444')
-                prefix = '✗'
-            else:
-                opt_clr = colors.HexColor('#718096')
-                prefix = '○'
-            opt_style = ParagraphStyle('o', fontName=FONT, fontSize=9, leading=13,
-                                       leftIndent=12, textColor=opt_clr)
-            story.append(Paragraph(f'{prefix}  {opt}', opt_style))
-
-        story.append(Spacer(1, 4*mm))
-
-    doc.build(story)
-    return buf.getvalue()
-
-
-def send_pdf_email(to_email, job_title, candidate_name, score, total, percentage, pdf_bytes):
+def send_result_email(to_email, job_title, candidate_name, candidate_phone,
+                      candidate_email, score, total, percentage, answers_detail, completed_at):
+    """Отправляет подробное HTML-письмо с разбором ответов кандидата."""
     smtp_host = os.environ.get('EMAIL_SMTP_HOST', '')
     smtp_port = int(os.environ.get('EMAIL_SMTP_PORT', 587))
     from_email = os.environ.get('EMAIL_FROM', '')
@@ -240,49 +108,94 @@ def send_pdf_email(to_email, job_title, candidate_name, score, total, percentage
 
     score_color = '#22c55e' if percentage >= 70 else '#f59e0b' if percentage >= 40 else '#ef4444'
 
+    # Генерируем HTML-блоки с разбором ответов
+    answers_html = ''
+    for i, a in enumerate(answers_detail):
+        is_correct = a.get('is_correct', False)
+        mark = '✅' if is_correct else '❌'
+        border_color = '#22c55e' if is_correct else '#ef4444'
+        bg_color = '#f0fdf4' if is_correct else '#fff5f5'
+        answers_html += f'''
+        <div style="border-left:4px solid {border_color};background:{bg_color};
+                    padding:12px 16px;margin-bottom:12px;border-radius:0 8px 8px 0;">
+          <p style="margin:0 0 8px;font-size:13px;font-weight:600;color:#2d3748;">
+            {mark} {i+1}. {a.get("question", "")}
+          </p>'''
+        for oi, opt in enumerate(a.get('options', [])):
+            is_opt_correct = oi == a.get('correct_index', -1)
+            is_opt_selected = oi == a.get('selected_index', -1)
+            if is_opt_correct and is_opt_selected:
+                opt_icon, opt_color, opt_weight = '✓', '#22c55e', '600'
+            elif is_opt_correct:
+                opt_icon, opt_color, opt_weight = '✓', '#22c55e', '600'
+            elif is_opt_selected:
+                opt_icon, opt_color, opt_weight = '✗', '#ef4444', '600'
+            else:
+                opt_icon, opt_color, opt_weight = '○', '#a0aec0', '400'
+            answers_html += f'''
+          <p style="margin:3px 0;font-size:12px;color:{opt_color};font-weight:{opt_weight};">
+            &nbsp;&nbsp;{opt_icon} {opt}
+          </p>'''
+        answers_html += '</div>'
+
     html = f"""<!DOCTYPE html>
 <html lang="ru">
-<head><meta charset="UTF-8"></head>
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;background:#f5f5f5;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:40px 20px;">
-  <tr><td align="center">
-    <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
-      <tr><td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:28px 30px;text-align:center;">
-        <h1 style="margin:0;color:#fff;font-size:24px;">🎯 iHUNT</h1>
-        <p style="margin:6px 0 0;color:rgba(255,255,255,0.9);font-size:14px;">Платформа поиска талантов</p>
-      </td></tr>
-      <tr><td style="padding:32px 30px;">
-        <h2 style="margin:0 0 12px;color:#1a1a1a;font-size:20px;">Кандидат прошёл тест 📋</h2>
-        <p style="margin:0 0 20px;color:#4a5568;font-size:15px;">
-          <strong>{candidate_name}</strong> завершил тест по вакансии <strong>«{job_title}»</strong>
-        </p>
-        <div style="background:#f8fafc;border-radius:8px;padding:20px;text-align:center;margin-bottom:20px;">
-          <p style="margin:0 0 4px;color:#718096;font-size:13px;">Результат</p>
-          <p style="margin:0;font-size:36px;font-weight:700;color:{score_color};">{percentage}%</p>
-          <p style="margin:4px 0 0;color:#718096;font-size:13px;">{score} правильных из {total}</p>
-        </div>
-        <p style="margin:0;color:#718096;font-size:13px;">
-          Подробный разбор ответов — в приложенном PDF-файле.
-        </p>
-      </td></tr>
-      <tr><td style="background:#f8fafc;padding:16px 30px;text-align:center;border-top:1px solid #e2e8f0;">
-        <p style="margin:0;color:#a0aec0;font-size:12px;">© iHUNT — Платформа рекомендательного найма</p>
-      </td></tr>
-    </table>
+<table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:30px 16px;">
+<tr><td align="center">
+<table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:12px;overflow:hidden;box-shadow:0 4px 6px rgba(0,0,0,0.08);max-width:600px;width:100%;">
+  <tr><td style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);padding:28px 30px;text-align:center;">
+    <h1 style="margin:0;color:#fff;font-size:24px;font-weight:700;">🎯 iHUNT</h1>
+    <p style="margin:6px 0 0;color:rgba(255,255,255,0.9);font-size:14px;">Платформа поиска талантов</p>
   </td></tr>
+  <tr><td style="padding:28px 24px;">
+    <h2 style="margin:0 0 8px;color:#1a1a1a;font-size:19px;">Новый результат теста 📋</h2>
+    <p style="margin:0 0 20px;color:#4a5568;font-size:14px;">
+      <strong>{candidate_name}</strong> прошёл тест по вакансии <strong>«{job_title}»</strong>
+    </p>
+
+    <!-- Данные кандидата -->
+    <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8fafc;border-radius:8px;margin-bottom:20px;">
+      <tr>
+        <td style="padding:10px 14px;color:#718096;font-size:12px;border-bottom:1px solid #e2e8f0;">Телефон</td>
+        <td style="padding:10px 14px;color:#2d3748;font-size:12px;font-weight:600;border-bottom:1px solid #e2e8f0;">{candidate_phone or '—'}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 14px;color:#718096;font-size:12px;border-bottom:1px solid #e2e8f0;">Email</td>
+        <td style="padding:10px 14px;color:#2d3748;font-size:12px;font-weight:600;border-bottom:1px solid #e2e8f0;">{candidate_email or '—'}</td>
+      </tr>
+      <tr>
+        <td style="padding:10px 14px;color:#718096;font-size:12px;">Дата</td>
+        <td style="padding:10px 14px;color:#2d3748;font-size:12px;font-weight:600;">{str(completed_at)[:16].replace('T', ' ')}</td>
+      </tr>
+    </table>
+
+    <!-- Результат -->
+    <div style="background:#f8fafc;border-radius:8px;padding:20px;text-align:center;margin-bottom:24px;">
+      <p style="margin:0 0 4px;color:#718096;font-size:13px;">Результат</p>
+      <p style="margin:0;font-size:42px;font-weight:700;color:{score_color};">{percentage}%</p>
+      <p style="margin:4px 0 0;color:#718096;font-size:13px;">{score} правильных из {total}</p>
+    </div>
+
+    <!-- Разбор ответов -->
+    <h3 style="margin:0 0 14px;color:#1a1a1a;font-size:15px;font-weight:600;">Разбор ответов</h3>
+    {answers_html}
+
+  </td></tr>
+  <tr><td style="background:#f8fafc;padding:16px 24px;text-align:center;border-top:1px solid #e2e8f0;">
+    <p style="margin:0;color:#a0aec0;font-size:12px;">© iHUNT — Платформа рекомендательного найма</p>
+  </td></tr>
+</table>
+</td></tr>
 </table>
 </body></html>"""
 
-    msg = MIMEMultipart()
+    msg = MIMEMultipart('alternative')
     msg['From'] = from_email
     msg['To'] = to_email
-    msg['Subject'] = f'Результат теста: {candidate_name} — {job_title}'
+    msg['Subject'] = f'Результат теста: {candidate_name} — {job_title} ({percentage}%)'
     msg.attach(MIMEText(html, 'html', 'utf-8'))
-
-    pdf_part = MIMEApplication(pdf_bytes, _subtype='pdf')
-    safe_name = candidate_name.replace(' ', '_')[:30]
-    pdf_part.add_header('Content-Disposition', 'attachment', filename=f'result_{safe_name}.pdf')
-    msg.attach(pdf_part)
 
     with smtplib.SMTP(smtp_host, smtp_port) as server:
         server.starttls()
@@ -481,9 +394,10 @@ def handler(event: dict, context) -> dict:
                 'is_correct': sel == q.get('correct_index', -1),
             })
 
-        # Генерируем и отправляем PDF
+        # Отправляем HTML-письмо с разбором ответов
         try:
-            pdf_bytes = generate_pdf(
+            send_result_email(
+                to_email=test['employer_email'],
                 job_title=test['job_title'],
                 candidate_name=candidate_name,
                 candidate_phone=candidate_phone,
@@ -494,17 +408,8 @@ def handler(event: dict, context) -> dict:
                 answers_detail=answers_detail,
                 completed_at=result['completed_at'],
             )
-            send_pdf_email(
-                to_email=test['employer_email'],
-                job_title=test['job_title'],
-                candidate_name=candidate_name,
-                score=score,
-                total=len(questions),
-                percentage=percentage,
-                pdf_bytes=pdf_bytes,
-            )
         except Exception as e:
-            print(f'PDF/email error: {e}')
+            print(f'Email error: {e}')
 
         return resp(201, result)
 
