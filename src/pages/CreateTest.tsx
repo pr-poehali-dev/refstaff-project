@@ -159,7 +159,7 @@ export default function CreateTest() {
           <>
             <div className="text-center space-y-2">
               <h1 className="text-2xl font-bold">Создать тест для кандидата</h1>
-              <p className="text-muted-foreground text-sm">ИИ сгенерирует вопросы по вашей вакансии. Результаты придут на email в PDF.</p>
+              <p className="text-muted-foreground text-sm">ИИ сгенерирует вопросы по вашей вакансии. Результаты каждого кандидата придут вам на email.</p>
             </div>
 
             <div className="bg-white rounded-2xl border p-6 space-y-5">
@@ -191,7 +191,7 @@ export default function CreateTest() {
                   value={employerEmail}
                   onChange={e => setEmployerEmail(e.target.value)}
                 />
-                <p className="text-xs text-muted-foreground">После прохождения теста каждым кандидатом вам придёт PDF с подробным разбором</p>
+                <p className="text-xs text-muted-foreground">После каждого прохождения вам придёт письмо с подробным разбором ответов</p>
               </div>
 
               <div className="space-y-3">
@@ -329,7 +329,7 @@ export default function CreateTest() {
                 <Icon name="CheckCircle" size={32} className="text-green-600" />
               </div>
               <h1 className="text-2xl font-bold">Тест готов!</h1>
-              <p className="text-muted-foreground text-sm">Отправьте ссылку кандидатам. Результаты каждого придут вам на <strong>{employerEmail}</strong> в виде PDF.</p>
+              <p className="text-muted-foreground text-sm">Отправьте ссылку кандидатам. Результаты каждого придут вам на <strong>{employerEmail}</strong>.</p>
             </div>
 
             <div className="bg-white rounded-2xl border p-6 space-y-4">
@@ -346,8 +346,25 @@ export default function CreateTest() {
               <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                 <Icon name="Mail" size={18} className="text-blue-600 shrink-0" />
                 <p className="text-xs text-blue-800">
-                  После каждого прохождения вы получите письмо с PDF, где видны все ответы кандидата — правильные и неправильные.
+                  После каждого прохождения вы получите письмо с подробным разбором — какие ответы были правильными, а какие нет.
                 </p>
+              </div>
+
+              {/* Рекламный блок iHUNT */}
+              <div className="rounded-xl border border-violet-200 bg-gradient-to-br from-violet-50 to-purple-50 p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg shrink-0">
+                    <Icon name="Rocket" size={14} className="text-white" />
+                  </div>
+                  <span className="font-bold text-sm bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
+                </div>
+                <p className="text-xs text-violet-800 leading-relaxed">
+                  Хотите больше? На платформе iHUNT вы можете вести базу кандидатов, управлять вакансиями, запускать реферальный найм и получать рекомендации от сотрудников.
+                </p>
+                <a href="/" className="inline-flex items-center gap-1 text-xs font-medium text-violet-700 hover:text-violet-900 transition-colors">
+                  Узнать подробнее
+                  <Icon name="ArrowRight" size={12} />
+                </a>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
