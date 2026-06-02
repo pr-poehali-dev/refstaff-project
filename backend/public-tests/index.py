@@ -320,7 +320,7 @@ def handler(event: dict, context) -> dict:
             or headers.get('x-real-ip')
             or 'unknown'
         )
-        print(f'[LIMIT] IP={ip}, identity={identity}, x-forwarded-for={headers.get("x-forwarded-for")}')
+
         employer_email = body.get('employer_email', '').strip()
         job_title = body.get('job_title', '').strip()
         job_description = body.get('job_description', '').strip()
