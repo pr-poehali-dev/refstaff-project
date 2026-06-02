@@ -194,15 +194,15 @@ export default function CreateTest() {
                 <p className="text-xs text-muted-foreground">После прохождения теста каждым кандидатом вам придёт PDF с подробным разбором</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-3">
                 <div className="space-y-1.5">
                   <Label>Сложность</Label>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     {(['easy', 'medium', 'hard'] as const).map(d => (
                       <button
                         key={d}
                         onClick={() => setDifficulty(d)}
-                        className={`flex-1 text-xs py-1.5 rounded-lg border transition-all ${
+                        className={`text-xs py-2 rounded-lg border transition-all ${
                           difficulty === d ? DIFFICULTY_COLOR[d] + ' font-semibold' : 'border-border text-muted-foreground hover:border-primary/40'
                         }`}
                       >
@@ -213,12 +213,12 @@ export default function CreateTest() {
                 </div>
                 <div className="space-y-1.5">
                   <Label>Количество вопросов</Label>
-                  <div className="flex gap-2">
+                  <div className="grid grid-cols-4 gap-2">
                     {[5, 10, 15, 20].map(n => (
                       <button
                         key={n}
                         onClick={() => setQuestionsCount(n)}
-                        className={`flex-1 text-xs py-1.5 rounded-lg border transition-all ${
+                        className={`text-xs py-2 rounded-lg border transition-all ${
                           questionsCount === n ? 'bg-primary text-primary-foreground border-primary font-semibold' : 'border-border text-muted-foreground hover:border-primary/40'
                         }`}
                       >
