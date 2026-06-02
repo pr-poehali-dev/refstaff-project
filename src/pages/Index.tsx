@@ -3554,6 +3554,7 @@ function Index() {
               <TabsTrigger value="subscription" className="sm:hidden">💳 Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
               <TabsTrigger value="help">❓ Помощь</TabsTrigger>
               <TabsTrigger value="ai-assistant">🤖 ИИ-чат</TabsTrigger>
+              <TabsTrigger value="ai-tests" onClick={() => window.open('/create-test', '_blank')}>✨ AI тесты</TabsTrigger>
             </TabsList>
           </ScrollableTabs>
 
