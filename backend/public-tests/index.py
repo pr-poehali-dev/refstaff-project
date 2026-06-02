@@ -102,79 +102,106 @@ correct_index — индекс правильного ответа (0-3). Воп
 
 def generate_pdf(job_title, candidate_name, candidate_phone, candidate_email,
                  score, total, percentage, answers_detail, completed_at):
-    """Генерирует PDF-отчёт через fpdf2, возвращает bytes."""
-    from fpdf import FPDF
+    """Генерирует PDF-отчёт через reportlab с поддержкой кириллицы, возвращает bytes."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib import colors
+    from reportlab.lib.units import mm
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.pdfbase import pdfmetrics
+    from reportlab.pdfbase.ttfonts import TTFont
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    import io
+    import urllib.request as ur
 
-    SCORE_COLOR = (34, 197, 94) if percentage >= 70 else (245, 158, 11) if percentage >= 40 else (239, 68, 68)
+    # Загружаем кириллический шрифт (кэшируем в /tmp)
+    FONT = 'Helvetica'
+    FONT_BOLD = 'Helvetica-Bold'
+    try:
+        import os as _os
+        path_r = '/tmp/dvu.ttf'
+        path_b = '/tmp/dvub.ttf'
+        if not _os.path.exists(path_r):
+            data = ur.urlopen('https://github.com/dejavu-fonts/dejavu-fonts/raw/refs/heads/master/ttf/DejaVuSans.ttf', timeout=20).read()
+            with open(path_r, 'wb') as f: f.write(data)
+        if not _os.path.exists(path_b):
+            data = ur.urlopen('https://github.com/dejavu-fonts/dejavu-fonts/raw/refs/heads/master/ttf/DejaVuSans-Bold.ttf', timeout=20).read()
+            with open(path_b, 'wb') as f: f.write(data)
+        pdfmetrics.registerFont(TTFont('DejaVu', path_r))
+        pdfmetrics.registerFont(TTFont('DejaVuBold', path_b))
+        FONT = 'DejaVu'
+        FONT_BOLD = 'DejaVuBold'
+    except Exception as fe:
+        print(f'Font load error (fallback to Helvetica): {fe}')
 
-    pdf = FPDF()
-    pdf.add_page()
-    pdf.set_auto_page_break(auto=True, margin=15)
+    score_hex = '#22c55e' if percentage >= 70 else '#f59e0b' if percentage >= 40 else '#ef4444'
+    score_color = colors.HexColor(score_hex)
+
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(buf, pagesize=A4, leftMargin=20*mm, rightMargin=20*mm,
+                            topMargin=20*mm, bottomMargin=20*mm)
+
+    styles = getSampleStyleSheet()
+    normal = ParagraphStyle('n', fontName=FONT, fontSize=10, leading=14)
+    bold = ParagraphStyle('b', fontName=FONT_BOLD, fontSize=10, leading=14)
+    title_style = ParagraphStyle('t', fontName=FONT_BOLD, fontSize=18, leading=22,
+                                 textColor=colors.HexColor('#1a1a1a'))
+    sub_style = ParagraphStyle('s', fontName=FONT, fontSize=11, leading=15,
+                               textColor=colors.HexColor('#4a5568'))
+    score_style = ParagraphStyle('sc', fontName=FONT_BOLD, fontSize=36, leading=44,
+                                 alignment=TA_CENTER, textColor=score_color)
+    section_style = ParagraphStyle('sec', fontName=FONT_BOLD, fontSize=13, leading=18,
+                                   textColor=colors.HexColor('#1a1a1a'))
+
+    story = []
 
     # Заголовок
-    pdf.set_fill_color(102, 126, 234)
-    pdf.rect(0, 0, 210, 32, 'F')
-    pdf.set_text_color(255, 255, 255)
-    pdf.set_font('Helvetica', 'B', 18)
-    pdf.set_xy(10, 8)
-    pdf.cell(0, 10, 'iHUNT - Результат теста', ln=True)
-    pdf.set_font('Helvetica', '', 11)
-    pdf.set_xy(10, 20)
-    pdf.cell(0, 8, f'Вакансия: {job_title}', ln=True)
+    story.append(Paragraph('iHUNT — Результат теста', title_style))
+    story.append(Spacer(1, 4*mm))
+    story.append(Paragraph(f'Вакансия: {job_title}', sub_style))
+    story.append(Spacer(1, 8*mm))
 
-    pdf.set_text_color(0, 0, 0)
-    pdf.ln(8)
-
-    # Блок кандидата
-    pdf.set_font('Helvetica', 'B', 13)
-    pdf.cell(0, 8, 'Кандидат', ln=True)
-    pdf.set_font('Helvetica', '', 11)
-    pdf.set_fill_color(248, 250, 252)
-    pdf.set_draw_color(226, 232, 240)
-
-    rows = [
-        ('Имя', candidate_name),
-        ('Телефон', candidate_phone or '—'),
-        ('Email', candidate_email or '—'),
-        ('Дата прохождения', str(completed_at)[:16].replace('T', ' ')),
+    # Данные кандидата
+    story.append(Paragraph('Кандидат', section_style))
+    story.append(Spacer(1, 3*mm))
+    table_data = [
+        [Paragraph('Имя', bold), Paragraph(candidate_name, normal)],
+        [Paragraph('Телефон', bold), Paragraph(candidate_phone or '—', normal)],
+        [Paragraph('Email', bold), Paragraph(candidate_email or '—', normal)],
+        [Paragraph('Дата', bold), Paragraph(str(completed_at)[:16].replace('T', ' '), normal)],
     ]
-    for label, value in rows:
-        pdf.set_font('Helvetica', '', 10)
-        pdf.set_fill_color(248, 250, 252)
-        pdf.cell(50, 8, label, border=1, fill=True)
-        pdf.set_font('Helvetica', 'B', 10)
-        pdf.cell(0, 8, value, border=1, ln=True)
-
-    pdf.ln(6)
+    t = Table(table_data, colWidths=[40*mm, 130*mm])
+    t.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, -1), colors.HexColor('#f8fafc')),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#e2e8f0')),
+        ('TOPPADDING', (0, 0), (-1, -1), 5),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 5),
+        ('LEFTPADDING', (0, 0), (-1, -1), 8),
+    ]))
+    story.append(t)
+    story.append(Spacer(1, 8*mm))
 
     # Результат
-    pdf.set_font('Helvetica', 'B', 13)
-    pdf.cell(0, 8, 'Результат', ln=True)
-    pdf.set_font('Helvetica', 'B', 28)
-    pdf.set_text_color(*SCORE_COLOR)
-    pdf.cell(0, 14, f'{percentage}%  ({score}/{total})', ln=True, align='C')
-    pdf.set_text_color(0, 0, 0)
-    pdf.ln(4)
+    story.append(Paragraph('Результат', section_style))
+    story.append(Spacer(1, 2*mm))
+    story.append(Paragraph(f'{percentage}%', score_style))
+    story.append(Paragraph(f'{score} правильных из {total}', ParagraphStyle(
+        'sc2', fontName=FONT, fontSize=12, alignment=TA_CENTER,
+        textColor=colors.HexColor('#718096'))))
+    story.append(Spacer(1, 8*mm))
 
     # Разбор ответов
-    pdf.set_font('Helvetica', 'B', 13)
-    pdf.cell(0, 8, 'Разбор ответов', ln=True)
-    pdf.ln(2)
+    story.append(Paragraph('Разбор ответов', section_style))
+    story.append(Spacer(1, 3*mm))
 
     for i, a in enumerate(answers_detail):
         is_correct = a.get('is_correct', False)
         mark = '[OK]' if is_correct else '[X]'
-        mark_color = (34, 197, 94) if is_correct else (239, 68, 68)
+        mark_clr = colors.HexColor('#22c55e') if is_correct else colors.HexColor('#ef4444')
+        q_style = ParagraphStyle('q', fontName=FONT_BOLD, fontSize=10, leading=14,
+                                 textColor=mark_clr)
+        story.append(Paragraph(f'{mark} {i+1}. {a.get("question", "")}', q_style))
 
-        # Вопрос
-        pdf.set_font('Helvetica', 'B', 10)
-        pdf.set_text_color(*mark_color)
-        pdf.cell(10, 6, mark)
-        pdf.set_text_color(0, 0, 0)
-        q_text = f"{i + 1}. {a.get('question', '')}"
-        pdf.multi_cell(0, 6, q_text)
-
-        # Варианты
         options = a.get('options', [])
         correct_idx = a.get('correct_index', -1)
         selected_idx = a.get('selected_index', -1)
@@ -182,26 +209,23 @@ def generate_pdf(job_title, candidate_name, candidate_phone, candidate_email,
         for oi, opt in enumerate(options):
             is_opt_correct = oi == correct_idx
             is_opt_selected = oi == selected_idx
-            prefix = '  '
-            if is_opt_correct and is_opt_selected:
-                pdf.set_text_color(34, 197, 94)
-                prefix = '  ✓ '
-            elif is_opt_correct:
-                pdf.set_text_color(34, 197, 94)
-                prefix = '  ✓ '
+            if is_opt_correct:
+                opt_clr = colors.HexColor('#22c55e')
+                prefix = '✓'
             elif is_opt_selected:
-                pdf.set_text_color(239, 68, 68)
-                prefix = '  ✗ '
+                opt_clr = colors.HexColor('#ef4444')
+                prefix = '✗'
             else:
-                pdf.set_text_color(113, 128, 150)
-            pdf.set_font('Helvetica', '', 9)
-            pdf.set_x(15)
-            pdf.multi_cell(0, 5, f'{prefix}{opt}')
+                opt_clr = colors.HexColor('#718096')
+                prefix = '○'
+            opt_style = ParagraphStyle('o', fontName=FONT, fontSize=9, leading=13,
+                                       leftIndent=12, textColor=opt_clr)
+            story.append(Paragraph(f'{prefix}  {opt}', opt_style))
 
-        pdf.set_text_color(0, 0, 0)
-        pdf.ln(2)
+        story.append(Spacer(1, 4*mm))
 
-    return bytes(pdf.output())
+    doc.build(story)
+    return buf.getvalue()
 
 
 def send_pdf_email(to_email, job_title, candidate_name, score, total, percentage, pdf_bytes):
