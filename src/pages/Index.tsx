@@ -1913,94 +1913,58 @@ function Index() {
       </header>
 
       <main>
-        {/* HERO */}
-        <section className="pt-20 sm:pt-24 md:pt-28 lg:pt-36 pb-12 sm:pb-16 md:pb-20 px-3 sm:px-4 lg:px-6 relative overflow-hidden" aria-labelledby="hero-title">
-          {/* фоновые декоративные блобы */}
-          <div className="absolute -top-40 -right-40 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-20 -left-20 w-72 h-72 bg-secondary/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="container mx-auto max-w-7xl relative z-10">
-            {/* Социальное доказательство над заголовком */}
-            <div className="flex justify-center lg:justify-start mb-5 sm:mb-6">
-              <div className="inline-flex items-center gap-2 bg-white border border-primary/20 rounded-full px-4 py-2 shadow-sm animate-fade-in">
-                <div className="flex -space-x-2">
-                  {['bg-blue-400','bg-green-400','bg-purple-400','bg-orange-400'].map((c,i) => (
-                    <div key={i} className={`w-6 h-6 rounded-full ${c} border-2 border-white`} />
-                  ))}
-                </div>
-                <span className="text-xs sm:text-sm font-medium text-foreground">500+ компаний уже нанимают через iHUNT</span>
-              </div>
-            </div>
-
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+        <section className="pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-8 sm:pb-12 md:pb-16 lg:pb-20 px-3 sm:px-4 lg:px-6" aria-labelledby="hero-title">
+          <div className="container mx-auto max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
               <div className="text-center lg:text-left">
-                <h1 id="hero-title" className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-5 animate-slide-up leading-tight">
-                  Ваши сотрудники —{' '}
-                  <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                    лучшие рекрутеры
-                  </span>
+                <Badge className="mb-4 sm:mb-6 animate-fade-in text-xs sm:text-sm">🚀 Реферальный рекрутинг</Badge>
+                <h1 id="hero-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight">
+                  Нанимайте лучших кандидатов через своих сотрудников
                 </h1>
-                <p className="text-base sm:text-lg md:text-xl text-muted-foreground mb-6 sm:mb-8 animate-slide-up leading-relaxed" style={{ animationDelay: '0.1s' }}>
-                  Запустите реферальный найм за 5 минут. Сотрудники рекомендуют знакомых — вы получаете качественных кандидатов, экономя до 70% бюджета на рекрутинг.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start mb-8" style={{ animationDelay: '0.2s' }}>
-                  <Button size="lg" className="animate-scale-in shadow-lg shadow-primary/30 text-sm sm:text-base px-6 sm:px-8" onClick={() => { setShowRegisterDialog(true); if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'click_cta_hero'); }} aria-label="Начать бесплатный пробный период на 14 дней">
+                <h2 className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-4 sm:mb-6 md:mb-8 animate-slide-up font-normal" style={{ animationDelay: '0.1s' }}>
+                  Платформа для реферального найма с геймификацией
+                </h2>
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center lg:justify-start">
+                  <Button size="default" className="animate-scale-in shadow-lg shadow-primary/25 text-sm sm:text-base" style={{ animationDelay: '0.2s' }} onClick={() => { setShowRegisterDialog(true); if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'click_cta_hero'); }} aria-label="Начать бесплатный пробный период на 14 дней">
                     <Icon name="Rocket" className="mr-2" size={18} aria-hidden="true" />
-                    Начать бесплатно — 14 дней
+                    <span className="hidden sm:inline">Начать бесплатно — 14 дней</span>
+                    <span className="sm:hidden">Начать бесплатно</span>
                   </Button>
-                  <Button size="lg" variant="outline" className="animate-scale-in text-sm sm:text-base" style={{ animationDelay: '0.3s' }} onClick={() => setShowDemoDialog(true)}>
-                    <Icon name="Play" className="mr-2" size={18} />
-                    Смотреть демо
+                  <Button size="default" variant="outline" className="animate-scale-in text-sm sm:text-base" style={{ animationDelay: '0.3s' }} onClick={() => setShowLoginDialog(true)}>
+                    <Icon name="LogIn" className="mr-2" size={18} />
+                    Войти
                   </Button>
                 </div>
-
-                {/* Метрики под CTA */}
-                <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-6 border-t border-gray-100">
-                  {[
-                    { value: '−70%', label: 'стоимость найма' },
-                    { value: '×2', label: 'быстрее закрытие' },
-                    { value: '92%', label: 'проходят испытание' },
-                  ].map((m) => (
-                    <div key={m.value} className="text-center lg:text-left">
-                      <div className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">{m.value}</div>
-                      <div className="text-[11px] sm:text-xs text-muted-foreground mt-0.5">{m.label}</div>
-                    </div>
-                  ))}
+                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-6 justify-center lg:justify-start text-xs sm:text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={16} />
+                    <span>Прост в использовании</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Icon name="Check" className="text-green-600" size={16} />
+                    <span>Настройка за 5 минут</span>
+                  </div>
                 </div>
               </div>
-
-              {/* Правая колонка — картинка + floating-карточки */}
               <div className="relative animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/5">
-                  <img
-                    src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/e96124dc-c09c-454b-a967-49eff0e74945.jpg"
-                    alt="Команда использует iHUNT для реферального найма"
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                  <img 
+                    src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/e96124dc-c09c-454b-a967-49eff0e74945.jpg" 
+                    alt="Команда сотрудников работает вместе"
                     loading="lazy"
                     decoding="async"
                     className="w-full h-auto"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
-
-                {/* Floating карточки */}
-                <div className="hidden sm:flex absolute -bottom-4 -left-6 bg-white rounded-2xl shadow-xl p-3.5 items-center gap-3 animate-bounce" style={{ animationDuration: '4s' }}>
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                    <Icon name="TrendingUp" className="text-green-600" size={20} />
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold text-green-600 leading-none">+127%</div>
-                    <div className="text-[11px] text-muted-foreground">рост рекомендаций</div>
-                  </div>
-                </div>
-
-                <div className="hidden sm:flex absolute -top-4 -right-4 bg-white rounded-2xl shadow-xl p-3.5 items-center gap-3 animate-bounce" style={{ animationDuration: '5s', animationDelay: '0.5s' }}>
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                    <Icon name="Users" className="text-primary" size={20} />
-                  </div>
-                  <div>
-                    <div className="text-lg font-bold text-primary leading-none">15 000+</div>
-                    <div className="text-[11px] text-muted-foreground">успешных найма</div>
+                <div className="hidden sm:block absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+                      <Icon name="TrendingUp" className="text-green-600" size={24} />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-bold text-green-600">+127%</div>
+                      <div className="text-xs text-muted-foreground">эффективность найма</div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2008,106 +1972,60 @@ function Index() {
           </div>
         </section>
 
-        {/* ЛОГОТИПЫ / ТРАСТОВАЯ ПОЛОСКА */}
-        <section className="py-8 sm:py-10 px-3 sm:px-4 lg:px-6 border-y bg-gray-50/60">
-          <div className="container mx-auto max-w-5xl">
-            <p className="text-center text-xs sm:text-sm text-muted-foreground mb-5 sm:mb-6 font-medium uppercase tracking-wider">Нам доверяют HR-команды</p>
-            <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 md:gap-14">
-              {['IT-компании', 'Ритейл', 'Производство', 'Банки', 'Консалтинг'].map((name) => (
-                <span key={name} className="text-sm sm:text-base font-semibold text-gray-400 hover:text-gray-600 transition-colors">{name}</span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* БОЛИ КЛИЕНТА */}
-        <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-white">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-10 sm:mb-14">
-              <Badge className="mb-4 bg-red-500/10 text-red-600 border-red-500/20">😤 Узнаёте себя?</Badge>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">Найм без системы — дорого и медленно</h2>
-              <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">Типичные проблемы HR-команд, которые iHUNT решает раз и навсегда</p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
-              {[
-                { icon: 'DollarSign', color: 'text-red-500 bg-red-50', title: 'Огромные расходы на рекрутинг', desc: 'Агентства и job-сайты съедают бюджет, а качество кандидатов остаётся посредственным' },
-                { icon: 'Clock', color: 'text-orange-500 bg-orange-50', title: 'Вакансии висят месяцами', desc: 'Поток нерелевантных резюме занимает время HR, а нужный человек так и не находится' },
-                { icon: 'UserX', color: 'text-purple-500 bg-purple-50', title: 'Кандидаты уходят после найма', desc: 'Нанятые через агентства сотрудники не вписываются в культуру компании и уходят' },
-                { icon: 'BarChart2', color: 'text-blue-500 bg-blue-50', title: 'Нет прозрачности процесса', desc: 'Непонятно откуда пришёл кандидат, сколько стоил найм и кто из сотрудников помог' },
-                { icon: 'Frown', color: 'text-yellow-600 bg-yellow-50', title: 'Сотрудники не вовлечены', desc: 'Команда не знает о вакансиях или не мотивирована рекомендовать знакомых' },
-                { icon: 'Zap', color: 'text-green-600 bg-green-50', title: 'iHUNT всё это решает', desc: 'Один инструмент — реферальная программа, геймификация, аналитика и автоматические выплаты' },
-              ].map((item, i) => (
-                <div key={i} className={`relative bg-white rounded-2xl border p-5 sm:p-6 flex gap-4 ${i === 5 ? 'border-primary/40 bg-gradient-to-br from-primary/5 to-secondary/5' : 'border-gray-100'} shadow-sm hover:shadow-md transition-shadow`}>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${item.color}`}>
-                    <Icon name={item.icon as 'Clock'} size={20} />
-                  </div>
-                  <div>
-                    <h3 className={`font-semibold text-sm sm:text-base mb-1 ${i === 5 ? 'text-primary' : ''}`}>{item.title}</h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* КАК РАБОТАЕТ */}
         <section id="how" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-primary/5 via-white to-purple-50 relative overflow-hidden" aria-labelledby="how-title">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="container mx-auto max-w-7xl relative z-10">
-            <div className="text-center mb-10 sm:mb-14 md:mb-16">
+            <div className="text-center mb-8 sm:mb-12 md:mb-20">
               <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">⚡ Простой процесс</Badge>
-              <h2 id="how-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                Запуск за 5 минут
+              <h2 id="how-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+                Как это работает
               </h2>
-              <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-xl mx-auto">
-                Четыре шага — и ваша команда уже приводит лучших кандидатов
+              <p className="text-sm sm:text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
+                Запустите реферальную программу за 4 простых шага и начните получать рекомендации
               </p>
             </div>
-
+            
             <div className="relative max-w-5xl mx-auto">
-              {/* Соединительная линия */}
-              <div className="hidden lg:block absolute top-[60px] left-[12.5%] right-[12.5%] h-0.5 bg-gradient-to-r from-blue-400 via-green-400 via-purple-400 to-orange-400 opacity-30" />
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-4">
+              <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-green-500 via-purple-500 to-orange-500 transform -translate-y-1/2 opacity-20"></div>
+              
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-4">
                 {[
-                  { icon: 'Building2', title: 'Регистрация', desc: 'Создайте аккаунт компании и разместите открытые вакансии', color: 'from-blue-500 to-blue-600' },
-                  { icon: 'UserPlus', title: 'Добавьте команду', desc: 'Пригласите сотрудников одной ссылкой — они сразу видят вакансии', color: 'from-green-500 to-green-600' },
-                  { icon: 'Send', title: 'Рекомендации', desc: 'Сотрудники рекомендуют знакомых и следят за статусом в реальном времени', color: 'from-purple-500 to-purple-600' },
-                  { icon: 'BadgeDollarSign', title: 'Выплаты', desc: 'Система сама считает и уведомляет о бонусе при успешном найме', color: 'from-orange-500 to-orange-600' },
+                  { emoji: '🏢', title: 'Регистрация', desc: 'Создайте аккаунт компании и разместите открытые вакансии', color: 'from-blue-500 to-blue-600' },
+                  { emoji: '👥', title: 'Приглашение', desc: 'Добавьте своих сотрудников в систему одним кликом', color: 'from-green-500 to-green-600' },
+                  { emoji: '🎯', title: 'Рекомендации', desc: 'Получайте качественные кандидатуры от вашей команды', color: 'from-purple-500 to-purple-600' },
+                  { emoji: '💰', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за найм', color: 'from-orange-500 to-orange-600' },
                 ].map((step, i) => (
                   <div key={i} className="relative group">
-                    <div className="relative bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-400 hover:-translate-y-2 border border-gray-100 overflow-hidden h-full">
-                      <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${step.color}`} />
-                      <div className="p-5 sm:p-6 pt-6">
-                        <div className="flex items-center gap-3 mb-4">
-                          <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-300`}>
-                            <Icon name={step.icon as 'Send'} size={22} className="text-white" />
+                    <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
+                      <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${step.color}`}></div>
+                      
+                      <div className="p-4 sm:p-6 pt-6 sm:pt-8">
+                        <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
+                          <div className={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
+                            <span className="text-xl sm:text-2xl">{step.emoji}</span>
                           </div>
-                          <span className={`text-3xl font-black bg-gradient-to-br ${step.color} bg-clip-text text-transparent opacity-30`}>{i + 1}</span>
+                          <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br ${step.color} text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-md`}>
+                            {i + 1}
+                          </div>
                         </div>
-                        <h3 className="text-base font-bold mb-2 text-gray-900">{step.title}</h3>
+                        
+                        <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{step.title}</h3>
                         <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
                       </div>
-                      <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${step.color} scale-x-0 group-hover:scale-x-100 transition-transform duration-500`} />
+                      
+                      <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${step.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
                     </div>
+                    
                     {i < 3 && (
-                      <div className="hidden lg:flex absolute top-[52px] -right-3 z-20 w-6 h-6 items-center justify-center">
-                        <Icon name="ChevronRight" className="text-primary/40" size={20} />
+                      <div className="hidden lg:flex absolute top-1/2 -right-2 transform -translate-y-1/2 z-20 w-8 h-8 items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center border-2 border-primary/20">
+                          <Icon name="ChevronRight" className="text-primary" size={18} />
+                        </div>
                       </div>
                     )}
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* CTA под шагами */}
-            <div className="text-center mt-10 sm:mt-14">
-              <Button size="lg" className="shadow-lg shadow-primary/20 px-8" onClick={() => { setShowRegisterDialog(true); }}>
-                <Icon name="Rocket" className="mr-2" size={18} />
-                Попробовать бесплатно
-              </Button>
-              <p className="text-xs text-muted-foreground mt-3">Без банковской карты. 14 дней бесплатно.</p>
             </div>
           </div>
         </section>
@@ -2180,7 +2098,7 @@ function Index() {
                       <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">🎯 Результаты наших клиентов</h3>
                       <div className="space-y-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center shrink-0">
+                          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                             <span className="text-2xl">📈</span>
                           </div>
                           <div>
@@ -2189,7 +2107,7 @@ function Index() {
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
+                          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                             <span className="text-2xl">⏱️</span>
                           </div>
                           <div>
@@ -2222,134 +2140,142 @@ function Index() {
           </div>
         </section>
 
-        {/* ОТЗЫВЫ */}
-        <section className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-white">
-          <div className="container mx-auto max-w-6xl">
-            <div className="text-center mb-10 sm:mb-14">
-              <Badge className="mb-4 bg-yellow-500/10 text-yellow-700 border-yellow-500/20">⭐ Отзывы клиентов</Badge>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3">Что говорят HR-руководители</h2>
-              <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">Реальные результаты от реальных компаний</p>
-            </div>
-            <div className="grid sm:grid-cols-3 gap-5 sm:gap-6">
-              {[
-                { name: 'Анна Петрова', role: 'HR-директор, IT-компания', text: 'За 3 месяца закрыли 12 вакансий через рефералов. Стоимость одного найма снизилась с 80 000 до 23 000 ₽. Сотрудники сами просят добавить новые вакансии.', rating: 5 },
-                { name: 'Михаил Соколов', role: 'CEO, ритейл-сеть 500+ чел.', text: 'Внедрили за один день. Уже через неделю получили первые рекомендации. Геймификация реально работает — сотрудники соревнуются, кто приведёт больше кандидатов.', rating: 5 },
-                { name: 'Елена Крюкова', role: 'Рекрутер, производственный холдинг', text: 'Раньше тратили 2 месяца на закрытие сложной вакансии. Теперь через iHUNT закрываем за 3 недели. 94% рефератных кандидатов прошли испытательный срок.', rating: 5 },
-              ].map((review, i) => (
-                <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow p-5 sm:p-6 flex flex-col gap-4">
-                  <div className="flex gap-0.5">
-                    {Array(review.rating).fill(0).map((_, j) => (
-                      <Icon key={j} name="Star" size={14} className="text-yellow-400 fill-yellow-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm text-gray-700 leading-relaxed flex-1">«{review.text}»</p>
-                  <div className="flex items-center gap-3 pt-2 border-t border-gray-50">
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-xs font-bold shrink-0">
-                      {review.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold">{review.name}</div>
-                      <div className="text-xs text-muted-foreground">{review.role}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
         <section id="pricing" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-blue-50 via-white to-green-50 relative overflow-hidden" aria-labelledby="pricing-title">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
-          <div className="container mx-auto max-w-5xl relative z-10">
-            <div className="text-center mb-10 sm:mb-12">
-              <Badge className="mb-4 bg-blue-500/10 text-blue-600 border-blue-500/20">💎 Прозрачное ценообразование</Badge>
-              <h2 id="pricing-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Один тариф — всё включено</h2>
-              <p className="text-muted-foreground text-sm sm:text-base max-w-xl mx-auto">Никаких скрытых платежей. 14 дней бесплатно — кредитная карта не нужна.</p>
+          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
+          <div className="container mx-auto max-w-6xl relative z-10">
+            <div className="text-center mb-10 sm:mb-12 md:mb-16">
+              <Badge className="mb-4 bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs sm:text-sm">💎 Прозрачное ценообразование</Badge>
+              <h2 id="pricing-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Тарифы</h2>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">14 дней бесплатно для всех новых клиентов</p>
             </div>
-
-            <div className="flex items-center justify-center gap-3 mb-8">
-              <button onClick={() => setPricingPeriod('monthly')} className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${pricingPeriod === 'monthly' ? 'bg-primary text-white shadow-md' : 'text-muted-foreground hover:text-foreground'}`}>Месяц</button>
-              <button onClick={() => setPricingPeriod('yearly')} className={`px-5 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${pricingPeriod === 'yearly' ? 'bg-primary text-white shadow-md' : 'text-muted-foreground hover:text-foreground'}`}>
+            
+            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10 md:mb-12">
+              <Button 
+                variant={pricingPeriod === 'monthly' ? 'default' : 'outline'} 
+                onClick={() => setPricingPeriod('monthly')}
+                className="min-w-[120px]"
+              >
+                Месяц
+              </Button>
+              <Button 
+                variant={pricingPeriod === 'yearly' ? 'default' : 'outline'} 
+                onClick={() => setPricingPeriod('yearly')}
+                className="min-w-[120px]"
+              >
                 Год
-                <span className="bg-green-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">−15%</span>
-              </button>
+                <Badge className="ml-2 bg-green-500 text-white">-15%</Badge>
+              </Button>
             </div>
-
-            <div className="grid sm:grid-cols-2 gap-5 sm:gap-6 max-w-3xl mx-auto">
-              {/* Бесплатный */}
-              <div className="relative bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-xl transition-all hover:-translate-y-1 overflow-hidden flex flex-col">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-gray-300 to-gray-400" />
-                <div className="p-6 sm:p-8 flex flex-col flex-1">
-                  <div className="mb-5">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">Старт</p>
-                    <h3 className="text-xl font-bold mb-1">Пробный период</h3>
-                    <p className="text-sm text-muted-foreground">Полный доступ, без ограничений</p>
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-3xl mx-auto">
+            <div className="group">
+              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gray-400 to-gray-500"></div>
+                
+                <div className="p-5 sm:p-8">
+                  <div className="mb-4 sm:mb-6">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Пробный период</h3>
+                    <p className="text-sm text-muted-foreground">Протестируйте платформу</p>
                   </div>
-                  <div className="mb-6">
-                    <span className="text-4xl font-black">0 ₽</span>
-                    <span className="text-muted-foreground text-sm ml-2">/ 14 дней</span>
+                  
+                  <div className="mb-4 sm:mb-6">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">0 ₽</div>
+                    <p className="text-sm text-muted-foreground">14 дней бесплатно</p>
                   </div>
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {['Все функции платформы', 'Неограниченные вакансии', 'Приглашение сотрудников', 'Поддержка 24/7'].map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm">
-                        <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                          <Icon name="Check" className="text-green-600" size={12} />
-                        </div>
-                        {f}
-                      </li>
-                    ))}
+                  
+                  <ul className="space-y-3 mb-5 sm:mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Все функции платформы</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Поддержка 24/7</span>
+                    </li>
                   </ul>
-                  <Button variant="outline" className="w-full" onClick={() => setShowRegisterDialog(true)}>Начать бесплатно</Button>
-                  <Button variant="ghost" className="w-full mt-2 text-muted-foreground" size="sm" onClick={() => setShowDemoDialog(true)}>Запросить демо</Button>
+                  
+                  <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Попробовать самостоятельно</Button>
+                  <Button className="w-full mt-2" variant="secondary" onClick={() => setShowDemoDialog(true)}>Запросить демонстрацию</Button>
                 </div>
               </div>
+            </div>
 
-              {/* Платный */}
-              <div className="relative bg-gradient-to-br from-primary to-secondary rounded-2xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 overflow-hidden flex flex-col">
-                <div className="absolute top-4 right-4">
-                  <span className="bg-white/20 text-white text-[11px] font-bold px-2.5 py-1 rounded-full backdrop-blur-sm">Популярный</span>
-                </div>
-                <div className="p-6 sm:p-8 flex flex-col flex-1">
-                  <div className="mb-5">
-                    <p className="text-xs font-semibold text-white/70 uppercase tracking-wider mb-1">Полный доступ</p>
-                    <h3 className="text-xl font-bold text-white mb-1">Продвинутый</h3>
-                    <p className="text-sm text-white/70">Для растущих компаний</p>
+            <div className="group">
+              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
+                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 to-red-500"></div>
+                
+                <div className="p-5 sm:p-8">
+                  <div className="mb-4 sm:mb-6">
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Продвинутый</h3>
+                    <p className="text-sm text-muted-foreground">Корпоративный тариф</p>
                   </div>
-                  <div className="mb-6">
-                    <span className="text-4xl font-black text-white">{pricingPeriod === 'monthly' ? '19 900' : '16 915'} ₽</span>
-                    <span className="text-white/70 text-sm ml-2">/ мес</span>
+                  
+                  <div className="mb-4 sm:mb-6">
+                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
+                      {pricingPeriod === 'monthly' ? '19 900 ₽' : '16 915 ₽'}
+                    </div>
+                    <p className="text-sm text-muted-foreground mb-1">в месяц</p>
                     {pricingPeriod === 'yearly' && (
-                      <p className="text-sm text-white/80 mt-1 font-medium">Экономия 35 820 ₽ в год</p>
+                      <p className="text-sm text-green-600 font-medium">202 980 ₽/год (экономия 35 820 ₽)</p>
                     )}
                   </div>
-                  <ul className="space-y-3 mb-8 flex-1">
-                    {[
-                      'Неограниченное кол-во сотрудников',
-                      'Геймификация и рейтинги',
-                      'Подробная аналитика',
-                      'Выделенный менеджер',
-                      'Внутренний чат',
-                      'Автоматические выплаты бонусов',
-                    ].map(f => (
-                      <li key={f} className="flex items-center gap-2.5 text-sm text-white">
-                        <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center shrink-0">
-                          <Icon name="Check" className="text-white" size={12} />
-                        </div>
-                        {f}
-                      </li>
-                    ))}
+                  
+                  <ul className="space-y-3 mb-5 sm:mb-8">
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Нет ограничений на  кол-во сотрудников</span>
+                    </li>
+
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Подробная аналитика</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Геймификация</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Нет ограничений на размещение вакансий</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Выделенный менеджер</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Работа с рекомендациями</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
+                        <Icon name="Check" className="text-green-600" size={14} />
+                      </div>
+                      <span className="text-sm">Внутренний чат с сотрудниками</span>
+                    </li>
                   </ul>
-                  <Button className="w-full bg-white text-primary hover:bg-white/90 font-semibold" onClick={() => setShowDemoDialog(true)}>Подключить</Button>
+                  
+                  <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500" onClick={() => setShowDemoDialog(true)}>Подключить</Button>
                 </div>
               </div>
             </div>
 
-            {/* Гарантия */}
-            <div className="text-center mt-8 flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <Icon name="ShieldCheck" size={16} className="text-green-600" />
-              <span>Без банковской карты при регистрации. Отмена в любой момент.</span>
-            </div>
           </div>
+        </div>
         </section>
 
         <section id="contact" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-green-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="contact-title">
@@ -2447,31 +2373,6 @@ function Index() {
                 </form>
               </div>
             </div>
-          </div>
-        </section>
-        {/* ФИНАЛЬНЫЙ CTA */}
-        <section className="py-14 sm:py-20 px-3 sm:px-4 lg:px-6 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-secondary" />
-          <div className="absolute -top-20 -right-20 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="container mx-auto max-w-4xl relative z-10 text-center">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
-              Готовы нанимать лучших<br className="hidden sm:block" /> через свою команду?
-            </h2>
-            <p className="text-white/80 text-sm sm:text-base md:text-lg mb-8 max-w-xl mx-auto">
-              500+ компаний уже экономят до 70% бюджета на рекрутинг. Присоединяйтесь — первые 14 дней бесплатно.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button size="lg" className="bg-white text-primary hover:bg-white/90 font-semibold shadow-xl px-8" onClick={() => { setShowRegisterDialog(true); if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'click_cta_bottom'); }}>
-                <Icon name="Rocket" className="mr-2" size={18} />
-                Начать бесплатно — 14 дней
-              </Button>
-              <Button size="lg" variant="outline" className="border-white/40 text-white hover:bg-white/10" onClick={() => setShowDemoDialog(true)}>
-                <Icon name="Play" className="mr-2" size={18} />
-                Смотреть демо
-              </Button>
-            </div>
-            <p className="text-white/50 text-xs mt-5">Без банковской карты. Отмена в любой момент.</p>
           </div>
         </section>
       </main>
