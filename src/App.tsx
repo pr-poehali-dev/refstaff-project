@@ -19,6 +19,8 @@ const VacancyTest = lazy(() => import("./pages/VacancyTest"));
 const PublicTest = lazy(() => import("./pages/PublicTest"));
 const CreateTest = lazy(() => import("./pages/CreateTest"));
 const CityLanding = lazy(() => import("./pages/CityLanding"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -49,6 +51,8 @@ const App = () => (
               <Route path="/test/:token" element={<VacancyTest />} />
               <Route path="/test-public/:token" element={<PublicTest />} />
               <Route path="/create-test" element={<CreateTest />} />
+              <Route path="/blog" element={<Blog />} />
+              <Route path="/blog/:slug" element={<BlogPost />} />
               <Route path="/:city" element={<CityLanding />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

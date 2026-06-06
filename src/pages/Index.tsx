@@ -1899,6 +1899,7 @@ function Index() {
             <button onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Преимущества</button>
             <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Тарифы</button>
             <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Контакты</button>
+            <a href="/blog" className="text-xs lg:text-sm hover:text-primary transition-colors">Блог</a>
             <a href="/create-test" target="_blank" className="text-xs lg:text-sm hover:text-primary transition-colors font-medium">✨ AI тесты</a>
           </nav>
           <div className="flex items-center gap-2">
@@ -2395,7 +2396,7 @@ function Index() {
             <nav aria-label="Компания">
               <h4 className="font-semibold mb-2 text-sm">Компания</h4>
               <ul className="space-y-1.5 text-xs text-muted-foreground">
-                <li><a href="https://t.me/i_hunt_ru" target="_blank" rel="noopener noreferrer" className="hover:text-primary">Блог</a></li>
+                <li><a href="/blog" className="hover:text-primary">Блог</a></li>
                 <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
                 <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
               </ul>
