@@ -256,6 +256,50 @@ def handler(event: dict, context) -> dict:
             'body': json.dumps({'success': True, 'id': post_id, 'slug': slug, 'title': article['title']})
         }
 
+    # POST: cron — генерирует N статей за один вызов (для cron-job.org)
+    # Вызывать: POST ?action=cron с заголовком X-Admin-Secret
+    # Рекомендуемый cron: каждые 4 часа → 0 */4 * * *
+    if method == 'POST' and action == 'cron':
+        if admin_secret != os.environ.get('ADMIN_SECRET', ''):
+            return {'statusCode': 403, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'forbidden'})}
+
+        body = json.loads(event.get('body') or '{}')
+        count = min(int(body.get('count', 1)), 5)  # максимум 5 за раз
+
+        results = []
+        existing_topics = get_existing_topics(conn)
+
+        for _ in range(count):
+            try:
+                article = generate_article(existing_topics)
+                content_with_links = inject_links(article['content'])
+                slug_base = slugify(article['topic'])
+                slug = slug_base
+                with conn.cursor() as cur:
+                    i = 1
+                    while True:
+                        cur.execute(f'SELECT 1 FROM {SCHEMA}.blog_posts WHERE slug=%s', (slug,))
+                        if not cur.fetchone():
+                            break
+                        slug = f'{slug_base}-{i}'
+                        i += 1
+                    cur.execute(
+                        f'INSERT INTO {SCHEMA}.blog_posts (slug, title, meta_description, content, topic) '
+                        f'VALUES (%s, %s, %s, %s, %s) RETURNING id',
+                        (slug, article['title'], article['metaDescription'], content_with_links, article['topic'])
+                    )
+                    post_id = cur.fetchone()[0]
+                existing_topics.append(article['topic'])
+                results.append({'id': post_id, 'slug': slug, 'title': article['title'], 'ok': True})
+            except Exception as e:
+                results.append({'ok': False, 'error': str(e)})
+
+        return {
+            'statusCode': 200,
+            'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
+            'body': json.dumps({'success': True, 'generated': len([r for r in results if r.get('ok')]), 'results': results})
+        }
+
     # POST: удаление статьи
     if method == 'POST' and action == 'delete':
         if admin_secret != os.environ.get('ADMIN_SECRET', ''):
