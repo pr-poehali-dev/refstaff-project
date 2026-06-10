@@ -66,8 +66,13 @@ def get_db():
 
 def slugify(text: str) -> str:
     text = text.lower().strip()
-    ru_map = str.maketrans('абвгдеёжзийклмнопрстуфхцчшщъыьэюя', 'abvgdeejzijklmnoprstufhcchshhjyeya')
-    text = text.translate(ru_map)
+    translit = {
+        'а':'a','б':'b','в':'v','г':'g','д':'d','е':'e','ё':'e','ж':'zh',
+        'з':'z','и':'i','й':'j','к':'k','л':'l','м':'m','н':'n','о':'o',
+        'п':'p','р':'r','с':'s','т':'t','у':'u','ф':'f','х':'h','ц':'ts',
+        'ч':'ch','ш':'sh','щ':'sch','ъ':'','ы':'y','ь':'','э':'e','ю':'yu','я':'ya',
+    }
+    text = ''.join(translit.get(c, c) for c in text)
     text = re.sub(r'[^a-z0-9\s-]', '', text)
     text = re.sub(r'[\s-]+', '-', text)
     return text[:80].strip('-')
