@@ -126,13 +126,22 @@ export default function BlogPost() {
 
             {/* Контент */}
             <div
-              className="prose prose-gray max-w-none
-                prose-headings:font-bold prose-headings:text-gray-900
-                prose-h2:text-xl prose-h2:sm:text-2xl prose-h2:mt-8 prose-h2:mb-4
-                prose-p:text-gray-700 prose-p:leading-relaxed prose-p:mb-4
-                prose-ul:space-y-2 prose-li:text-gray-700
-                prose-strong:text-gray-900
-                prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
+              className="
+                prose prose-gray max-w-none
+
+                prose-p:text-gray-700 prose-p:leading-[1.85] prose-p:text-base prose-p:mb-5
+
+                prose-h2:text-xl prose-h2:sm:text-2xl prose-h2:font-bold
+                prose-h2:text-gray-900 prose-h2:mt-10 prose-h2:mb-4
+                prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-100
+
+                prose-ul:my-4 prose-ul:space-y-2 prose-ul:pl-0
+                prose-li:text-gray-700 prose-li:leading-relaxed
+
+                prose-strong:text-gray-900 prose-strong:font-semibold
+
+                prose-a:text-primary prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+              "
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
