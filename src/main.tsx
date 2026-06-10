@@ -1,7 +1,13 @@
-import * as React from 'react';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
 
+const root = document.getElementById("root")!;
 
-createRoot(document.getElementById("root")!).render(<App />);
+// StrictMode только в dev — в prod двойных рендеров нет, меньше нагрузки
+if (import.meta.env.DEV) {
+  createRoot(root).render(<StrictMode><App /></StrictMode>);
+} else {
+  createRoot(root).render(<App />);
+}
