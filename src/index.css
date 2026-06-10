@@ -212,3 +212,20 @@ select {
     min-width: 44px;
   }
 }
+
+/* Float-анимация — только transform, без layout thrashing (лучше чем animate-bounce) */
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+/* Резервируем место под hero-картинку до загрузки — устраняет CLS */
+.hero-image-wrap {
+  aspect-ratio: 4 / 3;
+  background-color: hsl(var(--muted));
+}

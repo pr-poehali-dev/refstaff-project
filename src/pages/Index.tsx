@@ -1949,16 +1949,19 @@ function Index() {
                 </div>
               </div>
               <div className="relative animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <div className="hero-image-wrap relative rounded-2xl overflow-hidden shadow-2xl">
                   <img 
                     src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/e96124dc-c09c-454b-a967-49eff0e74945.jpg" 
                     alt="Команда сотрудников работает вместе"
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-auto"
+                    loading="eager"
+                    fetchPriority="high"
+                    decoding="sync"
+                    width={640}
+                    height={480}
+                    className="w-full h-full object-cover absolute inset-0"
                   />
                 </div>
-                <div className="hidden sm:block absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4 animate-bounce" style={{ animationDelay: '1s', animationDuration: '3s' }}>
+                <div className="hidden sm:block absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4" style={{ animation: 'float 3s ease-in-out 1s infinite' }}>
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
                       <Icon name="TrendingUp" className="text-green-600" size={24} />
@@ -2132,7 +2135,11 @@ function Index() {
                       <img 
                         src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/ff1c4a57-63e0-4e5e-ab1b-8c592b9d9ac2.jpg" 
                         alt="Статистика и результаты"
-                        className="rounded-xl shadow-xl"
+                        loading="lazy"
+                        decoding="async"
+                        width={600}
+                        height={400}
+                        className="rounded-xl shadow-xl w-full h-auto"
                       />
                     </div>
                   </div>
