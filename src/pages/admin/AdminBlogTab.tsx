@@ -126,24 +126,41 @@ export default function AdminBlogTab({ secret }: Props) {
               <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
                 <Icon name="Clock" size={16} className="text-blue-400" />
               </div>
-              <div>
+              <div className="w-full">
                 <p className="text-white text-sm font-medium mb-1">Автогенерация через cron-job.org</p>
-                <p className="text-gray-400 text-xs mb-3">Настрой бесплатный cron, чтобы статьи генерировались автоматически 5 штук в день:</p>
-                <div className="space-y-2 text-xs">
-                  <div className="bg-gray-800 rounded p-2">
-                    <p className="text-gray-400 mb-1">1. Зайди на <span className="text-blue-400">cron-job.org</span> → Create cronjob</p>
-                    <p className="text-gray-400 mb-1">2. URL:</p>
-                    <code className="text-green-400 break-all block">{BLOG_API}?action=generate</code>
+                <p className="text-gray-400 text-xs mb-3">Вставь этот URL в cron-job.org — никаких заголовков не нужно, секрет уже в ссылке:</p>
+                <div className="space-y-3 text-xs">
+
+                  <div className="bg-gray-800 rounded p-3">
+                    <p className="text-gray-400 mb-2 font-medium">Готовый URL для cron-job.org:</p>
+                    <div className="flex items-center gap-2">
+                      <code className="text-green-400 break-all flex-1 text-[11px] leading-relaxed">
+                        {BLOG_API}?action=generate&admin_secret=<span className="text-yellow-400">[вставь свой ADMIN_SECRET]</span>
+                      </code>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="text-gray-400 hover:text-white shrink-0 h-7 px-2"
+                        onClick={() => {
+                          const url = `${BLOG_API}?action=generate&admin_secret=${secret}`;
+                          navigator.clipboard.writeText(url);
+                          alert('✅ URL скопирован в буфер обмена');
+                        }}
+                      >
+                        <Icon name="Copy" size={13} />
+                      </Button>
+                    </div>
+                    <p className="text-gray-500 mt-2">👆 Нажми иконку копирования — секрет подставится автоматически</p>
                   </div>
-                  <div className="bg-gray-800 rounded p-2">
-                    <p className="text-gray-400 mb-1">3. Метод: POST. Заголовки:</p>
-                    <code className="text-green-400 block">X-Admin-Secret: [твой ADMIN_SECRET]</code>
+
+                  <div className="bg-gray-800 rounded p-3 space-y-1">
+                    <p className="text-gray-300 font-medium mb-2">Настройки в cron-job.org:</p>
+                    <p className="text-gray-400">• <span className="text-white">URL</span> — скопируй сверху</p>
+                    <p className="text-gray-400">• <span className="text-white">Request method</span> — <code className="text-green-400">GET</code> (не нужен POST)</p>
+                    <p className="text-gray-400">• <span className="text-white">Schedule</span> — <code className="text-green-400">0 */4 * * *</code> (каждые 4 ч = 6 статей/день)</p>
+                    <p className="text-gray-400">• <span className="text-white">Заголовки</span> — не нужны, оставь пустыми</p>
                   </div>
-                  <div className="bg-gray-800 rounded p-2">
-                    <p className="text-gray-400 mb-1">4. Расписание: каждые 4 часа</p>
-                    <code className="text-green-400">0 */4 * * *</code>
-                    <p className="text-gray-400 mt-1">→ 6 запросов в сутки = ~6 новых статей</p>
-                  </div>
+
                 </div>
               </div>
             </div>

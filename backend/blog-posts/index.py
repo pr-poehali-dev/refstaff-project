@@ -253,8 +253,9 @@ def handler(event: dict, context) -> dict:
             'body': json.dumps({'post': post})
         }
 
-    # POST: генерация новой статьи
-    if method == 'POST' and action == 'generate':
+    # POST или GET: генерация новой статьи
+    # GET удобен для cron-job.org: ?action=generate&admin_secret=...
+    if action == 'generate' and method in ('POST', 'GET'):
         if admin_secret != os.environ.get('ADMIN_SECRET', ''):
             return {'statusCode': 403, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'forbidden'})}
 
