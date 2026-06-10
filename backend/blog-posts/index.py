@@ -170,7 +170,21 @@ def handler(event: dict, context) -> dict:
     params = event.get('queryStringParameters') or {}
     action = params.get('action', 'list')
     headers = event.get('headers') or {}
-    admin_secret = headers.get('x-admin-secret', '')
+
+    # Секрет читаем из заголовка (разные регистры) ИЛИ из тела запроса
+    # (X-Admin-Secret фильтруется прокси, поэтому фронтенд шлёт в body)
+    raw_body = event.get('body') or '{}'
+    try:
+        body_data = json.loads(raw_body)
+    except Exception:
+        body_data = {}
+
+    admin_secret = (
+        headers.get('x-admin-secret')
+        or headers.get('X-Admin-Secret')
+        or params.get('admin_secret')
+        or body_data.get('admin_secret', '')
+    )
 
     conn = get_db()
 
@@ -263,8 +277,7 @@ def handler(event: dict, context) -> dict:
         if admin_secret != os.environ.get('ADMIN_SECRET', ''):
             return {'statusCode': 403, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'forbidden'})}
 
-        body = json.loads(event.get('body') or '{}')
-        count = min(int(body.get('count', 1)), 5)  # максимум 5 за раз
+        count = min(int(body_data.get('count', 1)), 5)  # максимум 5 за раз
 
         results = []
         existing_topics = get_existing_topics(conn)
@@ -304,8 +317,7 @@ def handler(event: dict, context) -> dict:
     if method == 'POST' and action == 'delete':
         if admin_secret != os.environ.get('ADMIN_SECRET', ''):
             return {'statusCode': 403, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'forbidden'})}
-        body = json.loads(event.get('body') or '{}')
-        post_id = body.get('id')
+        post_id = body_data.get('id')
         with conn.cursor() as cur:
             cur.execute(f'DELETE FROM {SCHEMA}.blog_posts WHERE id=%s', (post_id,))
         return {

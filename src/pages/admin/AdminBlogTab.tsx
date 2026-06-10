@@ -43,7 +43,8 @@ export default function AdminBlogTab({ secret }: Props) {
       try {
         const r = await fetch(`${BLOG_API}?action=generate`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': secret },
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ admin_secret: secret }),
         });
         const d = await r.json();
         if (d.success) {
@@ -66,8 +67,8 @@ export default function AdminBlogTab({ secret }: Props) {
     setDeleting(id);
     await fetch(`${BLOG_API}?action=delete`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'X-Admin-Secret': secret },
-      body: JSON.stringify({ id }),
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, admin_secret: secret }),
     });
     setDeleting(null);
     loadPosts();
