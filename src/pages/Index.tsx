@@ -1900,7 +1900,7 @@ function Index() {
             <button onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Преимущества</button>
             <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Тарифы</button>
             <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Контакты</button>
-            <a href="/blog" className="text-xs lg:text-sm hover:text-primary transition-colors">Блог</a>
+
             <a href="/create-test" target="_blank" className="text-xs lg:text-sm hover:text-primary transition-colors font-medium">✨ AI тесты</a>
           </nav>
           <div className="flex items-center gap-2">
