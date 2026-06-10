@@ -2287,10 +2287,6 @@ function Index() {
         </div>
         </section>
 
-        <Suspense fallback={null}>
-          <BlogCarousel />
-        </Suspense>
-
         <section id="contact" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-green-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="contact-title">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
           <div className="container mx-auto max-w-3xl relative z-10">
@@ -2388,6 +2384,10 @@ function Index() {
             </div>
           </div>
         </section>
+
+        <Suspense fallback={null}>
+          <BlogCarousel />
+        </Suspense>
       </main>
 
       <footer className="border-t bg-gray-50 py-6 px-3 sm:px-4 lg:px-6" role="contentinfo">
