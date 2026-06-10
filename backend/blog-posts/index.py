@@ -90,7 +90,7 @@ def call_gpt(prompt: str) -> str:
         'model': MODEL,
         'messages': [{'role': 'user', 'content': prompt}],
         'temperature': 0.8,
-        'max_tokens': 3000,
+        'max_tokens': 4096,
     }
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(
@@ -104,8 +104,20 @@ def call_gpt(prompt: str) -> str:
     return result['choices'][0]['message']['content']
 
 
+def fix_encoding(text: str) -> str:
+    """Убирает символы-заменители (U+FFFD и похожие) которые появляются
+    при обрезке UTF-8 на границе многобайтового символа."""
+    # Убираем Unicode replacement character
+    text = text.replace('\ufffd', '')
+    # Убираем последовательности вида ??, которые бывают при двойной
+    # ошибке кодировки — только если они окружены буквами (внутри слова)
+    text = re.sub(r'(?<=[а-яёa-z])\?{1,2}(?=[а-яёa-z])', '', text, flags=re.IGNORECASE)
+    return text
+
+
 def inject_links(content: str) -> str:
-    """Вшивает ссылки в первые вхождения ключевых фраз."""
+    """Вшивает ссылки в первые вхождения ключевых фраз. Сначала чистит артефакты кодировки."""
+    content = fix_encoding(content)
     used = set()
     for phrase, url in KEY_PHRASES:
         if phrase in used:

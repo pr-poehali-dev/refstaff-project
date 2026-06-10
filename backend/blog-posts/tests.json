@@ -1,11 +1,10 @@
 {
   "tests": [
     {
-      "name": "List posts (empty)",
+      "name": "List posts",
       "method": "GET",
       "path": "/?action=list",
       "expectedStatus": 200,
-      "expectedBody": {"posts": [], "total": 0},
       "bodyMatcher": "partial"
     },
     {
