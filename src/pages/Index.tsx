@@ -28,6 +28,7 @@ const VacancyDetail = lazy(() => import('@/components/VacancyDetail').then(m => 
 const CandidateDetail = lazy(() => import('@/components/CandidateDetail').then(m => ({ default: m.CandidateDetail })));
 const SubscriptionExpiredBlock = lazy(() => import('@/components/SubscriptionExpiredBlock').then(m => ({ default: m.SubscriptionExpiredBlock })));
 const CompanyStats = lazy(() => import('@/components/CompanyStats'));
+const BlogCarousel = lazy(() => import('@/components/BlogCarousel'));
 const Onboarding = lazy(() => import('@/components/Onboarding'));
 const GamesTab = lazy(() => import('@/components/GamesTab'));
 const VacancyTestManager = lazy(() => import('@/components/VacancyTestManager').then(m => ({ default: m.VacancyTestManager })));
@@ -2278,6 +2279,10 @@ function Index() {
           </div>
         </div>
         </section>
+
+        <Suspense fallback={null}>
+          <BlogCarousel />
+        </Suspense>
 
         <section id="contact" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-green-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="contact-title">
           <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
