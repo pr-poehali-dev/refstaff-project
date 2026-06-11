@@ -13,6 +13,13 @@
       "path": "/?action=get&slug=not-found",
       "expectedStatus": 404,
       "bodyMatcher": "partial"
+    },
+    {
+      "name": "Blog sitemap XML",
+      "method": "GET",
+      "path": "/?action=sitemap",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
     }
   ]
 }

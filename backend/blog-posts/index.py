@@ -408,11 +408,22 @@ def handler(event: dict, context) -> dict:
         count = min(int(body_data.get('count', 1)), 5)  # максимум 5 за раз
 
         results = []
-        existing_topics = get_existing_topics(conn)
+        existing_topics, existing_titles = get_existing_articles(conn)
 
         for _ in range(count):
             try:
-                article = generate_article(existing_topics)
+                article = generate_article(existing_topics, existing_titles)
+
+                # Проверка на схожесть заголовка
+                duplicate_found = False
+                for existing_title in existing_titles:
+                    if titles_are_similar(article['title'], existing_title):
+                        results.append({'ok': False, 'error': f'duplicate_title: похож на "{existing_title}"'})
+                        duplicate_found = True
+                        break
+                if duplicate_found:
+                    continue
+
                 content_with_links = inject_links(article['content'])
                 slug_base = slugify(article['topic'])
                 slug = slug_base
@@ -424,6 +435,10 @@ def handler(event: dict, context) -> dict:
                             break
                         slug = f'{slug_base}-{i}'
                         i += 1
+                    cur.execute(f'SELECT 1 FROM {SCHEMA}.blog_posts WHERE title=%s', (article['title'],))
+                    if cur.fetchone():
+                        results.append({'ok': False, 'error': 'duplicate_title: точное совпадение'})
+                        continue
                     cur.execute(
                         f'INSERT INTO {SCHEMA}.blog_posts (slug, title, meta_description, content, topic) '
                         f'VALUES (%s, %s, %s, %s, %s) RETURNING id',
@@ -431,6 +446,7 @@ def handler(event: dict, context) -> dict:
                     )
                     post_id = cur.fetchone()[0]
                 existing_topics.append(article['topic'])
+                existing_titles.append(article['title'])
                 results.append({'id': post_id, 'slug': slug, 'title': article['title'], 'ok': True})
             except Exception as e:
                 results.append({'ok': False, 'error': str(e)})
@@ -439,6 +455,33 @@ def handler(event: dict, context) -> dict:
             'statusCode': 200,
             'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
             'body': json.dumps({'success': True, 'generated': len([r for r in results if r.get('ok')]), 'results': results})
+        }
+
+    # GET: динамический sitemap всех опубликованных статей (XML)
+    if method == 'GET' and action == 'sitemap':
+        with conn.cursor() as cur:
+            cur.execute(
+                f'SELECT slug, published_at FROM {SCHEMA}.blog_posts '
+                f'WHERE is_published=TRUE ORDER BY published_at DESC'
+            )
+            rows = cur.fetchall()
+        lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+        for slug, published_at in rows:
+            lastmod = published_at.strftime('%Y-%m-%d') if published_at else '2026-01-01'
+            lines.append(
+                f'  <url>'
+                f'<loc>https://i-hunt.ru/blog/{slug}</loc>'
+                f'<lastmod>{lastmod}</lastmod>'
+                f'<changefreq>monthly</changefreq>'
+                f'<priority>0.7</priority>'
+                f'</url>'
+            )
+        lines.append('</urlset>')
+        return {
+            'statusCode': 200,
+            'headers': {**CORS_HEADERS, 'Content-Type': 'application/xml; charset=utf-8'},
+            'body': '\n'.join(lines)
         }
 
     # POST: удаление статьи
