@@ -19,6 +19,48 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 }
 
+const EMOJI_MAP: Array<{ keywords: string[]; emojis: string[] }> = [
+  { keywords: ['реферальн', 'рекоменд'], emojis: ['🤝', '👥', '🔗', '💬', '🎯'] },
+  { keywords: ['рекрутинг', 'рекрутер', 'подбор'], emojis: ['🔍', '🎯', '📋', '🧩', '🕵️'] },
+  { keywords: ['найм', 'нанима', 'вакансии', 'вакансия'], emojis: ['📌', '💼', '📝', '🗂️', '📂'] },
+  { keywords: ['собеседован', 'интервью'], emojis: ['🎤', '💬', '🤔', '📊', '🗣️'] },
+  { keywords: ['онбординг', 'адаптац', 'новичк'], emojis: ['🚀', '🌱', '👋', '🗺️', '🎒'] },
+  { keywords: ['удержан', 'текучк', 'лояльност'], emojis: ['🏆', '💎', '⚓', '🛡️', '❤️'] },
+  { keywords: ['мотивац', 'вовлечённ', 'вовлечен'], emojis: ['🔥', '⚡', '💪', '🌟', '🎮'] },
+  { keywords: ['аналитик', 'метрик', 'kpi', 'данн'], emojis: ['📊', '📈', '🔢', '📉', '🧮'] },
+  { keywords: ['бренд', 'evp', 'репутац'], emojis: ['✨', '💫', '🏅', '🎖️', '🌐'] },
+  { keywords: ['автоматизац', 'технолог', 'цифров', 'ии', 'искусственн'], emojis: ['🤖', '⚙️', '💡', '🖥️', '🔧'] },
+  { keywords: ['выплат', 'бонус', 'зарплат', 'деньг'], emojis: ['💰', '💵', '🤑', '💳', '🏦'] },
+  { keywords: ['геймификац', 'игр', 'рейтинг'], emojis: ['🎮', '🏆', '🎲', '⭐', '🥇'] },
+  { keywords: ['стартап', 'малый бизнес', 'бизнес'], emojis: ['🚀', '💡', '🌱', '⚡', '🎯'] },
+  { keywords: ['it', 'разработчик', 'программист', 'технич'], emojis: ['💻', '👨‍💻', '⌨️', '🖥️', '🔬'] },
+  { keywords: ['ритейл', 'торговл', 'магазин'], emojis: ['🛒', '🏪', '🛍️', '📦', '💳'] },
+  { keywords: ['производств', 'завод', 'фабрик'], emojis: ['🏭', '⚙️', '🔩', '🛠️', '👷'] },
+  { keywords: ['обучен', 'развити', 'карьер', 'навык'], emojis: ['📚', '🎓', '📖', '🧠', '✏️'] },
+  { keywords: ['команд', 'коллектив', 'корпоратив'], emojis: ['👫', '🤜', '🏃', '💼', '🌍'] },
+  { keywords: ['ошибк', 'проблем', 'сложност'], emojis: ['⚠️', '🚧', '🔍', '💡', '🛠️'] },
+  { keywords: ['совет', 'лайфхак', 'практик'], emojis: ['💡', '✅', '📌', '🎯', '🔑'] },
+];
+
+const emojiCache = new Map<string, string>();
+
+function getPostEmoji(title: string, topic: string, id: number): string {
+  const key = String(id);
+  if (emojiCache.has(key)) return emojiCache.get(key)!;
+  const text = (title + ' ' + topic).toLowerCase();
+  for (const { keywords, emojis } of EMOJI_MAP) {
+    if (keywords.some(kw => text.includes(kw))) {
+      const emoji = emojis[id % emojis.length];
+      emojiCache.set(key, emoji);
+      return emoji;
+    }
+  }
+  const fallback = ['📝', '💼', '🎯', '🔍', '📋', '✨', '🚀', '💡', '📊', '🤝'];
+  const emoji = fallback[id % fallback.length];
+  emojiCache.set(key, emoji);
+  return emoji;
+}
+
 export default function BlogCarousel() {
   const [posts, setPosts] = useState<PostPreview[]>([]);
   const [loading, setLoading] = useState(true);
@@ -158,7 +200,7 @@ export default function BlogCarousel() {
                       {post.publishedAt ? formatDate(post.publishedAt) : ''}
                     </span>
                     <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-3 leading-snug group-hover:text-primary transition-colors line-clamp-3 flex-1">
-                      {post.title}
+                      <span className="mr-1.5">{getPostEmoji(post.title, post.topic, post.id)}</span>{post.title}
                     </h3>
                     <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-4">
                       {post.metaDescription}
