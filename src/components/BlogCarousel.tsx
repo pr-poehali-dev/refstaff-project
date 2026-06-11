@@ -30,7 +30,16 @@ export default function BlogCarousel() {
   useEffect(() => {
     fetch(`${BLOG_API}?action=list&page=1&per_page=6`)
       .then(r => r.json())
-      .then(d => setPosts(d.posts || []))
+      .then(d => {
+        const raw: PostPreview[] = d.posts || [];
+        const seen = new Set<string>();
+        setPosts(raw.filter(p => {
+          const key = p.slug || p.title;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        }));
+      })
       .finally(() => setLoading(false));
   }, []);
 
