@@ -78,10 +78,26 @@ def slugify(text: str) -> str:
     return text[:80].strip('-')
 
 
-def get_existing_topics(conn) -> list:
+def get_existing_articles(conn) -> tuple:
+    """Возвращает (topics, titles) — для передачи GPT и проверки дублей."""
     with conn.cursor() as cur:
-        cur.execute(f'SELECT topic FROM {SCHEMA}.blog_posts ORDER BY created_at DESC LIMIT 50')
-        return [row[0] for row in cur.fetchall()]
+        cur.execute(f'SELECT topic, title FROM {SCHEMA}.blog_posts ORDER BY created_at DESC LIMIT 50')
+        rows = cur.fetchall()
+    topics = [r[0] for r in rows]
+    titles = [r[1] for r in rows]
+    return topics, titles
+
+
+def titles_are_similar(title_a: str, title_b: str, threshold: float = 0.6) -> bool:
+    """Простая проверка на схожесть через общие слова (без внешних библиотек)."""
+    def words(t):
+        return set(re.sub(r'[^а-яёa-z0-9\s]', '', t.lower()).split())
+    wa, wb = words(title_a), words(title_b)
+    if not wa or not wb:
+        return False
+    intersection = wa & wb
+    shorter = min(len(wa), len(wb))
+    return len(intersection) / shorter >= threshold
 
 
 def call_gpt(prompt: str) -> str:
@@ -132,21 +148,25 @@ def inject_links(content: str) -> str:
     return content
 
 
-def generate_article(existing_topics: list) -> dict:
+def generate_article(existing_topics: list, existing_titles: list) -> dict:
     import random
     available = [t for t in TOPIC_POOLS if t not in existing_topics]
     if not available:
         available = TOPIC_POOLS
     topic_hint = random.choice(available)
-    existing_str = '\n'.join(f'- {t}' for t in existing_topics[:20]) if existing_topics else 'нет'
+    existing_topics_str = '\n'.join(f'- {t}' for t in existing_topics[:20]) if existing_topics else 'нет'
+    existing_titles_str = '\n'.join(f'- {t}' for t in existing_titles[:20]) if existing_titles else 'нет'
 
     prompt = f"""Ты SEO-копирайтер для HR-платформы {BRAND} ({SITE_URL}) — сервиса реферального рекрутинга с геймификацией.
 
-ТЕМЫ УЖЕ НАПИСАННЫХ СТАТЕЙ (не повторяй и не пересекайся):
-{existing_str}
+УЖЕ НАПИСАННЫЕ СТАТЬИ — ТЕМЫ (не повторяй):
+{existing_topics_str}
+
+УЖЕ НАПИСАННЫЕ СТАТЬИ — ЗАГОЛОВКИ (твой заголовок должен быть ПОЛНОСТЬЮ другим):
+{existing_titles_str}
 
 ПОДСКАЗКА ДЛЯ НОВОЙ ТЕМЫ: {topic_hint}
-Можешь взять эту тему или близкую к ней — главное, чтобы она была уникальной.
+Выбери эту тему или любую другую — главное, чтобы заголовок и содержание были уникальными и не повторяли ни одну из статей выше.
 
 ЗАДАЧА: напиши одну полную SEO-статью для блога компании.
 
@@ -259,8 +279,21 @@ def handler(event: dict, context) -> dict:
         if admin_secret != os.environ.get('ADMIN_SECRET', ''):
             return {'statusCode': 403, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'forbidden'})}
 
-        existing_topics = get_existing_topics(conn)
-        article = generate_article(existing_topics)
+        existing_topics, existing_titles = get_existing_articles(conn)
+        article = generate_article(existing_topics, existing_titles)
+
+        # Проверяем схожесть заголовка с уже существующими
+        for existing_title in existing_titles:
+            if titles_are_similar(article['title'], existing_title):
+                return {
+                    'statusCode': 409,
+                    'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
+                    'body': json.dumps({
+                        'error': 'duplicate_title',
+                        'message': f'Сгенерированный заголовок слишком похож на существующий: "{existing_title}"',
+                        'generated_title': article['title']
+                    })
+                }
 
         content_with_links = inject_links(article['content'])
         slug_base = slugify(article['topic'])
@@ -274,6 +307,15 @@ def handler(event: dict, context) -> dict:
                     break
                 slug = f'{slug_base}-{i}'
                 i += 1
+
+            # Также проверяем уникальность заголовка в БД
+            cur.execute(f'SELECT 1 FROM {SCHEMA}.blog_posts WHERE title=%s', (article['title'],))
+            if cur.fetchone():
+                return {
+                    'statusCode': 409,
+                    'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
+                    'body': json.dumps({'error': 'duplicate_title', 'message': 'Статья с таким заголовком уже существует'})
+                }
 
             cur.execute(
                 f'INSERT INTO {SCHEMA}.blog_posts (slug, title, meta_description, content, topic) '
