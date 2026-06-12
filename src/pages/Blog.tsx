@@ -48,7 +48,6 @@ const emojiCache = new Map<string, string>();
 function getPostEmoji(title: string, topic: string, id: number): string {
   const key = String(id);
   if (emojiCache.has(key)) return emojiCache.get(key)!;
-
   const text = (title + ' ' + topic).toLowerCase();
   for (const { keywords, emojis } of EMOJI_MAP) {
     if (keywords.some(kw => text.includes(kw))) {
@@ -57,7 +56,6 @@ function getPostEmoji(title: string, topic: string, id: number): string {
       return emoji;
     }
   }
-  // Фоллбэк — разнообразный набор общих HR-эмодзи
   const fallback = ['📝', '💼', '🎯', '🔍', '📋', '✨', '🚀', '💡', '📊', '🤝'];
   const emoji = fallback[id % fallback.length];
   emojiCache.set(key, emoji);
@@ -103,69 +101,70 @@ export default function Blog() {
               </div>
               <span className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
             </div>
-            <div className="flex items-center gap-3">
-              <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">← Главная</Link>
-            </div>
+            <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+              <Icon name="ArrowLeft" size={14} />
+              Главная
+            </Link>
           </div>
         </header>
 
-        <main className="pt-20 pb-16 px-4">
+        <main className="pt-16 pb-12 px-3 sm:px-4">
           <div className="container mx-auto max-w-6xl">
             {/* Hero блога */}
-            <div className="text-center py-12 sm:py-16">
-              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">📝 Блог</Badge>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            <div className="text-center py-8 sm:py-12 md:py-16">
+              <Badge className="mb-3 bg-primary/10 text-primary border-primary/20 text-xs">📝 Блог</Badge>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight px-2">
                 Реферальный рекрутинг: советы и практики
               </h1>
-              <p className="text-muted-foreground text-base sm:text-lg max-w-2xl mx-auto">
-                Экспертные статьи для HR-специалистов, рекрутеров и руководителей — как нанимать лучших через свою команду
+              <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-2">
+                Экспертные статьи для HR-специалистов, рекрутеров и руководителей
               </p>
             </div>
 
             {/* Список постов */}
             {loading ? (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
                 {Array(6).fill(0).map((_, i) => (
-                  <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 animate-pulse">
-                    <div className="h-4 bg-gray-100 rounded mb-3 w-1/3" />
-                    <div className="h-6 bg-gray-100 rounded mb-2" />
-                    <div className="h-6 bg-gray-100 rounded mb-4 w-4/5" />
-                    <div className="h-4 bg-gray-100 rounded mb-2" />
-                    <div className="h-4 bg-gray-100 rounded w-3/4" />
+                  <div key={i} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 sm:p-6 animate-pulse">
+                    <div className="h-3 bg-gray-100 rounded mb-3 w-1/3" />
+                    <div className="h-5 bg-gray-100 rounded mb-2" />
+                    <div className="h-5 bg-gray-100 rounded mb-4 w-4/5" />
+                    <div className="h-3 bg-gray-100 rounded mb-2" />
+                    <div className="h-3 bg-gray-100 rounded w-3/4" />
                   </div>
                 ))}
               </div>
             ) : posts.length === 0 ? (
-              <div className="text-center py-20">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <Icon name="FileText" size={32} className="text-primary" />
+              <div className="text-center py-16">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Icon name="FileText" size={28} className="text-primary" />
                 </div>
-                <h2 className="text-xl font-semibold mb-2">Статьи скоро появятся</h2>
+                <h2 className="text-lg sm:text-xl font-semibold mb-2">Статьи скоро появятся</h2>
                 <p className="text-muted-foreground text-sm">Мы готовим полезный контент для HR-специалистов</p>
               </div>
             ) : (
               <>
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
                   {posts.map((post) => (
                     <Link
                       key={post.id}
                       to={`/blog/${post.slug}`}
-                      className="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden flex flex-col"
+                      className="group relative bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md active:scale-[0.98] transition-all duration-200 overflow-hidden flex flex-col"
                     >
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
-                      <div className="p-6 flex flex-col flex-1">
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="text-xs text-muted-foreground">{post.publishedAt ? formatDate(post.publishedAt) : ''}</span>
-                        </div>
-                        <h2 className="text-base font-bold text-gray-900 mb-3 leading-snug group-hover:text-primary transition-colors line-clamp-3">
-                          <span className="mr-1.5">{getPostEmoji(post.title, post.topic, post.id)}</span>{post.title}
+                      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <div className="p-4 sm:p-5 lg:p-6 flex flex-col flex-1">
+                        <span className="text-xs text-muted-foreground mb-2 block">
+                          {post.publishedAt ? formatDate(post.publishedAt) : ''}
+                        </span>
+                        <h2 className="text-sm sm:text-base font-bold text-gray-900 mb-2 leading-snug group-hover:text-primary transition-colors line-clamp-3">
+                          <span className="mr-1">{getPostEmoji(post.title, post.topic, post.id)}</span>{post.title}
                         </h2>
-                        <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3 flex-1">
+                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2 sm:line-clamp-3 flex-1">
                           {post.metaDescription}
                         </p>
-                        <div className="mt-4 flex items-center gap-1 text-primary text-sm font-medium">
+                        <div className="mt-3 flex items-center gap-1 text-primary text-xs sm:text-sm font-medium">
                           Читать
-                          <Icon name="ArrowRight" size={14} className="group-hover:translate-x-1 transition-transform" />
+                          <Icon name="ArrowRight" size={12} className="group-hover:translate-x-1 transition-transform" />
                         </div>
                       </div>
                     </Link>
@@ -174,7 +173,7 @@ export default function Blog() {
 
                 {/* Пагинация */}
                 {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 mt-12">
+                  <div className="flex items-center justify-center gap-2 mt-10">
                     <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>
                       <Icon name="ChevronLeft" size={16} />
                     </Button>
@@ -191,7 +190,7 @@ export default function Blog() {
           </div>
         </main>
 
-        <footer className="border-t bg-gray-50 py-6 px-4 text-center text-xs text-muted-foreground">
+        <footer className="border-t bg-gray-50 py-5 px-4 text-center text-xs text-muted-foreground">
           © 2026 iHUNT — <Link to="/" className="hover:text-primary">реферальный рекрутинг</Link>
         </footer>
       </div>

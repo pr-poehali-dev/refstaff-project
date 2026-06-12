@@ -47,11 +47,11 @@ export default function BlogPost() {
 
   if (notFound || !post) return (
     <div className="min-h-screen flex flex-col items-center justify-center gap-4 px-4 text-center">
-      <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center">
-        <Icon name="FileX" size={32} className="text-primary" />
+      <div className="w-14 h-14 bg-primary/10 rounded-2xl flex items-center justify-center">
+        <Icon name="FileX" size={28} className="text-primary" />
       </div>
-      <h1 className="text-2xl font-bold">Статья не найдена</h1>
-      <p className="text-muted-foreground">Возможно, она была удалена или ссылка устарела</p>
+      <h1 className="text-xl sm:text-2xl font-bold">Статья не найдена</h1>
+      <p className="text-muted-foreground text-sm">Возможно, она была удалена или ссылка устарела</p>
       <Button onClick={() => navigate('/blog')}>← Вернуться в блог</Button>
     </div>
   );
@@ -89,54 +89,62 @@ export default function BlogPost() {
               <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
                 <Icon name="Rocket" className="text-white" size={18} />
               </div>
-              <span className="text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
+              <span className="text-base sm:text-lg font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
             </div>
-            <div className="flex items-center gap-3">
-              <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors">← Блог</Link>
-            </div>
+            <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+              <Icon name="ArrowLeft" size={14} />
+              Блог
+            </Link>
           </div>
         </header>
 
-        <main className="pt-20 pb-16">
-          <article className="container mx-auto max-w-3xl px-4 py-10 sm:py-14">
+        <main className="pt-14 sm:pt-16 pb-12">
+          <article className="container mx-auto max-w-2xl px-4 py-6 sm:py-10 md:py-14">
+
             {/* Хлебные крошки */}
-            <nav className="flex items-center gap-2 text-xs text-muted-foreground mb-8">
-              <Link to="/" className="hover:text-primary">Главная</Link>
-              <Icon name="ChevronRight" size={12} />
-              <Link to="/blog" className="hover:text-primary">Блог</Link>
-              <Icon name="ChevronRight" size={12} />
-              <span className="text-foreground line-clamp-1">{post.title}</span>
+            <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6 flex-wrap">
+              <Link to="/" className="hover:text-primary whitespace-nowrap">Главная</Link>
+              <Icon name="ChevronRight" size={11} />
+              <Link to="/blog" className="hover:text-primary whitespace-nowrap">Блог</Link>
+              <Icon name="ChevronRight" size={11} />
+              <span className="text-foreground line-clamp-1 min-w-0">{post.title}</span>
             </nav>
 
             {/* Заголовок */}
-            <header className="mb-8 sm:mb-10">
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-xs text-muted-foreground bg-gray-100 px-3 py-1 rounded-full">
+            <header className="mb-6 sm:mb-8">
+              <div className="flex items-center gap-2 mb-3 flex-wrap">
+                <span className="text-xs text-muted-foreground bg-gray-100 px-2.5 py-1 rounded-full whitespace-nowrap">
                   {post.publishedAt ? formatDate(post.publishedAt) : ''}
                 </span>
-                <span className="text-xs text-primary bg-primary/10 px-3 py-1 rounded-full font-medium">HR & Рекрутинг</span>
+                <span className="text-xs text-primary bg-primary/10 px-2.5 py-1 rounded-full font-medium whitespace-nowrap">
+                  HR & Рекрутинг
+                </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight mb-4">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-3">
                 {post.title}
               </h1>
-              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+              <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 {post.metaDescription}
               </p>
             </header>
 
+            {/* Разделитель */}
+            <div className="h-px bg-gradient-to-r from-primary/20 via-secondary/20 to-transparent mb-6 sm:mb-8" />
+
             {/* Контент */}
             <div
               className="
-                prose prose-gray max-w-none
+                prose prose-sm sm:prose-base prose-gray max-w-none
 
-                prose-p:text-gray-700 prose-p:leading-[1.85] prose-p:text-base prose-p:mb-5
+                prose-p:text-gray-700 prose-p:leading-[1.8] prose-p:mb-4
 
-                prose-h2:text-xl prose-h2:sm:text-2xl prose-h2:font-bold
-                prose-h2:text-gray-900 prose-h2:mt-10 prose-h2:mb-4
+                prose-h2:text-lg prose-h2:sm:text-xl prose-h2:md:text-2xl
+                prose-h2:font-bold prose-h2:text-gray-900
+                prose-h2:mt-8 prose-h2:mb-3
                 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-100
 
-                prose-ul:my-4 prose-ul:space-y-2 prose-ul:pl-0
-                prose-li:text-gray-700 prose-li:leading-relaxed
+                prose-ul:my-3 prose-ul:space-y-1.5 prose-ul:pl-0
+                prose-li:text-gray-700 prose-li:leading-relaxed prose-li:text-sm prose-li:sm:text-base
 
                 prose-strong:text-gray-900 prose-strong:font-semibold
 
@@ -145,32 +153,33 @@ export default function BlogPost() {
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
-            {/* CTA блок в конце статьи */}
-            <div className="mt-12 sm:mt-16 bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-2xl p-6 sm:p-8 text-center">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Icon name="Rocket" size={22} className="text-white" />
+            {/* CTA блок */}
+            <div className="mt-10 sm:mt-14 bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-2xl p-5 sm:p-8 text-center">
+              <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mx-auto mb-3">
+                <Icon name="Rocket" size={20} className="text-white" />
               </div>
-              <h3 className="text-lg sm:text-xl font-bold mb-2">Попробуйте iHUNT бесплатно</h3>
-              <p className="text-sm text-muted-foreground mb-5 max-w-md mx-auto">
-                Запустите реферальную программу за 5 минут. 14 дней без ограничений и без банковской карты.
+              <h3 className="text-base sm:text-xl font-bold mb-2">Попробуйте iHUNT бесплатно</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground mb-4 max-w-sm mx-auto">
+                Запустите реферальную программу за 5 минут. 14 дней без ограничений.
               </p>
-              <Button size="lg" onClick={() => navigate('/')}>
-                <Icon name="Rocket" className="mr-2" size={16} />
+              <Button size="default" className="sm:size-lg w-full sm:w-auto" onClick={() => navigate('/')}>
+                <Icon name="Rocket" className="mr-2" size={15} />
                 Начать бесплатно
               </Button>
             </div>
 
-            {/* Навигация */}
-            <div className="mt-8 flex justify-center">
-              <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors">
+            {/* Навигация вниз */}
+            <div className="mt-6 flex justify-center">
+              <Link to="/blog" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors py-2">
                 <Icon name="ArrowLeft" size={14} />
                 Все статьи блога
               </Link>
             </div>
+
           </article>
         </main>
 
-        <footer className="border-t bg-gray-50 py-6 px-4 text-center text-xs text-muted-foreground">
+        <footer className="border-t bg-gray-50 py-5 px-4 text-center text-xs text-muted-foreground">
           © 2026 iHUNT — <Link to="/" className="hover:text-primary">реферальный рекрутинг</Link>
         </footer>
       </div>
