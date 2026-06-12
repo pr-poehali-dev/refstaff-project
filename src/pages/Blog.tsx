@@ -113,9 +113,7 @@ export default function Blog() {
             {/* Hero блога */}
             <div className="text-center py-8 sm:py-12 md:py-16">
               <Badge className="mb-3 bg-primary/10 text-primary border-primary/20 text-xs">📝 Блог</Badge>
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight px-2">
-                Реферальный рекрутинг: советы и практики
-              </h1>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight px-2">Рекрутинг: советы и практики</h1>
               <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-2">
                 Экспертные статьи для HR-специалистов, рекрутеров и руководителей
               </p>
