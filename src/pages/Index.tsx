@@ -2390,9 +2390,9 @@ function Index() {
         </Suspense>
       </main>
 
-      <footer className="border-t bg-gray-50 py-6 px-3 sm:px-4 lg:px-6" role="contentinfo">
+      <footer className="border-t bg-gray-50 py-4 px-3 sm:px-4 lg:px-6" role="contentinfo">
         <div className="container mx-auto max-w-6xl">
-          <div className="flex items-center gap-2 mb-5">
+          <div className="flex items-center gap-2 mb-3">
             <Icon name="Rocket" className="text-primary" size={20} />
             <span className="text-base font-bold">iHUNT</span>
             <span className="text-xs text-muted-foreground ml-1">— реферальный рекрутинг с геймификацией</span>
@@ -2416,9 +2416,9 @@ function Index() {
             <nav aria-label="Правовая информация" className="col-span-2 sm:col-span-1">
               <h4 className="font-semibold mb-2 text-xs">Правовая информация</h4>
               <ul className="space-y-1 text-xs text-muted-foreground">
-                <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary text-left leading-tight">Политика конфиденциальности</button></li>
-                <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary text-left leading-tight">Пользовательское соглашение</button></li>
-                <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary text-left leading-tight">Обработка персональных данных</button></li>
+                <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary text-left leading-tight p-0 m-0 bg-transparent border-0">Политика конфиденциальности</button></li>
+                <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary text-left leading-tight p-0 m-0 bg-transparent border-0">Пользовательское соглашение</button></li>
+                <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary text-left leading-tight p-0 m-0 bg-transparent border-0">Обработка персональных данных</button></li>
               </ul>
             </nav>
           </div>
