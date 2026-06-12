@@ -34,16 +34,8 @@ def handler(event: dict, context) -> dict:
     if len(image_bytes) > 2 * 1024 * 1024:
         return {'statusCode': 400, 'headers': {'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Image too large, max 2MB'})}
 
-    # Загрузка в S3
-    s3 = boto3.client(
-        's3',
-        endpoint_url='https://bucket.poehali.dev',
-        aws_access_key_id=os.environ['AWS_ACCESS_KEY_ID'],
-        aws_secret_access_key=os.environ['AWS_SECRET_ACCESS_KEY']
-    )
-    key = f"avatars/{user_id}/{uuid.uuid4()}.{ext}"
-    s3.put_object(Bucket='files', Key=key, Body=image_bytes, ContentType=content_type)
-    cdn_url = f"https://cdn.poehali.dev/projects/{os.environ['AWS_ACCESS_KEY_ID']}/bucket/{key}"
+    # Сохраняем как data URL прямо в БД (S3 недоступен)
+    cdn_url = f"data:{content_type};base64,{b64}"
 
     # Сохраняем URL в БД
     schema = os.environ.get('MAIN_DB_SCHEMA', 't_p65890965_refstaff_project')
