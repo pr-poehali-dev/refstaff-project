@@ -423,10 +423,11 @@ function VacancyReferral() {
                       onSuccess={(token) => setCaptchaToken(token)}
                       onExpire={() => setCaptchaToken(null)}
                       onError={() => setCaptchaError(true)}
+                      onUnsupported={() => setCaptchaError(true)}
                     />
                   </div>
 
-                  <Button type="submit" className="w-full" size="lg" disabled={!captchaToken && !captchaError}>
+                  <Button type="submit" className="w-full" size="lg">
                     <Icon name="Send" className="mr-2" size={18} />
                     Отправить отклик
                   </Button>
