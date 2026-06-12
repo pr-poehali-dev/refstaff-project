@@ -752,7 +752,10 @@ function Index() {
       if (companyData?.subscription_tier === 'none' || !companyData?.subscription_expires_at) {
         setSubscriptionDaysLeft(-1);
       } else {
-        const expires = new Date(companyData.subscription_expires_at);
+        const expiresStr = companyData.subscription_expires_at.endsWith('Z')
+          ? companyData.subscription_expires_at
+          : companyData.subscription_expires_at + 'Z';
+        const expires = new Date(expiresStr);
         const now = new Date();
         const days = Math.ceil((expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
         setSubscriptionDaysLeft(days);
