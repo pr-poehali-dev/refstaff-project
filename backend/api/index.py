@@ -1090,19 +1090,21 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             chat_id = query_params.get('chat_id')
             requester_id = query_params.get('user_id')
 
-            # Проверяем что запрашивающий — участник чата (employer или employee)
+            # Проверяем что запрашивающий — участник чата (employee или employer той же компании)
             if requester_id:
-                cur.execute("""
-                    SELECT id FROM t_p65890965_refstaff_project.chats
-                    WHERE id = %s AND (
-                        employee_id = %s
-                        OR company_id IN (
-                            SELECT company_id FROM t_p65890965_refstaff_project.users WHERE id = %s AND role = 'employer'
-                        )
-                    )
-                """, (chat_id, requester_id, requester_id))
-                if not cur.fetchone():
-                    return {'statusCode': 403, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Access denied'}), 'isBase64Encoded': False}
+                cur.execute("SELECT employee_id, company_id FROM t_p65890965_refstaff_project.chats WHERE id = %s", (chat_id,))
+                chat_row = cur.fetchone()
+                if chat_row:
+                    cur.execute("SELECT company_id, role FROM t_p65890965_refstaff_project.users WHERE id = %s", (requester_id,))
+                    user_row = cur.fetchone()
+                    allowed = False
+                    if user_row:
+                        if str(chat_row['employee_id']) == str(requester_id):
+                            allowed = True
+                        elif user_row['role'] == 'employer' and str(user_row['company_id']) == str(chat_row['company_id']):
+                            allowed = True
+                    if not allowed:
+                        return {'statusCode': 403, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Access denied'}), 'isBase64Encoded': False}
 
             query = """
                 SELECT m.*,
