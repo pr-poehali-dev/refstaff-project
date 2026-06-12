@@ -102,12 +102,12 @@ export default function BlogPost() {
           <article className="container mx-auto max-w-2xl px-4 py-6 sm:py-10 md:py-14">
 
             {/* Хлебные крошки */}
-            <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6 flex-wrap">
-              <Link to="/" className="hover:text-primary whitespace-nowrap">Главная</Link>
-              <Icon name="ChevronRight" size={11} />
-              <Link to="/blog" className="hover:text-primary whitespace-nowrap">Блог</Link>
-              <Icon name="ChevronRight" size={11} />
-              <span className="text-foreground line-clamp-1 min-w-0">{post.title}</span>
+            <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6 overflow-hidden">
+              <Link to="/" className="hover:text-primary shrink-0">Главная</Link>
+              <Icon name="ChevronRight" size={11} className="shrink-0" />
+              <Link to="/blog" className="hover:text-primary shrink-0">Блог</Link>
+              <Icon name="ChevronRight" size={11} className="shrink-0" />
+              <span className="text-foreground truncate">{post.title}</span>
             </nav>
 
             {/* Заголовок */}
