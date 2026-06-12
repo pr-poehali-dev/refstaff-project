@@ -240,16 +240,16 @@ export default function BlogCarousel() {
 
         {/* Dots */}
         {total > visibleCount() && (
-          <div className="flex justify-center gap-1.5 mt-6">
+          <div className="flex justify-center items-center gap-1.5 mt-4">
             {Array.from({ length: maxIndex + 1 }).map((_, i) => (
-              <button
+              <span
                 key={i}
                 onClick={() => setActiveIndex(i)}
                 aria-label={`Слайд ${i + 1}`}
-                className={`rounded-full transition-all duration-300 ${
+                className={`rounded-full transition-all duration-300 cursor-pointer block ${
                   i === activeIndex
-                    ? 'bg-primary w-6 h-2'
-                    : 'bg-gray-200 hover:bg-gray-300 w-2 h-2'
+                    ? 'bg-primary w-5 h-1.5'
+                    : 'bg-gray-200 hover:bg-gray-300 w-1.5 h-1.5'
                 }`}
               />
             ))}
