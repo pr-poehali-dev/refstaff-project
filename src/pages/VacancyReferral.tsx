@@ -152,7 +152,7 @@ function VacancyReferral() {
       setIsSubmitted(true);
     } catch (error) {
       console.error('[submit] error:', error);
-      alert('Не удалось отправить отклик');
+      alert('Не удалось отправить отклик: ' + (error instanceof Error ? error.message : String(error)));
     }
   };
 
