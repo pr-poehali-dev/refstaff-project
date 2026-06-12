@@ -6436,6 +6436,20 @@ function Index() {
               <span className="hidden sm:inline"></span>
             </h2>
             <div className="grid gap-4">
+              {recommendations.filter(r => r.employeeId === currentEmployeeId).length === 0 && (
+                <Card className="border-dashed">
+                  <CardContent className="flex flex-col items-center justify-center py-12 text-center gap-4">
+                    <span className="text-5xl">👥</span>
+                    <div>
+                      <p className="font-semibold text-lg mb-1">Рекомендаций пока нет</p>
+                      <p className="text-sm text-muted-foreground">Порекомендуйте знакомых на открытые вакансии и получайте вознаграждение</p>
+                    </div>
+                    <Button onClick={() => setActiveTab('vacancies')}>
+                      Начать рекомендовать
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
               {recommendations.filter(r => r.employeeId === currentEmployeeId).map((rec) => (
                 <Card 
                   key={rec.id} 
