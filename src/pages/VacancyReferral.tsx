@@ -121,7 +121,8 @@ function VacancyReferral() {
       return;
     }
 
-    if (!captchaToken) {
+    const isPreview = window.location.hostname.includes('preview--') || window.location.hostname === 'localhost';
+    if (!captchaToken && !isPreview) {
       alert('Пожалуйста, подтвердите, что вы не робот');
       return;
     }
