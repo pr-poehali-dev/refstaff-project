@@ -391,7 +391,7 @@ function Index() {
 
   const loadChatMessages = async (chatId: number) => {
     try {
-      const msgs = await api.getMessages(chatId);
+      const msgs = await api.getMessages(chatId, currentUser?.id);
       const mapped: ChatMessage[] = msgs.map((m) => ({
         id: m.id,
         senderId: m.sender_id,

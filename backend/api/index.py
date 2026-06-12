@@ -1088,7 +1088,22 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         elif method == 'GET' and resource == 'messages':
             chat_id = query_params.get('chat_id')
-            
+            requester_id = query_params.get('user_id')
+
+            # Проверяем что запрашивающий — участник чата (employer или employee)
+            if requester_id:
+                cur.execute("""
+                    SELECT id FROM t_p65890965_refstaff_project.chats
+                    WHERE id = %s AND (
+                        employee_id = %s
+                        OR company_id IN (
+                            SELECT company_id FROM t_p65890965_refstaff_project.users WHERE id = %s AND role = 'employer'
+                        )
+                    )
+                """, (chat_id, requester_id, requester_id))
+                if not cur.fetchone():
+                    return {'statusCode': 403, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Access denied'}), 'isBase64Encoded': False}
+
             query = """
                 SELECT m.*,
                        u.first_name || ' ' || u.last_name as sender_name,
