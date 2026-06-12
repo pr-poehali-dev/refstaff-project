@@ -366,10 +366,8 @@ export const api = {
     return response.json();
   },
 
-  async getMessages(chatId: number, userId?: number): Promise<ChatMessage[]> {
-    const params = new URLSearchParams({ resource: 'messages', chat_id: String(chatId) });
-    if (userId) params.set('user_id', String(userId));
-    const response = await fetch(`${API_URL}/?${params}`);
+  async getMessages(chatId: number): Promise<ChatMessage[]> {
+    const response = await fetch(`${API_URL}/?resource=messages&chat_id=${chatId}`);
     if (!response.ok) throw new Error('Failed to fetch messages');
     return response.json();
   }
