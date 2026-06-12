@@ -263,12 +263,40 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             ))
             new_recommendation = cur.fetchone()
 
-            # Обновляем статистику сотрудника (некритично)
+            # Обновляем статистику и собираем данные для уведомления
+            rec_user = None
+            vacancy_title = vac_row['title'] if vac_row else ''
             if body_data.get('recommended_by'):
                 try:
                     cur.execute("UPDATE t_p65890965_refstaff_project.users SET total_recommendations = total_recommendations + 1 WHERE id = %s", (body_data.get('recommended_by'),))
+                    cur.execute("SELECT first_name, last_name, company_id, telegram_chat_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (body_data.get('recommended_by'),))
+                    rec_user = cur.fetchone()
                 except Exception:
                     pass
+
+            result_body = json.dumps(dict(new_recommendation), default=str)
+
+            # Уведомляем работодателя (некритично — в отдельном потоке)
+            import threading
+            def notify():
+                try:
+                    if rec_user and rec_user.get('company_id'):
+                        send_notification({
+                            'company_id': rec_user['company_id'],
+                            'event_type': 'new_recommendation',
+                            'candidate_name': body_data.get('candidate_name', ''),
+                            'candidate_email': body_data.get('candidate_email', ''),
+                            'vacancy_title': vacancy_title,
+                            'recommended_by_name': f"{rec_user.get('first_name', '')} {rec_user.get('last_name', '')}",
+                            'reward_amount': reward_amount
+                        })
+                    tg_notify(
+                        rec_user.get('telegram_chat_id') if rec_user else None,
+                        f"📋 <b>Рекомендация отправлена!</b>\n\nКандидат: <b>{body_data.get('candidate_name', '')}</b>\nВакансия: <b>{vacancy_title}</b>\n\nМы уведомим вас об изменении статуса."
+                    )
+                except Exception:
+                    pass
+            threading.Thread(target=notify, daemon=True).start()
 
             return {
                 'statusCode': 201,
@@ -276,7 +304,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps(dict(new_recommendation), default=str),
+                'body': result_body,
                 'isBase64Encoded': False
             }
         

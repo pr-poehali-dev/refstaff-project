@@ -52,36 +52,6 @@ def handler(event: dict, context) -> dict:
     # Формируем data URL для хранения в БД
     resume_url = f"data:{content_type};base64,{file_data}"
 
-    # Дополнительно отправляем резюме на email работодателя
-    try:
-        smtp_host = os.environ.get('EMAIL_SMTP_HOST', 'smtp.reg.ru')
-        smtp_port = int(os.environ.get('EMAIL_SMTP_PORT', 587))
-        email_from = os.environ.get('EMAIL_FROM', '')
-        email_password = os.environ.get('EMAIL_PASSWORD', '')
-
-        if email_from and email_password:
-            file_bytes = base64.b64decode(file_data)
-
-            msg = MIMEMultipart()
-            msg['From'] = email_from
-            msg['To'] = email_from
-            msg['Subject'] = f'Резюме кандидата: {candidate_name or file_name}'
-
-            msg.attach(MIMEText(f'Резюме от кандидата {candidate_name}\nФайл: {file_name}', 'plain', 'utf-8'))
-
-            part = MIMEBase('application', 'octet-stream')
-            part.set_payload(file_bytes)
-            encoders.encode_base64(part)
-            part.add_header('Content-Disposition', f'attachment; filename="{file_name}"')
-            msg.attach(part)
-
-            with smtplib.SMTP(smtp_host, smtp_port) as server:
-                server.starttls()
-                server.login(email_from, email_password)
-                server.sendmail(email_from, email_from, msg.as_string())
-    except Exception:
-        pass  # Email — некритично, продолжаем
-
     return {
         'statusCode': 200,
         'headers': {'Access-Control-Allow-Origin': '*', 'Content-Type': 'application/json'},
