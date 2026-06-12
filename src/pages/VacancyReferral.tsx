@@ -132,7 +132,11 @@ function VacancyReferral() {
     try {
       let resumeUrl: string | undefined;
       if (resumeFile) {
-        resumeUrl = await api.uploadResume(resumeFile);
+        try {
+          resumeUrl = await api.uploadResume(resumeFile);
+        } catch {
+          // Загрузка резюме недоступна — продолжаем без файла
+        }
       }
 
       const payload = {
