@@ -532,17 +532,29 @@ function Index() {
     setSelectedFiles(files => files.filter((_, i) => i !== index));
   };
 
-  const handleOpenChat = () => {
+  const handleOpenChat = async () => {
     setShowChatDialog(true);
     setUnreadMessagesCount(0);
-    if (userRole === 'employee') {
-      const hr = employees.find(e => e.isAdmin && !e.isFired) || employees[0];
-      if (hr) setActiveChatEmployee(hr);
+    if (userRole === 'employee' && currentUser?.id && currentCompanyId) {
+      setChatMessages([]);
+      setActiveChatId(null);
+      try {
+        const chat = await api.createChat(currentCompanyId, currentUser.id);
+        const chatId = Number(chat.chat_id || chat.id);
+        if (!chatId) return;
+        setActiveChatId(chatId);
+        await loadChatMessages(chatId);
+        api.markMessagesRead(chatId, currentUser.id);
+        if (chatPollRef.current) clearInterval(chatPollRef.current);
+        chatPollRef.current = setInterval(() => loadChatMessages(chatId), 5000);
+      } catch (e) {
+        console.error('Failed to open employee chat:', e);
+      }
     }
   };
 
   useEffect(() => {
-    if (showChatDialog && activeChatEmployee) {
+    if (showChatDialog && activeChatEmployee && userRole === 'employer') {
       handleSelectChatEmployee(activeChatEmployee);
     }
     if (!showChatDialog && chatPollRef.current) {
