@@ -1101,7 +1101,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     if user_row:
                         if str(chat_row['employee_id']) == str(requester_id):
                             allowed = True
-                        elif user_row['role'] == 'employer' and str(user_row['company_id']) == str(chat_row['company_id']):
+                        elif user_row['role'] in ('employer', 'admin') and str(user_row['company_id']) == str(chat_row['company_id']):
                             allowed = True
                     if not allowed:
                         return {'statusCode': 403, 'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}, 'body': json.dumps({'error': 'Access denied'}), 'isBase64Encoded': False}
