@@ -391,7 +391,7 @@ function Index() {
 
   const loadChatMessages = async (chatId: number) => {
     try {
-      const msgs = await api.getMessages(chatId);
+      const msgs = await api.getMessages(chatId, currentUser?.id);
       const mapped: ChatMessage[] = msgs.map((m) => ({
         id: m.id,
         senderId: m.sender_id,
@@ -532,17 +532,29 @@ function Index() {
     setSelectedFiles(files => files.filter((_, i) => i !== index));
   };
 
-  const handleOpenChat = () => {
+  const handleOpenChat = async () => {
     setShowChatDialog(true);
     setUnreadMessagesCount(0);
-    if (userRole === 'employee') {
-      const hr = employees.find(e => e.isAdmin && !e.isFired) || employees[0];
-      if (hr) setActiveChatEmployee(hr);
+    if (userRole === 'employee' && currentUser?.id && currentCompanyId) {
+      setChatMessages([]);
+      setActiveChatId(null);
+      try {
+        const chat = await api.createChat(currentCompanyId, currentUser.id);
+        const chatId = Number(chat.chat_id || chat.id);
+        if (!chatId) return;
+        setActiveChatId(chatId);
+        await loadChatMessages(chatId);
+        api.markMessagesRead(chatId, currentUser.id);
+        if (chatPollRef.current) clearInterval(chatPollRef.current);
+        chatPollRef.current = setInterval(() => loadChatMessages(chatId), 5000);
+      } catch (e) {
+        console.error('Failed to open employee chat:', e);
+      }
     }
   };
 
   useEffect(() => {
-    if (showChatDialog && activeChatEmployee) {
+    if (showChatDialog && activeChatEmployee && userRole === 'employer') {
       handleSelectChatEmployee(activeChatEmployee);
     }
     if (!showChatDialog && chatPollRef.current) {
@@ -561,7 +573,7 @@ function Index() {
   useEffect(() => {
     if ((userRole === 'employer' || userRole === 'employee') && currentUser) {
       loadData();
-      const pollInterval = setInterval(() => loadData(true), 30000);
+      const pollInterval = setInterval(() => loadData(true), 180000);
       return () => clearInterval(pollInterval);
     }
   }, [userRole, currentUser]);
@@ -614,26 +626,27 @@ function Index() {
   const loadData = async (silent = false) => {
     try {
       if (!silent) setIsLoading(true);
-      const vacancyStatus = userRole === 'employer' ? 'all' : 'active';
-      const [vacanciesData, employeesData, recommendationsData, companyData, payoutsData, chatsData, newsData] = await Promise.all([
-        api.getVacancies(currentCompanyId, vacancyStatus).catch(() => []),
-        api.getEmployees(currentCompanyId).catch(() => []),
-        userRole === 'employer'
-          ? api.getRecommendations(currentCompanyId).catch(() => [])
-          : api.getRecommendations(currentCompanyId, undefined, currentEmployeeId).catch(() => []),
-        api.getCompany(currentCompanyId).catch(() => null),
-        userRole === 'employer' 
-          ? fetch(`https://functions.poehali.dev/f31523e1-66d9-4d65-8966-76cbff949641?company_id=${currentCompanyId}`)
-              .then(res => res.json()).catch(() => [])
-          : Promise.resolve([]),
-        userRole === 'employer' && currentUser?.id
-          ? api.getChats(currentUser.id, currentCompanyId).catch(() => [])
-          : Promise.resolve([]),
-        currentCompanyId
-          ? fetch(`https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news&company_id=${currentCompanyId}&role=${userRole}`)
-              .then(res => res.json()).catch(() => [])
-          : Promise.resolve([])
-      ]);
+
+      const dashParams = new URLSearchParams({
+        resource: 'dashboard',
+        company_id: String(currentCompanyId),
+        role: userRole,
+        ...(currentUser?.id ? { user_id: String(currentUser.id) } : {}),
+      });
+      const dashRes = await fetch(`https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?${dashParams}`);
+      const dash = await dashRes.json();
+
+      const vacanciesData = dash.vacancies || [];
+      const employeesData = dash.employees || [];
+      const recommendationsData = dash.recommendations || [];
+      const companyData = dash.company || null;
+      const chatsData = dash.chats || [];
+      const newsData = dash.news || [];
+      const walletDash = dash.wallet || null;
+
+      const payoutsData = userRole === 'employer'
+        ? await fetch(`https://functions.poehali.dev/f31523e1-66d9-4d65-8966-76cbff949641?company_id=${currentCompanyId}`).then(r => r.json()).catch(() => [])
+        : [];
 
       const mappedVacancies: Vacancy[] = vacanciesData.map((v: ApiVacancy) => ({
         id: v.id,
@@ -754,7 +767,10 @@ function Index() {
       if (companyData?.subscription_tier === 'none' || !companyData?.subscription_expires_at) {
         setSubscriptionDaysLeft(-1);
       } else {
-        const expires = new Date(companyData.subscription_expires_at);
+        const expiresStr = companyData.subscription_expires_at.endsWith('Z')
+          ? companyData.subscription_expires_at
+          : companyData.subscription_expires_at + 'Z';
+        const expires = new Date(expiresStr);
         const now = new Date();
         const days = Math.ceil((expires.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
         setSubscriptionDaysLeft(days);
@@ -872,7 +888,7 @@ function Index() {
       }
 
       if (userRole === 'employee') {
-        const wallet = await api.getWallet(currentEmployeeId).catch(() => null);
+        const wallet = walletDash;
         if (wallet && walletData) {
           const prevBalance = walletData.wallet?.wallet_balance || 0;
           const newBalance = wallet.wallet?.wallet_balance || 0;
@@ -6432,6 +6448,20 @@ function Index() {
               <span className="hidden sm:inline"></span>
             </h2>
             <div className="grid gap-4">
+              {recommendations.filter(r => r.employeeId === currentEmployeeId).length === 0 && (
+                <Card className="border-dashed">
+                  <CardContent className="flex flex-col items-center justify-center py-12 text-center gap-4">
+                    <span className="text-5xl">👥</span>
+                    <div>
+                      <p className="font-semibold text-lg mb-1">Рекомендаций пока нет</p>
+                      <p className="text-sm text-muted-foreground">Порекомендуйте знакомых на открытые вакансии и получайте вознаграждение</p>
+                    </div>
+                    <Button onClick={() => setActiveTab('vacancies')}>
+                      Начать рекомендовать
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
               {recommendations.filter(r => r.employeeId === currentEmployeeId).map((rec) => (
                 <Card 
                   key={rec.id} 
