@@ -2410,15 +2410,15 @@ function Index() {
               <ul className="space-y-1 text-xs text-muted-foreground">
                 <li><a href="/blog" className="hover:text-primary">Блог</a></li>
                 <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
-                <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
+                <li><span onClick={() => setShowAboutDialog(true)} className="hover:text-primary cursor-pointer">О нас</span></li>
               </ul>
             </nav>
             <nav aria-label="Правовая информация" className="col-span-2 sm:col-span-1">
               <h4 className="font-semibold mb-2 text-xs">Правовая информация</h4>
               <ul className="space-y-1 text-xs text-muted-foreground">
-                <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary text-left leading-tight p-0 m-0 bg-transparent border-0">Политика конфиденциальности</button></li>
-                <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary text-left leading-tight p-0 m-0 bg-transparent border-0">Пользовательское соглашение</button></li>
-                <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary text-left leading-tight p-0 m-0 bg-transparent border-0">Обработка персональных данных</button></li>
+                <li><span onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary cursor-pointer">Политика конфиденциальности</span></li>
+                <li><span onClick={() => setShowTermsDialog(true)} className="hover:text-primary cursor-pointer">Пользовательское соглашение</span></li>
+                <li><span onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary cursor-pointer">Обработка персональных данных</span></li>
               </ul>
             </nav>
           </div>
