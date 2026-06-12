@@ -628,10 +628,13 @@ function Index() {
       const employeesData = dash.employees || [];
       const recommendationsData = dash.recommendations || [];
       const companyData = dash.company || null;
-      const payoutsData = dash.payouts || [];
       const chatsData = dash.chats || [];
       const newsData = dash.news || [];
       const walletDash = dash.wallet || null;
+
+      const payoutsData = userRole === 'employer'
+        ? await fetch(`https://functions.poehali.dev/f31523e1-66d9-4d65-8966-76cbff949641?company_id=${currentCompanyId}`).then(r => r.json()).catch(() => [])
+        : [];
 
       const mappedVacancies: Vacancy[] = vacanciesData.map((v: ApiVacancy) => ({
         id: v.id,

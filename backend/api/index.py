@@ -1359,17 +1359,6 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 chats = [dict(r) for r in cur.fetchall()]
 
             payouts = []
-            if role == 'employer':
-                cur.execute("""
-                    SELECT pr.id, pr.user_id, pr.amount, pr.status, pr.payment_method,
-                           pr.payment_details, pr.created_at, pr.processed_at,
-                           u.first_name || ' ' || u.last_name as user_name, u.email as user_email
-                    FROM t_p65890965_refstaff_project.payout_requests pr
-                    JOIN t_p65890965_refstaff_project.users u ON pr.user_id = u.id
-                    WHERE u.company_id = %s
-                    ORDER BY pr.created_at DESC
-                """, (company_id,))
-                payouts = [dict(r) for r in cur.fetchall()]
 
             wallet = None
             if role == 'employee' and user_id:
