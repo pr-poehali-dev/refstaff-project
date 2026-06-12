@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Turnstile } from '@marsidev/react-turnstile';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +30,8 @@ function VacancyReferral() {
   });
 
   const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState(false);
 
   useEffect(() => {
     loadVacancyData();
@@ -119,6 +122,11 @@ function VacancyReferral() {
       return;
     }
 
+    if (!captchaToken && !captchaError) {
+      alert('Пожалуйста, подтвердите, что вы не робот');
+      return;
+    }
+
 
 
     try {
@@ -127,7 +135,7 @@ function VacancyReferral() {
         resumeUrl = await api.uploadResume(resumeFile);
       }
 
-      await api.createRecommendation({
+      const payload = {
         vacancy_id: vacancy.id,
         recommended_by: referrerId ? parseInt(referrerId) : undefined,
         candidate_name: form.name,
@@ -135,11 +143,15 @@ function VacancyReferral() {
         candidate_phone: form.phone,
         comment: form.comment,
         resume_url: resumeUrl
-      });
+      };
+      console.log('[submit] payload:', JSON.stringify(payload));
+
+      const result = await api.createRecommendation(payload);
+      console.log('[submit] result:', JSON.stringify(result));
       
       setIsSubmitted(true);
     } catch (error) {
-      console.error('Ошибка отправки:', error);
+      console.error('[submit] error:', error);
       alert('Не удалось отправить отклик');
     }
   };
@@ -405,7 +417,16 @@ function VacancyReferral() {
                     </div>
                   )}
 
-                  <Button type="submit" className="w-full" size="lg">
+                  <div className="flex justify-center">
+                    <Turnstile
+                      siteKey="0x4AAAAAACnexPnHsy0yGN6Z"
+                      onSuccess={(token) => setCaptchaToken(token)}
+                      onExpire={() => setCaptchaToken(null)}
+                      onError={() => setCaptchaError(true)}
+                    />
+                  </div>
+
+                  <Button type="submit" className="w-full" size="lg" disabled={!captchaToken && !captchaError}>
                     <Icon name="Send" className="mr-2" size={18} />
                     Отправить отклик
                   </Button>

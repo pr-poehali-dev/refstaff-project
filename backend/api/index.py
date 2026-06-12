@@ -238,23 +238,20 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         
         elif method == 'POST' and resource == 'recommendations':
             body_data = json.loads(event.get('body', '{}'))
-            print(f"[recommendations] body: {body_data}")
-            
+
             # Получаем reward_amount из вакансии если не передан
             reward_amount = body_data.get('reward_amount')
             if not reward_amount and body_data.get('vacancy_id'):
-                cur.execute("SELECT reward_amount FROM t_p65890965_refstaff_project.vacancies WHERE id = %s", (body_data.get('vacancy_id'),))
+                cur.execute("SELECT reward_amount, title FROM t_p65890965_refstaff_project.vacancies WHERE id = %s", (body_data.get('vacancy_id'),))
                 vac_row = cur.fetchone()
                 reward_amount = vac_row['reward_amount'] if vac_row else 30000
 
-            query = """
+            cur.execute("""
                 INSERT INTO t_p65890965_refstaff_project.recommendations 
                 (vacancy_id, recommended_by, candidate_name, candidate_email, candidate_phone, comment, resume_url, reward_amount)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING id, vacancy_id, candidate_name, candidate_email, status, resume_url, reward_amount, created_at
-            """
-            
-            cur.execute(query, (
+            """, (
                 body_data.get('vacancy_id'),
                 body_data.get('recommended_by'),
                 body_data.get('candidate_name'),
@@ -264,41 +261,14 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 body_data.get('resume_url'),
                 reward_amount
             ))
-            
             new_recommendation = cur.fetchone()
-            
-            update_user_stats = """
-                UPDATE t_p65890965_refstaff_project.users 
-                SET total_recommendations = total_recommendations + 1
-                WHERE id = %s
-            """
-            cur.execute(update_user_stats, (body_data.get('recommended_by'),))
 
-            cur.execute("SELECT first_name, last_name, company_id, telegram_chat_id FROM t_p65890965_refstaff_project.users WHERE id = %s", (body_data.get('recommended_by'),))
-            rec_user = cur.fetchone()
-            vacancy_title = ''
-            if body_data.get('vacancy_id'):
-                cur.execute("SELECT title FROM t_p65890965_refstaff_project.vacancies WHERE id = %s", (body_data.get('vacancy_id'),))
-                vac = cur.fetchone()
-                if vac:
-                    vacancy_title = vac['title']
-            if rec_user and rec_user.get('company_id'):
-                send_notification({
-                    'company_id': rec_user['company_id'],
-                    'event_type': 'new_recommendation',
-                    'candidate_name': body_data.get('candidate_name', ''),
-                    'candidate_email': body_data.get('candidate_email', ''),
-                    'vacancy_title': vacancy_title,
-                    'recommended_by_name': f"{rec_user.get('first_name', '')} {rec_user.get('last_name', '')}",
-                    'reward_amount': body_data.get('reward_amount', 30000)
-                })
-            # Telegram-уведомление сотруднику о принятой рекомендации
-            tg_notify(rec_user.get('telegram_chat_id') if rec_user else None,
-                f"📋 <b>Рекомендация отправлена!</b>\n\n"
-                f"Кандидат: <b>{body_data.get('candidate_name', '')}</b>\n"
-                f"Вакансия: <b>{vacancy_title}</b>\n\n"
-                f"Мы уведомим вас об изменении статуса."
-            )
+            # Обновляем статистику сотрудника (некритично)
+            if body_data.get('recommended_by'):
+                try:
+                    cur.execute("UPDATE t_p65890965_refstaff_project.users SET total_recommendations = total_recommendations + 1 WHERE id = %s", (body_data.get('recommended_by'),))
+                except Exception:
+                    pass
 
             return {
                 'statusCode': 201,
