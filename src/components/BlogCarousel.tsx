@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
@@ -67,7 +67,9 @@ export default function BlogCarousel() {
   const [activeIndex, setActiveIndex] = useState(0);
   const trackRef = useRef<HTMLDivElement>(null);
   const startX = useRef(0);
+  const dragDelta = useRef(0);
   const isDragging = useRef(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch(`${BLOG_API}?action=list&page=1&per_page=6`)
@@ -98,28 +100,36 @@ export default function BlogCarousel() {
   const prev = () => setActiveIndex(i => Math.max(0, i - 1));
   const next = () => setActiveIndex(i => Math.min(maxIndex, i + 1));
 
-  // Touch/drag support
-  const wasDragged = useRef(false);
-
-  const onPointerDown = (e: React.PointerEvent) => {
+  // Drag/swipe — без setPointerCapture, чтобы не блокировать клики по Link
+  const onMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
-    wasDragged.current = false;
+    dragDelta.current = 0;
     startX.current = e.clientX;
-    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
-  const onPointerUp = (e: React.PointerEvent) => {
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging.current) return;
+    dragDelta.current = e.clientX - startX.current;
+  };
+  const onMouseUp = () => {
     if (!isDragging.current) return;
     isDragging.current = false;
-    const diff = startX.current - e.clientX;
-    if (Math.abs(diff) > 10) wasDragged.current = true;
-    if (diff > 40) next();
-    else if (diff < -40) prev();
+    if (dragDelta.current < -40) next();
+    else if (dragDelta.current > 40) prev();
   };
-  const onLinkClick = (e: React.MouseEvent) => {
-    if (wasDragged.current) {
-      e.preventDefault();
-      wasDragged.current = false;
-    }
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    dragDelta.current = 0;
+    startX.current = e.touches[0].clientX;
+  };
+  const onTouchEnd = (e: React.TouchEvent) => {
+    const diff = e.changedTouches[0].clientX - startX.current;
+    if (diff < -40) next();
+    else if (diff > 40) prev();
+  };
+
+  const onCardClick = (e: React.MouseEvent, slug: string) => {
+    if (Math.abs(dragDelta.current) > 10) return;
+    navigate(`/blog/${slug}`);
   };
 
   if (loading) {
@@ -183,10 +193,13 @@ export default function BlogCarousel() {
 
         {/* Carousel track */}
         <div
-          className="overflow-hidden cursor-grab active:cursor-grabbing select-none"
-          onPointerDown={onPointerDown}
-          onPointerUp={onPointerUp}
-          onPointerCancel={() => { isDragging.current = false; }}
+          className="overflow-hidden select-none"
+          onMouseDown={onMouseDown}
+          onMouseMove={onMouseMove}
+          onMouseUp={onMouseUp}
+          onMouseLeave={onMouseUp}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
         >
           <div
             ref={trackRef}
@@ -199,11 +212,9 @@ export default function BlogCarousel() {
                 className="shrink-0 px-2"
                 style={{ width: `${cardWidthPct}%` }}
               >
-                <Link
-                  to={`/blog/${post.slug}`}
-                  className="group flex flex-col h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-                  draggable={false}
-                  onClick={onLinkClick}
+                <div
+                  className="group flex flex-col h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden cursor-pointer"
+                  onClick={(e) => onCardClick(e, post.slug)}
                 >
                   <div className="h-1 w-full bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="p-5 sm:p-6 flex flex-col flex-1">
@@ -221,7 +232,7 @@ export default function BlogCarousel() {
                       <Icon name="ArrowRight" size={14} className="group-hover:translate-x-1 transition-transform" />
                     </div>
                   </div>
-                </Link>
+                </div>
               </div>
             ))}
           </div>
