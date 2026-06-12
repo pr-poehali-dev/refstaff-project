@@ -13,11 +13,16 @@ interface PostPreview {
   title: string;
   topic: string;
   publishedAt: string;
+  views: number;
 }
 
 interface Props {
   secret: string;
 }
+
+type SortField = 'views' | 'date';
+type SortOrder = 'desc' | 'asc';
+type ViewsFilter = 'all' | '0' | '1-10' | '11-100' | '100+';
 
 export default function AdminBlogTab({ secret }: Props) {
   const [posts, setPosts] = useState<PostPreview[]>([]);
@@ -25,15 +30,38 @@ export default function AdminBlogTab({ secret }: Props) {
   const [generating, setGenerating] = useState(false);
   const [genLog, setGenLog] = useState<string[]>([]);
   const [deleting, setDeleting] = useState<number | null>(null);
+  const [sortField, setSortField] = useState<SortField>('views');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [viewsFilter, setViewsFilter] = useState<ViewsFilter>('all');
 
   const loadPosts = async () => {
-    const r = await fetch(`${BLOG_API}?action=list&per_page=50`);
+    const r = await fetch(
+      `${BLOG_API}?action=list_with_views&sort=${sortField}&order=${sortOrder}&admin_secret=${encodeURIComponent(secret)}`
+    );
     const d = await r.json();
     setPosts(d.posts || []);
     setTotal(d.total || 0);
   };
 
-  useEffect(() => { loadPosts(); }, []);
+  useEffect(() => { loadPosts(); }, [sortField, sortOrder]);
+
+  const filteredPosts = posts.filter(p => {
+    if (viewsFilter === 'all') return true;
+    if (viewsFilter === '0') return p.views === 0;
+    if (viewsFilter === '1-10') return p.views >= 1 && p.views <= 10;
+    if (viewsFilter === '11-100') return p.views >= 11 && p.views <= 100;
+    if (viewsFilter === '100+') return p.views > 100;
+    return true;
+  });
+
+  const toggleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(o => o === 'desc' ? 'asc' : 'desc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
+    }
+  };
 
   const generateBulk = async (count = 5) => {
     setGenerating(true);
@@ -55,7 +83,6 @@ export default function AdminBlogTab({ secret }: Props) {
       } catch {
         setGenLog(prev => [...prev.slice(0, -1), `❌ Ошибка сети при статье ${i + 1}`]);
       }
-      // Пауза 2 сек между запросами чтобы не перегружать GPT
       if (i < count - 1) await new Promise(res => setTimeout(res, 2000));
     }
     setGenerating(false);
@@ -74,6 +101,16 @@ export default function AdminBlogTab({ secret }: Props) {
     loadPosts();
   };
 
+  const totalViews = posts.reduce((sum, p) => sum + p.views, 0);
+
+  const FILTERS: { value: ViewsFilter; label: string }[] = [
+    { value: 'all', label: 'Все' },
+    { value: '0', label: '0 просмотров' },
+    { value: '1-10', label: '1–10' },
+    { value: '11-100', label: '11–100' },
+    { value: '100+', label: '100+' },
+  ];
+
   return (
     <TabsContent value="blog">
       <div className="space-y-5">
@@ -81,7 +118,9 @@ export default function AdminBlogTab({ secret }: Props) {
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div>
             <h2 className="text-white font-semibold text-lg">SEO-блог</h2>
-            <p className="text-gray-400 text-sm">Всего статей: {total}</p>
+            <p className="text-gray-400 text-sm">
+              Статей: {total} · Просмотров всего: {totalViews.toLocaleString('ru-RU')}
+            </p>
           </div>
           <div className="flex gap-2">
             <Button
@@ -130,7 +169,6 @@ export default function AdminBlogTab({ secret }: Props) {
                 <p className="text-white text-sm font-medium mb-1">Автогенерация через cron-job.org</p>
                 <p className="text-gray-400 text-xs mb-3">Вставь этот URL в cron-job.org — никаких заголовков не нужно, секрет уже в ссылке:</p>
                 <div className="space-y-3 text-xs">
-
                   <div className="bg-gray-800 rounded p-3">
                     <p className="text-gray-400 mb-2 font-medium">Готовый URL для cron-job.org:</p>
                     <div className="flex items-center gap-2">
@@ -152,7 +190,6 @@ export default function AdminBlogTab({ secret }: Props) {
                     </div>
                     <p className="text-gray-500 mt-2">👆 Нажми иконку копирования — секрет подставится автоматически</p>
                   </div>
-
                   <div className="bg-gray-800 rounded p-3 space-y-1">
                     <p className="text-gray-300 font-medium mb-2">Настройки в cron-job.org:</p>
                     <p className="text-gray-400">• <span className="text-white">URL</span> — скопируй сверху</p>
@@ -160,19 +197,64 @@ export default function AdminBlogTab({ secret }: Props) {
                     <p className="text-gray-400">• <span className="text-white">Schedule</span> — <code className="text-green-400">0 */4 * * *</code> (каждые 4 ч = 6 статей/день)</p>
                     <p className="text-gray-400">• <span className="text-white">Заголовки</span> — не нужны, оставь пустыми</p>
                   </div>
-
                 </div>
               </div>
             </div>
           </CardContent>
         </Card>
 
+        {/* Фильтры и сортировка */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-gray-500 text-xs">Просмотры:</span>
+          {FILTERS.map(f => (
+            <button
+              key={f.value}
+              onClick={() => setViewsFilter(f.value)}
+              className={`text-xs px-3 py-1 rounded-full border transition-colors ${
+                viewsFilter === f.value
+                  ? 'bg-primary border-primary text-white'
+                  : 'border-gray-700 text-gray-400 hover:border-gray-500 hover:text-gray-200'
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+          <div className="ml-auto flex gap-2">
+            <button
+              onClick={() => toggleSort('views')}
+              className={`flex items-center gap-1 text-xs px-3 py-1 rounded-full border transition-colors ${
+                sortField === 'views'
+                  ? 'border-primary text-primary'
+                  : 'border-gray-700 text-gray-400 hover:border-gray-500'
+              }`}
+            >
+              <Icon name="Eye" size={11} />
+              По просмотрам
+              {sortField === 'views' && <Icon name={sortOrder === 'desc' ? 'ArrowDown' : 'ArrowUp'} size={11} />}
+            </button>
+            <button
+              onClick={() => toggleSort('date')}
+              className={`flex items-center gap-1 text-xs px-3 py-1 rounded-full border transition-colors ${
+                sortField === 'date'
+                  ? 'border-primary text-primary'
+                  : 'border-gray-700 text-gray-400 hover:border-gray-500'
+              }`}
+            >
+              <Icon name="Calendar" size={11} />
+              По дате
+              {sortField === 'date' && <Icon name={sortOrder === 'desc' ? 'ArrowDown' : 'ArrowUp'} size={11} />}
+            </button>
+          </div>
+        </div>
+
         {/* Список статей */}
         <div className="space-y-2">
-          {posts.length === 0 && !generating && (
-            <p className="text-gray-400 text-sm">Статей пока нет. Нажми «5 статей» чтобы сгенерировать.</p>
+          {filteredPosts.length === 0 && !generating && (
+            <p className="text-gray-400 text-sm">
+              {posts.length === 0 ? 'Статей пока нет. Нажми «5 статей» чтобы сгенерировать.' : 'Нет статей с такими фильтрами.'}
+            </p>
           )}
-          {posts.map(post => (
+          {filteredPosts.map(post => (
             <Card key={post.id} className="bg-gray-900 border-gray-800 hover:border-gray-600 transition-colors">
               <CardContent className="p-3 flex items-center justify-between gap-3">
                 <div className="min-w-0">
@@ -184,7 +266,13 @@ export default function AdminBlogTab({ secret }: Props) {
                     <span className="text-gray-500 text-xs truncate">/blog/{post.slug}</span>
                   </div>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-1 text-gray-400">
+                    <Icon name="Eye" size={13} />
+                    <span className={`text-xs font-medium tabular-nums ${post.views > 100 ? 'text-green-400' : post.views > 0 ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {post.views.toLocaleString('ru-RU')}
+                    </span>
+                  </div>
                   <a
                     href={`/blog/${post.slug}`}
                     target="_blank"

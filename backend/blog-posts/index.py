@@ -563,6 +563,34 @@ def handler(event: dict, context) -> dict:
         return {'statusCode': 200, 'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
                 'body': json.dumps({'reactions': reactions, 'my_reaction': my_reaction})}
 
+    # GET: список статей с количеством просмотров (для админки)
+    if method == 'GET' and action == 'list_with_views':
+        if admin_secret != os.environ.get('ADMIN_SECRET', ''):
+            return {'statusCode': 403, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'forbidden'})}
+        sort = params.get('sort', 'views')  # 'views' или 'date'
+        order = params.get('order', 'desc').upper()
+        if order not in ('ASC', 'DESC'):
+            order = 'DESC'
+        with conn.cursor() as cur:
+            cur.execute(
+                f'''SELECT bp.id, bp.slug, bp.title, bp.topic, bp.published_at,
+                           COUNT(bpv.id) AS views
+                    FROM {SCHEMA}.blog_posts bp
+                    LEFT JOIN {SCHEMA}.blog_post_views bpv ON bpv.post_id = bp.id
+                    WHERE bp.is_published = TRUE
+                    GROUP BY bp.id, bp.slug, bp.title, bp.topic, bp.published_at
+                    ORDER BY {"views" if sort == "views" else "bp.published_at"} {order}
+                    LIMIT 200'''
+            )
+            rows = cur.fetchall()
+        posts = [
+            {'id': r[0], 'slug': r[1], 'title': r[2], 'topic': r[3],
+             'publishedAt': r[4].isoformat() if r[4] else None, 'views': r[5]}
+            for r in rows
+        ]
+        return {'statusCode': 200, 'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
+                'body': json.dumps({'posts': posts, 'total': len(posts)})}
+
     # POST: удаление статьи
     if method == 'POST' and action == 'delete':
         if admin_secret != os.environ.get('ADMIN_SECRET', ''):

@@ -27,6 +27,13 @@
       "path": "/?action=stats&post_id=1&session_id=test123",
       "expectedStatus": 200,
       "bodyMatcher": "partial"
+    },
+    {
+      "name": "List with views forbidden without secret",
+      "method": "GET",
+      "path": "/?action=list_with_views",
+      "expectedStatus": 403,
+      "bodyMatcher": "partial"
     }
   ]
 }
