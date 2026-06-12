@@ -7745,6 +7745,7 @@ function Index() {
         recommendation={selectedCandidate}
         open={showCandidateDetail}
         onOpenChange={setShowCandidateDetail}
+        userRole={userRole}
       />
 
       <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>

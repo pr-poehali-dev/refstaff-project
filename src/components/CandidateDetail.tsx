@@ -8,10 +8,20 @@ interface CandidateDetailProps {
   recommendation: Recommendation | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  userRole?: string;
 }
 
-export function CandidateDetail({ recommendation, open, onOpenChange }: CandidateDetailProps) {
+const maskPhone = (phone: string) => phone.replace(/(\+\d{1})(\d+)(\d{2})/, (_, a, b, c) => `${a}${'*'.repeat(b.length)}${c}`);
+const maskEmail = (email: string) => {
+  const [user, domain] = email.split('@');
+  if (!domain) return email;
+  return `${user[0]}${'*'.repeat(Math.max(user.length - 2, 2))}${user[user.length - 1] || ''}@${domain}`;
+};
+
+export function CandidateDetail({ recommendation, open, onOpenChange, userRole }: CandidateDetailProps) {
   if (!recommendation) return null;
+
+  const isEmployee = userRole === 'employee';
 
   const getStatusInfo = (status: string) => {
     const config: Record<string, { label: string; variant: 'default' | 'secondary' | 'outline' | 'destructive'; color: string }> = {
@@ -52,7 +62,7 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
               </div>
               <div className="flex-1">
                 <p className="text-sm text-muted-foreground">Email</p>
-                <p className="font-medium">{recommendation.candidateEmail}</p>
+                <p className="font-medium">{isEmployee && recommendation.candidateEmail ? maskEmail(recommendation.candidateEmail) : recommendation.candidateEmail}</p>
               </div>
             </div>
 
@@ -63,7 +73,7 @@ export function CandidateDetail({ recommendation, open, onOpenChange }: Candidat
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-muted-foreground">Телефон</p>
-                  <p className="font-medium">{recommendation.candidatePhone}</p>
+                  <p className="font-medium">{isEmployee ? maskPhone(recommendation.candidatePhone!) : recommendation.candidatePhone}</p>
                 </div>
               </div>
             )}
