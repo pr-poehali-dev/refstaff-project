@@ -99,8 +99,11 @@ export default function BlogCarousel() {
   const next = () => setActiveIndex(i => Math.min(maxIndex, i + 1));
 
   // Touch/drag support
+  const wasDragged = useRef(false);
+
   const onPointerDown = (e: React.PointerEvent) => {
     isDragging.current = true;
+    wasDragged.current = false;
     startX.current = e.clientX;
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
@@ -108,8 +111,15 @@ export default function BlogCarousel() {
     if (!isDragging.current) return;
     isDragging.current = false;
     const diff = startX.current - e.clientX;
+    if (Math.abs(diff) > 10) wasDragged.current = true;
     if (diff > 40) next();
     else if (diff < -40) prev();
+  };
+  const onLinkClick = (e: React.MouseEvent) => {
+    if (wasDragged.current) {
+      e.preventDefault();
+      wasDragged.current = false;
+    }
   };
 
   if (loading) {
@@ -193,6 +203,7 @@ export default function BlogCarousel() {
                   to={`/blog/${post.slug}`}
                   className="group flex flex-col h-full bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
                   draggable={false}
+                  onClick={onLinkClick}
                 >
                   <div className="h-1 w-full bg-gradient-to-r from-primary to-secondary opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="p-5 sm:p-6 flex flex-col flex-1">
