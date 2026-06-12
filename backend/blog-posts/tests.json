@@ -20,6 +20,13 @@
       "path": "/?action=sitemap",
       "expectedStatus": 200,
       "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get stats",
+      "method": "GET",
+      "path": "/?action=stats&post_id=1&session_id=test123",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
     }
   ]
 }

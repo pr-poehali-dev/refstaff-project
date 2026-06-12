@@ -1,10 +1,18 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 const BLOG_API = 'https://functions.poehali.dev/24adc9a7-714f-4df9-a6b0-3874d99d1577';
+
+const REACTIONS = [
+  { emoji: '👍', label: 'Полезно' },
+  { emoji: '🔥', label: 'Огонь' },
+  { emoji: '💡', label: 'Интересно' },
+  { emoji: '❤️', label: 'Нравится' },
+  { emoji: '😮', label: 'Удивительно' },
+];
 
 interface Post {
   id: number;
@@ -16,8 +24,23 @@ interface Post {
   publishedAt: string;
 }
 
+interface Stats {
+  views: number;
+  reactions: Record<string, number>;
+  my_reaction: string | null;
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+function getSessionId(): string {
+  let sid = localStorage.getItem('blog_session_id');
+  if (!sid) {
+    sid = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('blog_session_id', sid);
+  }
+  return sid;
 }
 
 export default function BlogPost() {
@@ -25,6 +48,8 @@ export default function BlogPost() {
   const [post, setPost] = useState<Post | null>(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+  const [stats, setStats] = useState<Stats>({ views: 0, reactions: {}, my_reaction: null });
+  const [reacting, setReacting] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,6 +63,37 @@ export default function BlogPost() {
       })
       .finally(() => setLoading(false));
   }, [slug]);
+
+  const loadStats = useCallback((postId: number) => {
+    const sid = getSessionId();
+    fetch(`${BLOG_API}?action=stats&post_id=${postId}&session_id=${sid}`)
+      .then(r => r.json())
+      .then(d => setStats({ views: d.views || 0, reactions: d.reactions || {}, my_reaction: d.my_reaction || null }));
+  }, []);
+
+  useEffect(() => {
+    if (!post) return;
+    const sid = getSessionId();
+    fetch(`${BLOG_API}?action=view`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: post.id, session_id: sid }),
+    }).then(() => loadStats(post.id));
+  }, [post, loadStats]);
+
+  const handleReact = async (emoji: string) => {
+    if (!post || reacting) return;
+    setReacting(true);
+    const sid = getSessionId();
+    const r = await fetch(`${BLOG_API}?action=react`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ post_id: post.id, session_id: sid, emoji }),
+    });
+    const d = await r.json();
+    setStats(prev => ({ ...prev, reactions: d.reactions || {}, my_reaction: d.my_reaction || null }));
+    setReacting(false);
+  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center">
@@ -57,6 +113,7 @@ export default function BlogPost() {
   );
 
   const postUrl = `https://i-hunt.ru/blog/${post.slug}`;
+  const totalReactions = Object.values(stats.reactions).reduce((a, b) => a + b, 0);
 
   return (
     <>
@@ -119,6 +176,12 @@ export default function BlogPost() {
                 <span className="text-xs text-primary bg-primary/10 px-2.5 py-1 rounded-full font-medium whitespace-nowrap">
                   HR & Рекрутинг
                 </span>
+                {stats.views > 0 && (
+                  <span className="text-xs text-muted-foreground flex items-center gap-1 whitespace-nowrap">
+                    <Icon name="Eye" size={12} />
+                    {stats.views.toLocaleString('ru-RU')}
+                  </span>
+                )}
               </div>
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-gray-900 leading-tight mb-3">
                 {post.title}
@@ -153,8 +216,42 @@ export default function BlogPost() {
               dangerouslySetInnerHTML={{ __html: post.content }}
             />
 
+            {/* Реакции */}
+            <div className="mt-10 border border-gray-100 rounded-2xl p-5 sm:p-6">
+              <p className="text-sm font-semibold text-gray-700 mb-4 text-center">
+                Как вам статья?
+              </p>
+              <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
+                {REACTIONS.map(({ emoji, label }) => {
+                  const count = stats.reactions[emoji] || 0;
+                  const isActive = stats.my_reaction === emoji;
+                  return (
+                    <button
+                      key={emoji}
+                      onClick={() => handleReact(emoji)}
+                      disabled={reacting}
+                      title={label}
+                      className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm transition-all duration-200 select-none
+                        ${isActive
+                          ? 'border-primary bg-primary/10 text-primary font-semibold scale-105'
+                          : 'border-gray-200 bg-white hover:border-primary/40 hover:bg-primary/5 text-gray-600'
+                        }`}
+                    >
+                      <span className="text-base leading-none">{emoji}</span>
+                      {count > 0 && <span className="text-xs font-medium">{count}</span>}
+                    </button>
+                  );
+                })}
+              </div>
+              {totalReactions > 0 && (
+                <p className="text-center text-xs text-muted-foreground mt-3">
+                  {totalReactions} {totalReactions === 1 ? 'читатель оценил' : totalReactions < 5 ? 'читателя оценили' : 'читателей оценили'} статью
+                </p>
+              )}
+            </div>
+
             {/* CTA блок */}
-            <div className="mt-10 sm:mt-14 bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-2xl p-5 sm:p-8 text-center">
+            <div className="mt-6 sm:mt-8 bg-gradient-to-br from-primary/5 to-secondary/5 border border-primary/20 rounded-2xl p-5 sm:p-8 text-center">
               <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center mx-auto mb-3">
                 <Icon name="Rocket" size={20} className="text-white" />
               </div>

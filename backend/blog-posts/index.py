@@ -488,6 +488,81 @@ def handler(event: dict, context) -> dict:
             'body': '\n'.join(lines)
         }
 
+    # POST: зафиксировать просмотр статьи
+    if method == 'POST' and action == 'view':
+        post_id = body_data.get('post_id')
+        session_id = body_data.get('session_id', '')[:64]
+        if not post_id or not session_id:
+            return {'statusCode': 400, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'missing params'})}
+        with conn.cursor() as cur:
+            cur.execute(
+                f'INSERT INTO {SCHEMA}.blog_post_views (post_id, session_id) VALUES (%s, %s) ON CONFLICT DO NOTHING',
+                (post_id, session_id)
+            )
+            cur.execute(f'SELECT COUNT(*) FROM {SCHEMA}.blog_post_views WHERE post_id=%s', (post_id,))
+            count = cur.fetchone()[0]
+        return {'statusCode': 200, 'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'}, 'body': json.dumps({'views': count})}
+
+    # GET: статистика статьи (просмотры + реакции)
+    if method == 'GET' and action == 'stats':
+        post_id = params.get('post_id')
+        session_id = params.get('session_id', '')[:64]
+        if not post_id:
+            return {'statusCode': 400, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'missing post_id'})}
+        with conn.cursor() as cur:
+            cur.execute(f'SELECT COUNT(*) FROM {SCHEMA}.blog_post_views WHERE post_id=%s', (post_id,))
+            views = cur.fetchone()[0]
+            cur.execute(
+                f'SELECT emoji, COUNT(*) as cnt FROM {SCHEMA}.blog_post_reactions WHERE post_id=%s GROUP BY emoji',
+                (post_id,)
+            )
+            reactions = {row[0]: row[1] for row in cur.fetchall()}
+            my_reaction = None
+            if session_id:
+                cur.execute(
+                    f'SELECT emoji FROM {SCHEMA}.blog_post_reactions WHERE post_id=%s AND session_id=%s',
+                    (post_id, session_id)
+                )
+                row = cur.fetchone()
+                my_reaction = row[0] if row else None
+        return {'statusCode': 200, 'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
+                'body': json.dumps({'views': views, 'reactions': reactions, 'my_reaction': my_reaction})}
+
+    # POST: поставить/убрать реакцию
+    if method == 'POST' and action == 'react':
+        post_id = body_data.get('post_id')
+        session_id = body_data.get('session_id', '')[:64]
+        emoji = body_data.get('emoji', '')[:8]
+        allowed = ['👍', '🔥', '💡', '❤️', '😮']
+        if not post_id or not session_id or emoji not in allowed:
+            return {'statusCode': 400, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'invalid params'})}
+        with conn.cursor() as cur:
+            cur.execute(
+                f'SELECT emoji FROM {SCHEMA}.blog_post_reactions WHERE post_id=%s AND session_id=%s',
+                (post_id, session_id)
+            )
+            existing = cur.fetchone()
+            if existing and existing[0] == emoji:
+                cur.execute(
+                    f'DELETE FROM {SCHEMA}.blog_post_reactions WHERE post_id=%s AND session_id=%s',
+                    (post_id, session_id)
+                )
+                my_reaction = None
+            else:
+                cur.execute(
+                    f'INSERT INTO {SCHEMA}.blog_post_reactions (post_id, session_id, emoji) VALUES (%s, %s, %s) '
+                    f'ON CONFLICT (post_id, session_id) DO UPDATE SET emoji=%s, created_at=NOW()',
+                    (post_id, session_id, emoji, emoji)
+                )
+                my_reaction = emoji
+            cur.execute(
+                f'SELECT emoji, COUNT(*) FROM {SCHEMA}.blog_post_reactions WHERE post_id=%s GROUP BY emoji',
+                (post_id,)
+            )
+            reactions = {row[0]: row[1] for row in cur.fetchall()}
+        return {'statusCode': 200, 'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
+                'body': json.dumps({'reactions': reactions, 'my_reaction': my_reaction})}
+
     # POST: удаление статьи
     if method == 'POST' and action == 'delete':
         if admin_secret != os.environ.get('ADMIN_SECRET', ''):
