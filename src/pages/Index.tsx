@@ -2397,28 +2397,28 @@ function Index() {
             <span className="text-base font-bold">iHUNT</span>
             <span className="text-xs text-muted-foreground ml-1">— реферальный рекрутинг с геймификацией</span>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
             <nav aria-label="Продукт">
-              <h4 className="font-semibold mb-2 text-sm">Продукт</h4>
-              <ul className="space-y-1.5 text-xs text-muted-foreground">
+              <h4 className="font-semibold mb-2 text-xs">Продукт</h4>
+              <ul className="space-y-1 text-xs text-muted-foreground">
                 <li><a href="#benefits" className="hover:text-primary">Возможности</a></li>
                 <li><a href="#pricing" className="hover:text-primary">Тарифы</a></li>
               </ul>
             </nav>
             <nav aria-label="Компания">
-              <h4 className="font-semibold mb-2 text-sm">Компания</h4>
-              <ul className="space-y-1.5 text-xs text-muted-foreground">
+              <h4 className="font-semibold mb-2 text-xs">Компания</h4>
+              <ul className="space-y-1 text-xs text-muted-foreground">
                 <li><a href="/blog" className="hover:text-primary">Блог</a></li>
                 <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
                 <li><button onClick={() => setShowAboutDialog(true)} className="hover:text-primary">О нас</button></li>
               </ul>
             </nav>
             <nav aria-label="Правовая информация" className="col-span-2 sm:col-span-1">
-              <h4 className="font-semibold mb-2 text-sm">Правовая информация</h4>
-              <ul className="space-y-1.5 text-xs text-muted-foreground">
-                <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary text-left">Политика конфиденциальности</button></li>
-                <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary text-left">Пользовательское соглашение</button></li>
-                <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary text-left">Обработка персональных данных</button></li>
+              <h4 className="font-semibold mb-2 text-xs">Правовая информация</h4>
+              <ul className="space-y-1 text-xs text-muted-foreground">
+                <li><button onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary text-left leading-tight">Политика конфиденциальности</button></li>
+                <li><button onClick={() => setShowTermsDialog(true)} className="hover:text-primary text-left leading-tight">Пользовательское соглашение</button></li>
+                <li><button onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary text-left leading-tight">Обработка персональных данных</button></li>
               </ul>
             </nav>
           </div>
