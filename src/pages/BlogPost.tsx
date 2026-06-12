@@ -276,41 +276,20 @@ export default function BlogPost() {
             </div>
 
             {/* Поделиться */}
-            <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 py-5 border-t border-gray-100">
-              <span className="text-sm font-medium text-gray-700">Поделиться статьёй:</span>
-              <div className="flex items-center gap-2 flex-wrap justify-center">
-                <a
-                  href={shareLinks.vk}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-600 hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all"
-                >
-                  <span className="text-base">🇻</span> ВКонтакте
-                </a>
-                <a
-                  href={shareLinks.telegram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-600 hover:border-sky-400 hover:text-sky-600 hover:bg-sky-50 transition-all"
-                >
-                  <span className="text-base">✈️</span> Telegram
-                </a>
-                <a
-                  href={shareLinks.whatsapp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-600 hover:border-green-400 hover:text-green-600 hover:bg-green-50 transition-all"
-                >
-                  <span className="text-base">💬</span> WhatsApp
-                </a>
-                <button
-                  onClick={handleCopyLink}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-600 hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all"
-                >
-                  <Icon name={copied ? 'Check' : 'Copy'} size={13} />
-                  {copied ? 'Скопировано!' : 'Копировать'}
-                </button>
-              </div>
+            <div className="mt-6 flex justify-center py-5 border-t border-gray-100">
+              <button
+                onClick={() => {
+                  if (navigator.share) {
+                    navigator.share({ title: post.title, url: window.location.href });
+                  } else {
+                    handleCopyLink();
+                  }
+                }}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-600 hover:border-primary/40 hover:text-primary hover:bg-primary/5 transition-all"
+              >
+                <Icon name={copied ? 'Check' : 'Share2'} size={15} />
+                {copied ? 'Скопировано!' : 'Поделиться'}
+              </button>
             </div>
 
             {/* CTA блок */}
