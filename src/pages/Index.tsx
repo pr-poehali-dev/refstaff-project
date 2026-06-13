@@ -40,6 +40,11 @@ import { ForgotPasswordDialog } from '@/components/dialogs/ForgotPasswordDialog'
 import { ResetPasswordDialog } from '@/components/dialogs/ResetPasswordDialog';
 import { DemoDialog } from '@/components/dialogs/DemoDialog';
 import { ReferralLinkDialog } from '@/components/dialogs/ReferralLinkDialog';
+import { RecommendDialog } from '@/components/dialogs/RecommendDialog';
+import { WithdrawDialog } from '@/components/dialogs/WithdrawDialog';
+import { CompanySettingsDialog } from '@/components/dialogs/CompanySettingsDialog';
+import { ChatDialog } from '@/components/dialogs/ChatDialog';
+import { InviteEmployeeDialog } from '@/components/dialogs/InviteEmployeeDialog';
 
 const LazyFallback = () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
@@ -4321,205 +4326,39 @@ function Index() {
         )}
       </div>
 
-      <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Добавить сотрудника</DialogTitle>
-            <DialogDescription>Создайте аккаунт для нового сотрудника компании</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <Label htmlFor="invite-first-name">Имя</Label>
-              <Input 
-                id="invite-first-name"
-                placeholder="Иван"
-                value={inviteForm.firstName}
-                onChange={(e) => setInviteForm({...inviteForm, firstName: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="invite-last-name">Фамилия</Label>
-              <Input 
-                id="invite-last-name"
-                placeholder="Иванов"
-                value={inviteForm.lastName}
-                onChange={(e) => setInviteForm({...inviteForm, lastName: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="invite-email">Email</Label>
-              <Input 
-                id="invite-email"
-                type="email"
-                placeholder="ivan@company.ru"
-                value={inviteForm.email}
-                onChange={(e) => setInviteForm({...inviteForm, email: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="invite-password">Пароль</Label>
-              <Input 
-                id="invite-password"
-                type="password"
-                placeholder="Минимум 8 символов"
-                value={inviteForm.password}
-                onChange={(e) => setInviteForm({...inviteForm, password: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="invite-position">Должность</Label>
-              <Input 
-                id="invite-position"
-                placeholder="Frontend Developer"
-                value={inviteForm.position}
-                onChange={(e) => setInviteForm({...inviteForm, position: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="invite-department">Отдел</Label>
-              <Input 
-                id="invite-department"
-                placeholder="Разработка"
-                value={inviteForm.department}
-                onChange={(e) => setInviteForm({...inviteForm, department: e.target.value})}
-              />
-            </div>
-            <Button 
-              className="w-full" 
-              onClick={handleInviteEmployee}
-              disabled={isAuthLoading}
-            >
-              {isAuthLoading ? 'Создание...' : 'Создать аккаунт сотрудника'}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <InviteEmployeeDialog
+        open={showInviteDialog}
+        onOpenChange={setShowInviteDialog}
+        form={inviteForm}
+        onFormChange={setInviteForm}
+        onSubmit={handleInviteEmployee}
+        isLoading={isAuthLoading}
+      />
 
-      <Dialog open={showCompanySettingsDialog} onOpenChange={setShowCompanySettingsDialog}>
-        <DialogContent className="w-[calc(100vw-16px)] max-w-2xl max-h-[92dvh] flex flex-col p-0 overflow-hidden">
-          <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
-            <DialogTitle className="text-base">Профиль компании</DialogTitle>
-            <DialogDescription className="text-xs">Управляйте информацией о вашей компании</DialogDescription>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-            <div>
-              <Label htmlFor="company-name-edit" className="text-xs">Название компании</Label>
-              <Input id="company-name-edit" className="mt-1 h-9 text-sm" value={company?.name || ''} readOnly disabled />
-            </div>
-            <div>
-              <Label htmlFor="company-logo" className="text-xs">Логотип</Label>
-              <div className="mt-1 flex items-center gap-3">
-                {(companyLogoPreview || company?.logo_url) && (
-                  <div className="relative shrink-0">
-                    <img
-                      src={companyLogoPreview || company?.logo_url}
-                      alt="Логотип"
-                      className="h-10 w-10 object-contain rounded border"
-                      loading="lazy"
-                      decoding="async"
-                    />
-                    <button
-                      type="button"
-                      className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-red-700"
-                      onClick={() => {
-                        setCompanyLogoPreview(null);
-                        setCompanyLogoFile(null);
-                        if (company?.logo_url) {
-                          api.updateCompany(currentCompanyId, { logo_url: '' });
-                          setCompany(prev => prev ? { ...prev, logo_url: undefined } : null);
-                        }
-                      }}
-                      title="Удалить логотип"
-                    >✕</button>
-                  </div>
-                )}
-                <div className="flex-1 min-w-0">
-                  <Input
-                    id="company-logo"
-                    className="text-xs h-9"
-                    type="file"
-                    accept="image/png,image/jpeg,image/jpg,image/webp"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 5 * 1024 * 1024) {
-                          alert('Файл слишком большой. Максимум 5 МБ');
-                          e.target.value = '';
-                          return;
-                        }
-                        setCompanyLogoFile(file);
-                        const reader = new FileReader();
-                        reader.onload = (ev) => setCompanyLogoPreview(ev.target?.result as string);
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                  <p className="text-[10px] text-muted-foreground mt-0.5">PNG, JPG, WebP до 5 МБ, от 200×200 пикселей</p>
-                </div>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="company-desc" className="text-xs">Описание</Label>
-              <Textarea id="company-desc" rows={2} className="mt-1 text-sm" placeholder="Расскажите о вашей компании..." value={companyEditForm.description} onChange={(e) => setCompanyEditForm(f => ({ ...f, description: e.target.value }))} />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="company-website" className="text-xs">Веб-сайт</Label>
-                <Input id="company-website" className="mt-1 h-9 text-sm" placeholder="https://example.com" value={companyEditForm.website} onChange={(e) => setCompanyEditForm(f => ({ ...f, website: e.target.value }))} />
-              </div>
-              <div>
-                <Label htmlFor="company-industry" className="text-xs">Отрасль</Label>
-                <Select value={companyEditForm.industry} onValueChange={(val) => setCompanyEditForm(f => ({ ...f, industry: val }))}>
-                  <SelectTrigger className="mt-1 h-9 text-sm">
-                    <SelectValue placeholder="Выберите" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="tech">IT и технологии</SelectItem>
-                    <SelectItem value="finance">Финансы</SelectItem>
-                    <SelectItem value="retail">Розничная торговля</SelectItem>
-                    <SelectItem value="manufacturing">Производство</SelectItem>
-                    <SelectItem value="services">Услуги</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="company-inn" className="text-xs">ИНН</Label>
-                <Input id="company-inn" className="mt-1 h-9 text-sm" value={company?.inn || ''} readOnly disabled />
-              </div>
-              <div>
-                <Label htmlFor="company-employee-count" className="text-xs">Сотрудников</Label>
-                <Input id="company-employee-count" className="mt-1 h-9 text-sm" type="number" value={company?.employee_count || 0} readOnly disabled />
-              </div>
-            </div>
-            <Separator />
-            <div>
-              <p className="text-xs font-semibold mb-2">Социальные сети</p>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label htmlFor="company-telegram" className="text-xs flex items-center gap-1">
-                    <Icon name="Send" size={12} /> Telegram
-                  </Label>
-                  <Input id="company-telegram" className="mt-1 h-9 text-sm" placeholder="@company" value={companyEditForm.telegram} onChange={(e) => setCompanyEditForm(f => ({ ...f, telegram: e.target.value }))} />
-                </div>
-                <div>
-                  <Label htmlFor="company-vk" className="text-xs flex items-center gap-1">
-                    <Icon name="MessageCircle" size={12} /> ВКонтакте
-                  </Label>
-                  <Input id="company-vk" className="mt-1 h-9 text-sm" placeholder="vk.com/company" value={companyEditForm.vk} onChange={(e) => setCompanyEditForm(f => ({ ...f, vk: e.target.value }))} />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="px-4 py-3 border-t shrink-0">
-            <Button className="w-full" onClick={handleSaveCompany} disabled={isSavingCompany}>
-              <Icon name={isSavingCompany ? 'Loader2' : 'Save'} className={`mr-2 ${isSavingCompany ? 'animate-spin' : ''}`} size={16} />
-              {isSavingCompany ? 'Сохранение...' : 'Сохранить изменения'}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CompanySettingsDialog
+        open={showCompanySettingsDialog}
+        onOpenChange={setShowCompanySettingsDialog}
+        company={company}
+        form={companyEditForm}
+        onFormChange={setCompanyEditForm}
+        logoPreview={companyLogoPreview}
+        onLogoFileChange={(file) => {
+          setCompanyLogoFile(file);
+          const reader = new FileReader();
+          reader.onload = (ev) => setCompanyLogoPreview(ev.target?.result as string);
+          reader.readAsDataURL(file);
+        }}
+        onLogoRemove={() => {
+          setCompanyLogoPreview(null);
+          setCompanyLogoFile(null);
+          if (company?.logo_url) {
+            api.updateCompany(currentCompanyId, { logo_url: '' });
+            setCompany(prev => prev ? { ...prev, logo_url: undefined } : null);
+          }
+        }}
+        onSave={handleSaveCompany}
+        isSaving={isSavingCompany}
+      />
 
       <Dialog open={showChatDialog} onOpenChange={(open) => { setShowChatDialog(open); if (!open && chatPollRef.current) { clearInterval(chatPollRef.current); chatPollRef.current = null; } }}>
         <DialogContent hideClose className="max-w-4xl h-[100dvh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
@@ -6606,99 +6445,17 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
-        <DialogContent className="w-[calc(100vw-16px)] max-w-2xl h-[92dvh] flex flex-col p-0">
-          <DialogHeader className="px-4 pt-4 pb-2 shrink-0">
-            <DialogTitle className="text-base">Чат с HR отделом</DialogTitle>
-            <DialogDescription className="text-xs">Задайте вопросы о рекомендациях и вакансиях</DialogDescription>
-          </DialogHeader>
-          <div className="flex-1 overflow-y-auto space-y-3 py-3 px-4 min-h-0">
-            {chatMessages.map((msg) => (
-              <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-3 py-2`}>
-                  <div className="text-[10px] opacity-70 mb-1">{msg.senderName}</div>
-                  {msg.message && <div className="text-sm mb-1">{msg.message}</div>}
-                  {msg.attachments && msg.attachments.length > 0 && (
-                    <div className="space-y-2 mt-2">
-                      {msg.attachments.map((attachment, idx) => (
-                        <div key={idx}>
-                          {attachment.type === 'image' ? (
-                            <img 
-                              src={attachment.url} 
-                              alt={attachment.name}
-                              className="rounded max-w-full h-auto cursor-pointer hover:opacity-90 transition"
-                              onClick={() => window.open(attachment.url, '_blank')}
-                            />
-                          ) : (
-                            <a 
-                              href={attachment.url} 
-                              download={attachment.name}
-                              className={`flex items-center gap-2 p-2 rounded ${msg.isOwn ? 'bg-primary-foreground/10' : 'bg-background'} hover:opacity-80 transition`}
-                            >
-                              <Icon name="File" size={14} className="flex-shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <div className="text-xs font-medium truncate">{attachment.name}</div>
-                                {attachment.size && (
-                                  <div className="text-[10px] opacity-70">{(attachment.size / 1024).toFixed(1)} KB</div>
-                                )}
-                              </div>
-                              <Icon name="Download" size={12} className="flex-shrink-0" />
-                            </a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                  <div className="text-[10px] opacity-70 mt-1">{msg.timestamp}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-          <div className="space-y-2 pt-3 border-t px-4 pb-4 shrink-0">
-            {selectedFiles.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {selectedFiles.map((file, idx) => (
-                  <div key={idx} className="flex items-center gap-1.5 bg-muted px-2 py-1.5 rounded text-xs">
-                    <Icon name={file.type.startsWith('image/') ? 'Image' : 'File'} size={12} />
-                    <span className="max-w-[100px] truncate">{file.name}</span>
-                    <button onClick={() => removeFile(idx)} className="hover:text-destructive transition">
-                      <Icon name="X" size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-            <div className="flex gap-2">
-              <input 
-                type="file" 
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                multiple
-                accept="image/*,.pdf,.doc,.docx,.txt"
-                className="hidden"
-              />
-              <Button 
-                variant="outline" 
-                size="icon"
-                onClick={() => fileInputRef.current?.click()}
-                className="h-10 w-10 flex-shrink-0"
-              >
-                <Icon name="Paperclip" size={16} />
-              </Button>
-              <Input 
-                placeholder="Сообщение..." 
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && !e.shiftKey && handleSendMessage()}
-                className="text-sm h-10"
-              />
-              <Button onClick={handleSendMessage} className="h-10 w-10 p-0 flex-shrink-0">
-                <Icon name="Send" size={16} />
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ChatDialog
+        open={showChatDialog}
+        onOpenChange={setShowChatDialog}
+        messages={chatMessages}
+        newMessage={newMessage}
+        onNewMessageChange={setNewMessage}
+        selectedFiles={selectedFiles}
+        onFileSelect={handleFileSelect}
+        onRemoveFile={removeFile}
+        onSend={handleSendMessage}
+      />
 
       <Dialog open={showNotificationsDialog} onOpenChange={setShowNotificationsDialog}>
         <DialogContent className="max-w-md">
@@ -7046,84 +6803,25 @@ function Index() {
         />
       </Suspense>
 
-      <Dialog open={showRecommendDialog} onOpenChange={setShowRecommendDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Рекомендовать кандидата</DialogTitle>
-            <DialogDescription>
-              Заполните информацию о кандидате на вакансию{' '}
-              <strong>{selectedVacancyDetail?.title}</strong>
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <Label htmlFor="recommend-name">ФИО кандидата *</Label>
-              <Input
-                id="recommend-name"
-                placeholder="Иван Иванов"
-                value={recommendationForm.name}
-                onChange={(e) =>
-                  setRecommendationForm({ ...recommendationForm, name: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label htmlFor="recommend-email">Email *</Label>
-              <Input
-                id="recommend-email"
-                type="email"
-                placeholder="ivan@example.com"
-                value={recommendationForm.email}
-                onChange={(e) =>
-                  setRecommendationForm({ ...recommendationForm, email: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label htmlFor="recommend-phone">Телефон</Label>
-              <Input
-                id="recommend-phone"
-                type="tel"
-                placeholder="+7 (999) 123-45-67"
-                value={recommendationForm.phone}
-                onChange={(e) =>
-                  setRecommendationForm({ ...recommendationForm, phone: e.target.value })
-                }
-              />
-            </div>
-            <div>
-              <Label htmlFor="recommend-comment">Комментарий</Label>
-              <Textarea
-                id="recommend-comment"
-                placeholder="Расскажите о кандидате и почему он подходит на эту позицию..."
-                rows={4}
-                value={recommendationForm.comment}
-                onChange={(e) =>
-                  setRecommendationForm({ ...recommendationForm, comment: e.target.value })
-                }
-              />
-            </div>
-            <Button
-              className="w-full"
-              onClick={async () => {
-                if (!selectedVacancyDetail) return;
-                await handleCreateRecommendation({
-                  vacancyId: selectedVacancyDetail.id,
-                  name: recommendationForm.name,
-                  email: recommendationForm.email,
-                  phone: recommendationForm.phone,
-                  comment: recommendationForm.comment,
-                });
-                setShowRecommendDialog(false);
-                setShowVacancyDetail(false);
-              }}
-            >
-              <Icon name="Send" className="mr-2" size={18} />
-              Отправить рекомендацию
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <RecommendDialog
+        open={showRecommendDialog}
+        onOpenChange={setShowRecommendDialog}
+        vacancyTitle={selectedVacancyDetail?.title}
+        form={recommendationForm}
+        onFormChange={setRecommendationForm}
+        onSubmit={async () => {
+          if (!selectedVacancyDetail) return;
+          await handleCreateRecommendation({
+            vacancyId: selectedVacancyDetail.id,
+            name: recommendationForm.name,
+            email: recommendationForm.email,
+            phone: recommendationForm.phone,
+            comment: recommendationForm.comment,
+          });
+          setShowRecommendDialog(false);
+          setShowVacancyDetail(false);
+        }}
+      />
 
       <CandidateDetail
         recommendation={selectedCandidate}
@@ -7132,224 +6830,54 @@ function Index() {
         userRole={userRole}
       />
 
-      <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Запрос на выплату</DialogTitle>
-            <DialogDescription>
-              Доступно для вывода: {walletData?.wallet?.wallet_balance?.toLocaleString() || 0} ₽
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <Label>Сумма</Label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  className="h-6 text-xs"
-                  onClick={() => setWithdrawForm({
-                    ...withdrawForm,
-                    amount: String(walletData?.wallet?.wallet_balance || 0)
-                  })}
-                >
-                  Вывести всё
-                </Button>
-              </div>
-              <Input
-                type="number"
-                placeholder="Введите сумму"
-                value={withdrawForm.amount}
-                onChange={(e) => setWithdrawForm({...withdrawForm, amount: e.target.value})}
-                max={walletData?.wallet?.wallet_balance || 0}
-                min={0}
-                className={
-                  withdrawForm.amount && parseFloat(withdrawForm.amount) > (walletData?.wallet?.wallet_balance || 0)
-                    ? 'border-red-500'
-                    : ''
-                }
-              />
-              <p className={`text-xs mt-1 ${
-                withdrawForm.amount && parseFloat(withdrawForm.amount) > (walletData?.wallet?.wallet_balance || 0)
-                  ? 'text-red-500'
-                  : 'text-muted-foreground'
-              }`}>
-                {withdrawForm.amount && parseFloat(withdrawForm.amount) > (walletData?.wallet?.wallet_balance || 0)
-                  ? `Сумма превышает доступный баланс! `
-                  : ''}
-                Максимальная сумма: {walletData?.wallet?.wallet_balance?.toLocaleString() || 0} ₽
-              </p>
-            </div>
-            <div>
-              <Label>Способ выплаты</Label>
-              <Select value={withdrawForm.paymentMethod} onValueChange={(v) => setWithdrawForm({...withdrawForm, paymentMethod: v})}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {(company?.payout_methods ?? ['card', 'sbp', 'bank', 'cash']).map((m) => {
-                    const labels: Record<string, string> = {
-                      card: '💳 Банковская карта',
-                      sbp: '📱 СБП',
-                      bank: '🏦 По реквизитам на счёт',
-                      cash: '💵 Наличными',
-                    };
-                    return <SelectItem key={m} value={m}>{labels[m] ?? m}</SelectItem>;
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-            {withdrawForm.paymentMethod === 'bank' ? (
-              <>
-                <div>
-                  <Label>ФИО получателя <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="Иванов Иван Иванович"
-                    value={withdrawForm.accountFullName}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountFullName: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label>Банк получателя <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="ПАО Сбербанк"
-                    value={withdrawForm.accountBank}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountBank: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label>Расчётный счёт <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="40817810099910004312"
-                    value={withdrawForm.accountNumber}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountNumber: e.target.value})}
-                    maxLength={20}
-                  />
-                </div>
-                <div>
-                  <Label>БИК <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="044525225"
-                    value={withdrawForm.accountBik}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountBik: e.target.value})}
-                    maxLength={9}
-                  />
-                </div>
-              </>
-            ) : withdrawForm.paymentMethod === 'cash' ? (
-              <p className="text-sm text-muted-foreground bg-muted rounded-lg p-3">
-                💵 Выплата будет произведена наличными. Уточните детали у вашего работодателя.
-              </p>
-            ) : (
-              <>
-                <div>
-                  <Label>ФИО держателя карты <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="Иванов Иван Иванович"
-                    value={withdrawForm.accountFullName}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, accountFullName: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label>{withdrawForm.paymentMethod === 'card' ? 'Номер банковской карты' : 'Номер телефона СБП'} <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder={withdrawForm.paymentMethod === 'card' ? '2202 **** **** ****' : '+7 (900) 123-45-67'}
-                    value={withdrawForm.paymentDetails}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, paymentDetails: e.target.value})}
-                  />
-                </div>
-                <div>
-                  <Label>Наименование банка <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="ПАО Сбербанк"
-                    value={withdrawForm.bankName || ''}
-                    onChange={(e) => setWithdrawForm({...withdrawForm, bankName: e.target.value})}
-                  />
-                </div>
-              </>
-            )}
-            <Button 
-              className="w-full"
-              onClick={async () => {
-                const requestedAmount = parseFloat(withdrawForm.amount);
-                const availableBalance = walletData?.wallet?.wallet_balance || 0;
-                
-                if (!withdrawForm.amount || requestedAmount <= 0) {
-                  alert('Введите сумму больше 0');
-                  return;
-                }
-                
-                if (requestedAmount > availableBalance) {
-                  alert(`Недостаточно средств. Доступно для вывода: ${availableBalance.toLocaleString()} ₽`);
-                  return;
-                }
-                
-                if (withdrawForm.paymentMethod === 'account') {
-                  if (!withdrawForm.accountFullName.trim() || !withdrawForm.accountBank.trim() || 
-                      !withdrawForm.accountNumber.trim() || !withdrawForm.accountBik.trim()) {
-                    alert('Заполните все поля для расчётного счёта');
-                    return;
-                  }
-                  if (withdrawForm.accountBik.length !== 9) {
-                    alert('БИК должен содержать 9 цифр');
-                    return;
-                  }
-                  if (withdrawForm.accountNumber.length !== 20) {
-                    alert('Расчётный счёт должен содержать 20 цифр');
-                    return;
-                  }
-                } else {
-                  if (!withdrawForm.paymentDetails.trim() || !withdrawForm.bankName.trim()) {
-                    alert('Заполните реквизиты и наименование банка');
-                    return;
-                  }
-                }
-                
-                try {
-                  const paymentDetails = withdrawForm.paymentMethod === 'account'
-                    ? `ФИО: ${withdrawForm.accountFullName}\nБанк: ${withdrawForm.accountBank}\nРасчётный счёт: ${withdrawForm.accountNumber}\nБИК: ${withdrawForm.accountBik}`
-                    : `${withdrawForm.paymentDetails}\nБанк: ${withdrawForm.bankName}`;
-                  
-                  const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      user_id: currentEmployeeId,
-                      amount: requestedAmount,
-                      payment_method: withdrawForm.paymentMethod === 'card' ? 'Банковская карта' : 
-                                      withdrawForm.paymentMethod === 'sbp' ? 'СБП' : 'Расчётный счёт',
-                      payment_details: paymentDetails
-                    })
-                  });
-                  
-                  if (response.ok) {
-                    alert('Запрос на выплату успешно отправлен!');
-                    setShowWithdrawDialog(false);
-                    setWithdrawForm({ 
-                      amount: '', 
-                      paymentMethod: 'card', 
-                      paymentDetails: '',
-                      accountFullName: '',
-                      accountBank: '',
-                      accountNumber: '',
-                      accountBik: ''
-                    });
-                    await loadData();
-                  } else {
-                    alert('Ошибка при отправке запроса');
-                  }
-                } catch (error) {
-                  console.error('Ошибка:', error);
-                  alert('Не удалось отправить запрос');
-                }
-              }}
-            >
-              Отправить запрос
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <WithdrawDialog
+        open={showWithdrawDialog}
+        onOpenChange={setShowWithdrawDialog}
+        form={withdrawForm}
+        onFormChange={setWithdrawForm}
+        walletData={walletData}
+        company={company}
+        onSubmit={async () => {
+          const requestedAmount = parseFloat(withdrawForm.amount);
+          const availableBalance = walletData?.wallet?.wallet_balance || 0;
+          if (!withdrawForm.amount || requestedAmount <= 0) { alert('Введите сумму больше 0'); return; }
+          if (requestedAmount > availableBalance) { alert(`Недостаточно средств. Доступно для вывода: ${availableBalance.toLocaleString()} ₽`); return; }
+          if (withdrawForm.paymentMethod === 'account') {
+            if (!withdrawForm.accountFullName.trim() || !withdrawForm.accountBank.trim() || !withdrawForm.accountNumber.trim() || !withdrawForm.accountBik.trim()) { alert('Заполните все поля для расчётного счёта'); return; }
+            if (withdrawForm.accountBik.length !== 9) { alert('БИК должен содержать 9 цифр'); return; }
+            if (withdrawForm.accountNumber.length !== 20) { alert('Расчётный счёт должен содержать 20 цифр'); return; }
+          } else {
+            if (!withdrawForm.paymentDetails.trim() || !withdrawForm.bankName.trim()) { alert('Заполните реквизиты и наименование банка'); return; }
+          }
+          try {
+            const paymentDetails = withdrawForm.paymentMethod === 'account'
+              ? `ФИО: ${withdrawForm.accountFullName}\nБанк: ${withdrawForm.accountBank}\nРасчётный счёт: ${withdrawForm.accountNumber}\nБИК: ${withdrawForm.accountBik}`
+              : `${withdrawForm.paymentDetails}\nБанк: ${withdrawForm.bankName}`;
+            const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                employee_id: currentEmployeeId,
+                amount: requestedAmount,
+                payment_method: withdrawForm.paymentMethod,
+                payment_details: paymentDetails,
+                account_full_name: withdrawForm.accountFullName,
+              })
+            });
+            if (response.ok) {
+              alert('✅ Запрос на выплату отправлен!');
+              setShowWithdrawDialog(false);
+              setWithdrawForm({ amount: '', paymentMethod: 'card', paymentDetails: '', accountFullName: '', accountBank: '', accountNumber: '', accountBik: '', bankName: '' });
+              await loadData();
+            } else {
+              alert('Ошибка при отправке запроса');
+            }
+          } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Не удалось отправить запрос');
+          }
+        }}
+      />
 
 
     </>
