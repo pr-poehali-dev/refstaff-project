@@ -5035,6 +5035,8 @@ function Index() {
                       src={companyLogoPreview || company?.logo_url}
                       alt="Логотип"
                       className="h-10 w-10 object-contain rounded border"
+                      loading="lazy"
+                      decoding="async"
                     />
                     <button
                       type="button"
@@ -5178,7 +5180,7 @@ function Index() {
                   >
                     <div className="flex items-center gap-3">
                       {emp.avatar ? (
-                        <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full object-cover shrink-0" />
+                        <img src={emp.avatar} alt={emp.name} className="w-10 h-10 rounded-full object-cover shrink-0" loading="lazy" decoding="async" />
                       ) : (
                         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                           <Icon name="User" size={18} className="text-primary" />
@@ -5210,7 +5212,7 @@ function Index() {
                         }}
                       >
                         {activeChatEmployee.avatar ? (
-                          <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover shrink-0" />
+                          <img src={activeChatEmployee.avatar} alt={activeChatEmployee.name} className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover shrink-0" loading="lazy" decoding="async" />
                         ) : (
                           <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                             <Icon name="User" size={18} className="text-primary" />
@@ -5243,6 +5245,8 @@ function Index() {
                                   alt={att.name}
                                   className="rounded max-w-full max-h-32 sm:max-h-48 object-contain cursor-pointer hover:opacity-90 transition-opacity"
                                   onClick={() => setLightboxImage(att.url)}
+                                  loading="lazy"
+                                  decoding="async"
                                 />
                               ) : (
                                 <a
@@ -7033,7 +7037,7 @@ function Index() {
             <div className="flex items-center gap-4">
               <div className="w-20 h-20 rounded-lg bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                 {company?.logo_url ? (
-                  <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-1" />
+                  <img src={company.logo_url} alt={company.name} className="w-full h-full object-contain p-1" loading="lazy" decoding="async" />
                 ) : (
                   <Icon name="Building2" className="text-primary" size={40} />
                 )}

@@ -4,10 +4,52 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, Component, type ReactNode } from "react";
 
-// Главная страница — грузим сразу (самая часто посещаемая)
+// Все lazy-компоненты объявляем ДО использования
 const Index = lazy(() => import("./pages/Index"));
+const VacancyReferral = lazy(() => import("./pages/VacancyReferral"));
+const VacancyApply = lazy(() => import("./pages/VacancyApply"));
+const EmployeeInvite = lazy(() => import("./pages/EmployeeInvite"));
+const EmployeeRegister = lazy(() => import("./pages/EmployeeRegister"));
+const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
+const NotFound = lazy(() => import("./pages/NotFound"));
+const Admin = lazy(() => import("./pages/Admin"));
+const VacancyQR = lazy(() => import("./pages/VacancyQR"));
+const VacancyTest = lazy(() => import("./pages/VacancyTest"));
+const PublicTest = lazy(() => import("./pages/PublicTest"));
+const CreateTest = lazy(() => import("./pages/CreateTest"));
+const CityLanding = lazy(() => import("./pages/CityLanding"));
+const Blog = lazy(() => import("./pages/Blog"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+
+// ErrorBoundary — ловит JS-краши и показывает кнопку перезагрузки вместо белого экрана
+interface ErrorBoundaryState { hasError: boolean; }
+class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryState> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24, textAlign: 'center' }}>
+          <div style={{ fontSize: 48 }}>⚠️</div>
+          <p style={{ fontSize: 18, fontWeight: 600 }}>Что-то пошло не так</p>
+          <p style={{ color: '#6b7280', fontSize: 14 }}>Попробуйте перезагрузить страницу</p>
+          <button
+            onClick={() => window.location.reload()}
+            style={{ marginTop: 8, padding: '10px 24px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: 8, fontSize: 15, cursor: 'pointer' }}
+          >
+            Перезагрузить
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 // Prefetch наиболее вероятных следующих страниц после главной
 function usePrefetch() {
@@ -15,7 +57,7 @@ function usePrefetch() {
     const timer = setTimeout(() => {
       import("./pages/VacancyApply");
       import("./pages/Blog");
-    }, 2000);
+    }, 3000);
     return () => clearTimeout(timer);
   }, []);
 }
@@ -44,20 +86,6 @@ function AppRoutes() {
     </Routes>
   );
 }
-const VacancyReferral = lazy(() => import("./pages/VacancyReferral"));
-const VacancyApply = lazy(() => import("./pages/VacancyApply"));
-const EmployeeInvite = lazy(() => import("./pages/EmployeeInvite"));
-const EmployeeRegister = lazy(() => import("./pages/EmployeeRegister"));
-const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
-const NotFound = lazy(() => import("./pages/NotFound"));
-const Admin = lazy(() => import("./pages/Admin"));
-const VacancyQR = lazy(() => import("./pages/VacancyQR"));
-const VacancyTest = lazy(() => import("./pages/VacancyTest"));
-const PublicTest = lazy(() => import("./pages/PublicTest"));
-const CreateTest = lazy(() => import("./pages/CreateTest"));
-const CityLanding = lazy(() => import("./pages/CityLanding"));
-const Blog = lazy(() => import("./pages/Blog"));
-const BlogPost = lazy(() => import("./pages/BlogPost"));
 
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center">
@@ -68,10 +96,10 @@ const PageLoader = () => (
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5,   // данные свежие 5 минут — нет лишних рефетчей
-      gcTime: 1000 * 60 * 10,      // кеш живёт 10 минут
-      retry: 1,                     // одна попытка вместо трёх
-      refetchOnWindowFocus: false,  // не рефетчить при переключении вкладки
+      staleTime: 1000 * 60 * 5,
+      gcTime: 1000 * 60 * 10,
+      retry: 1,
+      refetchOnWindowFocus: false,
     },
   },
 });
@@ -83,9 +111,11 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Suspense fallback={<PageLoader />}>
-            <AppRoutes />
-          </Suspense>
+          <ErrorBoundary>
+            <Suspense fallback={<PageLoader />}>
+              <AppRoutes />
+            </Suspense>
+          </ErrorBoundary>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
