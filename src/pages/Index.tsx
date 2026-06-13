@@ -36,6 +36,10 @@ import { AboutDialog } from '@/components/dialogs/AboutDialog';
 import { PrivacyDialog } from '@/components/dialogs/PrivacyDialog';
 import { TermsDialog } from '@/components/dialogs/TermsDialog';
 import { PersonalDataDialog } from '@/components/dialogs/PersonalDataDialog';
+import { ForgotPasswordDialog } from '@/components/dialogs/ForgotPasswordDialog';
+import { ResetPasswordDialog } from '@/components/dialogs/ResetPasswordDialog';
+import { DemoDialog } from '@/components/dialogs/DemoDialog';
+import { ReferralLinkDialog } from '@/components/dialogs/ReferralLinkDialog';
 
 const LazyFallback = () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
@@ -2835,75 +2839,14 @@ function Index() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showDemoDialog} onOpenChange={setShowDemoDialog}>
-        <DialogContent className="max-w-[95vw] sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Запросить доступ</DialogTitle>
-            <DialogDescription>Заполните форму и мы свяжемся с вами в ближайшее время</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-3 pt-2">
-            <div>
-              <Label htmlFor="demo-company" className="text-sm">Наименование компании <span className="text-destructive">*</span></Label>
-              <Input
-                id="demo-company"
-                className="mt-1"
-                placeholder="Acme Corp"
-                value={demoForm.companyName}
-                onChange={(e) => setDemoForm({ ...demoForm, companyName: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="demo-name" className="text-sm">Имя <span className="text-destructive">*</span></Label>
-              <Input
-                id="demo-name"
-                className="mt-1"
-                placeholder="Иван Иванов"
-                value={demoForm.name}
-                onChange={(e) => setDemoForm({ ...demoForm, name: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="demo-phone" className="text-sm">Номер телефона <span className="text-destructive">*</span></Label>
-              <Input
-                id="demo-phone"
-                className="mt-1"
-                type="tel"
-                placeholder="+7 (999) 123-45-67"
-                value={demoForm.phone}
-                onChange={(e) => setDemoForm({ ...demoForm, phone: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="demo-email" className="text-sm">Почта <span className="text-destructive">*</span></Label>
-              <Input
-                id="demo-email"
-                className="mt-1"
-                type="email"
-                placeholder="ivan@company.ru"
-                value={demoForm.email}
-                onChange={(e) => setDemoForm({ ...demoForm, email: e.target.value })}
-              />
-            </div>
-            <div>
-              <Label htmlFor="demo-count" className="text-sm">Количество сотрудников</Label>
-              <Input
-                id="demo-count"
-                className="mt-1"
-                placeholder="100"
-                value={demoForm.employeeCount}
-                onChange={(e) => setDemoForm({ ...demoForm, employeeCount: e.target.value })}
-              />
-            </div>
-            <Button className="w-full mt-2" onClick={handleDemoFormSubmit} disabled={demoFormSubmitting}>
-              {demoFormSubmitting ? (
-                <><Icon name="Loader2" className="mr-2 animate-spin" size={16} />Отправка...</>
-              ) : (
-                <><Icon name="Send" className="mr-2" size={16} />Отправить заявку</>
-              )}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <DemoDialog
+        open={showDemoDialog}
+        onOpenChange={setShowDemoDialog}
+        form={demoForm}
+        onFormChange={setDemoForm}
+        onSubmit={handleDemoFormSubmit}
+        isSubmitting={demoFormSubmitting}
+      />
 
       <AboutDialog open={showAboutDialog} onOpenChange={setShowAboutDialog} />
 
@@ -7479,182 +7422,41 @@ function Index() {
       )}
 
       {/* Диалог реферальной ссылки с QR-кодом */}
-      <Dialog open={showReferralLinkDialog} onOpenChange={setShowReferralLinkDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Регистрация сотрудников</DialogTitle>
-            <DialogDescription>
-              Поделитесь ссылкой или QR-кодом с новыми сотрудниками для регистрации
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-6 pt-4">
-            <div className="flex justify-center">
-              <div className="p-4 bg-white rounded-lg border-2 border-gray-200 invite-qr-container">
-                <QRCodeSVG value={referralLink} size={200} level="H" />
-              </div>
-            </div>
-            
-            <div>
-              <Label>Ссылка для регистрации</Label>
-              <div className="flex gap-2 mt-2">
-                <Input 
-                  value={referralLink} 
-                  readOnly 
-                  className="font-mono text-sm"
-                />
-                <Button 
-                  variant="outline"
-                  onClick={() => handleCopyLink(referralLink)}
-                >
-                  <Icon name="Copy" size={16} />
-                </Button>
-                <Button
-                  variant="outline"
-                  title="Распечатать"
-                  onClick={() => {
-                    const svgEl = document.querySelector('.invite-qr-container svg');
-                    const svgStr = svgEl ? new XMLSerializer().serializeToString(svgEl) : '';
-                    const b64 = svgStr ? btoa(unescape(encodeURIComponent(svgStr))) : '';
-                    const imgSrc = b64 ? `data:image/svg+xml;base64,${b64}` : '';
-                    const win = window.open('', '_blank');
-                    if (!win) return;
-                    win.document.write(`<!DOCTYPE html><html><head><title>Регистрация сотрудника</title><style>*{box-sizing:border-box}body{font-family:sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:32px;text-align:center}h2{font-size:22px;margin-bottom:8px}p{color:#555;font-size:14px;margin-bottom:24px}img{width:220px;height:220px}code{display:block;margin-top:20px;font-size:11px;color:#333;word-break:break-all;max-width:300px}</style></head><body><h2>Регистрация сотрудника</h2><p>Отсканируйте QR-код для регистрации в компании</p>${imgSrc ? `<img src="${imgSrc}" />` : ''}<code>${referralLink}</code></body></html>`);
-                    win.document.close();
-                    win.focus();
-                    setTimeout(() => { win.print(); }, 300);
-                  }}
-                >
-                  <Icon name="Printer" size={16} />
-                </Button>
-              </div>
-            </div>
-
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start gap-2">
-                <Icon name="Info" className="text-blue-600 mt-0.5" size={16} />
-                <div className="text-sm text-blue-900">
-                  <p className="font-medium mb-1">Как использовать:</p>
-                  <ul className="list-disc list-inside space-y-1 text-blue-800">
-                    <li>Отправьте ссылку новому сотруднику</li>
-                    <li>Покажите QR-код для быстрого сканирования</li>
-                    <li>Сотрудник автоматически привяжется к вашей компании</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ReferralLinkDialog
+        open={showReferralLinkDialog}
+        onOpenChange={setShowReferralLinkDialog}
+        referralLink={referralLink}
+        onCopyLink={handleCopyLink}
+      />
 
       {/* Диалог запроса восстановления пароля */}
-      <Dialog open={showForgotPasswordDialog} onOpenChange={(open) => {
-        setShowForgotPasswordDialog(open);
-        if (!open) {
+      <ForgotPasswordDialog
+        open={showForgotPasswordDialog}
+        onOpenChange={setShowForgotPasswordDialog}
+        email={forgotPasswordEmail}
+        onEmailChange={setForgotPasswordEmail}
+        message={passwordResetMessage}
+        onMessageChange={setPasswordResetMessage}
+        onSubmit={handleRequestPasswordReset}
+        onBackToLogin={() => {
+          setShowForgotPasswordDialog(false);
           setForgotPasswordEmail('');
           setPasswordResetMessage('');
-        }
-      }}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Восстановление пароля</DialogTitle>
-            <DialogDescription>
-              Введите email, и мы отправим вам ссылку для восстановления пароля
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <Label htmlFor="forgot-email">Email</Label>
-              <Input 
-                id="forgot-email" 
-                type="email"
-                placeholder="email@example.com"
-                value={forgotPasswordEmail}
-                onChange={(e) => setForgotPasswordEmail(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleRequestPasswordReset()}
-              />
-            </div>
-            {passwordResetMessage && (
-              <div className="text-sm text-green-600 bg-green-50 p-3 rounded">
-                {passwordResetMessage}
-              </div>
-            )}
-            <Button 
-              className="w-full" 
-              onClick={handleRequestPasswordReset}
-              disabled={!forgotPasswordEmail.trim()}
-            >
-              Отправить ссылку
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full" 
-              onClick={() => {
-                setShowForgotPasswordDialog(false);
-                setForgotPasswordEmail('');
-                setPasswordResetMessage('');
-                setShowLoginDialog(true);
-              }}
-            >
-              Назад к входу
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          setShowLoginDialog(true);
+        }}
+        isLoading={isAuthLoading}
+      />
 
       {/* Диалог сброса пароля */}
-      <Dialog open={showResetPasswordDialog} onOpenChange={setShowResetPasswordDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Новый пароль</DialogTitle>
-            <DialogDescription>
-              Введите новый пароль для вашего аккаунта
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div>
-              <Label htmlFor="new-password">Новый пароль</Label>
-              <Input 
-                id="new-password" 
-                type="password"
-                placeholder="Минимум 6 символов"
-                value={resetPasswordForm.password}
-                onChange={(e) => setResetPasswordForm({...resetPasswordForm, password: e.target.value})}
-              />
-            </div>
-            <div>
-              <Label htmlFor="confirm-password">Подтвердите пароль</Label>
-              <Input 
-                id="confirm-password" 
-                type="password"
-                placeholder="Введите пароль еще раз"
-                value={resetPasswordForm.confirmPassword}
-                onChange={(e) => setResetPasswordForm({...resetPasswordForm, confirmPassword: e.target.value})}
-                onKeyDown={(e) => e.key === 'Enter' && handleResetPassword()}
-              />
-            </div>
-            {passwordResetMessage && (
-              <div className={`text-sm p-3 rounded ${
-                passwordResetMessage.includes('успешно') 
-                  ? 'text-green-600 bg-green-50' 
-                  : 'text-red-600 bg-red-50'
-              }`}>
-                {passwordResetMessage}
-              </div>
-            )}
-            <Button 
-              className="w-full" 
-              onClick={handleResetPassword}
-              disabled={
-                !resetPasswordForm.password || 
-                !resetPasswordForm.confirmPassword || 
-                resetPasswordForm.password !== resetPasswordForm.confirmPassword
-              }
-            >
-              Изменить пароль
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ResetPasswordDialog
+        open={showResetPasswordDialog}
+        onOpenChange={setShowResetPasswordDialog}
+        form={resetPasswordForm}
+        onFormChange={setResetPasswordForm}
+        message={passwordResetMessage}
+        onSubmit={handleResetPassword}
+        isLoading={isAuthLoading}
+      />
 
       {lightboxImage && (
         <div
