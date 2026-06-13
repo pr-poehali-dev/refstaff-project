@@ -45,6 +45,13 @@ import { WithdrawDialog } from '@/components/dialogs/WithdrawDialog';
 import { CompanySettingsDialog } from '@/components/dialogs/CompanySettingsDialog';
 import { ChatDialog } from '@/components/dialogs/ChatDialog';
 import { InviteEmployeeDialog } from '@/components/dialogs/InviteEmployeeDialog';
+import { LandingHeader } from '@/components/landing/LandingHeader';
+import { HeroSection } from '@/components/landing/HeroSection';
+import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
+import { BenefitsSection } from '@/components/landing/BenefitsSection';
+import { PricingSection } from '@/components/landing/PricingSection';
+import { ContactSection } from '@/components/landing/ContactSection';
+import { LandingFooter } from '@/components/landing/LandingFooter';
 
 const LazyFallback = () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
@@ -1916,544 +1923,50 @@ function Index() {
     isAuthLoading: boolean
   ) => (
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <header className="border-b bg-white/80 backdrop-blur-sm fixed w-full z-50" role="banner">
-        <div className="container mx-auto px-3 sm:px-4 lg:px-6 py-2 sm:py-3 md:py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
-              <Icon name="Rocket" className="text-white" size={20} aria-hidden="true" />
-            </div>
-            <span className="text-lg sm:text-xl md:text-2xl px-0 py-0 my-0 font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">iHUNT</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-4 lg:gap-8" role="navigation" aria-label="Основная навигация">
-            <button onClick={() => document.getElementById('how')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Как работает</button>
-            <button onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Преимущества</button>
-            <button onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Тарифы</button>
-            <button onClick={() => document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })} className="text-xs lg:text-sm hover:text-primary transition-colors">Контакты</button>
-
-            <a href="/create-test" target="_blank" className="text-xs lg:text-sm hover:text-primary transition-colors font-medium">✨ AI тесты</a>
-          </nav>
-          <div className="flex items-center gap-2">
-            <a href="/create-test" target="_blank" className="md:hidden inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg border border-primary/40 text-primary bg-primary/5 active:bg-primary/10 transition-colors whitespace-nowrap leading-none">✨ AI</a>
-            <Button variant="ghost" onClick={() => setShowLoginDialog(true)} aria-label="Войти в систему" size="sm" className="text-xs sm:text-sm">Вход</Button>
-            <Button onClick={() => setShowRegisterDialog(true)} aria-label="Зарегистрировать компанию" size="sm" className="text-xs">
-              <span className="hidden sm:inline">Зарегистрировать</span>
-              <span className="sm:hidden">Регистрация</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <LandingHeader
+        onLogin={() => setShowLoginDialog(true)}
+        onRegister={() => setShowRegisterDialog(true)}
+      />
 
       <main>
-        <section className="pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-8 sm:pb-12 md:pb-16 lg:pb-20 px-3 sm:px-4 lg:px-6" aria-labelledby="hero-title">
-          <div className="container mx-auto max-w-7xl">
-            <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
-              <div className="text-center lg:text-left">
-                <Badge className="mb-4 sm:mb-6 animate-fade-in text-xs sm:text-sm">🚀 Реферальный рекрутинг</Badge>
-                <h1 id="hero-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight">
-                  Нанимайте лучших кандидатов через своих сотрудников
-                </h1>
-                <h2 className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground mb-4 sm:mb-6 md:mb-8 animate-slide-up font-normal" style={{ animationDelay: '0.1s' }}>
-                  Платформа для реферального найма с геймификацией
-                </h2>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 justify-center lg:justify-start">
-                  <Button size="default" className="animate-scale-in shadow-lg shadow-primary/25 text-sm sm:text-base" style={{ animationDelay: '0.2s' }} onClick={() => { setShowRegisterDialog(true); if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'click_cta_hero'); }} aria-label="Начать бесплатный пробный период на 14 дней">
-                    <Icon name="Rocket" className="mr-2" size={18} aria-hidden="true" />
-                    <span className="hidden sm:inline">Начать бесплатно — 14 дней</span>
-                    <span className="sm:hidden">Начать бесплатно</span>
-                  </Button>
-                  <Button size="default" variant="outline" className="animate-scale-in text-sm sm:text-base" style={{ animationDelay: '0.3s' }} onClick={() => setShowLoginDialog(true)}>
-                    <Icon name="LogIn" className="mr-2" size={18} />
-                    Войти
-                  </Button>
-                </div>
-                <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-6 justify-center lg:justify-start text-xs sm:text-sm text-muted-foreground">
-                  <div className="flex items-center gap-2">
-                    <Icon name="Check" className="text-green-600" size={16} />
-                    <span>Прост в использовании</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Icon name="Check" className="text-green-600" size={16} />
-                    <span>Настройка за 5 минут</span>
-                  </div>
-                </div>
-              </div>
-              <div className="relative animate-fade-in" style={{ animationDelay: '0.4s' }}>
-                <div className="hero-image-wrap relative rounded-2xl overflow-hidden shadow-2xl">
-                  <img 
-                    src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/e96124dc-c09c-454b-a967-49eff0e74945.jpg" 
-                    alt="Команда сотрудников работает вместе"
-                    loading="eager"
-                    fetchPriority="high"
-                    decoding="sync"
-                    width={640}
-                    height={480}
-                    className="w-full h-full object-cover absolute inset-0"
-                  />
-                </div>
-                <div className="hidden sm:block absolute -bottom-6 -right-6 bg-white rounded-xl shadow-xl p-4" style={{ animation: 'float 3s ease-in-out 1s infinite' }}>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                      <Icon name="TrendingUp" className="text-green-600" size={24} />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-green-600">+127%</div>
-                      <div className="text-xs text-muted-foreground">эффективность найма</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <HeroSection
+          onRegister={() => setShowRegisterDialog(true)}
+          onLogin={() => setShowLoginDialog(true)}
+        />
 
-        <section id="how" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-primary/5 via-white to-purple-50 relative overflow-hidden" aria-labelledby="how-title">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div className="container mx-auto max-w-7xl relative z-10">
-            <div className="text-center mb-8 sm:mb-12 md:mb-20">
-              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">⚡ Простой процесс</Badge>
-              <h2 id="how-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-                Как это работает
-              </h2>
-              <p className="text-sm sm:text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-                Запустите реферальную программу за 4 простых шага и начните получать рекомендации
-              </p>
-            </div>
-            
-            <div className="relative max-w-5xl mx-auto">
-              <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-green-500 via-purple-500 to-orange-500 transform -translate-y-1/2 opacity-20"></div>
-              
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-4">
-                {[
-                  { emoji: '🏢', title: 'Регистрация', desc: 'Создайте аккаунт компании и разместите открытые вакансии', color: 'from-blue-500 to-blue-600' },
-                  { emoji: '👥', title: 'Приглашение', desc: 'Добавьте своих сотрудников в систему одним кликом', color: 'from-green-500 to-green-600' },
-                  { emoji: '🎯', title: 'Рекомендации', desc: 'Получайте качественные кандидатуры от вашей команды', color: 'from-purple-500 to-purple-600' },
-                  { emoji: '💰', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за найм', color: 'from-orange-500 to-orange-600' },
-                ].map((step, i) => (
-                  <div key={i} className="relative group">
-                    <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
-                      <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${step.color}`}></div>
-                      
-                      <div className="p-4 sm:p-6 pt-6 sm:pt-8">
-                        <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
-                          <div className={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
-                            <span className="text-xl sm:text-2xl">{step.emoji}</span>
-                          </div>
-                          <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br ${step.color} text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-md`}>
-                            {i + 1}
-                          </div>
-                        </div>
-                        
-                        <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{step.title}</h3>
-                        <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
-                      </div>
-                      
-                      <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${step.color} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
-                    </div>
-                    
-                    {i < 3 && (
-                      <div className="hidden lg:flex absolute top-1/2 -right-2 transform -translate-y-1/2 z-20 w-8 h-8 items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-white shadow-md flex items-center justify-center border-2 border-primary/20">
-                          <Icon name="ChevronRight" className="text-primary" size={18} />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
+        <HowItWorksSection />
 
-        <section id="benefits" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-purple-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="benefits-title">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div className="container mx-auto max-w-7xl relative z-10">
-            <div className="text-center mb-10 sm:mb-14 md:mb-20">
-              <Badge className="mb-4 bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs sm:text-sm">✨ Почему iHUNT</Badge>
-              <h2 id="benefits-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
-                Преимущества платформы
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
-                Все инструменты для эффективного реферального найма в одной системе
-              </p>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-6xl mx-auto">
-              {BENEFITS_DATA.map((benefit, i) => (
-                <div key={i} className="group cursor-pointer" onClick={() => setActiveBenefit(i)}>
-                  <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-3 border border-gray-100 overflow-hidden h-full">
-                    <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${benefit.gradient}`}></div>
-                    <div className="p-4 sm:p-6 pt-5 sm:pt-8">
-                      <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
-                        <div className={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
-                          <span className="text-xl sm:text-2xl">{benefit.emoji}</span>
-                        </div>
-                      </div>
-                      <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{benefit.title}</h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{benefit.desc}</p>
-                      <p className="text-xs text-primary mt-3 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">Подробнее →</p>
-                    </div>
-                    <div className={`absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r ${benefit.gradient} transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500`}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Dialog open={activeBenefit !== null} onOpenChange={(open) => !open && setActiveBenefit(null)}>
-              <DialogContent className="max-w-lg">
-                {activeBenefit !== null && (
-                  <>
-                    <DialogHeader>
-                      <DialogTitle className="flex items-center gap-3 text-xl">
-                        <span className="text-3xl">{BENEFITS_DATA[activeBenefit].emoji}</span>
-                        {BENEFITS_DATA[activeBenefit].title}
-                      </DialogTitle>
-                      <DialogDescription className="text-base text-gray-700 mt-2 leading-relaxed">
-                        {BENEFITS_DATA[activeBenefit].details}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className="mt-4">
-                      <p className="text-sm font-semibold text-gray-900 mb-3">Примеры из практики:</p>
-                      <ul className="space-y-3">
-                        {BENEFITS_DATA[activeBenefit].examples.map((ex, j) => (
-                          <li key={j} className="flex gap-2 text-sm text-muted-foreground">
-                            <span className="mt-0.5 shrink-0 text-primary">✓</span>
-                            <span>{ex}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </>
-                )}
-              </DialogContent>
-            </Dialog>
-            <div className="mt-8 sm:mt-12 md:mt-16">
-              <Card className="border-2 border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
-                <CardContent className="p-4 sm:p-6 md:p-8">
-                  <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-center">
-                    <div>
-                      <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">🎯 Результаты наших клиентов</h3>
-                      <div className="space-y-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                            <span className="text-2xl">📈</span>
-                          </div>
-                          <div>
-                            <div className="font-bold text-xl">+127%</div>
-                            <div className="text-sm text-muted-foreground">рост числа рекомендаций</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                            <span className="text-2xl">⏱️</span>
-                          </div>
-                          <div>
-                            <div className="font-bold text-xl">-40%</div>
-                            <div className="text-sm text-muted-foreground">сокращение времени найма</div>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                            <span className="text-2xl">💎</span>
-                          </div>
-                          <div>
-                            <div className="font-bold text-xl">92%</div>
-                            <div className="text-sm text-muted-foreground">прошли испытательный срок</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <img 
-                        src="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/ff1c4a57-63e0-4e5e-ab1b-8c592b9d9ac2.jpg" 
-                        alt="Статистика и результаты"
-                        loading="lazy"
-                        decoding="async"
-                        width={600}
-                        height={400}
-                        className="rounded-xl shadow-xl w-full h-auto"
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
+        <BenefitsSection
+          activeBenefit={activeBenefit}
+          onBenefitClick={setActiveBenefit}
+          onBenefitClose={() => setActiveBenefit(null)}
+        />
 
-        <section id="pricing" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-blue-50 via-white to-green-50 relative overflow-hidden" aria-labelledby="pricing-title">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div className="container mx-auto max-w-6xl relative z-10">
-            <div className="text-center mb-10 sm:mb-12 md:mb-16">
-              <Badge className="mb-4 bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs sm:text-sm">💎 Прозрачное ценообразование</Badge>
-              <h2 id="pricing-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Тарифы</h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">14 дней бесплатно для всех новых клиентов</p>
-            </div>
-            
-            <div className="flex items-center justify-center gap-2 sm:gap-3 mb-8 sm:mb-10 md:mb-12">
-              <Button 
-                variant={pricingPeriod === 'monthly' ? 'default' : 'outline'} 
-                onClick={() => setPricingPeriod('monthly')}
-                className="min-w-[120px]"
-              >
-                Месяц
-              </Button>
-              <Button 
-                variant={pricingPeriod === 'yearly' ? 'default' : 'outline'} 
-                onClick={() => setPricingPeriod('yearly')}
-                className="min-w-[120px]"
-              >
-                Год
-                <Badge className="ml-2 bg-green-500 text-white">-15%</Badge>
-              </Button>
-            </div>
-          <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 md:gap-6 max-w-3xl mx-auto">
-            <div className="group">
-              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gray-400 to-gray-500"></div>
-                
-                <div className="p-5 sm:p-8">
-                  <div className="mb-4 sm:mb-6">
-                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Пробный период</h3>
-                    <p className="text-sm text-muted-foreground">Протестируйте платформу</p>
-                  </div>
-                  
-                  <div className="mb-4 sm:mb-6">
-                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">0 ₽</div>
-                    <p className="text-sm text-muted-foreground">14 дней бесплатно</p>
-                  </div>
-                  
-                  <ul className="space-y-3 mb-5 sm:mb-8">
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Все функции платформы</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Поддержка 24/7</span>
-                    </li>
-                  </ul>
-                  
-                  <Button className="w-full" variant="outline" onClick={() => setShowRegisterDialog(true)}>Попробовать самостоятельно</Button>
-                  <Button className="w-full mt-2" variant="secondary" onClick={() => setShowDemoDialog(true)}>Запросить демонстрацию</Button>
-                </div>
-              </div>
-            </div>
+        <PricingSection
+          period={pricingPeriod}
+          onPeriodChange={setPricingPeriod}
+          onRegister={() => setShowRegisterDialog(true)}
+          onDemo={() => setShowDemoDialog(true)}
+        />
 
-            <div className="group">
-              <div className="relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-gray-200 overflow-hidden h-full">
-                <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-orange-500 to-red-500"></div>
-                
-                <div className="p-5 sm:p-8">
-                  <div className="mb-4 sm:mb-6">
-                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Продвинутый</h3>
-                    <p className="text-sm text-muted-foreground">Корпоративный тариф</p>
-                  </div>
-                  
-                  <div className="mb-4 sm:mb-6">
-                    <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
-                      {pricingPeriod === 'monthly' ? '19 900 ₽' : '16 915 ₽'}
-                    </div>
-                    <p className="text-sm text-muted-foreground mb-1">в месяц</p>
-                    {pricingPeriod === 'yearly' && (
-                      <p className="text-sm text-green-600 font-medium">202 980 ₽/год (экономия 35 820 ₽)</p>
-                    )}
-                  </div>
-                  
-                  <ul className="space-y-3 mb-5 sm:mb-8">
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Нет ограничений на  кол-во сотрудников</span>
-                    </li>
-
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Подробная аналитика</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Геймификация</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Нет ограничений на размещение вакансий</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">AI тесты для кандидатов</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Работа с рекомендациями</span>
-                    </li>
-                    <li className="flex items-start gap-3">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-green-100 flex items-center justify-center mt-0.5">
-                        <Icon name="Check" className="text-green-600" size={14} />
-                      </div>
-                      <span className="text-sm">Внутренний чат с сотрудниками</span>
-                    </li>
-                  </ul>
-                  
-                  <Button className="w-full bg-gradient-to-r from-orange-500 to-red-500" onClick={() => setShowDemoDialog(true)}>Подключить</Button>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-        </section>
-
-        <section id="contact" className="py-12 sm:py-16 md:py-20 px-3 sm:px-4 lg:px-6 bg-gradient-to-br from-green-50 via-white to-blue-50 relative overflow-hidden" aria-labelledby="contact-title">
-          <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
-          <div className="container mx-auto max-w-3xl relative z-10">
-            <div className="text-center mb-8 sm:mb-10 md:mb-12">
-              <Badge className="mb-4 bg-green-500/10 text-green-600 border-green-500/20 text-xs sm:text-sm">💬 Контакты</Badge>
-              <h2 id="contact-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-                Остались вопросы?
-              </h2>
-              <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground px-4">
-                Свяжитесь с нами, и мы с радостью ответим на все ваши вопросы
-              </p>
-            </div>
-            
-            <div className="relative bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-green-500 to-blue-500"></div>
-              
-              <div className="p-5 sm:p-6 md:p-8 lg:p-10">
-                <form className="space-y-4 sm:space-y-5 md:space-y-6" aria-label="Форма обратной связи" onSubmit={handleContactFormSubmit}>
-                  <div>
-                    <Label htmlFor="name" className="text-sm sm:text-base font-medium">Имя</Label>
-                    <Input 
-                      id="name" 
-                      name="name" 
-                      placeholder="Иван Иванов" 
-                      autoComplete="name" 
-                      required 
-                      className="mt-1.5 sm:mt-2 h-10 sm:h-11 md:h-12"
-                      value={contactForm.name}
-                      onChange={(e) => setContactForm({...contactForm, name: e.target.value})}
-                      disabled={contactFormSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email" className="text-sm sm:text-base font-medium">Email</Label>
-                    <Input 
-                      id="email" 
-                      name="email" 
-                      type="email" 
-                      placeholder="ivan@company.ru" 
-                      autoComplete="email" 
-                      required 
-                      className="mt-1.5 sm:mt-2 h-10 sm:h-11 md:h-12"
-                      value={contactForm.email}
-                      onChange={(e) => setContactForm({...contactForm, email: e.target.value})}
-                      disabled={contactFormSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="contact-phone" className="text-sm sm:text-base font-medium">Телефон</Label>
-                    <Input 
-                      id="contact-phone" 
-                      name="phone" 
-                      type="tel" 
-                      placeholder="+7 (999) 123-45-67" 
-                      autoComplete="tel" 
-                      className="mt-1.5 sm:mt-2 h-10 sm:h-11 md:h-12"
-                      value={contactForm.phone}
-                      onChange={(e) => setContactForm({...contactForm, phone: e.target.value})}
-                      disabled={contactFormSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="message" className="text-sm sm:text-base font-medium">Сообщение</Label>
-                    <Textarea 
-                      id="message" 
-                      name="message" 
-                      placeholder="Расскажите о вашем проекте..." 
-                      rows={4} 
-                      required 
-                      className="mt-1.5 sm:mt-2 text-sm sm:text-base"
-                      value={contactForm.message}
-                      onChange={(e) => setContactForm({...contactForm, message: e.target.value})}
-                      disabled={contactFormSubmitting}
-                    />
-                  </div>
-                  <Button 
-                    type="submit" 
-                    className="w-full h-10 sm:h-11 md:h-12 text-sm sm:text-base bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
-                    disabled={contactFormSubmitting}
-                  >
-                    {contactFormSubmitting ? (
-                      <>
-                        <Icon name="Loader2" className="mr-2 animate-spin" size={18} />
-                        Отправка...
-                      </>
-                    ) : (
-                      <>
-                        <Icon name="Send" className="mr-2" size={18} />
-                        Отправить сообщение
-                      </>
-                    )}
-                  </Button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </section>
+        <ContactSection
+          form={contactForm}
+          onFormChange={setContactForm}
+          onSubmit={handleContactFormSubmit}
+          isSubmitting={contactFormSubmitting}
+        />
 
         <Suspense fallback={null}>
           <BlogCarousel />
         </Suspense>
       </main>
 
-      <footer className="border-t bg-gray-50 py-4 px-3 sm:px-4 lg:px-6" role="contentinfo">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex items-center gap-2 mb-3">
-            <Icon name="Rocket" className="text-primary" size={20} />
-            <span className="text-base font-bold">iHUNT</span>
-            <span className="text-xs text-muted-foreground ml-1">— реферальный рекрутинг с геймификацией</span>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
-            <nav aria-label="Продукт">
-              <h4 className="font-semibold mb-2 text-xs">Продукт</h4>
-              <ul className="space-y-1 text-xs text-muted-foreground">
-                <li><a href="#benefits" className="hover:text-primary">Возможности</a></li>
-                <li><a href="#pricing" className="hover:text-primary">Тарифы</a></li>
-              </ul>
-            </nav>
-            <nav aria-label="Компания">
-              <h4 className="font-semibold mb-2 text-xs">Компания</h4>
-              <ul className="space-y-1 text-xs text-muted-foreground">
-                <li><a href="/blog" className="hover:text-primary">Блог</a></li>
-                <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
-                <li><span onClick={() => setShowAboutDialog(true)} className="hover:text-primary cursor-pointer">О нас</span></li>
-              </ul>
-            </nav>
-            <nav aria-label="Правовая информация" className="col-span-2 sm:col-span-1">
-              <h4 className="font-semibold mb-2 text-xs">Правовая информация</h4>
-              <ul className="space-y-1 text-xs text-muted-foreground">
-                <li><span onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary cursor-pointer">Политика конфиденциальности</span></li>
-                <li><span onClick={() => setShowTermsDialog(true)} className="hover:text-primary cursor-pointer">Пользовательское соглашение</span></li>
-                <li><span onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary cursor-pointer">Обработка персональных данных</span></li>
-              </ul>
-            </nav>
-          </div>
-          <div className="mt-5 pt-4 border-t text-center text-xs text-muted-foreground">© 2026 iHUNT. Все права защищены.</div>
-        </div>
-      </footer>
+      <LandingFooter
+        onAbout={() => setShowAboutDialog(true)}
+        onPrivacy={() => setShowPrivacyDialog(true)}
+        onTerms={() => setShowTermsDialog(true)}
+        onPersonalData={() => setShowPersonalDataDialog(true)}
+      />
 
       <Dialog open={showRegisterDialog} onOpenChange={setShowRegisterDialog}>
         <DialogContent className="max-w-[95vw] sm:max-w-lg max-h-[90dvh] overflow-y-auto md:overflow-visible md:max-h-none p-4 sm:p-6">
