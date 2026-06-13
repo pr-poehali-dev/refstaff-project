@@ -1889,6 +1889,37 @@ function Index() {
     }
   };
 
+  const handleSaveRoles = handleUpdateEmployeeRoles;
+
+  const handleRestoreEmployee = async (employee: Employee) => {
+    try {
+      await api.updateEmployeeFired(employee.id, false);
+      await loadData();
+    } catch (error) {
+      console.error('Ошибка восстановления сотрудника:', error);
+      alert('Не удалось восстановить сотрудника');
+    }
+  };
+
+  const handleEditNews = async () => {
+    if (!newsToEdit || !newsForm.title || !newsForm.content) {
+      alert('Заполните все поля');
+      return;
+    }
+    try {
+      const r = await fetch('https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=news', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'update', news_id: newsToEdit.id, title: newsForm.title, content: newsForm.content, category: newsForm.category })
+      });
+      if (r.ok) {
+        setNewsForm({ title: '', content: '', category: 'news' });
+        setShowEditNewsDialog(false);
+        setNewsToEdit(null);
+        loadData(true);
+      }
+    } catch { alert('Ошибка обновления'); }
+  };
+
   const renderLandingPage = () => renderLandingPageComponent(
     setShowRegisterDialog,
     setShowLoginDialog,
@@ -2529,23 +2560,10 @@ function Index() {
               onSearchChange={setEmployeeSearchQuery}
               employeeStatusFilter={employeeStatusFilter}
               onStatusFilterChange={setEmployeeStatusFilter}
-              onInvite={() => setShowInviteDialog(true)}
               onReferralLink={handleGenerateReferralLink}
               onViewEmployee={(emp) => { setSelectedEmployee(emp); setShowEmployeeDetail(true); }}
-              onDeleteEmployee={(emp) => { setEmployeeToDelete(emp); setShowDeleteDialog(true); }}
               onEditEmployee={(emp) => { setEmployeeToEdit(emp); setEmployeeEditForm({ firstName: emp.name.split(' ')[1] || '', lastName: emp.name.split(' ')[0] || '', position: emp.position || '', department: emp.department || '' }); setShowEditEmployeeDialog(true); }}
               onOpenChat={(emp) => { setActiveChatEmployee(emp); setShowChatDialog(true); }}
-              onEditRoles={(emp) => { setEmployeeToEditRoles(emp); setRolesForm({ isAdmin: emp.isAdmin || false }); setShowEditRolesDialog(true); }}
-              showDeleteDialog={showDeleteDialog}
-              onDeleteDialogChange={setShowDeleteDialog}
-              employeeToDelete={employeeToDelete}
-              onConfirmDelete={handleDeleteEmployee}
-              showEditEmployeeDialog={showEditEmployeeDialog}
-              onEditEmployeeDialogChange={setShowEditEmployeeDialog}
-              employeeToEdit={employeeToEdit}
-              employeeEditForm={employeeEditForm}
-              onEmployeeEditFormChange={setEmployeeEditForm}
-              onSaveEmployeeEdit={handleUpdateEmployeeData}
               showEditRolesDialog={showEditRolesDialog}
               onEditRolesDialogChange={setShowEditRolesDialog}
               employeeToEditRoles={employeeToEditRoles}
@@ -2553,7 +2571,9 @@ function Index() {
               onRolesFormChange={setRolesForm}
               onSaveRoles={handleSaveRoles}
               onFireEmployee={handleToggleFired}
-              onRestoreEmployee={handleRestoreEmployee}
+              onSetEmployeeToEditRoles={setEmployeeToEditRoles}
+              currentUserRole={userRole}
+              calculateEmployeeRank={calculateEmployeeRank}
             />
           </TabsContent>
 

@@ -34,7 +34,7 @@ export interface EmployeesTabProps {
   onRolesFormChange: (f: { isAdmin: boolean }) => void;
   onSaveRoles: () => void;
   onFireEmployee: (emp: Employee) => void;
-  currentUserRole: string;
+  currentUserRole: 'guest' | 'employer' | 'employee';
   calculateEmployeeRank: (emp: Employee) => number;
 }
 
@@ -193,7 +193,7 @@ export function EmployeesTab({
                             <DialogDescription>Назначьте права доступа сотруднику</DialogDescription>
                           </DialogHeader>
                           <div className="space-y-4 pt-4">
-                            {currentUserRole === 'admin' && (
+                            {currentUserRole === 'employer' && (
                               <>
                                 <div className="flex items-center justify-between">
                                   <div>
@@ -274,7 +274,7 @@ export function EmployeesTab({
                           <DialogDescription>Назначьте права доступа сотруднику</DialogDescription>
                         </DialogHeader>
                         <div className="space-y-4 pt-4">
-                          {currentUserRole === 'admin' && (
+                          {currentUserRole === 'employer' && (
                             <>
                               <div className="flex items-center justify-between">
                                 <div>
