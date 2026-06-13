@@ -52,6 +52,16 @@ import { BenefitsSection } from '@/components/landing/BenefitsSection';
 import { PricingSection } from '@/components/landing/PricingSection';
 import { ContactSection } from '@/components/landing/ContactSection';
 import { LandingFooter } from '@/components/landing/LandingFooter';
+import { VacanciesTab } from '@/components/employer/VacanciesTab';
+import { EmployeesTab } from '@/components/employer/EmployeesTab';
+import { RecommendationsTab } from '@/components/employer/RecommendationsTab';
+import { PayoutsTab } from '@/components/employer/PayoutsTab';
+import { NewsTab } from '@/components/employer/NewsTab';
+import { ChatsTab } from '@/components/employer/ChatsTab';
+import { StatsTab } from '@/components/employer/StatsTab';
+import { SubscriptionTab } from '@/components/employer/SubscriptionTab';
+import { HelpTab } from '@/components/employer/HelpTab';
+import { AiAssistantTabWrapper } from '@/components/employer/AiAssistantTabWrapper';
 
 const LazyFallback = () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
@@ -2488,1351 +2498,156 @@ function Index() {
           </ScrollableTabs>
 
           <TabsContent value="vacancies" className="space-y-4">
-            {isSubscriptionExpired ? (
-              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
-            ) : (
-              <>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-              <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-                <span>💼 Вакансии</span>
-                <span className="hidden sm:inline"></span>
-              </h2>
-              <Dialog>
-                  <DialogTrigger asChild>
-                    <Button disabled={isSubscriptionExpired} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">Создать вакансию</Button>
-                  </DialogTrigger>
-                <DialogContent className="w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-lg rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
-                  <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
-                    <DialogTitle className="text-base">Новая вакансия</DialogTitle>
-                    <DialogDescription className="text-xs">Создайте вакансию для реферального найма</DialogDescription>
-                  </DialogHeader>
-                  <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="vacancy-title" className="text-xs">Должность</Label>
-                        <Input
-                          id="vacancy-title"
-                          className="mt-1 h-9 text-sm"
-                          placeholder="Frontend Developer"
-                          value={vacancyForm.title}
-                          onChange={(e) => setVacancyForm({...vacancyForm, title: e.target.value})}
-                        />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="salary" className="text-xs">Зарплата</Label>
-                        <Input
-                          id="salary"
-                          className="mt-1 h-9 text-sm"
-                          placeholder="250 000 ₽"
-                          value={vacancyForm.salary}
-                          onChange={(e) => setVacancyForm({...vacancyForm, salary: e.target.value})}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="city" className="text-xs">Город</Label>
-                        <Input
-                          id="city"
-                          className="mt-1 h-9 text-sm"
-                          placeholder="Москва"
-                          value={vacancyForm.city}
-                          onChange={(e) => setVacancyForm({...vacancyForm, city: e.target.value})}
-                          disabled={vacancyForm.isRemote}
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox
-                        id="isRemote"
-                        checked={vacancyForm.isRemote}
-                        onCheckedChange={(checked) => setVacancyForm({...vacancyForm, isRemote: checked as boolean, city: checked ? 'Удалённо' : ''})}
-                      />
-                      <Label htmlFor="isRemote" className="cursor-pointer text-xs">Удалённая работа</Label>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label htmlFor="reward-amount" className="text-xs">Бонус за рекомендацию ₽</Label>
-                        <Input
-                          id="reward-amount"
-                          type="number"
-                          className="mt-1 h-9 text-sm"
-                          placeholder="30000"
-                          value={vacancyForm.reward}
-                          onChange={(e) => setVacancyForm({...vacancyForm, reward: e.target.value})}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="payout-delay" className="text-xs">Срок выплаты</Label>
-                        <Select
-                          value={vacancyForm.payoutDelay}
-                          onValueChange={(value) => setVacancyForm({...vacancyForm, payoutDelay: value})}
-                        >
-                          <SelectTrigger id="payout-delay" className="mt-1 h-9 text-sm">
-                            <SelectValue placeholder="Выберите" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="0">Сразу</SelectItem>
-                            <SelectItem value="7">7 дней</SelectItem>
-                            <SelectItem value="14">14 дней</SelectItem>
-                            <SelectItem value="30">30 дней</SelectItem>
-                            <SelectItem value="45">45 дней</SelectItem>
-                            <SelectItem value="60">60 дней</SelectItem>
-                            <SelectItem value="90">90 дней (исп. срок)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="description" className="text-xs">Описание вакансии</Label>
-                      <Textarea
-                        id="description"
-                        placeholder="Расскажите о вакансии, задачах и условиях..."
-                        rows={3}
-                        className="mt-1 text-sm"
-                        value={vacancyForm.description}
-                        onChange={(e) => setVacancyForm({...vacancyForm, description: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="requirements" className="text-xs">Требования</Label>
-                      <Textarea
-                        id="requirements"
-                        placeholder="Опыт работы от 5 лет, знание React..."
-                        rows={3}
-                        className="mt-1 text-sm"
-                        value={vacancyForm.requirements}
-                        onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="motivation" className="text-xs">Мотивация</Label>
-                      <Textarea
-                        id="motivation"
-                        placeholder="Что мы предлагаем: ДМС, гибкий график, обучение..."
-                        rows={3}
-                        className="mt-1 text-sm"
-                        value={vacancyForm.motivation}
-                        onChange={(e) => setVacancyForm({...vacancyForm, motivation: e.target.value})}
-                      />
-                    </div>
-                  </div>
-                  <div className="px-4 py-3 border-t shrink-0">
-                    <Button className="w-full" onClick={handleCreateVacancy}>Создать вакансию</Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
-              <div className="flex-1">
-                <Input 
-                  placeholder="Поиск..."
-                  value={vacancyFilter.search}
-                  onChange={(e) => setVacancyFilter({...vacancyFilter, search: e.target.value})}
-                  className="text-sm"
-                />
-              </div>
-              <Select value={vacancyFilter.status} onValueChange={(value) => setVacancyFilter({...vacancyFilter, status: value})}>
-                <SelectTrigger className="w-full sm:w-[160px] text-sm">
-                  <SelectValue placeholder="Статус" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все статусы</SelectItem>
-                  <SelectItem value="active">Активные</SelectItem>
-                  <SelectItem value="archived">Архив</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-4">
-              {vacancies.filter(v => {
-                const searchMatch = vacancyFilter.search === '' || 
-                  v.title.toLowerCase().includes(vacancyFilter.search.toLowerCase()) ||
-                  v.department.toLowerCase().includes(vacancyFilter.search.toLowerCase());
-                const statusMatch = vacancyFilter.status === 'all' || v.status === vacancyFilter.status;
-                return searchMatch && statusMatch;
-              }).sort((a, b) => {
-                if (a.status === 'archived' && b.status !== 'archived') return 1;
-                if (a.status !== 'archived' && b.status === 'archived') return -1;
-                return 0;
-              }).map((vacancy) => (
-                <Card key={vacancy.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader className="p-2 sm:p-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-1.5 sm:gap-3">
-                      <div 
-                        className="cursor-pointer hover:opacity-70 transition-opacity flex-1"
-                        onClick={() => {
-                          setSelectedVacancyDetail(vacancy);
-                          setShowVacancyDetail(true);
-                        }}
-                      >
-                        <CardTitle className="flex items-center gap-1.5 text-xs sm:text-lg">
-                          {vacancy.title}
-                          <Icon name="ExternalLink" size={12} className="text-muted-foreground" />
-                        </CardTitle>
-                        <CardDescription className="text-[10px] sm:text-sm">{vacancy.department}</CardDescription>
-                      </div>
-                      <div className="flex gap-1">
-                        <Badge 
-                          variant="secondary" 
-                          className={`text-[9px] sm:text-xs px-1 sm:px-2 ${
-                            vacancy.status === 'archived' ? 'bg-gray-200 text-gray-600 dark:bg-gray-800 dark:text-gray-400' : ''
-                          }`}
-                        >
-                          {vacancy.status === 'active' ? 'Активна' : 'Архив'}
-                        </Badge>
-                        {vacancy.recommendations > 0 && (
-                          <Badge variant="outline" className="text-[9px] sm:text-xs px-1 sm:px-2">
-                            <Icon name="Users" size={8} className="mr-0.5" />
-                            {vacancy.recommendations}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-2 sm:p-6 pt-0 sm:pt-0">
-                    <div className="space-y-2 sm:space-y-4">
-                      <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-[10px] sm:text-sm">
-                        <div className="flex items-center gap-1">
-                          <Icon name="Wallet" size={12} className="text-muted-foreground" />
-                          <span className="truncate">{vacancy.salary}</span>
-                        </div>
-                        {vacancy.city && (
-                          <div className="flex items-center gap-1">
-                            <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={12} className="text-muted-foreground" />
-                            <span className="truncate">{vacancy.city}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-1 text-primary font-medium">
-                          <Icon name="Award" size={12} />
-                          <span>{vacancy.reward.toLocaleString()} ₽</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Icon name="Clock" size={12} />
-                          <span>{vacancy.payoutDelayDays} дн.</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            setTestManagerVacancy({ id: vacancy.id, title: vacancy.title });
-                            setShowTestManager(true);
-                          }}
-                          className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
-                        >
-                          <span className="mr-1">📋</span>
-                          <span className="hidden sm:inline">Тест</span>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            setActiveVacancy(vacancy);
-                            setVacancyForm({
-                              title: vacancy.title,
-                              department: vacancy.department,
-                              salary: vacancy.salary,
-                              description: vacancy.description || '',
-                              requirements: vacancy.requirements || '',
-                              motivation: vacancy.motivation || '',
-                              reward: vacancy.reward.toString(),
-                              payoutDelay: vacancy.payoutDelayDays.toString(),
-                              city: vacancy.city || '',
-                              isRemote: vacancy.isRemote || false
-                            });
-                          }}
-                          className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
-                        >
-                          <span className="mr-1">✏️</span>
-                          <span className="hidden sm:inline">Ред.</span>
-                        </Button>
-                        {vacancy.status === 'active' && (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleArchiveVacancy(vacancy.id)}
-                            className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
-                          >
-                            <span className="mr-1">📦</span>
-                            <span className="hidden sm:inline">В архив</span>
-                          </Button>
-                        )}
-                        {vacancy.status === 'archived' && (
-                          <>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleRestoreVacancy(vacancy.id)}
-                              className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
-                            >
-                              <span className="mr-1">✅</span>
-                              <span>Активировать</span>
-                            </Button>
-                            <Button 
-                              variant="destructive" 
-                              size="sm"
-                              onClick={() => {
-                                if (window.confirm('Удалить вакансию безвозвратно?')) {
-                                  handleDeleteVacancy(vacancy.id);
-                                }
-                              }}
-                              className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
-                            >
-                              <span className="mr-1">🗑️</span>
-                              <span className="hidden sm:inline">Удалить</span>
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-
-            <Dialog open={activeVacancy !== null} onOpenChange={(open) => !open && setActiveVacancy(null)}>
-              <DialogContent className="w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-lg rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
-                <DialogHeader className="px-4 pt-4 pb-3 border-b shrink-0">
-                  <DialogTitle className="text-base">Редактировать вакансию</DialogTitle>
-                  <DialogDescription className="text-xs">Обновите информацию о вакансии</DialogDescription>
-                </DialogHeader>
-                <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor="edit-vacancy-title" className="text-xs">Должность</Label>
-                      <Input
-                        id="edit-vacancy-title"
-                        className="mt-1 h-9 text-sm"
-                        value={vacancyForm.title}
-                        onChange={(e) => setVacancyForm({...vacancyForm, title: e.target.value})}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label htmlFor="edit-salary" className="text-xs">Зарплата</Label>
-                      <Input
-                        id="edit-salary"
-                        className="mt-1 h-9 text-sm"
-                        value={vacancyForm.salary}
-                        onChange={(e) => setVacancyForm({...vacancyForm, salary: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="edit-reward-amount" className="text-xs">Вознаграждение за рекомендацию, ₽</Label>
-                      <Input
-                        id="edit-reward-amount"
-                        type="number"
-                        className="mt-1 h-9 text-sm"
-                        value={vacancyForm.reward}
-                        onChange={(e) => setVacancyForm({...vacancyForm, reward: e.target.value})}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-payout-delay" className="text-xs">Срок выплаты вознаграждения</Label>
-                    <Select
-                      value={vacancyForm.payoutDelay}
-                      onValueChange={(value) => setVacancyForm({...vacancyForm, payoutDelay: value})}
-                    >
-                      <SelectTrigger id="edit-payout-delay" className="mt-1 h-9 text-sm">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="0">Сразу после найма</SelectItem>
-                        <SelectItem value="7">7 дней</SelectItem>
-                        <SelectItem value="14">14 дней</SelectItem>
-                        <SelectItem value="30">30 дней</SelectItem>
-                        <SelectItem value="45">45 дней</SelectItem>
-                        <SelectItem value="60">60 дней</SelectItem>
-                        <SelectItem value="90">90 дней (исп. срок)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-description" className="text-xs">Описание вакансии</Label>
-                    <Textarea
-                      id="edit-description"
-                      rows={3}
-                      className="mt-1 text-sm"
-                      value={vacancyForm.description}
-                      onChange={(e) => setVacancyForm({...vacancyForm, description: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-requirements" className="text-xs">Требования</Label>
-                    <Textarea
-                      id="edit-requirements"
-                      rows={3}
-                      className="mt-1 text-sm"
-                      value={vacancyForm.requirements}
-                      onChange={(e) => setVacancyForm({...vacancyForm, requirements: e.target.value})}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-motivation" className="text-xs">Мотивация</Label>
-                    <Textarea
-                      id="edit-motivation"
-                      rows={3}
-                      className="mt-1 text-sm"
-                      placeholder="Что мы предлагаем: ДМС, гибкий график, обучение..."
-                      value={vacancyForm.motivation}
-                      onChange={(e) => setVacancyForm({...vacancyForm, motivation: e.target.value})}
-                    />
-                  </div>
-                </div>
-                <div className="px-4 py-3 border-t shrink-0 flex gap-2">
-                  <Button className="flex-1" onClick={handleUpdateVacancy}>Сохранить</Button>
-                  {activeVacancy?.status === 'active' && (
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        if (activeVacancy) {
-                          handleArchiveVacancy(activeVacancy.id);
-                          setActiveVacancy(null);
-                        }
-                      }}
-                    >
-                      <Icon name="Archive" size={16} className="mr-1.5" />
-                      В архив
-                    </Button>
-                  )}
-                </div>
-              </DialogContent>
-            </Dialog>
-            </>
-            )}
+            <VacanciesTab
+              isSubscriptionExpired={isSubscriptionExpired}
+              onRenew={() => setShowSubscriptionDialog(true)}
+              vacancies={vacancies}
+              vacancyFilter={vacancyFilter}
+              onVacancyFilterChange={setVacancyFilter}
+              vacancyForm={vacancyForm}
+              onVacancyFormChange={setVacancyForm}
+              onCreateVacancy={handleCreateVacancy}
+              onUpdateVacancy={handleUpdateVacancy}
+              onArchiveVacancy={handleArchiveVacancy}
+              onRestoreVacancy={handleRestoreVacancy}
+              onDeleteVacancy={handleDeleteVacancy}
+              onViewDetail={(v) => { setSelectedVacancyDetail(v); setShowVacancyDetail(true); }}
+              newReward={newReward}
+              onNewRewardChange={setNewReward}
+              activeVacancy={activeVacancy}
+              onActiveVacancyChange={setActiveVacancy}
+              onTestManager={(v) => { setTestManagerVacancy(v); setShowTestManager(true); }}
+            />
           </TabsContent>
 
           <TabsContent value="employees" className="space-y-4">
-            {isSubscriptionExpired ? (
-              <SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} />
-            ) : (
-              <>
-            <div className="flex flex-col gap-4 mb-6">
-              <div>
-                <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-                  <span>👥</span>
-                  <span className="hidden sm:inline">Сотрудники компании</span>
-                  <span className="sm:hidden">Сотрудники</span>
-                </h2>
-                <p className="text-sm text-muted-foreground mt-1">
-                  Всего: <span className="font-semibold">{employees.length}</span>
-                </p>
-              </div>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button onClick={handleGenerateReferralLink} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                  <Icon name="Link" className="mr-1 sm:mr-2" size={16} />
-                  <span>Пригласить сотрудника</span>
-                </Button>
-
-              </div>
-            </div>
-            <div className="mb-4 flex flex-col sm:flex-row gap-2">
-              <Input
-                placeholder="Поиск..."
-                value={employeeSearchQuery}
-                onChange={(e) => setEmployeeSearchQuery(e.target.value)}
-                className="w-full text-sm"
-              />
-              <select
-                value={employeeStatusFilter}
-                onChange={(e) => setEmployeeStatusFilter(e.target.value as 'all' | 'active' | 'fired' | 'admin')}
-                className="shrink-0 text-sm border border-input rounded-md px-3 py-2 bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              >
-                <option value="all">Все</option>
-                <option value="active">Действующие</option>
-                <option value="fired">Уволенные</option>
-                <option value="admin">Администраторы</option>
-              </select>
-            </div>
-            <div className="grid gap-4">
-              {employees.filter(emp => {
-                const matchesStatus =
-                  employeeStatusFilter === 'all' ||
-                  (employeeStatusFilter === 'active' && !emp.isFired) ||
-                  (employeeStatusFilter === 'fired' && emp.isFired) ||
-                  (employeeStatusFilter === 'admin' && emp.isAdmin);
-                const matchesSearch =
-                  employeeSearchQuery === '' ||
-                  emp.name.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
-                  emp.position.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
-                  emp.department.toLowerCase().includes(employeeSearchQuery.toLowerCase()) ||
-                  (emp.email && emp.email.toLowerCase().includes(employeeSearchQuery.toLowerCase()));
-                return matchesStatus && matchesSearch;
-              }
-              ).map((employee) => (
-                <Card 
-                  key={employee.id} 
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => {
-                    setSelectedEmployee(employee);
-                    setShowEmployeeDetail(true);
-                  }}
-                >
-                  <CardHeader>
-                    <div className="flex items-start gap-3 mb-3">
-                      <Avatar className="h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
-                        <AvatarImage src={employee.avatar} />
-                        <AvatarFallback>{employee.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-1 sm:gap-2 mb-1">
-                          <CardTitle className="text-base sm:text-lg truncate">{employee.name}</CardTitle>
-
-                          {employee.isFired
-                            ? <Badge variant="destructive" className="text-xs">Уволен</Badge>
-                            : employee.isAdmin
-                              ? <Badge className="text-xs bg-purple-600 hover:bg-purple-600">Администратор</Badge>
-                              : <Badge variant="secondary" className="text-xs">Действующий</Badge>
-                          }
-                          <Badge variant="outline" className="bg-primary/10 text-xs hidden sm:inline-flex">
-                            <Icon name="Trophy" size={12} className="mr-1" />
-                            #{calculateEmployeeRank(employee)}
-                          </Badge>
-                        </div>
-                        <CardDescription className="text-xs sm:text-sm truncate">{employee.position} • {employee.department}</CardDescription>
-                      </div>
-                      <div className="hidden sm:flex flex-row gap-2" onClick={(e) => e.stopPropagation()}>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveChatEmployee(employee);
-                            setShowChatDialog(true);
-                          }}
-                          className="flex-1 sm:flex-none text-xs sm:text-sm"
-                        >
-                          <span className="sm:mr-1">💬</span>
-                          <span className="hidden sm:inline">Написать</span>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEmployeeToEdit(employee);
-                            const [firstName, ...lastNameParts] = employee.name.split(' ');
-                            setEmployeeEditForm({
-                              firstName: firstName,
-                              lastName: lastNameParts.join(' '),
-                              position: employee.position,
-                              department: employee.department
-                            });
-                            setShowEditEmployeeDialog(true);
-                          }}
-                          className="flex-1 sm:flex-none text-xs sm:text-sm"
-                        >
-                          <span>✏️</span>
-                        </Button>
-                        <Dialog open={showEditRolesDialog && employeeToEditRoles?.id === employee.id} onOpenChange={(open) => {
-                          if (!open) {
-                            setShowEditRolesDialog(false);
-                            setEmployeeToEditRoles(null);
-                          }
-                        }}>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={(e) => {
-                              e.stopPropagation();
-                              setEmployeeToEditRoles(employee);
-                              setRolesForm({
-                                isAdmin: employee.isAdmin || false
-                              });
-                              setShowEditRolesDialog(true);
-                            }} className="flex-1 sm:flex-none text-xs sm:text-sm">
-                              <span>🛡️</span>
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Управление ролями: {employee.name}</DialogTitle>
-                              <DialogDescription>Назначьте права доступа сотруднику</DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-4 pt-4">
-                              {currentUser?.role === 'admin' && (
-                                <>
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <Label>Администратор</Label>
-                                      <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
-                                    </div>
-                                    <Checkbox
-                                      checked={rolesForm.isAdmin}
-                                      onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
-                                    />
-                                  </div>
-                                  <div className="border-t pt-4">
-                                    <Button
-                                      variant={employeeToEditRoles?.isFired ? "outline" : "destructive"}
-                                      className="w-full"
-                                      onClick={() => {
-                                        if (employeeToEditRoles) {
-                                          setShowEditRolesDialog(false);
-                                          handleToggleFired(employeeToEditRoles);
-                                        }
-                                      }}
-                                    >
-                                      <Icon name={employeeToEditRoles?.isFired ? "UserCheck" : "UserX"} size={16} className="mr-2" />
-                                      {employeeToEditRoles?.isFired ? 'Восстановить сотрудника' : 'Уволить сотрудника'}
-                                    </Button>
-                                  </div>
-                                </>
-                              )}
-                              <Button className="w-full" onClick={handleUpdateEmployeeRoles}>Сохранить</Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                      </div>
-                    </div>
-                    <div className="flex sm:hidden flex-wrap gap-1 sm:gap-2 mt-3" onClick={(e) => e.stopPropagation()}>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveChatEmployee(employee);
-                            setShowChatDialog(true);
-                          }}
-                          className="flex-1 sm:flex-none text-xs sm:text-sm"
-                        >
-                          <Icon name="MessageCircle" className="sm:mr-1" size={16} />
-                          <span className="hidden sm:inline">Написать</span>
-                        </Button>
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEmployeeToEdit(employee);
-                            const [firstName, ...lastNameParts] = employee.name.split(' ');
-                            setEmployeeEditForm({
-                              firstName: firstName,
-                              lastName: lastNameParts.join(' '),
-                              position: employee.position,
-                              department: employee.department
-                            });
-                            setShowEditEmployeeDialog(true);
-                          }}
-                          className="flex-1 sm:flex-none text-xs sm:text-sm"
-                        >
-                          <Icon name="Edit" size={16} />
-                        </Button>
-                        <Dialog open={showEditRolesDialog && employeeToEditRoles?.id === employee.id} onOpenChange={(open) => {
-                          if (!open) {
-                            setShowEditRolesDialog(false);
-                            setEmployeeToEditRoles(null);
-                          }
-                        }}>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm" onClick={(e) => {
-                              e.stopPropagation();
-                              setEmployeeToEditRoles(employee);
-                              setRolesForm({
-                                isAdmin: employee.isAdmin || false
-                              });
-                              setShowEditRolesDialog(true);
-                            }} className="flex-1 sm:flex-none text-xs sm:text-sm">
-                              <Icon name="Shield" size={16} />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Управление ролями: {employee.name}</DialogTitle>
-                              <DialogDescription>Назначьте права доступа сотруднику</DialogDescription>
-                            </DialogHeader>
-                            <div className="space-y-4 pt-4">
-                              {currentUser?.role === 'admin' && (
-                                <>
-                                  <div className="flex items-center justify-between">
-                                    <div>
-                                      <Label>Администратор</Label>
-                                      <p className="text-xs text-muted-foreground">Полный доступ к системе</p>
-                                    </div>
-                                    <Checkbox
-                                      checked={rolesForm.isAdmin}
-                                      onCheckedChange={(checked) => setRolesForm({...rolesForm, isAdmin: checked as boolean})}
-                                    />
-                                  </div>
-                                  <div className="border-t pt-4">
-                                    <Button
-                                      variant={employeeToEditRoles?.isFired ? "outline" : "destructive"}
-                                      className="w-full"
-                                      onClick={() => {
-                                        if (employeeToEditRoles) {
-                                          setShowEditRolesDialog(false);
-                                          handleToggleFired(employeeToEditRoles);
-                                        }
-                                      }}
-                                    >
-                                      <Icon name={employeeToEditRoles?.isFired ? "UserCheck" : "UserX"} size={16} className="mr-2" />
-                                      {employeeToEditRoles?.isFired ? 'Восстановить сотрудника' : 'Уволить сотрудника'}
-                                    </Button>
-                                  </div>
-                                </>
-                              )}
-                              <Button className="w-full" onClick={handleUpdateEmployeeRoles}>Сохранить</Button>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
-                    </div>
-                    <Badge variant="outline" className="mt-2">Уровень {employee.level}</Badge>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center">
-                      <div>
-                        <div className="text-lg sm:text-2xl font-bold text-primary">{employee.recommendations}</div>
-                        <div className="text-[10px] sm:text-xs text-muted-foreground">Реком.</div>
-                      </div>
-                      <div>
-                        <div className="text-lg sm:text-2xl font-bold text-green-600">{employee.hired}</div>
-                        <div className="text-[10px] sm:text-xs text-muted-foreground">Нанято</div>
-                      </div>
-                      <div>
-                        <div className="text-base sm:text-xl font-bold text-secondary truncate">{employee.earnings.toLocaleString()} ₽</div>
-                        <div className="text-[10px] sm:text-xs text-muted-foreground">Зараб.</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            </>
-            )}
+            <EmployeesTab
+              isSubscriptionExpired={isSubscriptionExpired}
+              onRenew={() => setShowSubscriptionDialog(true)}
+              employees={employees}
+              employeeSearchQuery={employeeSearchQuery}
+              onSearchChange={setEmployeeSearchQuery}
+              employeeStatusFilter={employeeStatusFilter}
+              onStatusFilterChange={setEmployeeStatusFilter}
+              onInvite={() => setShowInviteDialog(true)}
+              onReferralLink={handleGenerateReferralLink}
+              onViewEmployee={(emp) => { setSelectedEmployee(emp); setShowEmployeeDetail(true); }}
+              onDeleteEmployee={(emp) => { setEmployeeToDelete(emp); setShowDeleteDialog(true); }}
+              onEditEmployee={(emp) => { setEmployeeToEdit(emp); setEmployeeEditForm({ firstName: emp.name.split(' ')[1] || '', lastName: emp.name.split(' ')[0] || '', position: emp.position || '', department: emp.department || '' }); setShowEditEmployeeDialog(true); }}
+              onOpenChat={(emp) => { setActiveChatEmployee(emp); setShowChatDialog(true); }}
+              onEditRoles={(emp) => { setEmployeeToEditRoles(emp); setRolesForm({ isAdmin: emp.isAdmin || false }); setShowEditRolesDialog(true); }}
+              showDeleteDialog={showDeleteDialog}
+              onDeleteDialogChange={setShowDeleteDialog}
+              employeeToDelete={employeeToDelete}
+              onConfirmDelete={handleDeleteEmployee}
+              showEditEmployeeDialog={showEditEmployeeDialog}
+              onEditEmployeeDialogChange={setShowEditEmployeeDialog}
+              employeeToEdit={employeeToEdit}
+              employeeEditForm={employeeEditForm}
+              onEmployeeEditFormChange={setEmployeeEditForm}
+              onSaveEmployeeEdit={handleUpdateEmployeeData}
+              showEditRolesDialog={showEditRolesDialog}
+              onEditRolesDialogChange={setShowEditRolesDialog}
+              employeeToEditRoles={employeeToEditRoles}
+              rolesForm={rolesForm}
+              onRolesFormChange={setRolesForm}
+              onSaveRoles={handleSaveRoles}
+              onFireEmployee={handleToggleFired}
+              onRestoreEmployee={handleRestoreEmployee}
+            />
           </TabsContent>
 
           <TabsContent value="recommendations" className="space-y-4">
-            {isSubscriptionExpired ? (
-              <Suspense fallback={<LazyFallback />}><SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /></Suspense>
-            ) : (
-              <>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
-              <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-                <span>🎯</span>
-                <span className="hidden sm:inline">Рекомендации кандидатов</span>
-                <span className="sm:hidden">Рекомендации</span>
-              </h2>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-2 mb-4">
-              <div className="relative flex-1">
-                <Icon name="Search" size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Поиск по кандидатам..."
-                  value={recommendationSearchQuery}
-                  onChange={(e) => setRecommendationSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <Select value={recommendationStatusFilter} onValueChange={(value: any) => setRecommendationStatusFilter(value)}>
-                <SelectTrigger className="w-full sm:w-[200px]">
-                  <SelectValue placeholder="Фильтр по статусу" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Все статусы</SelectItem>
-                  <SelectItem value="pending">На рассмотрении</SelectItem>
-                  <SelectItem value="accepted">Принятые</SelectItem>
-                  <SelectItem value="rejected">Отклонённые</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid gap-4">
-              {recommendations.filter(rec => {
-                const matchesSearch = recommendationSearchQuery === '' || 
-                  rec.candidateName.toLowerCase().includes(recommendationSearchQuery.toLowerCase()) ||
-                  rec.vacancy.toLowerCase().includes(recommendationSearchQuery.toLowerCase()) ||
-                  (rec.recommendedBy && rec.recommendedBy.toLowerCase().includes(recommendationSearchQuery.toLowerCase()));
-                const matchesStatus = recommendationStatusFilter === 'all' || 
-                  rec.status === recommendationStatusFilter || 
-                  (recommendationStatusFilter === 'accepted' && rec.status === 'hired') ||
-                  (recommendationStatusFilter === 'hired' && rec.status === 'accepted');
-                return matchesSearch && matchesStatus;
-              }).map((rec) => (
-                <Card key={rec.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
-                  setActiveRecommendation(rec);
-                  setShowRecommendationDetailsDialog(true);
-                }}>
-                  <CardHeader>
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-2 sm:gap-4">
-                      <div className="flex-1 min-w-0">
-                        <CardTitle className="text-base sm:text-lg truncate">{rec.candidateName}</CardTitle>
-                        <CardDescription className="text-xs sm:text-sm truncate">{rec.vacancy}</CardDescription>
-                        {rec.recommendedBy && (
-                          <div className="flex items-center gap-2 mt-2">
-                            <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
-                              <AvatarFallback className="text-xs">{rec.recommendedBy.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                            </Avatar>
-                            <span className="text-xs sm:text-sm text-muted-foreground truncate">
-                              <span className="hidden sm:inline">Рекомендовал: </span><span className="font-medium text-foreground">{rec.recommendedBy}</span>
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <Badge variant={
-                        rec.status === 'accepted' || rec.status === 'hired' ? 'default' : 
-                        rec.status === 'rejected' ? 'destructive' : 
-                        'secondary'
-                      } className="text-xs whitespace-nowrap">
-                        {rec.status === 'accepted' || rec.status === 'hired' ? 'Принят' : 
-                         rec.status === 'rejected' ? 'Отклонён' : 
-                         'На рассмотрении'}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                      <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
-                        <div className="flex items-center gap-1">
-                          <Icon name="Calendar" size={14} />
-                          <span className="whitespace-nowrap">{new Date(rec.date).toLocaleDateString('ru-RU')}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Icon name="Award" size={14} />
-                          <span className="whitespace-nowrap">{rec.reward.toLocaleString()} ₽</span>
-                        </div>
-                      </div>
-                      {rec.status === 'pending' && (
-                        <div className="flex gap-2 w-full sm:w-auto">
-                          <Button variant="outline" size="sm" onClick={(e) => {
-                            e.stopPropagation();
-                            handleUpdateRecommendationStatus(rec.id, 'rejected');
-                          }} disabled={isSubscriptionExpired} className="flex-1 sm:flex-none text-xs sm:text-sm">
-                            <Icon name="X" className="sm:mr-1" size={14} />
-                            <span className="hidden sm:inline">Отклонить</span>
-                          </Button>
-                          <Button size="sm" onClick={(e) => {
-                            e.stopPropagation();
-                            handleUpdateRecommendationStatus(rec.id, 'accepted');
-                          }} disabled={isSubscriptionExpired} className="flex-1 sm:flex-none text-xs sm:text-sm">
-                            <Icon name="Check" className="sm:mr-1" size={14} />
-                            <span className="hidden sm:inline">Принять</span>
-                          </Button>
-                        </div>
-                      )}
-                      {(rec.status === 'accepted' || rec.status === 'hired') && (
-                        <div className="flex gap-2 items-center">
-                          <div className="text-xs sm:text-sm text-muted-foreground">
-                            <Icon name="Clock" size={14} className="inline mr-1" />
-                            <span className="hidden sm:inline">Выплата через 30 дней</span>
-                            <span className="sm:hidden">30 дн.</span>
-                          </div>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (window.confirm('Отменить принятие кандидата? Статус вернётся в "На рассмотрении".')) {
-                                handleUpdateRecommendationStatus(rec.id, 'pending');
-                              }
-                            }} 
-                            disabled={isSubscriptionExpired}
-                            className="text-xs"
-                          >
-                            <Icon name="RotateCcw" className="sm:mr-1" size={14} />
-                            <span className="hidden sm:inline">Отменить</span>
-                          </Button>
-                        </div>
-                      )}
-                      {rec.status === 'rejected' && (
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (window.confirm('Вернуть кандидата на рассмотрение?')) {
-                              handleUpdateRecommendationStatus(rec.id, 'pending');
-                            }
-                          }} 
-                          disabled={isSubscriptionExpired}
-                          className="text-xs"
-                        >
-                          <Icon name="RotateCcw" className="mr-1" size={14} />
-                          На рассмотрение
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            </>
-            )}
+            <RecommendationsTab
+              isSubscriptionExpired={isSubscriptionExpired}
+              onRenew={() => setShowSubscriptionDialog(true)}
+              recommendations={recommendations}
+              searchQuery={recommendationSearchQuery}
+              onSearchChange={setRecommendationSearchQuery}
+              statusFilter={recommendationStatusFilter}
+              onStatusFilterChange={setRecommendationStatusFilter}
+              onUpdateStatus={handleUpdateRecommendationStatus}
+              onViewDetails={(rec) => { setActiveRecommendation(rec); setShowRecommendationDetailsDialog(true); }}
+            />
           </TabsContent>
 
           <TabsContent value="payouts" className="space-y-4">
-            {isSubscriptionExpired ? (
-              <Suspense fallback={<LazyFallback />}><SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /></Suspense>
-            ) : (
-            <>
-            <div className="mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 mb-2">
-                <span>💰</span>
-                <span className="hidden sm:inline">Запросы на выплаты</span>
-                <span className="sm:hidden">Выплаты</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-muted-foreground">
-                Управление запросами сотрудников
-              </p>
-            </div>
-            <Card className="mb-4 sm:mb-6">
-              <CardHeader
-                className="pb-3 cursor-pointer select-none"
-                onClick={() => setPayoutMethodsCollapsed(v => !v)}
-              >
-                <CardTitle className="text-sm sm:text-base flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span>⚙️</span> Доступные методы выплат
-                  </div>
-                  <Icon name={payoutMethodsCollapsed ? 'ChevronDown' : 'ChevronUp'} size={16} className="text-muted-foreground" />
-                </CardTitle>
-                {!payoutMethodsCollapsed && (
-                  <CardDescription className="text-xs">Выберите способы, которые сотрудники смогут использовать для получения вознаграждений</CardDescription>
-                )}
-              </CardHeader>
-              {!payoutMethodsCollapsed && (
-                <CardContent className="space-y-2">
-                  {[
-                    { key: 'cash', label: 'Наличными', emoji: '💵' },
-                    { key: 'card', label: 'На карту', emoji: '💳' },
-                    { key: 'sbp', label: 'По СБП', emoji: '📱' },
-                    { key: 'bank', label: 'По реквизитам на счёт', emoji: '🏦' },
-                  ].map(({ key, label, emoji }) => {
-                    const methods: string[] = company?.payout_methods ?? ['card', 'sbp', 'cash', 'bank'];
-                    const enabled = methods.includes(key);
-                    return (
-                      <div key={key} className="flex items-center justify-between py-1" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center gap-2 text-sm">
-                          <span>{emoji}</span>
-                          <span>{label}</span>
-                        </div>
-                        <Checkbox
-                          checked={enabled}
-                          onCheckedChange={async (checked) => {
-                            const current: string[] = company?.payout_methods ?? ['card', 'sbp', 'cash', 'bank'];
-                            const updated = checked
-                              ? [...current, key]
-                              : current.filter(m => m !== key);
-                            await api.updateCompany(currentCompanyId, { payout_methods: updated });
-                            setCompany(prev => prev ? { ...prev, payout_methods: updated } : null);
-                          }}
-                        />
-                      </div>
-                    );
-                  })}
-                </CardContent>
-              )}
-            </Card>
-
-            <Suspense fallback={<LazyFallback />}><PayoutRequests 
-              requests={payoutRequests}
-              companyId={currentCompanyId}
-              onUpdateStatus={async (requestId, status, comment) => {
-                try {
-                  const response = await fetch('https://functions.poehali.dev/f88ab2cf-1304-40dd-82e4-a7a1f7358901', {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                      request_id: requestId,
-                      status: status,
-                      admin_comment: comment,
-                      reviewed_by: currentUser?.id || 1
-                    })
-                  });
-                  
-                  if (response.ok) {
-                    await loadData();
-                  } else {
-                    const error = await response.json();
-                    alert(`Ошибка: ${error.error || 'Не удалось обновить статус'}`);
-                  }
-                } catch (error) {
-                  console.error('Ошибка обновления статуса выплаты:', error);
-                  alert('Не удалось обновить статус выплаты');
-                }
-              }}
-              onVacancyClick={(vacancyId) => {
-                const vacancy = vacancies.find(v => v.id === vacancyId);
-                if (vacancy) {
-                  setSelectedVacancyDetail(vacancy);
-                  setShowVacancyDetail(true);
-                }
-              }}
-            /></Suspense>
-            </>
-            )}
+            <PayoutsTab
+              isSubscriptionExpired={isSubscriptionExpired}
+              onRenew={() => setShowSubscriptionDialog(true)}
+              payoutMethodsCollapsed={payoutMethodsCollapsed}
+              onPayoutMethodsCollapsedChange={setPayoutMethodsCollapsed}
+              company={company}
+              onCompanyChange={setCompany}
+              payoutRequests={payoutRequests}
+              currentCompanyId={currentCompanyId}
+              vacancies={vacancies}
+              onViewVacancy={(v) => { setSelectedVacancyDetail(v); setShowVacancyDetail(true); }}
+              onReloadData={loadData}
+              currentUserId={currentUser?.id || 1}
+            />
           </TabsContent>
 
           <TabsContent value="news" className="space-y-4">
-            {isSubscriptionExpired ? <Suspense fallback={<LazyFallback />}><SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /></Suspense> : <>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-              <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-                <span>📢</span>
-                <span className="hidden sm:inline">Новости компании</span>
-                <span className="sm:hidden">Новости</span>
-              </h2>
-              <Button onClick={() => setShowCreateNewsDialog(true)} size="sm" className="w-full sm:w-auto text-xs sm:text-sm">
-                <Icon name="Plus" className="mr-1 sm:mr-2" size={16} />
-                Создать
-              </Button>
-            </div>
-
-            <div className="grid gap-4">
-              {newsPosts.map((post) => (
-                <Card key={post.id} className={`hover:shadow-md transition-shadow ${post.isArchived ? 'opacity-60 border-dashed' : ''}`}>
-                  <CardHeader>
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <Badge variant={
-                            post.category === 'news' ? 'default' :
-                            post.category === 'achievement' ? 'secondary' :
-                            post.category === 'announcement' ? 'outline' :
-                            'default'
-                          } className="text-xs">
-                            {post.category === 'news' ? '📰 Новость' :
-                             post.category === 'achievement' ? '🏆 Достижение' :
-                             post.category === 'announcement' ? '📢 Объявление' :
-                             '✍️ Блог'}
-                          </Badge>
-                          <span className="text-xs text-muted-foreground whitespace-nowrap">
-                            {new Date(post.date).toLocaleDateString('ru-RU')}
-                          </span>
-                        </div>
-                        <CardTitle className="text-base sm:text-xl">{post.title}</CardTitle>
-                        <CardDescription className="mt-1 text-xs sm:text-sm truncate">Автор: {post.author}</CardDescription>
-                      </div>
-                      <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
-                        {post.isArchived && (
-                          <Badge variant="secondary" className="text-[10px] hidden sm:inline-flex">Архив</Badge>
-                        )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setNewsToEdit(post);
-                            setNewsForm({
-                              title: post.title,
-                              content: post.content,
-                              category: post.category
-                            });
-                            setShowEditNewsDialog(true);
-                          }}
-                          className="h-8 w-8 p-0"
-                          title="Редактировать"
-                        >
-                          <Icon name="Edit" size={14} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleArchiveNews(post.id, !post.isArchived)}
-                          className="h-8 w-8 p-0"
-                          title={post.isArchived ? 'Вернуть из архива' : 'В архив'}
-                        >
-                          <Icon name={post.isArchived ? 'ArchiveRestore' : 'Archive'} size={14} className="text-muted-foreground" />
-                        </Button>
-
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-wrap line-clamp-3">{post.content}</p>
-                  </CardContent>
-                  <CardFooter className="flex-col items-stretch gap-2 sm:gap-3 border-t pt-3 sm:pt-4">
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => handleLikeNews(post.id)}
-                        className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
-                      >
-                        <Icon name="ThumbsUp" size={14} />
-                        {post.likes}
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => {
-                          setActiveNewsPost(post);
-                          setShowCommentsDialog(true);
-                        }}
-                        className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
-                      >
-                        <Icon name="MessageCircle" size={14} />
-                        {post.comments.length}
-                      </Button>
-                    </div>
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-            </>}
+            <NewsTab
+              isSubscriptionExpired={isSubscriptionExpired}
+              onRenew={() => setShowSubscriptionDialog(true)}
+              newsPosts={newsPosts}
+              onCreateNews={() => setShowCreateNewsDialog(true)}
+              onEditNews={(post) => { setNewsToEdit(post); setNewsForm({ title: post.title, content: post.content, category: post.category || '' }); setShowEditNewsDialog(true); }}
+              onArchiveNews={handleArchiveNews}
+              onLikeNews={handleLikeNews}
+              onViewComments={(post) => { setActiveNewsPost(post); setShowCommentsDialog(true); }}
+              showCreateNewsDialog={showCreateNewsDialog}
+              onCreateNewsDialogChange={setShowCreateNewsDialog}
+              newsForm={newsForm}
+              onNewsFormChange={setNewsForm}
+              onSubmitNews={handleCreateNews}
+              showEditNewsDialog={showEditNewsDialog}
+              onEditNewsDialogChange={setShowEditNewsDialog}
+              newsToEdit={newsToEdit}
+              onSubmitEditNews={handleEditNews}
+            />
           </TabsContent>
 
           <TabsContent value="chats" className="space-y-4">
-            {isSubscriptionExpired ? (
-              <Suspense fallback={<LazyFallback />}><SubscriptionExpiredBlock onRenew={() => setShowSubscriptionDialog(true)} /></Suspense>
-            ) : (
-              <>
-            <h2 className="text-xl sm:text-2xl font-semibold mb-4 flex items-center gap-2">
-              <span>💬</span>
-              <span className="hidden sm:inline">Чаты с сотрудниками</span>
-              <span className="sm:hidden">Чаты</span>
-            </h2>
-            <div className="grid gap-3">
-              {(chats.length > 0
-                ? chats.filter((chat, idx, arr) => arr.findIndex(c => c.employee_id === chat.employee_id) === idx)
-                : employees.slice(0, 3).map(emp => ({ employee_id: emp.id, unread_count: 0 }))
-              ).map((chat) => {
-                const emp = employees.find(e => e.id === chat.employee_id);
-                if (!emp) return null;
-                const unread = chat.unread_count || 0;
-                return (
-                <Card key={emp.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
-                  setActiveChatEmployee(emp);
-                  setShowChatDialog(true);
-                }}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="h-10 w-10">
-                        <AvatarFallback>{emp.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium">{emp.name}</div>
-                        <div className="text-sm text-muted-foreground truncate">{emp.position}</div>
-                      </div>
-                      {unread > 0 && <Badge className="bg-red-500 hover:bg-red-500 text-white">{unread}</Badge>}
-                    </div>
-                  </CardContent>
-                </Card>
-                );
-              })}
-            </div>
-            </>
-            )}
+            <ChatsTab
+              isSubscriptionExpired={isSubscriptionExpired}
+              onRenew={() => setShowSubscriptionDialog(true)}
+              chats={chats}
+              employees={employees}
+              onOpenChat={(emp) => { setActiveChatEmployee(emp); setShowChatDialog(true); }}
+            />
           </TabsContent>
 
           <TabsContent value="stats" className="space-y-6">
-            <Suspense fallback={<LazyFallback />}>
-              <CompanyStats
-                recommendations={recommendations}
-                employees={employees}
-                vacancies={vacancies}
-                companyName={company?.name}
-              />
-            </Suspense>
+            <StatsTab
+              recommendations={recommendations}
+              employees={employees}
+              vacancies={vacancies}
+              companyName={company?.name}
+            />
           </TabsContent>
 
           <TabsContent value="subscription" className="space-y-4 sm:hidden">
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <span>💳</span> Подписка
-            </h2>
-            <Card className={subscriptionDaysLeft !== null && subscriptionDaysLeft <= 0 ? 'border-destructive' : subscriptionDaysLeft !== null && subscriptionDaysLeft < 7 ? 'border-orange-400' : 'border-primary'}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-base">{company?.subscription_tier === 'trial' ? 'Пробный период' : 'Продвинутый'}</CardTitle>
-                  <Badge variant={subscriptionDaysLeft !== null && subscriptionDaysLeft <= 0 ? 'destructive' : subscriptionDaysLeft !== null && subscriptionDaysLeft < 7 ? 'destructive' : 'secondary'}>
-                    {subscriptionDaysLeft !== null && subscriptionDaysLeft <= 0 ? 'Истекла' : subscriptionDaysLeft !== null ? `${subscriptionDaysLeft} дн. осталось` : '—'}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Progress value={Math.max(0, Math.min(100, ((subscriptionDaysLeft ?? 0) / 30) * 100))} className="h-2" />
-                {company?.subscription_expires_at && (
-                  <p className="text-xs text-muted-foreground">
-                    Действует до: {new Date(company.subscription_expires_at).toLocaleDateString('ru-RU')}
-                  </p>
-                )}
-              </CardContent>
-            </Card>
-
-            {subscriptionDaysLeft !== null && subscriptionDaysLeft <= 0 && (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Icon name="AlertTriangle" className="text-destructive mt-0.5" size={20} />
-                  <div className="flex-1 text-sm">
-                    <p className="font-medium text-destructive mb-1">Подписка истекла</p>
-                    <p className="text-muted-foreground">Доступ ограничен. Продлите подписку для восстановления.</p>
-                  </div>
-                </div>
-              </div>
-            )}
-            {subscriptionDaysLeft !== null && subscriptionDaysLeft > 0 && subscriptionDaysLeft < 7 && (
-              <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Icon name="AlertTriangle" className="text-destructive mt-0.5" size={20} />
-                  <div className="flex-1 text-sm">
-                    <p className="font-medium text-destructive mb-1">Подписка заканчивается!</p>
-                    <p className="text-muted-foreground">Продлите, чтобы не потерять доступ к функциям</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <Button
-              className="w-full"
-              size="lg"
-              onClick={() => setShowSubscriptionDialog(true)}
-            >
-              <Icon name="CreditCard" className="mr-2" size={18} />
-              {subscriptionDaysLeft !== null && subscriptionDaysLeft <= 0 ? 'Восстановить подписку' : 'Продлить подписку'}
-            </Button>
+            <SubscriptionTab
+              subscriptionDaysLeft={subscriptionDaysLeft}
+              company={company}
+              onRenew={() => setShowSubscriptionDialog(true)}
+            />
           </TabsContent>
 
           <TabsContent value="help" className="space-y-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
-                <span>❓ Помощь</span>
-              </h2>
-              <p className="text-muted-foreground">Краткий гид по разделам платформы</p>
-            </div>
-
-            <div className="grid gap-4">
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Briefcase" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">💼 Вакансии</CardTitle>
-                      <CardDescription className="mt-1">Управление открытыми позициями</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="Plus" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Создать вакансию</strong> — кнопка в правом верхнем углу. Укажите должность, зарплату, отдел, город и размер вознаграждения для сотрудника</p></div>
-                  <div className="flex gap-2"><Icon name="Pencil" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Редактировать / архивировать</strong> — иконки карандаша и архива справа на карточке вакансии</p></div>
-                  <div className="flex gap-2"><Icon name="Eye" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Кандидаты</strong> — нажмите на вакансию, чтобы увидеть всех рекомендованных кандидатов и их статусы</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Users" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">👥 Сотрудники</CardTitle>
-                      <CardDescription className="mt-1">Управление командой</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="UserPlus" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Пригласить сотрудника</strong> — кнопка вверху раздела. Укажите имя, email, должность — сотрудник получит доступ</p></div>
-                  <div className="flex gap-2"><Icon name="Shield" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Права доступа</strong> — иконка щита на карточке сотрудника. Можно назначить администратора или уволить</p></div>
-                  <div className="flex gap-2"><Icon name="MessageSquare" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Написать</strong> — кнопка на карточке сотрудника открывает личный чат</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Star" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">🎯 Рекомендации</CardTitle>
-                      <CardDescription className="mt-1">Входящие кандидаты от сотрудников</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="UserCheck" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Принять / Отклонить</strong> — кнопки на карточке кандидата со статусом "На рассмотрении"</p></div>
-                  <div className="flex gap-2"><Icon name="ArrowRight" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Статусы:</strong> На рассмотрении → Принят → На интервью → Нанят. При смене на "Нанят" сотруднику начисляется вознаграждение</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Wallet" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">💰 Выплаты</CardTitle>
-                      <CardDescription className="mt-1">Запросы на вывод средств от сотрудников</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="CheckCircle2" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Одобрить / Отклонить</strong> — действия на каждом запросе. При отклонении можно указать причину</p></div>
-                  <div className="flex gap-2"><Icon name="Filter" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Фильтр</strong> — переключайте между "Ожидающие", "Одобренные" и "Отклонённые" запросами</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Newspaper" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">📢 Новости</CardTitle>
-                      <CardDescription className="mt-1">Публикации для всей команды</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="PenSquare" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Создать новость</strong> — кнопка вверху. Выберите категорию (Новость, Достижение, Объявление, Блог), добавьте заголовок и текст</p></div>
-                  <div className="flex gap-2"><Icon name="Trash2" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Редактировать / удалить</strong> — иконки на карточке новости (видны только администратору)</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="MessageSquare" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">💬 Чаты</CardTitle>
-                      <CardDescription className="mt-1">Личная переписка с сотрудниками</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="Send" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Открыть чат</strong> — нажмите на карточку сотрудника в разделе Чаты или кнопку "Написать" в разделе Сотрудники</p></div>
-                  <div className="flex gap-2"><Icon name="Paperclip" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Файлы</strong> — скрепка в поле ввода позволяет прикрепить резюме или документ</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="BarChart" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">📊 Статистика</CardTitle>
-                      <CardDescription className="mt-1">Эффективность реферальной программы</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="TrendingUp" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Сводные показатели</strong> — общее число рекомендаций, наймов и выплаченных вознаграждений</p></div>
-                  <div className="flex gap-2"><Icon name="Trophy" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Топ сотрудников</strong> — рейтинг по количеству успешных рекомендаций</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 bg-muted/30">
-                <CardHeader>
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="HelpCircle" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">Нужна помощь?</CardTitle>
-                      <CardDescription className="mt-1">Свяжитесь с нами</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="flex gap-3 items-start">
-                    <Icon name="Mail" className="w-5 h-5 text-muted-foreground mt-0.5" />
-                    <div><p className="font-medium text-sm">Email</p><p className="text-sm text-muted-foreground">info@i-hunt.ru</p></div>
-                  </div>
-                  <div className="flex gap-3 items-start">
-                    <Icon name="Send" className="w-5 h-5 text-muted-foreground mt-0.5" />
-                    <div><p className="font-medium text-sm">Telegram-блог</p><a href="https://t.me/i_hunt_ru" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">t.me/i_hunt_ru</a></div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <HelpTab />
           </TabsContent>
 
 
           <TabsContent value="ai-assistant" className="space-y-4">
-            <AiAssistantTab companyId={currentCompanyId} messages={aiMessages} setMessages={setAiMessages} />
+            <AiAssistantTabWrapper
+              companyId={currentCompanyId}
+              messages={aiMessages}
+              setMessages={setAiMessages}
+            />
           </TabsContent>
 
         </Tabs>
