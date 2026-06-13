@@ -62,6 +62,16 @@ import { StatsTab } from '@/components/employer/StatsTab';
 import { SubscriptionTab } from '@/components/employer/SubscriptionTab';
 import { HelpTab } from '@/components/employer/HelpTab';
 import { AiAssistantTabWrapper } from '@/components/employer/AiAssistantTabWrapper';
+import { EmployeeNewsTab } from '@/components/employee/EmployeeNewsTab';
+import { EmployeeVacanciesTab } from '@/components/employee/EmployeeVacanciesTab';
+import { MyRecommendationsTab } from '@/components/employee/MyRecommendationsTab';
+import { AchievementsTab } from '@/components/employee/AchievementsTab';
+import { WalletHistoryTab } from '@/components/employee/WalletHistoryTab';
+import { NotificationsTab } from '@/components/employee/NotificationsTab';
+import { EmployeeHelpTab } from '@/components/employee/EmployeeHelpTab';
+import { GamesTabWrapper } from '@/components/employee/GamesTabWrapper';
+import { HrVacanciesTab } from '@/components/employee/HrVacanciesTab';
+import { HrRecommendationsTab } from '@/components/employee/HrRecommendationsTab';
 
 const LazyFallback = () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
@@ -3737,858 +3747,80 @@ function Index() {
           </ScrollableTabs>
 
           <TabsContent value="news" className="space-y-4">
-            <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-              <span>📢 Новости компании</span>
-              <span className="hidden sm:inline"></span>
-            </h2>
-            
-            {newsPosts.length === 0 ? (
-              <Card>
-                <CardContent className="py-12 text-center">
-                  <Icon name="Newspaper" className="mx-auto mb-4 text-muted-foreground" size={48} />
-                  <p className="text-muted-foreground">Пока нет новостей</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="grid gap-4">
-                {newsPosts.map((post) => (
-                  <Card key={post.id} className="hover:shadow-md transition-shadow">
-                    <CardHeader className="p-3 sm:p-6">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge variant={
-                          post.category === 'news' ? 'default' :
-                          post.category === 'achievement' ? 'secondary' :
-                          post.category === 'announcement' ? 'outline' :
-                          'default'
-                        } className="text-[10px] sm:text-xs">
-                          {post.category === 'news' ? '📰 Новость' :
-                           post.category === 'achievement' ? '🏆 Достижение' :
-                           post.category === 'announcement' ? '📢 Объявление' :
-                           '✍️ Блог'}
-                        </Badge>
-                        <span className="text-[10px] sm:text-xs text-muted-foreground">
-                          {new Date(post.date).toLocaleDateString('ru-RU')}
-                        </span>
-                      </div>
-                      <CardTitle className="text-base sm:text-xl">{post.title}</CardTitle>
-                      <CardDescription className="text-xs sm:text-sm">Автор: {post.author}</CardDescription>
-                    </CardHeader>
-                    <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-                      <p className="text-xs sm:text-sm text-muted-foreground whitespace-pre-wrap">{post.content}</p>
-                    </CardContent>
-                    <CardFooter className="border-t pt-3 sm:pt-4 p-3 sm:p-6">
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-2 sm:gap-4">
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => handleLikeNews(post.id)}
-                          >
-                            <Icon name="Heart" className="mr-1" size={16} />
-                            {post.likes}
-                          </Button>
-                          <Button 
-                            variant="ghost" 
-                            size="sm"
-                            onClick={() => {
-                              setActiveNewsPost(post);
-                              setShowCommentsDialog(true);
-                            }}
-                          >
-                            <Icon name="MessageCircle" className="mr-1" size={16} />
-                            {post.comments.length}
-                          </Button>
-                        </div>
-                      </div>
-                    </CardFooter>
-                  </Card>
-                ))}
-              </div>
-            )}
+            <EmployeeNewsTab
+              newsPosts={newsPosts}
+              onLike={handleLikeNews}
+              onComments={(post) => { setActiveNewsPost(post); setShowCommentsDialog(true); }}
+            />
           </TabsContent>
 
           <TabsContent value="vacancies" className="space-y-4">
-            {isSubscriptionExpired ? (
-              <SubscriptionExpiredBlock isEmployee />
-            ) : (<>
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4">
-              <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-                <span>💼 Вакансии</span>
-                <span className="hidden sm:inline"></span>
-              </h2>
-            </div>
-            <div className="mb-4">
-              <Input
-                placeholder="Поиск..."
-                value={vacancySearchQuery}
-                onChange={(e) => setVacancySearchQuery(e.target.value)}
-                className="w-full text-sm"
-              />
-            </div>
-
-            <div className="grid gap-4">
-              {vacancies.filter(v =>
-                vacancySearchQuery === '' ||
-                v.title.toLowerCase().includes(vacancySearchQuery.toLowerCase()) ||
-                v.department.toLowerCase().includes(vacancySearchQuery.toLowerCase())
-              ).map((vacancy) => (
-                <Card 
-                  key={vacancy.id} 
-                  className="hover:shadow-md transition-shadow"
-                >
-                  <CardHeader className="p-3 sm:p-6 relative">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          className="absolute top-2 right-2 h-8 w-8"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setActiveVacancy(vacancy);
-                          }}
-                        >
-                          <Icon name="UserPlus" size={18} />
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent onClick={(e) => e.stopPropagation()}>
-                          <DialogHeader>
-                            <DialogTitle>Данные кандидата</DialogTitle>
-                            <DialogDescription>
-                              Вакансия: {activeVacancy?.title}
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-4 pt-4">
-                            <div>
-                              <Label htmlFor="candidate-name">ФИО кандидата <span className="text-destructive">*</span></Label>
-                              <Input 
-                                id="candidate-name" 
-                                placeholder="Иван Иванов"
-                                value={recommendationForm.name}
-                                onChange={(e) => setRecommendationForm({...recommendationForm, name: e.target.value})}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="candidate-phone">Телефон <span className="text-destructive">*</span></Label>
-                              <Input 
-                                id="candidate-phone" 
-                                placeholder="+7 (999) 123-45-67"
-                                value={recommendationForm.phone}
-                                onChange={(e) => setRecommendationForm({...recommendationForm, phone: e.target.value})}
-                                required
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="candidate-email">Email</Label>
-                              <Input 
-                                id="candidate-email" 
-                                type="email" 
-                                placeholder="ivan@example.com"
-                                value={recommendationForm.email}
-                                onChange={(e) => setRecommendationForm({...recommendationForm, email: e.target.value})}
-                              />
-                            </div>
-                            <div>
-                              <Label htmlFor="comment">Сопроводительное письмо <span className="text-destructive">*</span></Label>
-                              <Textarea 
-                                id="comment" 
-                                placeholder="Почему этот кандидат подходит..." 
-                                rows={3}
-                                value={recommendationForm.comment}
-                                onChange={(e) => setRecommendationForm({...recommendationForm, comment: e.target.value})}
-                              />
-                            </div>
-                            <div className="bg-primary/10 p-4 rounded-lg">
-                              <div className="flex items-center gap-2 mb-2">
-                                <Icon name="Award" className="text-primary" size={20} />
-                                <span className="font-medium">Вознаграждение за успешный найм</span>
-                              </div>
-                              <div className="text-2xl font-bold text-primary">{activeVacancy?.reward.toLocaleString()} ₽</div>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {activeVacancy?.payoutDelayDays === 0 
-                                  ? 'Выплата сразу после найма'
-                                  : `Выплата через ${activeVacancy?.payoutDelayDays} ${activeVacancy?.payoutDelayDays === 1 ? 'день' : (activeVacancy?.payoutDelayDays ?? 0) < 5 ? 'дня' : 'дней'} после найма`
-                                }
-                              </p>
-                            </div>
-                            <Button 
-                              className="w-full" 
-                              disabled={!recommendationForm.name || !recommendationForm.phone || !recommendationForm.comment}
-                              onClick={() => activeVacancy && handleCreateRecommendation({
-                                vacancyId: activeVacancy.id,
-                                name: recommendationForm.name,
-                                email: recommendationForm.email,
-                                phone: recommendationForm.phone,
-                                comment: recommendationForm.comment
-                              })}
-                            >
-                              Отправить рекомендацию
-                            </Button>
-                          </div>
-                        </DialogContent>
-                    </Dialog>
-                    <div className="flex flex-col sm:flex-row justify-between items-start gap-3 sm:gap-0 pr-10">
-                      <div 
-                        className="flex-1 cursor-pointer hover:text-primary transition-colors"
-                        onClick={() => {
-                          if (vacancy.referralLink) {
-                            window.open(vacancy.referralLink, '_blank');
-                          }
-                        }}
-                      >
-                        <CardTitle className="text-sm sm:text-lg">{vacancy.title}</CardTitle>
-                        <CardDescription className="text-xs sm:text-sm">{vacancy.department}</CardDescription>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-                    <div className="space-y-3 sm:space-y-4">
-                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-6">
-                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
-                          <Icon name="Wallet" size={14} className="text-muted-foreground" />
-                          <span className="truncate">{vacancy.salary}</span>
-                        </div>
-                        {vacancy.city && (
-                          <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm">
-                            <Icon name={vacancy.isRemote ? "Home" : "MapPin"} size={14} className="text-muted-foreground" />
-                            <span className="truncate">{vacancy.city}</span>
-                          </div>
-                        )}
-                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-primary">
-                          <Icon name="Award" size={14} />
-                          <span className="font-medium">{vacancy.reward.toLocaleString()} ₽</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-muted-foreground">
-                          <Icon name="Clock" size={14} />
-                          <span>Выплата через {vacancy.payoutDelayDays} {vacancy.payoutDelayDays === 1 ? 'день' : vacancy.payoutDelayDays < 5 ? 'дня' : 'дней'} после найма</span>
-                        </div>
-                      </div>
-                      <Separator />
-                      <div className="space-y-2">
-                        <Label className="text-[10px] sm:text-xs text-muted-foreground">Ссылка на вакансию</Label>
-                        <div className="flex gap-1 sm:gap-2">
-                          <Input 
-                            value={vacancy.referralLink} 
-                            readOnly 
-                            className="text-[10px] sm:text-xs flex-1" 
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <Button size="sm" variant="outline" className="px-2 sm:px-3" onClick={(e) => {
-                            e.stopPropagation();
-                            navigator.clipboard.writeText(vacancy.referralLink || '');
-                            alert('Ссылка скопирована');
-                          }}>
-                            <Icon name="Copy" size={14} />
-                          </Button>
-                          <Button size="sm" variant="outline" className="px-2 sm:px-3" onClick={(e) => {
-                            e.stopPropagation();
-                            navigate(`/vacancy/${vacancy.id}/qr`, { state: { referralLink: vacancy.referralLink, title: vacancy.title } });
-                          }}>
-                            <Icon name="QrCode" size={14} />
-                          </Button>
-                        </div>
-                        <Button size="sm" className="sm:hidden w-full text-xs bg-primary text-primary-foreground hover:bg-primary/90" onClick={(e) => {
-                          e.stopPropagation();
-                          const text = `Привет! Смотри, есть отличная вакансия "${vacancy.title}" в нашей компании. Зарплата ${vacancy.salary}. Вот ссылка: ${vacancy.referralLink}`;
-                          if (navigator.share) {
-                            navigator.share({
-                              title: vacancy.title,
-                              text: text,
-                              url: vacancy.referralLink
-                            }).catch(() => {});
-                          } else {
-                            navigator.clipboard.writeText(text);
-                            alert('Текст скопирован');
-                          }
-                        }}>
-                          <Icon name="Share2" size={14} className="mr-2" />
-                          Поделиться вакансией
-                        </Button>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            </>)}
+            <EmployeeVacanciesTab
+              isSubscriptionExpired={isSubscriptionExpired}
+              vacancies={vacancies}
+              vacancySearchQuery={vacancySearchQuery}
+              onSearchChange={setVacancySearchQuery}
+              activeVacancy={activeVacancy}
+              onSetActiveVacancy={setActiveVacancy}
+              recommendationForm={recommendationForm}
+              onRecommendationFormChange={setRecommendationForm}
+              onCreateRecommendation={handleCreateRecommendation}
+              onViewDetail={(v) => { setSelectedVacancyDetail(v); setShowVacancyDetail(true); }}
+            />
           </TabsContent>
 
           <TabsContent value="my-recommendations" className="space-y-4">
-            <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-              <span>⭐ Мои рекомендации</span>
-              <span className="hidden sm:inline"></span>
-            </h2>
-            <div className="grid gap-4">
-              {recommendations.filter(r => r.employeeId === currentEmployeeId).length === 0 && (
-                <Card className="border-dashed">
-                  <CardContent className="flex flex-col items-center justify-center py-12 text-center gap-4">
-                    <span className="text-5xl">👥</span>
-                    <div>
-                      <p className="font-semibold text-lg mb-1">Рекомендаций пока нет</p>
-                      <p className="text-sm text-muted-foreground">Порекомендуйте знакомых на открытые вакансии и получайте вознаграждение</p>
-                    </div>
-                    <Button onClick={() => setActiveTab('vacancies')}>
-                      Начать рекомендовать
-                    </Button>
-                  </CardContent>
-                </Card>
-              )}
-              {recommendations.filter(r => r.employeeId === currentEmployeeId).map((rec) => (
-                <Card 
-                  key={rec.id} 
-                  className="cursor-pointer hover:shadow-lg transition-shadow"
-                  onClick={() => {
-                    setSelectedCandidate(rec);
-                    setShowCandidateDetail(true);
-                  }}
-                >
-                  <CardHeader>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{rec.candidateName}</CardTitle>
-                        <CardDescription>{rec.vacancyTitle || rec.vacancy}</CardDescription>
-                      </div>
-                      <Badge variant={
-                        rec.status === 'hired' || rec.status === 'accepted' ? 'default' : 
-                        rec.status === 'rejected' ? 'destructive' :
-                        rec.status === 'interview' ? 'outline' :
-                        'secondary'
-                      } className={rec.status === 'accepted' ? 'bg-green-600 hover:bg-green-600' : ''}>
-                        {rec.status === 'hired' || rec.status === 'accepted' ? 'Принят' : 
-                         rec.status === 'rejected' ? 'Отклонён' : 
-                         rec.status === 'interview' ? 'На интервью' :
-                         'На рассмотрении'}
-                      </Badge>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Icon name="Calendar" size={16} />
-                        <span>{new Date(rec.date).toLocaleDateString('ru-RU')}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Icon name="Award" size={16} />
-                        <span>{rec.reward.toLocaleString()} ₽</span>
-                      </div>
-                      {(rec.status === 'accepted' || rec.status === 'hired') && rec.acceptedDate && (() => {
-                        const acceptedDate = new Date(rec.acceptedDate);
-                        const unlockDate = new Date(acceptedDate.getTime() + (rec.payoutDelayDays ?? 30) * 24 * 60 * 60 * 1000);
-                        const today = new Date();
-                        const msRemaining = unlockDate.getTime() - today.getTime();
-                        const daysRemaining = Math.max(0, Math.ceil(msRemaining / (1000 * 60 * 60 * 24)));
-                        
-                        return (
-                          <div className={`flex items-center gap-1 ${daysRemaining > 0 ? 'text-orange-600' : 'text-green-600'}`}>
-                            <Icon name="Clock" size={16} />
-                            <span>
-                              {daysRemaining > 0 
-                                ? `Выплата через ${daysRemaining} ${daysRemaining === 1 ? 'день' : daysRemaining < 5 ? 'дня' : 'дней'}`
-                                : '✓ Выплата доступна'
-                              }
-                            </span>
-                          </div>
-                        );
-                      })()}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <MyRecommendationsTab
+              recommendations={recommendations}
+              currentEmployeeId={currentEmployeeId}
+              onViewCandidate={(rec) => { setSelectedCandidate(rec); setShowCandidateDetail(true); }}
+              onNavigateToVacancies={() => setActiveTab('vacancies')}
+            />
           </TabsContent>
 
           <TabsContent value="achievements" className="space-y-4">
-            <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-              <span>🏆 Достижения и рейтинг</span>
-              <span className="hidden sm:inline"></span>
-            </h2>
-            
-            <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
-              <CardHeader className="p-3 sm:p-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-xl">
-                  <Icon name="Trophy" size={20} className="text-primary" />
-                  <span className="hidden sm:inline">Рейтинг сотрудников</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3 sm:p-6 pt-0 sm:pt-0">
-                <div className="space-y-2 sm:space-y-3">
-                  {employees
-                    .sort((a, b) => {
-                      if (b.hired !== a.hired) return b.hired - a.hired;
-                      if (b.recommendations !== a.recommendations) return b.recommendations - a.recommendations;
-                      return b.earnings - a.earnings;
-                    })
-                    .slice(0, 10)
-                    .map((emp, idx) => (
-                      <div key={emp.id} className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg ${emp.id === currentEmployeeId ? 'bg-primary/20 border-2 border-primary' : 'bg-background'}`}>
-                        <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center font-bold text-xs sm:text-sm ${
-                          idx === 0 ? 'bg-yellow-500 text-white' :
-                          idx === 1 ? 'bg-gray-400 text-white' :
-                          idx === 2 ? 'bg-orange-600 text-white' :
-                          'bg-muted text-muted-foreground'
-                        }`}>
-                          {idx + 1}
-                        </div>
-                        <Avatar className="h-8 w-8 sm:h-10 sm:w-10 hidden sm:flex">
-                          <AvatarFallback>{emp.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-xs sm:text-sm truncate">{emp.name}</div>
-                          <div className="text-[10px] sm:text-xs text-muted-foreground">
-                            {emp.hired} нанято <span className="hidden sm:inline">• {emp.recommendations} рекомендаций</span>
-                          </div>
-                        </div>
-                        <div className="text-right">
-                          <div className="font-bold text-primary text-xs sm:text-sm">
-                            {emp.hired >= 10 ? '👑 Легенда' :
-                             emp.hired >= 5 ? '⭐ Мастер' :
-                             emp.hired >= 3 ? '🎯 Профи' :
-                             emp.hired >= 1 ? '🌟 Новичок' : '🔰 Старт'}
-                          </div>
-                        </div>
-                      </div>
-                    ))
-                  }
-                </div>
-              </CardContent>
-            </Card>
-
-            <h3 className="text-base sm:text-lg font-semibold mt-4 sm:mt-6">Мои достижения</h3>
-            {(() => {
-              const me = employees.find(e => e.id === currentEmployeeId);
-              const myRecs = recommendations.filter(r => r.employeeId === currentEmployeeId);
-              const myHires = me?.hired || 0;
-              const myRecsCount = me?.recommendations || 0;
-              const firstRec = myRecs.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0];
-              const hasFirstRec = myRecsCount >= 1;
-              const hasSharpEye = myHires >= 3;
-              const recruiterProgress = Math.min(myHires, 5);
-              const goldProgress = Math.min(myHires, 10);
-              return (
-                <div className="grid sm:grid-cols-2 gap-3 sm:gap-4">
-                  <Card className={!hasFirstRec ? 'opacity-50' : ''}>
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
-                          <Icon name="Star" className="text-yellow-600" size={24} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm sm:text-lg truncate">Первая рекомендация</div>
-                          {hasFirstRec && firstRec
-                            ? <div className="text-xs sm:text-sm text-muted-foreground">Получено {new Date(firstRec.date).toLocaleDateString('ru-RU')}</div>
-                            : <div className="text-xs sm:text-sm text-muted-foreground">{myRecsCount}/1 рекомендаций<Progress value={myRecsCount * 100} className="h-1 mt-2" /></div>
-                          }
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className={!hasSharpEye ? 'opacity-50' : ''}>
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                          <Icon name="Target" className="text-green-600" size={24} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm sm:text-lg truncate">Меткий глаз</div>
-                          {hasSharpEye
-                            ? <div className="text-xs sm:text-sm text-muted-foreground">3 успешных найма выполнено ✓</div>
-                            : <div className="text-xs sm:text-sm text-muted-foreground">{myHires}/3 успешных найма<Progress value={Math.round((myHires / 3) * 100)} className="h-1 mt-2" /></div>
-                          }
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className={myHires < 5 ? 'opacity-50' : ''}>
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                          <Icon name="Award" className="text-purple-600" size={24} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm sm:text-lg truncate">Рекрутер месяца</div>
-                          <div className="text-xs sm:text-sm text-muted-foreground">{recruiterProgress}/5 наймов</div>
-                          <Progress value={Math.round((recruiterProgress / 5) * 100)} className="h-1 mt-2" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                  <Card className={myHires < 10 ? 'opacity-50' : ''}>
-                    <CardContent className="p-4 sm:p-6">
-                      <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                          <Icon name="Crown" className="text-blue-600" size={24} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-sm sm:text-lg truncate">Золотой рекрутер</div>
-                          <div className="text-xs sm:text-sm text-muted-foreground">{goldProgress}/10 успешных наймов</div>
-                          <Progress value={Math.round((goldProgress / 10) * 100)} className="h-1 mt-2" />
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              );
-            })()}
+            <AchievementsTab
+              employees={employees}
+              recommendations={recommendations}
+              currentEmployeeId={currentEmployeeId}
+            />
           </TabsContent>
 
           <TabsContent value="wallet-history" className="space-y-4">
-            <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-              <span>💳 История кошелька</span>
-              <span className="hidden sm:inline"></span>
-            </h2>
-            <div className="space-y-2 sm:space-y-3">
-              {recommendations.filter(r => r.employeeId === currentEmployeeId && (r.status === 'accepted' || r.status === 'hired')).length === 0 ? (
-                <Card>
-                  <CardContent className="p-6 text-center text-muted-foreground">
-                    История транзакций пуста
-                  </CardContent>
-                </Card>
-              ) : recommendations.filter(r => r.employeeId === currentEmployeeId && (r.status === 'accepted' || r.status === 'hired')).map((rec) => (
-                <Card key={rec.id}>
-                  <CardContent className="p-3 sm:p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                          rec.status === 'accepted' ? 'bg-yellow-100' : 'bg-green-100'
-                        }`}>
-                          <Icon name={rec.status === 'accepted' ? 'Clock' : 'CheckCircle'}
-                                className={rec.status === 'accepted' ? 'text-yellow-600' : 'text-green-600'}
-                                size={16} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="font-medium text-xs sm:text-sm truncate">Вознаграждение за рекомендацию {rec.candidateName}</div>
-                          <div className="text-[10px] sm:text-xs text-muted-foreground">
-                            {new Date(rec.date).toLocaleDateString('ru-RU')}
-                          </div>
-                        </div>
-                      </div>
-                      <div className={`text-sm sm:text-lg font-bold flex-shrink-0 ${
-                        rec.status === 'accepted' ? 'text-yellow-600' : 'text-green-600'
-                      }`}>
-                        +{(rec.reward || 0).toLocaleString()} ₽
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <WalletHistoryTab
+              recommendations={recommendations}
+              currentEmployeeId={currentEmployeeId}
+            />
           </TabsContent>
 
           <TabsContent value="notifications" className="space-y-4">
-            <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-              <span>🔔 Уведомления</span>
-              <span className="hidden sm:inline"></span>
-            </h2>
-            <div className="space-y-2 sm:space-y-3">
-              {notifications
-                .filter(n => {
-                  if (userRole === 'employee') {
-                    return n.type !== 'subscription';
-                  }
-                  return true;
-                })
-                .map((notif) => (
-                  <Card
-                    key={notif.id}
-                    className={`transition-opacity cursor-pointer hover:shadow-sm ${notif.read ? 'opacity-60' : ''}`}
-                    onClick={() => {
-                      if (!notif.read) {
-                        setNotifications(prev => prev.map(n => n.id === notif.id ? { ...n, read: true } : n));
-                        setNewNotificationsCount(prev => Math.max(0, prev - 1));
-                      }
-                    }}
-                  >
-                    <CardContent className="p-3 sm:p-4">
-                      <div className="flex items-start gap-2 sm:gap-3">
-                        <div className={`p-1.5 sm:p-2 rounded-full flex-shrink-0 ${
-                          notif.type === 'recommendation' ? 'bg-blue-100' :
-                          notif.type === 'hire' ? 'bg-green-100' :
-                          notif.type === 'payout' ? 'bg-yellow-100' :
-                          notif.type === 'wallet' ? 'bg-purple-100' :
-                          notif.type === 'chat' ? 'bg-teal-100' :
-                          notif.type === 'vacancy' ? 'bg-orange-100' :
-                          'bg-gray-100'
-                        }`}>
-                          <Icon 
-                            name={
-                              notif.type === 'recommendation' ? 'UserPlus' :
-                              notif.type === 'hire' ? 'CheckCircle' :
-                              notif.type === 'payout' ? 'DollarSign' :
-                              notif.type === 'wallet' ? 'Wallet' :
-                              notif.type === 'chat' ? 'MessageSquare' :
-                              notif.type === 'vacancy' ? 'Briefcase' :
-                              'Bell'
-                            }
-                            size={16}
-                            className={
-                              notif.type === 'recommendation' ? 'text-blue-600' :
-                              notif.type === 'hire' ? 'text-green-600' :
-                              notif.type === 'payout' ? 'text-yellow-600' :
-                              notif.type === 'wallet' ? 'text-purple-600' :
-                              notif.type === 'chat' ? 'text-teal-600' :
-                              notif.type === 'vacancy' ? 'text-orange-600' :
-                              'text-gray-600'
-                            }
-                          />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-xs sm:text-sm">{notif.message}</p>
-                          <p className="text-[10px] sm:text-xs text-muted-foreground mt-1">
-                            {new Date(notif.date).toLocaleDateString('ru-RU', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric'
-                            })}
-                          </p>
-                        </div>
-                        {!notif.read ? (
-                          <Badge variant="default" className="text-[10px] sm:text-xs flex-shrink-0">Новое</Badge>
-                        ) : (
-                          <Icon name="Check" size={14} className="text-muted-foreground flex-shrink-0 mt-0.5" />
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))
-              }
-              {notifications.filter(n => userRole === 'employee' ? n.type !== 'subscription' : true).length === 0 && (
-                <Card>
-                  <CardContent className="py-12 text-center">
-                    <Icon name="Bell" size={48} className="mx-auto mb-2 text-muted-foreground opacity-50" />
-                    <p className="text-muted-foreground">Нет уведомлений</p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+            <NotificationsTab
+              notifications={notifications}
+              userRole={userRole}
+              onMarkRead={(id) => {
+                setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+                setNewNotificationsCount(prev => Math.max(0, prev - 1));
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="help" className="space-y-6">
-            <div className="mb-6">
-              <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
-                <span>❓ Помощь</span>
-              </h2>
-              <p className="text-muted-foreground">Краткий гид по разделам платформы</p>
-            </div>
-
-            <div className="grid gap-4">
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Newspaper" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">📢 Новости</CardTitle>
-                      <CardDescription className="mt-1">Лента событий компании</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="ThumbsUp" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Лайк</strong> — нажмите сердечко на карточке новости</p></div>
-                  <div className="flex gap-2"><Icon name="MessageCircle" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Комментарий</strong> — кнопка с пузырьком открывает обсуждение новости</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Briefcase" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">💼 Вакансии</CardTitle>
-                      <CardDescription className="mt-1">Открытые позиции для рекомендаций</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="UserPlus" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Рекомендовать</strong> — кнопка на карточке вакансии. Укажите ФИО, телефон кандидата и сопроводительное письмо</p></div>
-                  <div className="flex gap-2"><Icon name="Link" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Реферальная ссылка</strong> — скопируйте и отправьте знакомому, чтобы он сам оставил заявку</p></div>
-                  <div className="flex gap-2"><Icon name="Award" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Вознаграждение</strong> — размер бонуса и срок выплаты указаны на каждой карточке вакансии</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Star" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">⭐ Рекомендации</CardTitle>
-                      <CardDescription className="mt-1">История ваших кандидатов</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="Filter" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Фильтр по статусу</strong> — переключайтесь между "Все", "На рассмотрении", "Принят", "Нанят", "Отклонён"</p></div>
-                  <div className="flex gap-2"><Icon name="ArrowRight" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Путь кандидата:</strong> На рассмотрении → Принят → На интервью → Нанят → вознаграждение зачислено</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Trophy" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">🏆 Рейтинг</CardTitle>
-                      <CardDescription className="mt-1">Ваш профиль, кошелёк и достижения</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="Wallet" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Кошелёк</strong> — отображается прямо на этой вкладке. Кнопка "Запросить выплату" позволяет вывести средства на карту, СБП или расчётный счёт</p></div>
-                  <div className="flex gap-2"><Icon name="Medal" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Бейджи</strong> — зарабатывайте значки: "Острый глаз" (3 найма), "Рекрутер месяца" (5), "Золотой рекрутер" (10)</p></div>
-                  <div className="flex gap-2"><Icon name="BarChart3" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Место в рейтинге</strong> — ваша позиция среди коллег по числу успешных наймов</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Bell" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">🔔 Уведомления</CardTitle>
-                      <CardDescription className="mt-1">Все важные события в одном месте</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="Circle" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Новые уведомления</strong> — отмечены счётчиком на вкладке. Открытие вкладки сбрасывает счётчик</p></div>
-                  <div className="flex gap-2"><Icon name="Zap" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>Типы:</strong> изменение статуса рекомендации, пополнение кошелька, новые вакансии, сообщения в чате</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg"><Icon name="CreditCard" className="w-6 h-6 text-primary" /></div>
-                    <div>
-                      <CardTitle className="text-lg">💳 История</CardTitle>
-                      <CardDescription className="mt-1">Все транзакции по вашему кошельку</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2"><Icon name="Clock" className="w-4 h-4 text-muted-foreground mt-0.5 flex-shrink-0" /><p><strong>В ожидании</strong> — вознаграждение зачислено, но ещё не разблокировано (идёт испытательный срок)</p></div>
-                  <div className="flex gap-2"><Icon name="CheckCircle2" className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" /><p><strong>Выплачено</strong> — средства перечислены на ваши реквизиты</p></div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-2 bg-primary/5">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded-lg">
-                      <Icon name="Lightbulb" className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <CardTitle className="text-lg">Советы для успеха</CardTitle>
-                      <CardDescription className="mt-1">Как рекомендовать эффективно</CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2 text-sm">
-                  <div className="flex gap-2">
-                    <Icon name="CheckCircle2" className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <p><strong>Качество, а не количество:</strong> Рекомендуйте только тех, кто действительно соответствует требованиям вакансии</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Icon name="CheckCircle2" className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <p><strong>Детальная информация:</strong> Чем больше полезных деталей о кандидате вы укажете, тем выше шанс на успех</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Icon name="CheckCircle2" className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <p><strong>Предупредите кандидата:</strong> Убедитесь, что человек готов рассмотреть предложение, прежде чем его рекомендовать</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <Icon name="CheckCircle2" className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <p><strong>Будьте активны:</strong> Регулярно проверяйте новые вакансии — возможность заработать может появиться в любой момент</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            <EmployeeHelpTab />
           </TabsContent>
 
           <TabsContent value="games" className="space-y-6">
-            <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">🎮 Мини-игры</h2>
-            <p className="text-sm text-muted-foreground">Отдохни — здесь можно поиграть в перерыве</p>
-            <Suspense fallback={<LazyFallback />}><GamesTab /></Suspense>
+            <GamesTabWrapper />
           </TabsContent>
 
           {currentUser?.is_hr_manager && (
             <TabsContent value="hr-vacancies" className="space-y-4">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-                    <span>👔</span> Управление вакансиями
-                  </h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground">Доступ HR Manager</p>
-                </div>
-              </div>
-              <div className="grid gap-4">
-                {vacancies.sort((a, b) => {
-                  if (a.status === 'archived' && b.status !== 'archived') return 1;
-                  if (a.status !== 'archived' && b.status === 'archived') return -1;
-                  return 0;
-                }).map((vacancy) => (
-                  <Card key={vacancy.id}>
-                    <CardHeader className="p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <CardTitle className="text-base">{vacancy.title}</CardTitle>
-                          <CardDescription>{vacancy.department}</CardDescription>
-                        </div>
-                        <Badge variant={vacancy.status === 'active' ? 'default' : 'secondary'}>
-                          {vacancy.status === 'active' ? 'Активна' : 'Архив'}
-                        </Badge>
-                      </div>
-                      <div className="flex flex-wrap gap-2 mt-2 text-sm text-muted-foreground">
-                        <span>💰 {vacancy.salary}</span>
-                        <span>🎁 {vacancy.reward.toLocaleString()} ₽</span>
-                        <span>👥 {vacancy.candidates} кандидатов</span>
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-                {vacancies.length === 0 && (
-                  <Card><CardContent className="py-12 text-center text-muted-foreground">Вакансий нет</CardContent></Card>
-                )}
-              </div>
+              <HrVacanciesTab vacancies={vacancies} />
             </TabsContent>
           )}
 
           {currentUser?.is_hr_manager && (
             <TabsContent value="hr-recommendations" className="space-y-4">
-              <div className="mb-4">
-                <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-                  <span>👔</span> Все рекомендации
-                </h2>
-                <p className="text-xs sm:text-sm text-muted-foreground">Доступ HR Manager</p>
-              </div>
-              <div className="grid gap-4">
-                {recommendations.map((rec) => (
-                  <Card key={rec.id}>
-                    <CardHeader className="p-4">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <CardTitle className="text-base">{rec.candidateName}</CardTitle>
-                          <CardDescription>{rec.vacancyTitle}</CardDescription>
-                        </div>
-                        <Badge variant={
-                          rec.status === 'hired' ? 'default' :
-                          rec.status === 'rejected' ? 'destructive' : 'secondary'
-                        }>
-                          {rec.status === 'pending' ? 'Новая' :
-                           rec.status === 'accepted' ? 'Принята' :
-                           rec.status === 'interview' ? 'Интервью' :
-                           rec.status === 'hired' ? 'Нанят' : 'Отклонена'}
-                        </Badge>
-                      </div>
-                      <div className="text-sm text-muted-foreground mt-1">
-                        {rec.candidatePhone && <span>📞 {rec.candidatePhone}</span>}
-                        {rec.candidateEmail && <span className="ml-3">✉️ {rec.candidateEmail}</span>}
-                      </div>
-                    </CardHeader>
-                  </Card>
-                ))}
-                {recommendations.length === 0 && (
-                  <Card><CardContent className="py-12 text-center text-muted-foreground">Рекомендаций нет</CardContent></Card>
-                )}
-              </div>
+              <HrRecommendationsTab recommendations={recommendations} />
             </TabsContent>
           )}
         </Tabs>
