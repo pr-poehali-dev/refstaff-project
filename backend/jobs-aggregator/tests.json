@@ -1,0 +1,44 @@
+{
+  "tests": [
+    {
+      "name": "Базовый запрос HR-вакансий",
+      "method": "GET",
+      "path": "/?position=hr_manager&source=all",
+      "expectedStatus": 200,
+      "expectedBody": { "hh": {}, "trudvsem": {}, "positions": {} },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Только hh.ru, рекрутер, Москва",
+      "method": "GET",
+      "path": "/?position=recruiter&city=Москва&source=hh",
+      "expectedStatus": 200,
+      "expectedBody": { "hh": {}, "trudvsem": {} },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Только trudvsem, без опыта",
+      "method": "GET",
+      "path": "/?position=hr_admin&experience=no&source=trudvsem",
+      "expectedStatus": 200,
+      "expectedBody": { "trudvsem": {} },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Удалённая работа с зарплатой от 80000",
+      "method": "GET",
+      "path": "/?position=hrbp&city=remote&salary_from=80000&source=all",
+      "expectedStatus": 200,
+      "expectedBody": { "hh": {}, "trudvsem": {} },
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "CORS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {},
+      "bodyMatcher": "partial"
+    }
+  ]
+}

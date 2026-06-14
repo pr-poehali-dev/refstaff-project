@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
@@ -8,6 +9,7 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ onRegister, onLogin }: HeroSectionProps) {
+  const navigate = useNavigate();
   return (
     <section className="pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-8 sm:pb-12 md:pb-16 lg:pb-20 px-3 sm:px-4 lg:px-6" aria-labelledby="hero-title">
       <div className="container mx-auto max-w-7xl">
@@ -40,6 +42,10 @@ export function HeroSection({ onRegister, onLogin }: HeroSectionProps) {
               <Button size="default" variant="outline" className="animate-scale-in text-sm sm:text-base" style={{ animationDelay: '0.3s' }} onClick={onLogin}>
                 <Icon name="LogIn" className="mr-2" size={18} />
                 Войти
+              </Button>
+              <Button size="default" variant="ghost" className="animate-scale-in text-sm sm:text-base" style={{ animationDelay: '0.4s' }} onClick={() => navigate('/jobs')}>
+                <Icon name="Briefcase" className="mr-2" size={18} />
+                HR Вакансии
               </Button>
             </div>
             <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-6 justify-center lg:justify-start text-xs sm:text-sm text-muted-foreground">
