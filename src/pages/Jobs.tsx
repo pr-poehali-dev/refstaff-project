@@ -20,7 +20,7 @@ const POSITIONS: Record<string, string> = {
 };
 
 const EXPERIENCE_OPTIONS = [
-  { value: '', label: 'Любой опыт' },
+  { value: 'any', label: 'Любой опыт' },
   { value: 'no', label: 'Без опыта' },
   { value: '1-3', label: 'От 1 до 3 лет' },
   { value: '3-6', label: 'От 3 до 6 лет' },
@@ -28,7 +28,7 @@ const EXPERIENCE_OPTIONS = [
 ];
 
 const SALARY_OPTIONS = [
-  { value: '', label: 'Любая зарплата' },
+  { value: 'any', label: 'Любая зарплата' },
   { value: '30000', label: 'от 30 000 ₽' },
   { value: '50000', label: 'от 50 000 ₽' },
   { value: '80000', label: 'от 80 000 ₽' },
@@ -151,8 +151,8 @@ export default function Jobs() {
   const [position, setPosition] = useState('hr_manager');
   const [city, setCity] = useState('');
   const [cityInput, setCityInput] = useState('');
-  const [salaryFrom, setSalaryFrom] = useState('');
-  const [experience, setExperience] = useState('');
+  const [salaryFrom, setSalaryFrom] = useState('any');
+  const [experience, setExperience] = useState('any');
   const [source, setSource] = useState('all');
 
   const [pageHh, setPageHh] = useState(0);
@@ -172,8 +172,8 @@ export default function Jobs() {
         page_tv: String(ptv),
       });
       if (city) params.set('city', city);
-      if (salaryFrom) params.set('salary_from', salaryFrom);
-      if (experience) params.set('experience', experience);
+      if (salaryFrom && salaryFrom !== 'any') params.set('salary_from', salaryFrom);
+      if (experience && experience !== 'any') params.set('experience', experience);
 
       const res = await fetch(`${API_URL}?${params}`);
       const json: ApiResponse = await res.json();
