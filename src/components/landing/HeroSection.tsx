@@ -43,10 +43,7 @@ export function HeroSection({ onRegister, onLogin }: HeroSectionProps) {
                 <Icon name="LogIn" className="mr-2" size={18} />
                 Войти
               </Button>
-              <Button size="default" variant="ghost" className="animate-scale-in text-sm sm:text-base" style={{ animationDelay: '0.4s' }} onClick={() => navigate('/jobs')}>
-                <Icon name="Briefcase" className="mr-2" size={18} />
-                HR Вакансии
-              </Button>
+
             </div>
             <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row items-center gap-3 sm:gap-6 justify-center lg:justify-start text-xs sm:text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
