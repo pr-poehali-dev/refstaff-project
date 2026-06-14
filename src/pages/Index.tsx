@@ -2112,7 +2112,7 @@ function Index() {
         isSaving={isSavingCompany}
       />
 
-      <Dialog open={showChatDialog} onOpenChange={(open) => { setShowChatDialog(open); if (!open && chatPollRef.current) { clearInterval(chatPollRef.current); chatPollRef.current = null; } }}>
+      <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
         <DialogContent hideClose className="max-w-4xl h-[100dvh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
           <div className="flex h-full overflow-hidden">
             {/* Sidebar — on mobile hidden when chat is open */}
