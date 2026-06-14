@@ -2203,43 +2203,71 @@ function Index() {
                     {chatMessages.length === 0 && (
                       <div className="flex items-center justify-center h-full text-sm text-muted-foreground">Начните диалог</div>
                     )}
-                    {chatMessages.map((msg) => (
-                      <div key={msg.id} className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[90%] sm:max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-2 py-1.5 sm:px-4 sm:py-2`}>
-                          <div className="text-[10px] sm:text-xs opacity-70 mb-0.5">{msg.senderName}</div>
-                          {msg.message && <div className="text-xs sm:text-sm break-words">{msg.message}</div>}
-                          {msg.attachments && msg.attachments.map((att, idx) => (
-                            <div key={idx} className="mt-1.5">
-                              {att.type === 'image' ? (
-                                <img
-                                  src={att.url}
-                                  alt={att.name}
-                                  className="rounded max-w-full max-h-32 sm:max-h-48 object-contain cursor-pointer hover:opacity-90 transition-opacity"
-                                  onClick={() => setLightboxImage(att.url)}
-                                  loading="lazy"
-                                  decoding="async"
-                                />
-                              ) : (
-                                <a
-                                  href={att.url}
-                                  download={att.name}
-                                  className="flex items-center gap-1.5 p-1.5 bg-background/10 rounded hover:bg-background/20 transition-colors group"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <Icon name="FileText" size={14} />
-                                  <div className="flex-1 min-w-0">
-                                    <p className="text-[10px] sm:text-xs font-medium truncate">{att.name}</p>
-                                    <p className="text-[10px] sm:text-xs opacity-70">{(att.size / 1024).toFixed(1)} KB</p>
-                                  </div>
-                                  <Icon name="Download" size={12} className="opacity-60 group-hover:opacity-100 shrink-0" />
-                                </a>
-                              )}
+                    {chatMessages.map((msg, idx) => {
+                      const msgDate = new Date(msg.createdAt);
+                      const prevMsg = chatMessages[idx - 1];
+                      const prevDate = prevMsg ? new Date(prevMsg.createdAt) : null;
+                      const showDateSeparator = !prevDate ||
+                        msgDate.getFullYear() !== prevDate.getFullYear() ||
+                        msgDate.getMonth() !== prevDate.getMonth() ||
+                        msgDate.getDate() !== prevDate.getDate();
+                      const today = new Date();
+                      const yesterday = new Date(today);
+                      yesterday.setDate(today.getDate() - 1);
+                      const isToday = msgDate.toDateString() === today.toDateString();
+                      const isYesterday = msgDate.toDateString() === yesterday.toDateString();
+                      const dateLabel = isToday
+                        ? 'Сегодня'
+                        : isYesterday
+                        ? 'Вчера'
+                        : msgDate.toLocaleDateString(undefined, { day: 'numeric', month: 'long', year: msgDate.getFullYear() !== today.getFullYear() ? 'numeric' : undefined });
+                      return (
+                        <div key={msg.id}>
+                          {showDateSeparator && (
+                            <div className="flex items-center gap-2 my-3">
+                              <div className="flex-1 h-px bg-border" />
+                              <span className="text-[10px] sm:text-xs text-muted-foreground px-2 shrink-0">{dateLabel}</span>
+                              <div className="flex-1 h-px bg-border" />
                             </div>
-                          ))}
-                          <div className="text-[10px] sm:text-xs opacity-70 mt-0.5">{msg.timestamp}</div>
+                          )}
+                          <div className={`flex ${msg.isOwn ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-[90%] sm:max-w-[70%] ${msg.isOwn ? 'bg-primary text-primary-foreground' : 'bg-muted'} rounded-lg px-2 py-1.5 sm:px-4 sm:py-2`}>
+                              <div className="text-[10px] sm:text-xs opacity-70 mb-0.5">{msg.senderName}</div>
+                              {msg.message && <div className="text-xs sm:text-sm break-words">{msg.message}</div>}
+                              {msg.attachments && msg.attachments.map((att, aidx) => (
+                                <div key={aidx} className="mt-1.5">
+                                  {att.type === 'image' ? (
+                                    <img
+                                      src={att.url}
+                                      alt={att.name}
+                                      className="rounded max-w-full max-h-32 sm:max-h-48 object-contain cursor-pointer hover:opacity-90 transition-opacity"
+                                      onClick={() => setLightboxImage(att.url)}
+                                      loading="lazy"
+                                      decoding="async"
+                                    />
+                                  ) : (
+                                    <a
+                                      href={att.url}
+                                      download={att.name}
+                                      className="flex items-center gap-1.5 p-1.5 bg-background/10 rounded hover:bg-background/20 transition-colors group"
+                                      onClick={(e) => e.stopPropagation()}
+                                    >
+                                      <Icon name="FileText" size={14} />
+                                      <div className="flex-1 min-w-0">
+                                        <p className="text-[10px] sm:text-xs font-medium truncate">{att.name}</p>
+                                        <p className="text-[10px] sm:text-xs opacity-70">{(att.size / 1024).toFixed(1)} KB</p>
+                                      </div>
+                                      <Icon name="Download" size={12} className="opacity-60 group-hover:opacity-100 shrink-0" />
+                                    </a>
+                                  )}
+                                </div>
+                              ))}
+                              <div className="text-[10px] sm:text-xs opacity-70 mt-0.5">{msg.timestamp}</div>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                     <div ref={chatMessagesEndRef} />
                   </div>
                   <div className="p-1.5 sm:p-4 border-t shrink-0">

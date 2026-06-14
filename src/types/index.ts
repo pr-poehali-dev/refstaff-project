@@ -62,6 +62,7 @@ export interface ChatMessage {
   senderName: string;
   message: string;
   timestamp: string;
+  createdAt: string;
   isOwn: boolean;
   attachments?: {
     type: 'image' | 'file';

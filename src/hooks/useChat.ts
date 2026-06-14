@@ -84,7 +84,8 @@ export function useChat(params: {
         senderId: m.sender_id,
         senderName: m.sender_name || 'Сотрудник',
         message: m.message,
-        timestamp: new Date(m.created_at).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }),
+        timestamp: new Date(m.created_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }),
+        createdAt: m.created_at,
         isOwn: m.sender_id === currentUser?.id,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         attachments: (m as any).attachment_url ? [{
