@@ -85,14 +85,12 @@ function VacancyCard({ v }: { v: Vacancy }) {
       <CardHeader className="pb-2 p-4">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <a
-              href={v.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold text-sm sm:text-base hover:text-primary transition-colors line-clamp-2"
+            <button
+              onClick={() => v.url && window.open(v.url, '_blank', 'noopener,noreferrer')}
+              className="font-semibold text-sm sm:text-base hover:text-primary transition-colors line-clamp-2 text-left"
             >
               {v.title}
-            </a>
+            </button>
             <p className="text-sm text-muted-foreground mt-1 truncate">{v.company}</p>
           </div>
           <Badge variant="outline" className={`text-[10px] shrink-0 ${sourceBadgeClass}`}>
@@ -132,14 +130,13 @@ function VacancyCard({ v }: { v: Vacancy }) {
             dangerouslySetInnerHTML={{ __html: v.snippet.replace(/<[^>]*>/g, '') }}
           />
         )}
-        <a
-          href={v.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1"
+        <button
+          onClick={() => v.url && window.open(v.url, '_blank', 'noopener,noreferrer')}
+          disabled={!v.url}
+          className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-1 disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Открыть вакансию <Icon name="ExternalLink" size={12} />
-        </a>
+        </button>
       </CardContent>
     </Card>
   );
