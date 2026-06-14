@@ -24,6 +24,17 @@ HR_POSITIONS = {
     'hrg': 'HRG generalist',
 }
 
+# Ключевые слова для фильтрации по названию должности (job-name)
+POSITION_KEYWORDS = {
+    'recruiter': ['рекрутер', 'рекрутинг', 'recruiter'],
+    'hr_manager': ['hr менеджер', 'hr-менеджер', 'менеджер по персонал', 'hr manager', 'управлени персонал'],
+    'hr_selection': ['подбор персонал', 'подбору персонал', 'менеджер по подбор', 'специалист по подбор'],
+    'hrd': ['директор по персонал', 'hrd', 'hr директор', 'hr-директор'],
+    'hrbp': ['hrbp', 'hr бизнес партнер', 'hr-бизнес-партнер', 'бизнес партнер'],
+    'hr_admin': ['кадровик', 'кадровое делопроизводств', 'специалист по кадр', 'инспектор по кадр', 'кадровый специалист'],
+    'hrg': ['hrg', 'hr generalist', 'hr-generalist', 'hr генералист'],
+}
+
 # Опыт hh.ru: noExperience, between1And3, between3And6, moreThan6
 HH_EXPERIENCE_MAP = {
     'no': 'noExperience',
@@ -35,6 +46,13 @@ HH_EXPERIENCE_MAP = {
 PER_PAGE = 20
 
 
+def is_relevant(title: str, position_key: str) -> bool:
+    """Проверяет, что название вакансии соответствует HR-должности."""
+    title_lower = title.lower()
+    keywords = POSITION_KEYWORDS.get(position_key, [])
+    return any(kw in title_lower for kw in keywords)
+
+
 def fetch_hh(position_key: str, city: str, salary_from: int | None,
              experience: str | None, page: int) -> dict:
     """Загружает вакансии с hh.ru через публичный API."""
@@ -42,6 +60,7 @@ def fetch_hh(position_key: str, city: str, salary_from: int | None,
 
     params: dict = {
         'text': text,
+        'search_field': 'name',  # искать только в названии вакансии
         'per_page': PER_PAGE,
         'page': page,
         'order_by': 'publication_time',
@@ -143,6 +162,12 @@ def fetch_trudvsem(position_key: str, city: str, salary_from: int | None,
             vacancies = []
             for item in items:
                 v = item.get('vacancy', {})
+                job_name = v.get('job-name', '')
+
+                # Фильтруем нерелевантные вакансии по названию должности
+                if not is_relevant(job_name, position_key):
+                    continue
+
                 salary_min = v.get('salary_min')
                 salary_max = v.get('salary_max')
                 salary_raw = v.get('salary', '')
@@ -171,7 +196,7 @@ def fetch_trudvsem(position_key: str, city: str, salary_from: int | None,
                 vacancies.append({
                     'id': f"tv_{v.get('id', '')}",
                     'source': 'trudvsem',
-                    'title': v.get('job-name', ''),
+                    'title': job_name,
                     'company': v.get('company', {}).get('name', ''),
                     'city': region_name,
                     'salary': salary_str,
