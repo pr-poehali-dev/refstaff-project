@@ -62,7 +62,7 @@ const PAYOUT_STATUS: Record<string, { label: string; color: string }> = {
   rejected: { label: 'Отклонено', color: 'bg-red-100 text-red-800' },
 };
 
-type AuthStep = 'choose' | 'enter_code' | 'messenger_wait' | 'enter_otp';
+type AuthStep = 'choose' | 'messenger_wait' | 'enter_otp';
 type Messenger = 'telegram' | 'max';
 
 export default function Partner() {
@@ -75,7 +75,6 @@ export default function Partner() {
   // Auth flow
   const [authStep, setAuthStep] = useState<AuthStep>('choose');
   const [messenger, setMessenger] = useState<Messenger>('telegram');
-  const [partnerCodeInput, setPartnerCodeInput] = useState('');
   const [sessionToken, setSessionToken] = useState('');
   const [deepLink, setDeepLink] = useState('');
   const [otp, setOtp] = useState('');
@@ -135,21 +134,18 @@ export default function Partner() {
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, []);
 
-  // Шаг 1 — ввод кода партнёра и выбор мессенджера
-  const handleSendToMessenger = async () => {
-    const code = partnerCodeInput.trim().toUpperCase();
-    if (!code) { toast({ title: 'Введите ваш партнёрский код', variant: 'destructive' }); return; }
+  // Выбор мессенджера — сразу открываем бота
+  const handleSendToMessenger = async (selectedMessenger: Messenger) => {
+    setMessenger(selectedMessenger);
     setSubmitting(true);
     try {
-      const data = await apiCall('create_login_session', 'POST', { partner_code: code, messenger });
+      const data = await apiCall('create_login_session', 'POST', { messenger: selectedMessenger });
       if (data.error) {
         toast({ title: data.error, variant: 'destructive' });
       } else {
         setSessionToken(data.session_token);
         setDeepLink(data.deep_link);
         setAuthStep('messenger_wait');
-
-        // Открываем мессенджер
         window.open(data.deep_link, '_blank');
 
         // Поллинг — ждём code_sent
@@ -197,10 +193,9 @@ export default function Partner() {
       if (data.error) {
         toast({ title: data.error, variant: 'destructive' });
       } else {
-        toast({ title: 'Регистрация успешна!', description: `Ваш партнёрский код: ${data.partner_code}` });
+        toast({ title: 'Регистрация успешна!', description: 'Теперь войдите через Telegram или MAX' });
         setShowRegister(false);
-        setPartnerCodeInput(data.partner_code);
-        setAuthStep('enter_code');
+        setAuthStep('choose');
       }
     } finally {
       setSubmitting(false);
@@ -281,80 +276,44 @@ export default function Partner() {
             <p className="text-sm text-muted-foreground">Приглашайте компании в iHUNT и зарабатывайте вместе с нами</p>
           </div>
 
-          {/* Шаг: выбор способа */}
+          {/* Шаг: выбор мессенджера */}
           {authStep === 'choose' && (
             <Card>
               <CardContent className="pt-6 space-y-4">
                 <p className="text-sm font-medium text-center">Войдите через мессенджер</p>
+                <p className="text-xs text-center text-muted-foreground">Нажмите кнопку — откроется бот, который пришлёт вам код</p>
 
-                {/* Выбор мессенджера */}
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   <button
-                    onClick={() => { setMessenger('telegram'); setAuthStep('enter_code'); }}
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-transparent hover:border-primary hover:bg-primary/5 transition-all"
+                    onClick={() => handleSendToMessenger('telegram')}
+                    disabled={submitting}
+                    className="flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-transparent hover:border-[#229ED9] hover:bg-blue-50 transition-all disabled:opacity-50"
                   >
-                    <div className="w-12 h-12 rounded-full bg-[#229ED9] flex items-center justify-center">
-                      <Icon name="Send" size={24} className="text-white" />
+                    <div className="w-14 h-14 rounded-full bg-[#229ED9] flex items-center justify-center">
+                      <Icon name="Send" size={26} className="text-white" />
                     </div>
-                    <span className="text-sm font-medium">Telegram</span>
+                    <span className="text-sm font-semibold">Telegram</span>
                   </button>
                   <button
-                    onClick={() => { setMessenger('max'); setAuthStep('enter_code'); }}
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-transparent hover:border-primary hover:bg-primary/5 transition-all"
+                    onClick={() => handleSendToMessenger('max')}
+                    disabled={submitting}
+                    className="flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-transparent hover:border-[#0066CC] hover:bg-blue-50 transition-all disabled:opacity-50"
                   >
-                    <div className="w-12 h-12 rounded-full bg-[#0066CC] flex items-center justify-center">
-                      <span className="text-white font-bold text-lg">M</span>
+                    <div className="w-14 h-14 rounded-full bg-[#0066CC] flex items-center justify-center">
+                      <span className="text-white font-bold text-xl">M</span>
                     </div>
-                    <span className="text-sm font-medium">MAX</span>
+                    <span className="text-sm font-semibold">MAX</span>
                   </button>
                 </div>
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
-                  <div className="relative flex justify-center text-xs text-muted-foreground bg-white px-2 w-fit mx-auto">ещё не партнёр?</div>
+                  <div className="relative flex justify-center"><span className="text-xs text-muted-foreground bg-white px-3">ещё не партнёр?</span></div>
                 </div>
 
                 <Button variant="outline" className="w-full" onClick={() => setShowRegister(true)}>
                   <Icon name="UserPlus" size={16} className="mr-2" />
                   Зарегистрироваться
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-
-          {/* Шаг: ввод кода партнёра */}
-          {authStep === 'enter_code' && (
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <button onClick={() => setAuthStep('choose')} className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-                  <Icon name="ArrowLeft" size={14} />
-                  Назад
-                </button>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${messenger === 'telegram' ? 'bg-[#229ED9]' : 'bg-[#0066CC]'}`}>
-                    {messenger === 'telegram'
-                      ? <Icon name="Send" size={18} className="text-white" />
-                      : <span className="text-white font-bold">M</span>}
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">Вход через {messenger === 'telegram' ? 'Telegram' : 'MAX'}</p>
-                    <p className="text-xs text-muted-foreground">Введите ваш партнёрский код</p>
-                  </div>
-                </div>
-                <div>
-                  <Label>Партнёрский код</Label>
-                  <Input
-                    placeholder="Например: ANNA1234"
-                    value={partnerCodeInput}
-                    onChange={e => setPartnerCodeInput(e.target.value.toUpperCase())}
-                    className="font-mono text-center text-lg tracking-widest mt-1"
-                    onKeyDown={e => e.key === 'Enter' && handleSendToMessenger()}
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">Код был выдан при регистрации</p>
-                </div>
-                <Button className="w-full" onClick={handleSendToMessenger} disabled={submitting}>
-                  {submitting ? 'Отправка...' : `Открыть ${messenger === 'telegram' ? 'Telegram' : 'MAX'}`}
-                  <Icon name="ExternalLink" size={14} className="ml-2" />
                 </Button>
               </CardContent>
             </Card>

@@ -116,20 +116,27 @@ def handler(event: dict, context) -> dict:
                 )
                 session = cur.fetchone()
                 if not session:
+                    tg_send(tg_bot_token, chat_id, '❌ Ссылка недействительна или истекла. Вернитесь на сайт и попробуйте снова.')
                     return {'statusCode': 200, 'body': 'ok'}
 
-                cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (session['partner_id'],))
+                # Ищем партнёра по telegram_chat_id
+                cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE telegram_chat_id = %s AND status = 'active'", (chat_id,))
                 partner = cur.fetchone()
+
                 if not partner:
+                    # Первый вход — партнёр ещё не привязан к TG
+                    tg_send(tg_bot_token, chat_id,
+                        '⚠️ Ваш Telegram не привязан к партнёрскому аккаунту.\n\n'
+                        'Обратитесь к администратору iHUNT для привязки вашего Telegram к партнёрскому аккаунту.'
+                    )
                     return {'statusCode': 200, 'body': 'ok'}
 
                 code = generate_code()
                 expires_at = datetime.utcnow() + timedelta(minutes=10)
                 cur.execute(
-                    f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, expires_at=%s WHERE session_token=%s",
-                    (chat_id, code, expires_at, session_token)
+                    f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
+                    (chat_id, code, partner['id'], expires_at, session_token)
                 )
-                cur.execute(f"UPDATE {SCHEMA}.hr_partners SET telegram_chat_id=%s WHERE id=%s", (chat_id, partner['id']))
                 conn.commit()
 
             tg_send(tg_bot_token, chat_id,
@@ -163,18 +170,23 @@ def handler(event: dict, context) -> dict:
                 if not session:
                     return {'statusCode': 200, 'body': 'ok'}
 
-                cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (session['partner_id'],))
+                # Ищем партнёра по max_user_id
+                cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE max_user_id = %s AND status = 'active'", (user_id,))
                 partner = cur.fetchone()
+
                 if not partner:
+                    max_send(max_bot_token, user_id,
+                        '⚠️ Ваш MAX не привязан к партнёрскому аккаунту.\n\n'
+                        'Обратитесь к администратору iHUNT для привязки.'
+                    )
                     return {'statusCode': 200, 'body': 'ok'}
 
                 code = generate_code()
                 expires_at = datetime.utcnow() + timedelta(minutes=10)
                 cur.execute(
-                    f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, expires_at=%s WHERE session_token=%s",
-                    (user_id, code, expires_at, start_payload)
+                    f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
+                    (user_id, code, partner['id'], expires_at, start_payload)
                 )
-                cur.execute(f"UPDATE {SCHEMA}.hr_partners SET max_user_id=%s WHERE id=%s", (user_id, partner['id']))
                 conn.commit()
 
             max_send(max_bot_token, user_id,
@@ -214,25 +226,16 @@ def handler(event: dict, context) -> dict:
                         return resp(409, {'error': 'Партнёр с таким email уже зарегистрирован'})
                     raise
 
-        # ── Создать сессию входа через Telegram или MAX ──────────────────────────
+        # ── Создать сессию входа через Telegram или MAX (без кода партнёра) ───────
         if action == 'create_login_session' and method == 'POST':
-            partner_code = body.get('partner_code', '').strip().upper()
             messenger = body.get('messenger', 'telegram')
 
-            if not partner_code:
-                return resp(400, {'error': 'Укажите код партнёра'})
-
+            session_token = generate_token()
+            expires_at = datetime.utcnow() + timedelta(minutes=15)
             with conn.cursor() as cur:
-                cur.execute(f"SELECT id, name FROM {SCHEMA}.hr_partners WHERE partner_code = %s AND status = 'active'", (partner_code,))
-                partner = cur.fetchone()
-                if not partner:
-                    return resp(404, {'error': 'Партнёр не найден. Проверьте код или зарегистрируйтесь'})
-
-                session_token = generate_token()
-                expires_at = datetime.utcnow() + timedelta(minutes=15)
                 cur.execute(
-                    f"INSERT INTO {SCHEMA}.partner_login_sessions (session_token, partner_id, messenger, expires_at) VALUES (%s, %s, %s, %s)",
-                    (session_token, partner['id'], messenger, expires_at)
+                    f"INSERT INTO {SCHEMA}.partner_login_sessions (session_token, messenger, expires_at) VALUES (%s, %s, %s)",
+                    (session_token, messenger, expires_at)
                 )
                 conn.commit()
 
