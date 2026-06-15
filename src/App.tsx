@@ -20,6 +20,7 @@ const VacancyTest = lazy(() => import("./pages/VacancyTest"));
 const PublicTest = lazy(() => import("./pages/PublicTest"));
 const CreateTest = lazy(() => import("./pages/CreateTest"));
 const CityLanding = lazy(() => import("./pages/CityLanding"));
+const Partner = lazy(() => import("./pages/Partner"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 
@@ -78,6 +79,7 @@ function AppRoutes() {
       <Route path="/test/:token" element={<VacancyTest />} />
       <Route path="/test-public/:token" element={<PublicTest />} />
       <Route path="/create-test" element={<CreateTest />} />
+      <Route path="/partner" element={<Partner />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
       <Route path="/:city" element={<CityLanding />} />

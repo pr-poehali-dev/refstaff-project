@@ -30,6 +30,7 @@ export function LandingFooter({ onAbout, onPrivacy, onTerms, onPersonalData }: L
               <li><a href="/blog" className="hover:text-primary">Блог</a></li>
               <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
               <li><span onClick={onAbout} className="hover:text-primary cursor-pointer">О нас</span></li>
+              <li><a href="/partner" className="hover:text-primary">Партнёрская программа</a></li>
             </ul>
           </nav>
           <nav aria-label="Правовая информация" className="col-span-2 sm:col-span-1">

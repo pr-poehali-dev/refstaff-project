@@ -1,0 +1,21 @@
+{
+  "tests": [
+    {
+      "name": "Register new partner",
+      "method": "POST",
+      "path": "/?action=register",
+      "body": {"name": "Анна Иванова", "email": "anna_test_888@example.com", "phone": "+79001234567"},
+      "expectedStatus": 200,
+      "expectedBody": {"partner_code": "string"},
+      "bodyMatcher": "partial"
+    },
+    {
+      "name": "Get profile without token",
+      "method": "GET",
+      "path": "/?action=profile",
+      "expectedStatus": 401,
+      "expectedBody": {"error": "string"},
+      "bodyMatcher": "partial"
+    }
+  ]
+}
