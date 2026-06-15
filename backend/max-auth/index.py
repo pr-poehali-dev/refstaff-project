@@ -141,7 +141,42 @@ def handler(event: dict, context) -> dict:
                 )
                 return {'statusCode': 200, 'body': 'ok'}
 
-            # Иначе — сессия регистрации
+            # Проверяем — это партнёрская сессия входа?
+            cursor.execute(
+                f"SELECT * FROM {DB_SCHEMA}.partner_login_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
+                (payload,)
+            )
+            partner_session = cursor.fetchone()
+
+            if partner_session:
+                cursor.execute(
+                    f"SELECT * FROM {DB_SCHEMA}.hr_partners WHERE max_user_id = %s AND status = 'active'",
+                    (max_user_id,)
+                )
+                partner = cursor.fetchone()
+
+                if not partner:
+                    max_send(bot_token, max_user_id,
+                        '⚠️ Ваш MAX не привязан к партнёрскому аккаунту iHUNT.\n\nОбратитесь к администратору.')
+                    return {'statusCode': 200, 'body': 'ok'}
+
+                import random as _r, string as _s
+                partner_code = ''.join(_r.choices(_s.digits, k=6))
+                from datetime import timedelta as _td
+                expires_at_p = datetime.utcnow() + _td(minutes=10)
+                cursor.execute(
+                    f"UPDATE {DB_SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
+                    (max_user_id, partner_code, partner['id'], expires_at_p, payload)
+                )
+                conn.commit()
+                max_send(bot_token, max_user_id,
+                    f"👋 Привет, {partner['name']}!\n\n"
+                    f"🔐 Ваш код для входа в партнёрский кабинет iHUNT:\n\n{partner_code}\n\n"
+                    f"Введите этот код на сайте. Код действует 10 минут."
+                )
+                return {'statusCode': 200, 'body': 'ok'}
+
+            # Иначе — сессия регистрации сотрудника
             cursor.execute(
                 f"SELECT * FROM {DB_SCHEMA}.max_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
                 (payload,)

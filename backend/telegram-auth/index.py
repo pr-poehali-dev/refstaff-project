@@ -149,7 +149,40 @@ def handler(event: dict, context) -> dict:
                     )
                     return {'statusCode': 200, 'body': 'ok'}
 
-                # Проверяем регистрационную сессию
+                # Проверяем — это партнёрская сессия?
+                cursor.execute(
+                    f"SELECT * FROM {DB_SCHEMA}.partner_login_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
+                    (session_token,)
+                )
+                partner_session = cursor.fetchone()
+
+                if partner_session:
+                    cursor.execute(
+                        f"SELECT * FROM {DB_SCHEMA}.hr_partners WHERE telegram_chat_id = %s AND status = 'active'",
+                        (chat_id,)
+                    )
+                    partner = cursor.fetchone()
+
+                    if not partner:
+                        tg_send(bot_token, chat_id,
+                            '⚠️ Ваш Telegram не привязан к партнёрскому аккаунту iHUNT.\n\nОбратитесь к администратору.')
+                        return {'statusCode': 200, 'body': 'ok'}
+
+                    partner_code = generate_code()
+                    partner_expires = datetime.utcnow() + timedelta(minutes=10)
+                    cursor.execute(
+                        f"UPDATE {DB_SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
+                        (chat_id, partner_code, partner['id'], partner_expires, session_token)
+                    )
+                    conn.commit()
+                    tg_send(bot_token, chat_id,
+                        f"👋 Привет, {partner['first_name'] if 'first_name' in partner else partner['name']}!\n\n"
+                        f"🔐 Ваш код для входа в партнёрский кабинет iHUNT:\n\n<b>{partner_code}</b>\n\n"
+                        f"Введите этот код на сайте. Код действует <b>10 минут</b>."
+                    )
+                    return {'statusCode': 200, 'body': 'ok'}
+
+                # Проверяем регистрационную сессию сотрудника
                 cursor.execute(
                     f"SELECT * FROM {DB_SCHEMA}.tg_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
                     (session_token,)
