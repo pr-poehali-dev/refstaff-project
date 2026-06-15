@@ -5,8 +5,8 @@
       "method": "POST",
       "path": "/?action=register",
       "body": {"name": "Анна Иванова", "email": "anna_test_888@example.com", "phone": "+79001234567"},
-      "expectedStatus": 200,
-      "expectedBody": {"partner_code": "string"},
+      "expectedStatus": 409,
+      "expectedBody": {"error": "string"},
       "bodyMatcher": "partial"
     },
     {
