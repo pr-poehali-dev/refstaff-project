@@ -311,42 +311,52 @@ def handler(event: dict, context) -> dict:
             if not session_token or not chat_id_val:
                 return resp(400, {'error': 'Неверные данные сессии'})
 
+            tg_id = int(chat_id_val) if messenger_type == 'telegram' else None
+            max_id = int(chat_id_val) if messenger_type == 'max' else None
+
             partner_code = generate_partner_code(name)
+            partner = None
+
             with conn.cursor() as cur:
-                for _ in range(5):
-                    cur.execute(f"SELECT id FROM {SCHEMA}.hr_partners WHERE partner_code = %s", (partner_code,))
-                    if not cur.fetchone():
-                        break
-                    partner_code = generate_partner_code(name)
+                # Если партнёр уже создан (повторный запрос) — найти по chat_id
+                if tg_id:
+                    cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE telegram_chat_id = %s", (tg_id,))
+                else:
+                    cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE max_user_id = %s", (max_id,))
+                existing = cur.fetchone()
+                if existing:
+                    partner = dict(existing)
+                else:
+                    for _ in range(5):
+                        cur.execute(f"SELECT id FROM {SCHEMA}.hr_partners WHERE partner_code = %s", (partner_code,))
+                        if not cur.fetchone():
+                            break
+                        partner_code = generate_partner_code(name)
 
-                tg_id = int(chat_id_val) if messenger_type == 'telegram' else None
-                max_id = int(chat_id_val) if messenger_type == 'max' else None
+                    try:
+                        cur.execute(
+                            f"INSERT INTO {SCHEMA}.hr_partners (name, email, phone, partner_code, telegram_chat_id, max_user_id) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+                            (name, email or None, phone or None, partner_code, tg_id, max_id)
+                        )
+                        new_id = cur.fetchone()['id']
+                        cur.execute(
+                            f"UPDATE {SCHEMA}.partner_login_sessions SET partner_id=%s WHERE session_token=%s",
+                            (new_id, session_token)
+                        )
+                        conn.commit()
 
-                try:
-                    cur.execute(
-                        f"INSERT INTO {SCHEMA}.hr_partners (name, email, phone, partner_code, telegram_chat_id, max_user_id) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id, partner_code",
-                        (name, email or None, phone or None, partner_code, tg_id, max_id)
-                    )
-                    row = cur.fetchone()
-                    new_id = row['id']
-                    cur.execute(
-                        f"UPDATE {SCHEMA}.partner_login_sessions SET partner_id=%s WHERE session_token=%s",
-                        (new_id, session_token)
-                    )
-                    conn.commit()
-                except Exception as e:
-                    conn.rollback()
-                    if 'unique' in str(e).lower():
-                        return resp(409, {'error': 'Партнёр с таким email уже зарегистрирован'})
-                    raise
-
-                cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (new_id,))
-                partner = cur.fetchone()
+                        cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (new_id,))
+                        partner = dict(cur.fetchone())
+                    except Exception as e:
+                        conn.rollback()
+                        if 'unique' in str(e).lower():
+                            return resp(409, {'error': 'Партнёр с таким email уже зарегистрирован'})
+                        raise
 
             d = dict(partner)
-            d['balance'] = float(d['balance'] or 0)
-            d['total_earned'] = float(d['total_earned'] or 0)
-            d['created_at'] = str(d['created_at'])
+            d['balance'] = float(d.get('balance') or 0)
+            d['total_earned'] = float(d.get('total_earned') or 0)
+            d['created_at'] = str(d.get('created_at', ''))
             d.pop('telegram_chat_id', None)
             d.pop('max_user_id', None)
             return resp(200, d)

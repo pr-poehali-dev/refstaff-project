@@ -204,12 +204,15 @@ export default function Partner() {
       });
       if (data.error) {
         toast({ title: data.error, variant: 'destructive' });
-      } else {
+      } else if (data.partner_code) {
         localStorage.setItem('partner_code', data.partner_code);
         setPartner(data);
+        setReferrals([]);
+        setPayouts([]);
         setAuthStep('choose');
-        loadPartnerData(data.partner_code);
         toast({ title: 'Добро пожаловать в партнёрскую программу!' });
+      } else {
+        toast({ title: 'Что-то пошло не так, попробуйте снова', variant: 'destructive' });
       }
     } finally {
       setSubmitting(false);
