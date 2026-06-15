@@ -385,7 +385,7 @@ export function VacanciesTab({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="edit-reward-amount" className="text-xs">Вознаграждение за рекомендацию, ₽</Label>
+                    <Label htmlFor="edit-reward-amount" className="text-xs">Бонус за рекомендацию, ₽</Label>
                     <Input
                       id="edit-reward-amount"
                       type="number"
