@@ -270,6 +270,17 @@ def handler(event: dict, context) -> dict:
                 if not session:
                     return resp(400, {'error': 'Неверный или истёкший код'})
 
+                # Если partner_id не задан — это новый партнёр, нужна регистрация
+                if not session['partner_id']:
+                    cur.execute(f"UPDATE {SCHEMA}.partner_login_sessions SET status='verified' WHERE session_token=%s", (session_token,))
+                    conn.commit()
+                    return resp(200, {
+                        'need_registration': True,
+                        'session_token': session_token,
+                        'messenger': session['messenger'],
+                        'chat_id': str(session['chat_id']),
+                    })
+
                 cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (session['partner_id'],))
                 partner = cur.fetchone()
                 if not partner:
@@ -277,6 +288,60 @@ def handler(event: dict, context) -> dict:
 
                 cur.execute(f"UPDATE {SCHEMA}.partner_login_sessions SET status='verified' WHERE session_token=%s", (session_token,))
                 conn.commit()
+
+            d = dict(partner)
+            d['balance'] = float(d['balance'] or 0)
+            d['total_earned'] = float(d['total_earned'] or 0)
+            d['created_at'] = str(d['created_at'])
+            d.pop('telegram_chat_id', None)
+            d.pop('max_user_id', None)
+            return resp(200, d)
+
+        # ── Завершить регистрацию (после подтверждения мессенджера) ──────────────
+        if action == 'complete_registration' and method == 'POST':
+            session_token = body.get('session_token', '').strip()
+            name = body.get('name', '').strip()
+            email = body.get('email', '').strip().lower()
+            phone = body.get('phone', '').strip()
+            messenger_type = body.get('messenger', 'telegram')
+            chat_id_val = body.get('chat_id', '').strip()
+
+            if not name:
+                return resp(400, {'error': 'Укажите имя'})
+            if not session_token or not chat_id_val:
+                return resp(400, {'error': 'Неверные данные сессии'})
+
+            partner_code = generate_partner_code(name)
+            with conn.cursor() as cur:
+                for _ in range(5):
+                    cur.execute(f"SELECT id FROM {SCHEMA}.hr_partners WHERE partner_code = %s", (partner_code,))
+                    if not cur.fetchone():
+                        break
+                    partner_code = generate_partner_code(name)
+
+                tg_id = int(chat_id_val) if messenger_type == 'telegram' else None
+                max_id = int(chat_id_val) if messenger_type == 'max' else None
+
+                try:
+                    cur.execute(
+                        f"INSERT INTO {SCHEMA}.hr_partners (name, email, phone, partner_code, telegram_chat_id, max_user_id) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id, partner_code",
+                        (name, email or None, phone or None, partner_code, tg_id, max_id)
+                    )
+                    row = cur.fetchone()
+                    new_id = row['id']
+                    cur.execute(
+                        f"UPDATE {SCHEMA}.partner_login_sessions SET partner_id=%s WHERE session_token=%s",
+                        (new_id, session_token)
+                    )
+                    conn.commit()
+                except Exception as e:
+                    conn.rollback()
+                    if 'unique' in str(e).lower():
+                        return resp(409, {'error': 'Партнёр с таким email уже зарегистрирован'})
+                    raise
+
+                cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (new_id,))
+                partner = cur.fetchone()
 
             d = dict(partner)
             d['balance'] = float(d['balance'] or 0)

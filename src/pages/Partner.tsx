@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+// Dialog used for add-referral and payout modals
 import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
@@ -62,7 +63,7 @@ const PAYOUT_STATUS: Record<string, { label: string; color: string }> = {
   rejected: { label: 'Отклонено', color: 'bg-red-100 text-red-800' },
 };
 
-type AuthStep = 'choose' | 'messenger_wait' | 'enter_otp';
+type AuthStep = 'choose' | 'messenger_wait' | 'enter_otp' | 'fill_profile';
 type Messenger = 'telegram' | 'max';
 
 export default function Partner() {
@@ -78,12 +79,12 @@ export default function Partner() {
   const [sessionToken, setSessionToken] = useState('');
   const [deepLink, setDeepLink] = useState('');
   const [otp, setOtp] = useState('');
+  const [pendingChatId, setPendingChatId] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Регистрация
-  const [showRegister, setShowRegister] = useState(false);
-  const [registerForm, setRegisterForm] = useState({ name: '', email: '', phone: '' });
+  // Форма профиля (для новых партнёров)
+  const [profileForm, setProfileForm] = useState({ name: '', email: '', phone: '' });
 
   // Кабинет
   const [showAddReferral, setShowAddReferral] = useState(false);
@@ -170,6 +171,10 @@ export default function Partner() {
       const data = await apiCall('verify_login_code', 'POST', { session_token: sessionToken, code: otp.trim() });
       if (data.error) {
         toast({ title: data.error, variant: 'destructive' });
+      } else if (data.need_registration) {
+        // Новый партнёр — нужно заполнить данные
+        setPendingChatId(data.chat_id);
+        setAuthStep('fill_profile');
       } else {
         localStorage.setItem('partner_code', data.partner_code);
         setPartner(data);
@@ -181,21 +186,30 @@ export default function Partner() {
     }
   };
 
-  // Регистрация
-  const handleRegister = async () => {
-    if (!registerForm.name || !registerForm.email) {
-      toast({ title: 'Заполните имя и email', variant: 'destructive' });
+  // Шаг 3 — заполнение данных при первой регистрации
+  const handleCompleteRegistration = async () => {
+    if (!profileForm.name) {
+      toast({ title: 'Укажите ваше имя', variant: 'destructive' });
       return;
     }
     setSubmitting(true);
     try {
-      const data = await apiCall('register', 'POST', registerForm);
+      const data = await apiCall('complete_registration', 'POST', {
+        session_token: sessionToken,
+        name: profileForm.name,
+        email: profileForm.email,
+        phone: profileForm.phone,
+        messenger,
+        chat_id: pendingChatId,
+      });
       if (data.error) {
         toast({ title: data.error, variant: 'destructive' });
       } else {
-        toast({ title: 'Регистрация успешна!', description: 'Теперь войдите через Telegram или MAX' });
-        setShowRegister(false);
+        localStorage.setItem('partner_code', data.partner_code);
+        setPartner(data);
         setAuthStep('choose');
+        loadPartnerData(data.partner_code);
+        toast({ title: 'Добро пожаловать в партнёрскую программу!' });
       }
     } finally {
       setSubmitting(false);
@@ -306,15 +320,7 @@ export default function Partner() {
                   </button>
                 </div>
 
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t" /></div>
-                  <div className="relative flex justify-center"><span className="text-xs text-muted-foreground bg-white px-3">ещё не партнёр?</span></div>
-                </div>
-
-                <Button variant="outline" className="w-full" onClick={() => setShowRegister(true)}>
-                  <Icon name="UserPlus" size={16} className="mr-2" />
-                  Зарегистрироваться
-                </Button>
+                <p className="text-xs text-center text-muted-foreground">Впервые? Просто откройте бот — он создаст аккаунт автоматически</p>
               </CardContent>
             </Card>
           )}
@@ -363,45 +369,63 @@ export default function Partner() {
                   onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   className="text-center text-2xl font-mono tracking-[0.5em]"
                   maxLength={6}
+                  autoFocus
                   onKeyDown={e => e.key === 'Enter' && handleVerifyOtp()}
                 />
                 <Button className="w-full" onClick={handleVerifyOtp} disabled={submitting || otp.length < 6}>
-                  {submitting ? 'Проверка...' : 'Войти'}
+                  {submitting ? 'Проверка...' : 'Продолжить'}
                 </Button>
-                <button className="text-xs text-muted-foreground w-full text-center hover:text-foreground" onClick={() => setAuthStep('enter_code')}>
-                  Отправить код повторно
+                <button className="text-xs text-muted-foreground w-full text-center hover:text-foreground" onClick={() => { setOtp(''); setAuthStep('choose'); }}>
+                  ← Попробовать снова
                 </button>
               </CardContent>
             </Card>
           )}
-        </div>
 
-        {/* Диалог регистрации */}
-        <Dialog open={showRegister} onOpenChange={setShowRegister}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Стать партнёром iHUNT</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-3">
-              <p className="text-sm text-muted-foreground">После регистрации вы получите уникальный партнёрский код для входа</p>
-              <div>
-                <Label>Имя и фамилия *</Label>
-                <Input placeholder="Иванова Анна" value={registerForm.name} onChange={e => setRegisterForm(p => ({ ...p, name: e.target.value }))} />
-              </div>
-              <div>
-                <Label>Email *</Label>
-                <Input type="email" placeholder="anna@example.com" value={registerForm.email} onChange={e => setRegisterForm(p => ({ ...p, email: e.target.value }))} />
-              </div>
-              <div>
-                <Label>Телефон</Label>
-                <Input placeholder="+7 900 000 00 00" value={registerForm.phone} onChange={e => setRegisterForm(p => ({ ...p, phone: e.target.value }))} />
-              </div>
-              <Button className="w-full" onClick={handleRegister} disabled={submitting}>
-                {submitting ? 'Регистрация...' : 'Зарегистрироваться'}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+          {/* Шаг: заполнение данных (новый партнёр) */}
+          {authStep === 'fill_profile' && (
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                <div className="text-center">
+                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Icon name="CheckCircle" size={24} className="text-green-600" />
+                  </div>
+                  <p className="font-semibold">Почти готово!</p>
+                  <p className="text-sm text-muted-foreground mt-1">Заполните данные для партнёрского аккаунта</p>
+                </div>
+                <div>
+                  <Label>Имя и фамилия *</Label>
+                  <Input
+                    placeholder="Иванова Анна"
+                    value={profileForm.name}
+                    onChange={e => setProfileForm(p => ({ ...p, name: e.target.value }))}
+                    autoFocus
+                  />
+                </div>
+                <div>
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    placeholder="anna@example.com"
+                    value={profileForm.email}
+                    onChange={e => setProfileForm(p => ({ ...p, email: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <Label>Телефон</Label>
+                  <Input
+                    placeholder="+7 900 000 00 00"
+                    value={profileForm.phone}
+                    onChange={e => setProfileForm(p => ({ ...p, phone: e.target.value }))}
+                  />
+                </div>
+                <Button className="w-full" onClick={handleCompleteRegistration} disabled={submitting || !profileForm.name}>
+                  {submitting ? 'Создаём аккаунт...' : 'Начать работу'}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     );
   }

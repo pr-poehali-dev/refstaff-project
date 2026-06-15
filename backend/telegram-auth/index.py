@@ -163,20 +163,30 @@ def handler(event: dict, context) -> dict:
                     )
                     partner = cursor.fetchone()
 
-                    if not partner:
-                        tg_send(bot_token, chat_id,
-                            '⚠️ Ваш Telegram не привязан к партнёрскому аккаунту iHUNT.\n\nОбратитесь к администратору.')
-                        return {'statusCode': 200, 'body': 'ok'}
-
                     partner_code = generate_code()
                     partner_expires = datetime.utcnow() + timedelta(minutes=10)
+
+                    if not partner:
+                        # Новый пользователь — регистрация: сохраняем chat_id, переходим к заполнению данных
+                        cursor.execute(
+                            f"UPDATE {DB_SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, expires_at=%s WHERE session_token=%s",
+                            (chat_id, partner_code, partner_expires, session_token)
+                        )
+                        conn.commit()
+                        tg_send(bot_token, chat_id,
+                            f"👋 Привет!\n\n"
+                            f"🔐 Ваш код для регистрации в партнёрском кабинете iHUNT:\n\n<b>{partner_code}</b>\n\n"
+                            f"Введите этот код на сайте. Код действует <b>10 минут</b>."
+                        )
+                        return {'statusCode': 200, 'body': 'ok'}
+
                     cursor.execute(
                         f"UPDATE {DB_SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
                         (chat_id, partner_code, partner['id'], partner_expires, session_token)
                     )
                     conn.commit()
                     tg_send(bot_token, chat_id,
-                        f"👋 Привет, {partner['first_name'] if 'first_name' in partner else partner['name']}!\n\n"
+                        f"👋 Привет, {partner['name']}!\n\n"
                         f"🔐 Ваш код для входа в партнёрский кабинет iHUNT:\n\n<b>{partner_code}</b>\n\n"
                         f"Введите этот код на сайте. Код действует <b>10 минут</b>."
                     )

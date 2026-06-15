@@ -155,23 +155,31 @@ def handler(event: dict, context) -> dict:
                 )
                 partner = cursor.fetchone()
 
+                code_val = generate_code()
+                expires_at_p = datetime.utcnow() + timedelta(minutes=10)
+
                 if not partner:
+                    # Новый пользователь — регистрация
+                    cursor.execute(
+                        f"UPDATE {DB_SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, expires_at=%s WHERE session_token=%s",
+                        (max_user_id, code_val, expires_at_p, payload)
+                    )
+                    conn.commit()
                     max_send(bot_token, max_user_id,
-                        '⚠️ Ваш MAX не привязан к партнёрскому аккаунту iHUNT.\n\nОбратитесь к администратору.')
+                        f"👋 Привет!\n\n"
+                        f"🔐 Ваш код для регистрации в партнёрском кабинете iHUNT:\n\n{code_val}\n\n"
+                        f"Введите этот код на сайте. Код действует 10 минут."
+                    )
                     return {'statusCode': 200, 'body': 'ok'}
 
-                import random as _r, string as _s
-                partner_code = ''.join(_r.choices(_s.digits, k=6))
-                from datetime import timedelta as _td
-                expires_at_p = datetime.utcnow() + _td(minutes=10)
                 cursor.execute(
                     f"UPDATE {DB_SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
-                    (max_user_id, partner_code, partner['id'], expires_at_p, payload)
+                    (max_user_id, code_val, partner['id'], expires_at_p, payload)
                 )
                 conn.commit()
                 max_send(bot_token, max_user_id,
                     f"👋 Привет, {partner['name']}!\n\n"
-                    f"🔐 Ваш код для входа в партнёрский кабинет iHUNT:\n\n{partner_code}\n\n"
+                    f"🔐 Ваш код для входа в партнёрский кабинет iHUNT:\n\n{code_val}\n\n"
                     f"Введите этот код на сайте. Код действует 10 минут."
                 )
                 return {'statusCode': 200, 'body': 'ok'}
