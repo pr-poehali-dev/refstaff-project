@@ -175,11 +175,17 @@ export default function Partner() {
         // Новый партнёр — нужно заполнить данные
         setPendingChatId(data.chat_id);
         setAuthStep('fill_profile');
-      } else {
+      } else if (data.partner_code) {
         localStorage.setItem('partner_code', data.partner_code);
         setPartner(data);
+        setReferrals([]);
+        setPayouts([]);
         setAuthStep('choose');
-        loadPartnerData(data.partner_code);
+        // Догружаем рефералы и выплаты в фоне
+        apiCall('referrals', 'GET', undefined, data.partner_code).then(r => { if (Array.isArray(r)) setReferrals(r); });
+        apiCall('payouts', 'GET', undefined, data.partner_code).then(p => { if (Array.isArray(p)) setPayouts(p); });
+      } else {
+        toast({ title: 'Ошибка входа, попробуйте снова', variant: 'destructive' });
       }
     } finally {
       setSubmitting(false);

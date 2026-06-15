@@ -261,42 +261,45 @@ def handler(event: dict, context) -> dict:
             session_token = body.get('session_token', '').strip()
             code = body.get('code', '').strip()
 
+            result = None
             with conn.cursor() as cur:
                 cur.execute(
-                    f"SELECT * FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status = 'code_sent' AND code = %s AND expires_at > NOW()",
+                    f"SELECT id, partner_id, messenger, chat_id, status, code, expires_at FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status = 'code_sent' AND code = %s AND expires_at > NOW()",
                     (session_token, code)
                 )
                 session = cur.fetchone()
                 if not session:
                     return resp(400, {'error': 'Неверный или истёкший код'})
 
-                # Если partner_id не задан — это новый партнёр, нужна регистрация
-                if not session['partner_id']:
+                session = dict(session)
+                partner_id = session.get('partner_id')
+
+                # Если partner_id не задан — новый партнёр, нужна регистрация
+                if not partner_id:
                     cur.execute(f"UPDATE {SCHEMA}.partner_login_sessions SET status='verified' WHERE session_token=%s", (session_token,))
                     conn.commit()
-                    return resp(200, {
+                    result = {
                         'need_registration': True,
                         'session_token': session_token,
-                        'messenger': session['messenger'],
-                        'chat_id': str(session['chat_id']),
-                    })
+                        'messenger': session.get('messenger', ''),
+                        'chat_id': str(session.get('chat_id', '')),
+                    }
+                else:
+                    cur.execute(f"SELECT id, name, email, phone, partner_code, balance, total_earned, clients_invited, clients_registered, status, created_at FROM {SCHEMA}.hr_partners WHERE id = %s", (partner_id,))
+                    row = cur.fetchone()
+                    if not row:
+                        return resp(404, {'error': 'Партнёр не найден'})
 
-                cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (session['partner_id'],))
-                row = cur.fetchone()
-                if not row:
-                    return resp(404, {'error': 'Партнёр не найден'})
+                    cur.execute(f"UPDATE {SCHEMA}.partner_login_sessions SET status='verified' WHERE session_token=%s", (session_token,))
+                    conn.commit()
 
-                cur.execute(f"UPDATE {SCHEMA}.partner_login_sessions SET status='verified' WHERE session_token=%s", (session_token,))
-                conn.commit()
+                    d = dict(row)
+                    d['balance'] = float(d['balance'] or 0)
+                    d['total_earned'] = float(d['total_earned'] or 0)
+                    d['created_at'] = str(d['created_at'])
+                    result = d
 
-                d = dict(row)
-                d['balance'] = float(d['balance'] or 0)
-                d['total_earned'] = float(d['total_earned'] or 0)
-                d['created_at'] = str(d['created_at'])
-                d.pop('telegram_chat_id', None)
-                d.pop('max_user_id', None)
-
-            return resp(200, d)
+            return resp(200, result)
 
         # ── Завершить регистрацию (после подтверждения мессенджера) ──────────────
         if action == 'complete_registration' and method == 'POST':
