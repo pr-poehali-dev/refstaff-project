@@ -282,19 +282,20 @@ def handler(event: dict, context) -> dict:
                     })
 
                 cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (session['partner_id'],))
-                partner = cur.fetchone()
-                if not partner:
+                row = cur.fetchone()
+                if not row:
                     return resp(404, {'error': 'Партнёр не найден'})
 
                 cur.execute(f"UPDATE {SCHEMA}.partner_login_sessions SET status='verified' WHERE session_token=%s", (session_token,))
                 conn.commit()
 
-            d = dict(partner)
-            d['balance'] = float(d['balance'] or 0)
-            d['total_earned'] = float(d['total_earned'] or 0)
-            d['created_at'] = str(d['created_at'])
-            d.pop('telegram_chat_id', None)
-            d.pop('max_user_id', None)
+                d = dict(row)
+                d['balance'] = float(d['balance'] or 0)
+                d['total_earned'] = float(d['total_earned'] or 0)
+                d['created_at'] = str(d['created_at'])
+                d.pop('telegram_chat_id', None)
+                d.pop('max_user_id', None)
+
             return resp(200, d)
 
         # ── Завершить регистрацию (после подтверждения мессенджера) ──────────────
