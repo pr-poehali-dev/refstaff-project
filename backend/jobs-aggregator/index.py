@@ -10,7 +10,7 @@ import urllib.error
 
 
 def get_hh_token() -> str:
-    """Возвращает access token приложения hh.ru из секретов."""
+    """Возвращает access token приложения hh.ru из секретов (если задан)."""
     return os.environ.get('HH_ACCESS_TOKEN', '')
 
 CORS_HEADERS = {
