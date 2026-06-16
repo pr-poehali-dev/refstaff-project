@@ -10,6 +10,7 @@ import Icon from '@/components/ui/icon';
 const API_URL = 'https://functions.poehali.dev/5ab7f550-e0f2-4f0e-8ce3-079e6069c1ac';
 
 const POSITIONS: Record<string, string> = {
+  all: 'Все должности',
   hr_manager: 'HR менеджер',
   recruiter: 'Рекрутер',
   hr_selection: 'Менеджер по подбору персонала',
@@ -145,7 +146,7 @@ function VacancyCard({ v }: { v: Vacancy }) {
 export default function Jobs() {
   const navigate = useNavigate();
 
-  const [position, setPosition] = useState('hr_manager');
+  const [position, setPosition] = useState('all');
   const [city, setCity] = useState('');
   const [cityInput, setCityInput] = useState('');
   const [salaryFrom, setSalaryFrom] = useState('any');

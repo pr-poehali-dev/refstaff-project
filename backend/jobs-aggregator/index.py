@@ -272,11 +272,36 @@ def handler(event: dict, context) -> dict:
     hh_result = {'vacancies': [], 'total': 0, 'pages': 0}
     tv_result = {'vacancies': [], 'total': 0, 'pages': 0}
 
-    if source in ('hh', 'all'):
-        hh_result = fetch_hh(position, city, salary_from, experience or None, page_hh)
-
-    if source in ('trudvsem', 'all'):
-        tv_result = fetch_trudvsem(position, city, salary_from, experience or None, page_tv)
+    # Если выбраны все должности — собираем по каждой и объединяем
+    if position == 'all':
+        all_positions = list(HR_POSITIONS.keys())
+        if source in ('hh', 'all'):
+            seen_ids = set()
+            merged_hh = []
+            for pos in all_positions:
+                r = fetch_hh(pos, city, salary_from, experience or None, 0)
+                for v in r.get('vacancies', []):
+                    if v['id'] not in seen_ids:
+                        seen_ids.add(v['id'])
+                        merged_hh.append(v)
+            merged_hh.sort(key=lambda v: v.get('published_at', ''), reverse=True)
+            hh_result = {'vacancies': merged_hh[:20], 'total': len(merged_hh), 'pages': 1}
+        if source in ('trudvsem', 'all'):
+            seen_ids = set()
+            merged_tv = []
+            for pos in all_positions:
+                r = fetch_trudvsem(pos, city, salary_from, experience or None, 0)
+                for v in r.get('vacancies', []):
+                    if v['id'] not in seen_ids:
+                        seen_ids.add(v['id'])
+                        merged_tv.append(v)
+            merged_tv.sort(key=lambda v: v.get('published_at', ''), reverse=True)
+            tv_result = {'vacancies': merged_tv[:20], 'total': len(merged_tv), 'pages': 1}
+    else:
+        if source in ('hh', 'all'):
+            hh_result = fetch_hh(position, city, salary_from, experience or None, page_hh)
+        if source in ('trudvsem', 'all'):
+            tv_result = fetch_trudvsem(position, city, salary_from, experience or None, page_tv)
 
     body = {
         'hh': {
