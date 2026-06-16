@@ -55,7 +55,8 @@ def is_relevant(title: str, position_key: str) -> bool:
 
 def fetch_hh(position_key: str, city: str, salary_from: int | None,
              experience: str | None, page: int) -> dict:
-    """Загружает вакансии с hh.ru через публичный API."""
+    """Загружает вакансии с hh.ru через API с авторизацией по Client ID/Secret."""
+    import os
     text = HR_POSITIONS.get(position_key, 'HR менеджер')
 
     params: dict = {
@@ -79,7 +80,14 @@ def fetch_hh(position_key: str, city: str, salary_from: int | None,
         params['experience'] = HH_EXPERIENCE_MAP[experience]
 
     url = 'https://api.hh.ru/vacancies?' + urllib.parse.urlencode(params)
-    req = urllib.request.Request(url, headers={'User-Agent': 'iHUNT/1.0 (hr-aggregator)'})
+    hh_headers = {'User-Agent': 'iHUNT/1.0 (hr-aggregator)'}
+    client_id = os.environ.get('HH_CLIENT_ID', '')
+    client_secret = os.environ.get('HH_CLIENT_SECRET', '')
+    if client_id:
+        hh_headers['HH-Client-Id'] = client_id
+    if client_secret:
+        hh_headers['HH-Client-Secret'] = client_secret
+    req = urllib.request.Request(url, headers=hh_headers)
 
     try:
         with urllib.request.urlopen(req, timeout=8) as resp:
