@@ -23,6 +23,7 @@ const CityLanding = lazy(() => import("./pages/CityLanding"));
 const Partner = lazy(() => import("./pages/Partner"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Jobs = lazy(() => import("./pages/Jobs"));
 
 // ErrorBoundary — ловит JS-краши и показывает кнопку перезагрузки вместо белого экрана
 interface ErrorBoundaryState { hasError: boolean; }
@@ -79,6 +80,7 @@ function AppRoutes() {
       <Route path="/test/:token" element={<VacancyTest />} />
       <Route path="/test-public/:token" element={<PublicTest />} />
       <Route path="/create-test" element={<CreateTest />} />
+      <Route path="/jobs" element={<Jobs />} />
       <Route path="/partner" element={<Partner />} />
       <Route path="/blog" element={<Blog />} />
       <Route path="/blog/:slug" element={<BlogPost />} />
