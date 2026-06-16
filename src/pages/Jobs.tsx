@@ -367,16 +367,16 @@ export default function Jobs() {
         {/* Source status */}
         {searched && data && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {source !== 'trudvsem' && (
-              <Badge variant={hhError ? 'destructive' : 'secondary'} className="text-xs">
-                <Icon name={hhError ? 'AlertCircle' : 'CheckCircle'} size={12} className="mr-1" />
-                hh.ru: {hhError ? 'недоступен' : `${hhTotal.toLocaleString()} вакансий`}
+            {source !== 'trudvsem' && !hhError && (
+              <Badge variant="secondary" className="text-xs">
+                <Icon name="CheckCircle" size={12} className="mr-1" />
+                hh.ru: {hhTotal.toLocaleString()} вакансий
               </Badge>
             )}
-            {source !== 'hh' && (
-              <Badge variant={tvError ? 'destructive' : 'secondary'} className="text-xs">
-                <Icon name={tvError ? 'AlertCircle' : 'CheckCircle'} size={12} className="mr-1" />
-                Trudvsem: {tvError ? 'недоступен' : `${tvTotal.toLocaleString()} вакансий`}
+            {source !== 'hh' && !tvError && (
+              <Badge variant="secondary" className="text-xs">
+                <Icon name="CheckCircle" size={12} className="mr-1" />
+                Trudvsem: {tvTotal.toLocaleString()} вакансий
               </Badge>
             )}
           </div>
