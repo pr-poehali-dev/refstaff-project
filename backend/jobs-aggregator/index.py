@@ -10,29 +10,8 @@ import urllib.error
 
 
 def get_hh_token() -> str:
-    """Получает OAuth2 токен приложения hh.ru через client_credentials."""
-    client_id = os.environ.get('HH_CLIENT_ID', '')
-    client_secret = os.environ.get('HH_CLIENT_SECRET', '')
-    if not client_id or not client_secret:
-        return ''
-    data = urllib.parse.urlencode({
-        'grant_type': 'client_credentials',
-        'client_id': client_id,
-        'client_secret': client_secret,
-    }).encode()
-    req = urllib.request.Request(
-        'https://hh.ru/oauth/token',
-        data=data,
-        headers={'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'iHUNT/1.0 (refstaff.ru)'},
-        method='POST',
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=8) as resp:
-            result = json.loads(resp.read().decode())
-            return result.get('access_token', '')
-    except Exception as e:
-        print(f"HH token error: {e}")
-        return ''
+    """Возвращает access token приложения hh.ru из секретов."""
+    return os.environ.get('HH_ACCESS_TOKEN', '')
 
 CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
