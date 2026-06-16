@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
 
@@ -45,12 +45,13 @@ const POPULAR_CITIES = [
 
 interface Vacancy {
   id: string;
-  source: 'hh' | 'trudvsem';
+  source: 'trudvsem';
   title: string;
   company: string;
   city: string;
   salary: string;
   salary_from: number | null;
+  salary_to: number | null;
   experience: string;
   schedule: string;
   is_remote: boolean;
@@ -67,23 +68,17 @@ interface SourceResult {
 }
 
 interface ApiResponse {
-  hh: SourceResult;
   trudvsem: SourceResult;
 }
 
 function VacancyCard({ v }: { v: Vacancy }) {
-  const sourceLabel = v.source === 'hh' ? 'hh.ru' : 'Trudvsem';
-  const sourceBadgeClass = v.source === 'hh'
-    ? 'bg-red-100 text-red-700 border-red-200'
-    : 'bg-blue-100 text-blue-700 border-blue-200';
-
   const publishedDate = v.published_at
     ? new Date(v.published_at).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short' })
     : '';
 
   return (
     <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-2 p-4">
+      <CardContent className="p-4 space-y-2">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
             <button
@@ -94,12 +89,10 @@ function VacancyCard({ v }: { v: Vacancy }) {
             </button>
             <p className="text-sm text-muted-foreground mt-1 truncate">{v.company}</p>
           </div>
-          <Badge variant="outline" className={`text-[10px] shrink-0 ${sourceBadgeClass}`}>
-            {sourceLabel}
+          <Badge variant="outline" className="text-[10px] shrink-0 bg-blue-50 text-blue-700 border-blue-200">
+            Trudvsem
           </Badge>
         </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0 space-y-2">
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs sm:text-sm text-muted-foreground">
           {v.city && (
             <span className="flex items-center gap-1">
@@ -151,24 +144,16 @@ export default function Jobs() {
   const [cityInput, setCityInput] = useState('');
   const [salaryFrom, setSalaryFrom] = useState('any');
   const [experience, setExperience] = useState('any');
-  const [source, setSource] = useState('all');
-
-  const [pageHh, setPageHh] = useState(0);
   const [pageTv, setPageTv] = useState(0);
 
   const [data, setData] = useState<ApiResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
 
-  const fetchJobs = useCallback(async (phh: number, ptv: number) => {
+  const fetchJobs = useCallback(async (ptv: number) => {
     setLoading(true);
     try {
-      const params = new URLSearchParams({
-        position,
-        source,
-        page_hh: String(phh),
-        page_tv: String(ptv),
-      });
+      const params = new URLSearchParams({ position, page_tv: String(ptv) });
       if (city) params.set('city', city);
       if (salaryFrom && salaryFrom !== 'any') params.set('salary_from', salaryFrom);
       if (experience && experience !== 'any') params.set('experience', experience);
@@ -182,51 +167,28 @@ export default function Jobs() {
     } finally {
       setLoading(false);
     }
-  }, [position, city, salaryFrom, experience, source]);
+  }, [position, city, salaryFrom, experience]);
 
   useEffect(() => {
-    fetchJobs(0, 0);
+    fetchJobs(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = () => {
-    setPageHh(0);
     setPageTv(0);
-    fetchJobs(0, 0);
+    fetchJobs(0);
   };
 
-  const handleCitySelect = (c: string) => {
-    setCity(c);
-    setCityInput(c);
-  };
+  const handleCitySelect = (c: string) => { setCity(c); setCityInput(c); };
+  const handleRemote = () => { setCity('remote'); setCityInput('Удалённо'); };
 
-  const handleRemote = () => {
-    setCity('remote');
-    setCityInput('Удалённо');
-  };
-
-  const hhVacancies = data?.hh?.vacancies ?? [];
-  const tvVacancies = data?.trudvsem?.vacancies ?? [];
-
-  const allVacancies: Vacancy[] = source === 'hh'
-    ? hhVacancies
-    : source === 'trudvsem'
-    ? tvVacancies
-    : [...hhVacancies, ...tvVacancies].sort((a, b) =>
-        new Date(b.published_at).getTime() - new Date(a.published_at).getTime()
-      );
-
-  const hhTotal = data?.hh?.total ?? 0;
+  const vacancies = data?.trudvsem?.vacancies ?? [];
   const tvTotal = data?.trudvsem?.total ?? 0;
-  const hhPages = data?.hh?.pages ?? 1;
   const tvPages = data?.trudvsem?.pages ?? 1;
-
-  const hhError = data?.hh?.error;
   const tvError = data?.trudvsem?.error;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
@@ -243,23 +205,18 @@ export default function Jobs() {
       </header>
 
       <div className="container mx-auto px-4 py-6 max-w-5xl">
-        {/* Title */}
         <div className="mb-6">
           <h1 className="text-2xl sm:text-3xl font-bold mb-1">HR Вакансии</h1>
-          <p className="text-muted-foreground text-sm">Агрегатор вакансий для HR-специалистов с hh.ru и Trudvsem.ru</p>
+          <p className="text-muted-foreground text-sm">Агрегатор вакансий для HR-специалистов</p>
         </div>
 
-        {/* Filters */}
         <Card className="mb-6">
           <CardContent className="p-4 space-y-4">
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {/* Position */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Должность</label>
                 <Select value={position} onValueChange={setPosition}>
-                  <SelectTrigger className="text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
+                  <SelectTrigger className="text-sm"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     {Object.entries(POSITIONS).map(([k, v]) => (
                       <SelectItem key={k} value={k}>{v}</SelectItem>
@@ -267,14 +224,10 @@ export default function Jobs() {
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Experience */}
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Опыт работы</label>
                 <Select value={experience} onValueChange={setExperience}>
-                  <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Любой опыт" />
-                  </SelectTrigger>
+                  <SelectTrigger className="text-sm"><SelectValue placeholder="Любой опыт" /></SelectTrigger>
                   <SelectContent>
                     {EXPERIENCE_OPTIONS.map(o => (
                       <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
@@ -282,14 +235,10 @@ export default function Jobs() {
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Salary */}
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Зарплата от</label>
                 <Select value={salaryFrom} onValueChange={setSalaryFrom}>
-                  <SelectTrigger className="text-sm">
-                    <SelectValue placeholder="Любая зарплата" />
-                  </SelectTrigger>
+                  <SelectTrigger className="text-sm"><SelectValue placeholder="Любая зарплата" /></SelectTrigger>
                   <SelectContent>
                     {SALARY_OPTIONS.map(o => (
                       <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
@@ -297,24 +246,8 @@ export default function Jobs() {
                   </SelectContent>
                 </Select>
               </div>
-
-              {/* Source */}
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Источник</label>
-                <Select value={source} onValueChange={setSource}>
-                  <SelectTrigger className="text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Все источники</SelectItem>
-                    <SelectItem value="hh">hh.ru</SelectItem>
-                    <SelectItem value="trudvsem">Trudvsem.ru</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
             </div>
 
-            {/* City */}
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Город</label>
               <div className="flex gap-2">
@@ -326,8 +259,7 @@ export default function Jobs() {
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
                 <Button variant="outline" size="sm" onClick={handleRemote} className="shrink-0 text-xs">
-                  <Icon name="Home" size={14} className="mr-1" />
-                  Удалённо
+                  <Icon name="Home" size={14} className="mr-1" />Удалённо
                 </Button>
               </div>
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -356,41 +288,30 @@ export default function Jobs() {
             </div>
 
             <Button onClick={handleSearch} disabled={loading} className="w-full sm:w-auto">
-              {loading ? (
-                <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />Поиск...</>
-              ) : (
-                <><Icon name="Search" size={16} className="mr-2" />Найти вакансии</>
-              )}
+              {loading
+                ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />Поиск...</>
+                : <><Icon name="Search" size={16} className="mr-2" />Найти вакансии</>
+              }
             </Button>
           </CardContent>
         </Card>
 
-        {/* Source status */}
-        {searched && data && (
+        {searched && data && !tvError && (
           <div className="flex flex-wrap gap-2 mb-4">
-            {source !== 'trudvsem' && !hhError && (
-              <Badge variant="secondary" className="text-xs">
-                <Icon name="CheckCircle" size={12} className="mr-1" />
-                hh.ru: {hhTotal.toLocaleString()} вакансий
-              </Badge>
-            )}
-            {source !== 'hh' && !tvError && (
-              <Badge variant="secondary" className="text-xs">
-                <Icon name="CheckCircle" size={12} className="mr-1" />
-                Trudvsem: {tvTotal.toLocaleString()} вакансий
-              </Badge>
-            )}
+            <Badge variant="secondary" className="text-xs">
+              <Icon name="CheckCircle" size={12} className="mr-1" />
+              Найдено: {tvTotal.toLocaleString()} вакансий
+            </Badge>
           </div>
         )}
 
-        {/* Results */}
         {loading && (
           <div className="flex items-center justify-center py-20">
             <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
-        {!loading && searched && allVacancies.length === 0 && (
+        {!loading && searched && vacancies.length === 0 && (
           <Card>
             <CardContent className="py-16 text-center">
               <Icon name="SearchX" size={48} className="mx-auto mb-3 text-muted-foreground opacity-50" />
@@ -399,50 +320,27 @@ export default function Jobs() {
           </Card>
         )}
 
-        {!loading && allVacancies.length > 0 && (
+        {!loading && vacancies.length > 0 && (
           <div className="space-y-3">
-            {allVacancies.map(v => <VacancyCard key={v.id} v={v} />)}
+            {vacancies.map(v => <VacancyCard key={v.id} v={v} />)}
           </div>
         )}
 
-        {/* Pagination */}
-        {!loading && searched && (source === 'all' || source === 'hh') && hhPages > 1 && !hhError && (
+        {!loading && searched && tvPages > 1 && !tvError && (
           <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-white rounded-lg border">
-            <span className="text-sm text-muted-foreground">hh.ru — страница {pageHh + 1} из {hhPages}</span>
-            <div className="flex gap-2">
-              <Button
-                variant="outline" size="sm"
-                disabled={pageHh === 0}
-                onClick={() => { const p = pageHh - 1; setPageHh(p); fetchJobs(p, pageTv); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              >
-                <Icon name="ChevronLeft" size={16} />
-              </Button>
-              <Button
-                variant="outline" size="sm"
-                disabled={pageHh >= hhPages - 1}
-                onClick={() => { const p = pageHh + 1; setPageHh(p); fetchJobs(p, pageTv); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-              >
-                <Icon name="ChevronRight" size={16} />
-              </Button>
-            </div>
-          </div>
-        )}
-
-        {!loading && searched && (source === 'all' || source === 'trudvsem') && tvPages > 1 && !tvError && (
-          <div className="mt-3 flex flex-col sm:flex-row items-center justify-between gap-3 p-4 bg-white rounded-lg border">
-            <span className="text-sm text-muted-foreground">Trudvsem — страница {pageTv + 1} из {tvPages}</span>
+            <span className="text-sm text-muted-foreground">Страница {pageTv + 1} из {tvPages}</span>
             <div className="flex gap-2">
               <Button
                 variant="outline" size="sm"
                 disabled={pageTv === 0}
-                onClick={() => { const p = pageTv - 1; setPageTv(p); fetchJobs(pageHh, p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => { const p = pageTv - 1; setPageTv(p); fetchJobs(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
                 <Icon name="ChevronLeft" size={16} />
               </Button>
               <Button
                 variant="outline" size="sm"
                 disabled={pageTv >= tvPages - 1}
-                onClick={() => { const p = pageTv + 1; setPageTv(p); fetchJobs(pageHh, p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                onClick={() => { const p = pageTv + 1; setPageTv(p); fetchJobs(p); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
               >
                 <Icon name="ChevronRight" size={16} />
               </Button>
@@ -450,9 +348,8 @@ export default function Jobs() {
           </div>
         )}
 
-        {/* Footer note */}
         <p className="text-center text-xs text-muted-foreground mt-8">
-          Вакансии загружаются с hh.ru и Trudvsem.ru. Для отклика вы будете перенаправлены на сайт источника.
+          Вакансии загружаются с Trudvsem.ru. Для отклика вы будете перенаправлены на сайт источника.
         </p>
       </div>
     </div>
