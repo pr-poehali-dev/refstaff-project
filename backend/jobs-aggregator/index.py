@@ -3,9 +3,36 @@
 Поддерживает фильтрацию по позиции, городу, зарплате, опыту.
 """
 import json
+import os
 import urllib.request
 import urllib.parse
 import urllib.error
+
+
+def get_hh_token() -> str:
+    """Получает OAuth2 токен приложения hh.ru через client_credentials."""
+    client_id = os.environ.get('HH_CLIENT_ID', '')
+    client_secret = os.environ.get('HH_CLIENT_SECRET', '')
+    if not client_id or not client_secret:
+        return ''
+    data = urllib.parse.urlencode({
+        'grant_type': 'client_credentials',
+        'client_id': client_id,
+        'client_secret': client_secret,
+    }).encode()
+    req = urllib.request.Request(
+        'https://hh.ru/oauth/token',
+        data=data,
+        headers={'Content-Type': 'application/x-www-form-urlencoded', 'User-Agent': 'iHUNT/1.0 (refstaff.ru)'},
+        method='POST',
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            result = json.loads(resp.read().decode())
+            return result.get('access_token', '')
+    except Exception as e:
+        print(f"HH token error: {e}")
+        return ''
 
 CORS_HEADERS = {
     'Access-Control-Allow-Origin': '*',
@@ -55,8 +82,7 @@ def is_relevant(title: str, position_key: str) -> bool:
 
 def fetch_hh(position_key: str, city: str, salary_from: int | None,
              experience: str | None, page: int) -> dict:
-    """Загружает вакансии с hh.ru через API с авторизацией по Client ID/Secret."""
-    import os
+    """Загружает вакансии с hh.ru через OAuth2 токен приложения."""
     text = HR_POSITIONS.get(position_key, 'HR менеджер')
 
     params: dict = {
@@ -81,12 +107,9 @@ def fetch_hh(position_key: str, city: str, salary_from: int | None,
 
     url = 'https://api.hh.ru/vacancies?' + urllib.parse.urlencode(params)
     hh_headers = {'User-Agent': 'iHUNT/1.0 (refstaff.ru)'}
-    client_id = os.environ.get('HH_CLIENT_ID', '')
-    client_secret = os.environ.get('HH_CLIENT_SECRET', '')
-    if client_id:
-        hh_headers['HH-Client-Id'] = client_id
-    if client_secret:
-        hh_headers['HH-Client-Secret'] = client_secret
+    token = get_hh_token()
+    if token:
+        hh_headers['Authorization'] = f'Bearer {token}'
     req = urllib.request.Request(url, headers=hh_headers)
 
     try:
