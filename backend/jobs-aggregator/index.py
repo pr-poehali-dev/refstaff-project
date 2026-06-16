@@ -80,7 +80,7 @@ def fetch_hh(position_key: str, city: str, salary_from: int | None,
         params['experience'] = HH_EXPERIENCE_MAP[experience]
 
     url = 'https://api.hh.ru/vacancies?' + urllib.parse.urlencode(params)
-    hh_headers = {'User-Agent': 'iHUNT/1.0 (hr-aggregator)'}
+    hh_headers = {'User-Agent': 'iHUNT/1.0 (refstaff.ru)'}
     client_id = os.environ.get('HH_CLIENT_ID', '')
     client_secret = os.environ.get('HH_CLIENT_SECRET', '')
     if client_id:
@@ -90,7 +90,13 @@ def fetch_hh(position_key: str, city: str, salary_from: int | None,
     req = urllib.request.Request(url, headers=hh_headers)
 
     try:
-        with urllib.request.urlopen(req, timeout=8) as resp:
+        try:
+            raw_resp = urllib.request.urlopen(req, timeout=8)
+        except urllib.error.HTTPError as http_err:
+            body = http_err.read().decode('utf-8', errors='replace')
+            print(f"HH API HTTP {http_err.code}: {body[:500]}")
+            return {'vacancies': [], 'total': 0, 'pages': 0, 'error': f"HTTP {http_err.code}: {body[:200]}"}
+        with raw_resp as resp:
             data = json.loads(resp.read().decode())
             vacancies = []
             for v in data.get('items', []):
