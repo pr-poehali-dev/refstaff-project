@@ -54,7 +54,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
     if method == 'GET' and resource == 'companies':
         cur.execute(f"""
             SELECT c.id, c.name, c.inn, c.subscription_tier, c.subscription_expires_at,
-                   c.employee_count, c.created_at,
+                   c.employee_count, c.created_at, c.referred_by_partner_id,
+                   p.name as partner_name, p.partner_code,
                    COUNT(DISTINCT u.id) FILTER (WHERE u.role != 'superadmin') as users_count,
                    COUNT(DISTINCT v.id) as vacancies_count,
                    COUNT(DISTINCT r.id) as recommendations_count
@@ -62,7 +63,8 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             LEFT JOIN {SCHEMA}.users u ON u.company_id = c.id
             LEFT JOIN {SCHEMA}.vacancies v ON v.company_id = c.id
             LEFT JOIN {SCHEMA}.recommendations r ON r.vacancy_id = v.id
-            GROUP BY c.id
+            LEFT JOIN {SCHEMA}.hr_partners p ON p.id = c.referred_by_partner_id
+            GROUP BY c.id, p.name, p.partner_code
             ORDER BY c.created_at DESC
         """)
         return ok(list(cur.fetchall()))
@@ -115,6 +117,12 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         if not company_id:
             return err('company_id required')
         from datetime import datetime, timedelta
+
+        # Цены подписки для расчёта комиссии партнёру
+        SUBSCRIPTION_PRICES = {30: 9900, 365: 89900}
+        COMMISSION_RATE = 0.5
+        HOLD_DAYS = 30
+
         if tier == 'none' or days == 0:
             cur.execute(f"""
                 UPDATE {SCHEMA}.companies
@@ -122,13 +130,56 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 WHERE id = %s
             """, (company_id,))
             return ok({'success': True, 'expires_at': None})
+
         expires = datetime.utcnow() + timedelta(days=days)
         cur.execute(f"""
             UPDATE {SCHEMA}.companies
             SET subscription_tier = %s, subscription_expires_at = %s, updated_at = CURRENT_TIMESTAMP
             WHERE id = %s
         """, (tier, expires, company_id))
-        return ok({'success': True, 'expires_at': expires.isoformat()})
+
+        # Начисляем комиссию партнёру, если компания пришла по реф-ссылке
+        cur.execute(
+            f"SELECT referred_by_partner_id, name FROM {SCHEMA}.companies WHERE id = %s",
+            (company_id,)
+        )
+        company_row = cur.fetchone()
+        partner_commission_info = None
+        if company_row and company_row['referred_by_partner_id']:
+            partner_id = company_row['referred_by_partner_id']
+            price = SUBSCRIPTION_PRICES.get(days, days * 330)  # fallback: 330₽/день
+            commission = round(price * COMMISSION_RATE, 2)
+            commission_available_at = datetime.utcnow() + timedelta(days=HOLD_DAYS)
+
+            # Обновляем запись в partner_referrals
+            cur.execute(f"""
+                UPDATE {SCHEMA}.partner_referrals
+                SET commission_amount = %s,
+                    commission_available_at = %s,
+                    subscription_tier = %s,
+                    subscription_expires_at = %s,
+                    subscription_set_at = NOW(),
+                    status = 'subscribed',
+                    updated_at = NOW()
+                WHERE partner_id = %s AND company_id = %s
+            """, (commission, commission_available_at, tier, expires, partner_id, company_id))
+
+            # Начисляем на баланс партнёра (в pending — разблокируется после hold)
+            cur.execute(f"""
+                UPDATE {SCHEMA}.hr_partners
+                SET balance = balance + %s,
+                    total_earned = total_earned + %s,
+                    updated_at = NOW()
+                WHERE id = %s
+            """, (commission, commission, partner_id))
+
+            partner_commission_info = {
+                'partner_id': partner_id,
+                'commission': commission,
+                'available_at': commission_available_at.isoformat(),
+            }
+
+        return ok({'success': True, 'expires_at': expires.isoformat(), 'partner_commission': partner_commission_info})
 
     # --- UPDATE USER ---
     if method == 'PUT' and resource == 'user':

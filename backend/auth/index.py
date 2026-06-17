@@ -119,6 +119,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 company_name = body_data.get('company_name')
                 company_inn = body_data.get('company_inn')
                 employee_count = body_data.get('employee_count', 50)
+                ref_code = body_data.get('ref_code', '').strip()
                 
                 if not email or not password or not first_name or not last_name:
                     return {
@@ -162,15 +163,41 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                                 'isBase64Encoded': False
                             }
                     
+                    # Находим партнёра по реферальному коду
+                    referred_by_partner_id = None
+                    partner_row = None
+                    if ref_code:
+                        cursor.execute(
+                            "SELECT id, name, telegram_chat_id, max_user_id FROM t_p65890965_refstaff_project.hr_partners WHERE partner_code = %s AND status = 'active'",
+                            (ref_code,)
+                        )
+                        partner_row = cursor.fetchone()
+                        if partner_row:
+                            referred_by_partner_id = partner_row['id']
+
                     invite_token = os.urandom(16).hex()
                     cursor.execute("""
                         INSERT INTO t_p65890965_refstaff_project.companies 
-                        (name, employee_count, invite_token, subscription_tier, subscription_expires_at, inn, created_at, updated_at)
-                        VALUES (%s, %s, %s, 'trial', %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                        (name, employee_count, invite_token, subscription_tier, subscription_expires_at, inn, referred_by_partner_id, created_at, updated_at)
+                        VALUES (%s, %s, %s, 'trial', %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                         RETURNING id
-                    """, (company_name, employee_count, invite_token, datetime.utcnow() + timedelta(days=14), company_inn))
+                    """, (company_name, employee_count, invite_token, datetime.utcnow() + timedelta(days=14), company_inn, referred_by_partner_id))
                     company_id = cursor.fetchone()['id']
                     role = 'admin'
+
+                    # Создаём запись в partner_referrals
+                    if referred_by_partner_id:
+                        cursor.execute("""
+                            INSERT INTO t_p65890965_refstaff_project.partner_referrals
+                            (partner_id, company_id, company_name, contact_name, contact_email, status, source)
+                            VALUES (%s, %s, %s, %s, %s, 'registered', 'link')
+                        """, (referred_by_partner_id, company_id, company_name,
+                              f"{first_name} {last_name}", email))
+                        cursor.execute("""
+                            UPDATE t_p65890965_refstaff_project.hr_partners
+                            SET clients_registered = clients_registered + 1, updated_at = NOW()
+                            WHERE id = %s
+                        """, (referred_by_partner_id,))
                 else:
                     company_id = 1
                     role = 'employee'
@@ -196,7 +223,39 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """, (user_id, verification_token, expires_at))
                 
                 conn.commit()
-                
+
+                # Уведомляем партнёра о новой регистрации по его ссылке
+                if referred_by_partner_id and partner_row and company_name:
+                    tg_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+                    tg_chat = partner_row.get('telegram_chat_id')
+                    if tg_token and tg_chat:
+                        try:
+                            notif_msg = (
+                                f"🎉 По вашей реферальной ссылке зарегистрировалась новая компания!\n\n"
+                                f"🏢 <b>{company_name}</b>\n"
+                                f"👤 Контакт: {first_name} {last_name[0]}.\n"
+                                f"📧 {email[:2]}***@{email.split('@')[-1]}\n\n"
+                                f"Как только компания оплатит подписку — вам будет начислена комиссия 50%."
+                            )
+                            tg_payload = json.dumps({'chat_id': tg_chat, 'text': notif_msg, 'parse_mode': 'HTML'}).encode()
+                            tg_req = urllib.request.Request(
+                                f'https://api.telegram.org/bot{tg_token}/sendMessage',
+                                data=tg_payload,
+                                headers={'Content-Type': 'application/json'}
+                            )
+                            urllib.request.urlopen(tg_req, timeout=5)
+                        except Exception:
+                            pass
+                    # Уведомление нам на email
+                    send_notification({
+                        'type': 'partner_referral_registered',
+                        'partner_id': referred_by_partner_id,
+                        'partner_name': partner_row.get('name', ''),
+                        'company_name': company_name,
+                        'contact_name': f"{first_name} {last_name}",
+                        'contact_email': email,
+                    })
+
                 import urllib.request
                 import urllib.parse
                 

@@ -64,8 +64,20 @@ function usePrefetch() {
   }, []);
 }
 
+// Сохраняем ref из URL в localStorage при переходе по реферальной ссылке
+function useRefCapture() {
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get('ref');
+    if (ref) {
+      localStorage.setItem('partner_ref', ref);
+    }
+  }, []);
+}
+
 function AppRoutes() {
   usePrefetch();
+  useRefCapture();
   return (
     <Routes>
       <Route path="/" element={<Index />} />

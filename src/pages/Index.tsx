@@ -847,7 +847,8 @@ function Index() {
           last_name: registerForm.lastName,
           company_name: registerForm.companyName,
           company_inn: registerForm.inn || undefined,
-          employee_count: parseInt(registerForm.employeeCount)
+          employee_count: parseInt(registerForm.employeeCount),
+          ref_code: localStorage.getItem('partner_ref') || undefined,
         })
       });
 

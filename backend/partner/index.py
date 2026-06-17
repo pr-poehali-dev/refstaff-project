@@ -1,7 +1,7 @@
 """
 Партнёрская программа для HR-партнёров.
-Регистрация и вход через Telegram/MAX, статистика, рефералы, выплаты.
-action=register|create_login_session|check_login_session|verify_login_code|profile|referrals|add_referral|payouts|request_payout
+Регистрация и вход через Telegram/MAX, статистика, рефералы, выплаты, профиль с реквизитами.
+action=register|create_login_session|check_login_session|verify_login_code|complete_registration|profile|update_profile|referrals|payouts|request_payout
 """
 import json
 import os
@@ -22,6 +22,14 @@ CORS_HEADERS = {
 
 SCHEMA = 't_p65890965_refstaff_project'
 MAX_API = 'https://platform-api.max.ru'
+
+# Стоимость подписки для расчёта комиссии (50%)
+SUBSCRIPTION_PRICES = {
+    30: 9900,    # 1 месяц — 9 900 ₽
+    365: 89900,  # 1 год — 89 900 ₽
+}
+COMMISSION_RATE = 0.5  # 50%
+HOLD_DAYS = 30
 
 
 def get_conn():
@@ -58,10 +66,27 @@ def max_send(token: str, user_id: int, text: str):
     return r.json()
 
 
+def notify_partner(partner: dict, tg_bot_token: str, max_bot_token: str, msg: str):
+    if partner.get('telegram_chat_id') and tg_bot_token:
+        try:
+            tg_send(tg_bot_token, partner['telegram_chat_id'], msg)
+        except Exception:
+            pass
+    if partner.get('max_user_id') and max_bot_token:
+        try:
+            max_send(max_bot_token, partner['max_user_id'], msg)
+        except Exception:
+            pass
+
+
 def get_partner_by_token(conn, token: str):
     with conn.cursor() as cur:
         cur.execute(
-            f"SELECT id, name, email, phone, partner_code, balance, total_earned, clients_invited, clients_registered, status, created_at, telegram_chat_id, max_user_id FROM {SCHEMA}.hr_partners WHERE partner_code = %s",
+            f"""SELECT id, name, email, phone, partner_code, balance, total_earned,
+                clients_invited, clients_registered, status, created_at,
+                telegram_chat_id, max_user_id,
+                payment_method, payment_details, inn, company_name, notes
+                FROM {SCHEMA}.hr_partners WHERE partner_code = %s""",
             (token,)
         )
         row = cur.fetchone()
@@ -74,12 +99,30 @@ def get_partner_by_token(conn, token: str):
         return d
 
 
+def mask_email(email: str) -> str:
+    if not email or '@' not in email:
+        return email or ''
+    local, domain = email.split('@', 1)
+    if len(local) <= 2:
+        return f"{'*' * len(local)}@{domain}"
+    return f"{local[0]}{'*' * (len(local) - 2)}{local[-1]}@{domain}"
+
+
+def mask_phone(phone: str) -> str:
+    if not phone:
+        return ''
+    digits = ''.join(c for c in phone if c.isdigit())
+    if len(digits) >= 4:
+        return phone[:3] + '*' * (len(phone) - 6) + phone[-3:]
+    return '*' * len(phone)
+
+
 def resp(status: int, body: dict):
-    return {'statusCode': status, 'headers': CORS_HEADERS, 'body': json.dumps(body, ensure_ascii=False)}
+    return {'statusCode': status, 'headers': CORS_HEADERS, 'body': json.dumps(body, ensure_ascii=False, default=str)}
 
 
 def handler(event: dict, context) -> dict:
-    """Партнёрская программа: регистрация/вход через Telegram или MAX, статистика, рефералы, выплаты."""
+    """Партнёрская программа: вход через Telegram/MAX, рефералы с комиссией, профиль с реквизитами."""
     if event.get('httpMethod') == 'OPTIONS':
         return {'statusCode': 200, 'headers': CORS_HEADERS, 'body': ''}
 
@@ -119,12 +162,10 @@ def handler(event: dict, context) -> dict:
                     tg_send(tg_bot_token, chat_id, '❌ Ссылка недействительна или истекла. Вернитесь на сайт и попробуйте снова.')
                     return {'statusCode': 200, 'body': 'ok'}
 
-                # Ищем партнёра по telegram_chat_id
                 cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE telegram_chat_id = %s AND status = 'active'", (chat_id,))
                 partner = cur.fetchone()
 
                 if not partner:
-                    # Первый вход — партнёр ещё не привязан к TG
                     tg_send(tg_bot_token, chat_id,
                         '⚠️ Ваш Telegram не привязан к партнёрскому аккаунту.\n\n'
                         'Обратитесь к администратору iHUNT для привязки вашего Telegram к партнёрскому аккаунту.'
@@ -170,14 +211,12 @@ def handler(event: dict, context) -> dict:
                 if not session:
                     return {'statusCode': 200, 'body': 'ok'}
 
-                # Ищем партнёра по max_user_id
                 cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE max_user_id = %s AND status = 'active'", (user_id,))
                 partner = cur.fetchone()
 
                 if not partner:
                     max_send(max_bot_token, user_id,
-                        '⚠️ Ваш MAX не привязан к партнёрскому аккаунту.\n\n'
-                        'Обратитесь к администратору iHUNT для привязки.'
+                        '⚠️ Ваш MAX не привязан к партнёрскому аккаунту.\n\nОбратитесь к администратору iHUNT для привязки.'
                     )
                     return {'statusCode': 200, 'body': 'ok'}
 
@@ -196,40 +235,9 @@ def handler(event: dict, context) -> dict:
             )
             return {'statusCode': 200, 'body': 'ok'}
 
-        # ── Регистрация — публичный эндпоинт ────────────────────────────────────
-        if action == 'register' and method == 'POST':
-            name = body.get('name', '').strip()
-            email = body.get('email', '').strip().lower()
-            phone = body.get('phone', '').strip()
-
-            if not name or not email:
-                return resp(400, {'error': 'Имя и email обязательны'})
-
-            partner_code = generate_partner_code(name)
-            with conn.cursor() as cur:
-                for _ in range(5):
-                    cur.execute(f"SELECT id FROM {SCHEMA}.hr_partners WHERE partner_code = %s", (partner_code,))
-                    if not cur.fetchone():
-                        break
-                    partner_code = generate_partner_code(name)
-                try:
-                    cur.execute(
-                        f"INSERT INTO {SCHEMA}.hr_partners (name, email, phone, partner_code) VALUES (%s, %s, %s, %s) RETURNING id, partner_code",
-                        (name, email, phone or None, partner_code)
-                    )
-                    row = cur.fetchone()
-                    conn.commit()
-                    return resp(200, {'id': row['id'], 'partner_code': row['partner_code']})
-                except Exception as e:
-                    conn.rollback()
-                    if 'unique' in str(e).lower():
-                        return resp(409, {'error': 'Партнёр с таким email уже зарегистрирован'})
-                    raise
-
-        # ── Создать сессию входа через Telegram или MAX (без кода партнёра) ───────
+        # ── Создать сессию входа через Telegram или MAX ───────────────────────────
         if action == 'create_login_session' and method == 'POST':
             messenger = body.get('messenger', 'telegram')
-
             session_token = generate_token()
             expires_at = datetime.utcnow() + timedelta(minutes=15)
             with conn.cursor() as cur:
@@ -261,7 +269,6 @@ def handler(event: dict, context) -> dict:
             session_token = body.get('session_token', '').strip()
             code = body.get('code', '').strip()
 
-            result = None
             with conn.cursor() as cur:
                 cur.execute(
                     f"SELECT id, partner_id, messenger, chat_id, status, code, expires_at FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status = 'code_sent' AND code = %s AND expires_at > NOW()",
@@ -274,32 +281,33 @@ def handler(event: dict, context) -> dict:
                 session = dict(session)
                 partner_id = session.get('partner_id')
 
-                # Если partner_id не задан — новый партнёр, нужна регистрация
                 if not partner_id:
                     cur.execute(f"UPDATE {SCHEMA}.partner_login_sessions SET status='verified' WHERE session_token=%s", (session_token,))
                     conn.commit()
-                    result = {
+                    return resp(200, {
                         'need_registration': True,
                         'session_token': session_token,
                         'messenger': session.get('messenger', ''),
                         'chat_id': str(session.get('chat_id', '')),
-                    }
+                    })
                 else:
-                    cur.execute(f"SELECT id, name, email, phone, partner_code, balance, total_earned, clients_invited, clients_registered, status, created_at FROM {SCHEMA}.hr_partners WHERE id = %s", (partner_id,))
+                    cur.execute(
+                        f"""SELECT id, name, email, phone, partner_code, balance, total_earned,
+                            clients_invited, clients_registered, status, created_at,
+                            payment_method, payment_details, inn, company_name, notes
+                            FROM {SCHEMA}.hr_partners WHERE id = %s""",
+                        (partner_id,)
+                    )
                     row = cur.fetchone()
                     if not row:
                         return resp(404, {'error': 'Партнёр не найден'})
-
                     cur.execute(f"UPDATE {SCHEMA}.partner_login_sessions SET status='verified' WHERE session_token=%s", (session_token,))
                     conn.commit()
-
                     d = dict(row)
                     d['balance'] = float(d['balance'] or 0)
                     d['total_earned'] = float(d['total_earned'] or 0)
                     d['created_at'] = str(d['created_at'])
-                    result = d
-
-            return resp(200, result)
+                    return resp(200, d)
 
         # ── Завершить регистрацию (после подтверждения мессенджера) ──────────────
         if action == 'complete_registration' and method == 'POST':
@@ -322,7 +330,6 @@ def handler(event: dict, context) -> dict:
             partner = None
 
             with conn.cursor() as cur:
-                # Если партнёр уже создан (повторный запрос) — найти по chat_id
                 if tg_id:
                     cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE telegram_chat_id = %s", (tg_id,))
                 else:
@@ -348,7 +355,6 @@ def handler(event: dict, context) -> dict:
                             (new_id, session_token)
                         )
                         conn.commit()
-
                         cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (new_id,))
                         partner = dict(cur.fetchone())
                     except Exception as e:
@@ -375,20 +381,76 @@ def handler(event: dict, context) -> dict:
 
         partner_id = partner['id']
 
+        # ── Профиль партнёра ──────────────────────────────────────────────────────
         if action == 'profile':
             return resp(200, partner)
 
+        # ── Обновить профиль / реквизиты ─────────────────────────────────────────
+        if action == 'update_profile' and method == 'POST':
+            name = body.get('name', '').strip() or partner['name']
+            email = body.get('email', '').strip().lower() or partner['email']
+            phone = body.get('phone', '').strip()
+            payment_method = body.get('payment_method', '').strip()
+            payment_details = body.get('payment_details', '').strip()
+            inn = body.get('inn', '').strip()
+            company_name = body.get('company_name', '').strip()
+            notes = body.get('notes', '').strip()
+
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"""UPDATE {SCHEMA}.hr_partners
+                        SET name=%s, email=%s, phone=%s, payment_method=%s,
+                            payment_details=%s, inn=%s, company_name=%s, notes=%s,
+                            updated_at=NOW()
+                        WHERE id=%s""",
+                    (name, email, phone or None, payment_method or None,
+                     payment_details or None, inn or None, company_name or None,
+                     notes or None, partner_id)
+                )
+                conn.commit()
+            return resp(200, {'success': True})
+
+        # ── Список клиентов (рефералов) с комиссией и hold ───────────────────────
         if action == 'referrals' and method == 'GET':
             with conn.cursor() as cur:
                 cur.execute(
-                    f"SELECT id, company_name, contact_name, contact_email, contact_phone, status, source, promo_code, created_at FROM {SCHEMA}.partner_referrals WHERE partner_id = %s ORDER BY created_at DESC",
+                    f"""SELECT id, company_name, contact_name, contact_email, contact_phone,
+                               status, source, created_at,
+                               commission_amount, commission_available_at,
+                               subscription_tier, subscription_expires_at, subscription_set_at
+                        FROM {SCHEMA}.partner_referrals
+                        WHERE partner_id = %s
+                        ORDER BY created_at DESC""",
                     (partner_id,)
                 )
-                referrals = [dict(r) for r in cur.fetchall()]
-                for r in referrals:
-                    r['created_at'] = str(r['created_at'])
+                referrals = []
+                now = datetime.utcnow()
+                for r in cur.fetchall():
+                    d = dict(r)
+                    # Маскируем контакты
+                    d['contact_email'] = mask_email(d.get('contact_email') or '')
+                    d['contact_phone'] = mask_phone(d.get('contact_phone') or '')
+                    # Первые 2 буквы имени + ***
+                    cn = d.get('contact_name') or ''
+                    d['contact_name'] = (cn[:2] + '***') if len(cn) > 2 else cn
+                    # Числа
+                    d['commission_amount'] = float(d['commission_amount'] or 0)
+                    # Hold статус
+                    avail = d.get('commission_available_at')
+                    if avail:
+                        d['hold_days_left'] = max(0, (avail - now).days)
+                        d['commission_available'] = avail <= now
+                    else:
+                        d['hold_days_left'] = None
+                        d['commission_available'] = False
+                    # Даты в строки
+                    for k in ('created_at', 'commission_available_at', 'subscription_expires_at', 'subscription_set_at'):
+                        if d.get(k):
+                            d[k] = str(d[k])
+                    referrals.append(d)
             return resp(200, referrals)
 
+        # ── Добавить клиента вручную ──────────────────────────────────────────────
         if action == 'add_referral' and method == 'POST':
             company_name = body.get('company_name', '').strip()
             contact_name = body.get('contact_name', '').strip()
@@ -401,30 +463,22 @@ def handler(event: dict, context) -> dict:
 
             with conn.cursor() as cur:
                 cur.execute(
-                    f"INSERT INTO {SCHEMA}.partner_referrals (partner_id, company_name, contact_name, contact_email, contact_phone, source, promo_code) VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING id",
-                    (partner_id, company_name, contact_name or None, contact_email or None, contact_phone or None, source, partner_token)
+                    f"INSERT INTO {SCHEMA}.partner_referrals (partner_id, company_name, contact_name, contact_email, contact_phone, source) VALUES (%s, %s, %s, %s, %s, %s) RETURNING id",
+                    (partner_id, company_name, contact_name or None, contact_email or None, contact_phone or None, source)
                 )
                 ref_id = cur.fetchone()['id']
                 cur.execute(f"UPDATE {SCHEMA}.hr_partners SET clients_invited = clients_invited + 1, updated_at = NOW() WHERE id = %s", (partner_id,))
                 conn.commit()
 
-            msg = (f"✅ Новый клиент добавлен!\n\n"
-                   f"🏢 Компания: {company_name}\n"
-                   f"👤 Контакт: {contact_name or '—'}\n"
-                   f"📧 Email: {contact_email or '—'}")
-            if partner.get('telegram_chat_id') and tg_bot_token:
-                try:
-                    tg_send(tg_bot_token, partner['telegram_chat_id'], msg)
-                except Exception:
-                    pass
-            if partner.get('max_user_id') and max_bot_token:
-                try:
-                    max_send(max_bot_token, partner['max_user_id'], msg)
-                except Exception:
-                    pass
-
+            notify_partner(partner, tg_bot_token, max_bot_token,
+                f"✅ Новый клиент добавлен!\n\n"
+                f"🏢 Компания: {company_name}\n"
+                f"👤 Контакт: {contact_name or '—'}\n"
+                f"📧 Email: {contact_email or '—'}"
+            )
             return resp(200, {'id': ref_id, 'success': True})
 
+        # ── История выплат ────────────────────────────────────────────────────────
         if action == 'payouts' and method == 'GET':
             with conn.cursor() as cur:
                 cur.execute(
@@ -437,6 +491,7 @@ def handler(event: dict, context) -> dict:
                     p['created_at'] = str(p['created_at'])
             return resp(200, payouts)
 
+        # ── Запрос на выплату ─────────────────────────────────────────────────────
         if action == 'request_payout' and method == 'POST':
             amount = float(body.get('amount', 0))
             payment_method = body.get('payment_method', '').strip()
@@ -457,22 +512,13 @@ def handler(event: dict, context) -> dict:
                 payout_id = cur.fetchone()['id']
                 conn.commit()
 
-            msg = (f"💰 Запрос на выплату отправлен!\n\n"
-                   f"Сумма: {amount:,.0f} ₽\n"
-                   f"Способ: {payment_method}\n"
-                   f"Реквизиты: {payment_details}\n\n"
-                   f"Мы обработаем запрос в течение 2 рабочих дней.")
-            if partner.get('telegram_chat_id') and tg_bot_token:
-                try:
-                    tg_send(tg_bot_token, partner['telegram_chat_id'], msg)
-                except Exception:
-                    pass
-            if partner.get('max_user_id') and max_bot_token:
-                try:
-                    max_send(max_bot_token, partner['max_user_id'], msg)
-                except Exception:
-                    pass
-
+            notify_partner(partner, tg_bot_token, max_bot_token,
+                f"💰 Запрос на выплату отправлен!\n\n"
+                f"Сумма: {amount:,.0f} ₽\n"
+                f"Способ: {payment_method}\n"
+                f"Реквизиты: {payment_details}\n\n"
+                f"Мы обработаем запрос в течение 2 рабочих дней."
+            )
             return resp(200, {'id': payout_id, 'success': True})
 
         return resp(400, {'error': 'Неизвестное действие'})
