@@ -11,7 +11,7 @@ import Icon from '@/components/ui/icon';
 import { useToast } from '@/hooks/use-toast';
 
 const PARTNER_URL = 'https://functions.poehali.dev/4c894112-f90d-46f8-8aeb-d2f35aeee15e';
-const APP_URL = 'https://refstaff.ru';
+const APP_URL = 'https://i-hunt.ru';
 
 interface Partner {
   id: number;
