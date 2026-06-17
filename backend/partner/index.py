@@ -190,14 +190,24 @@ def handler(event: dict, context) -> dict:
         # ── WEBHOOK от MAX ───────────────────────────────────────────────────────
         if body.get('update_type') in ('bot_started', 'message_created'):
             update_type = body.get('update_type')
+            print(f"MAX webhook update_type={update_type} body={json.dumps(body)[:500]}")
             if update_type == 'bot_started':
                 payload_data = body.get('payload', {})
-                user_id = payload_data.get('user', {}).get('user_id')
-                start_payload = payload_data.get('payload', '')
+                user_info = payload_data.get('user', {})
+                user_id = user_info.get('user_id') or user_info.get('id')
+                start_payload = payload_data.get('payload', '') or payload_data.get('start_payload', '')
             else:
+                # message_created — текст "/start TOKEN" или просто TOKEN
                 payload_data = body.get('message', body.get('payload', {}).get('message', {}))
-                user_id = payload_data.get('sender', {}).get('user_id')
-                start_payload = payload_data.get('body', {}).get('text', '')
+                user_id = (payload_data.get('sender') or {}).get('user_id') or (payload_data.get('sender') or {}).get('id')
+                raw_text = (payload_data.get('body') or {}).get('text', '')
+                # Парсим как "/start TOKEN" или просто токен
+                parts = raw_text.strip().split()
+                if len(parts) >= 2 and parts[0].lower() in ('/start', 'start'):
+                    start_payload = parts[1]
+                else:
+                    start_payload = raw_text.strip()
+            print(f"MAX parsed: user_id={user_id} start_payload={start_payload}")
 
             if not user_id or not start_payload:
                 return {'statusCode': 200, 'body': 'ok'}
@@ -214,14 +224,23 @@ def handler(event: dict, context) -> dict:
                 cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE max_user_id = %s AND status = 'active'", (user_id,))
                 partner = cur.fetchone()
 
+                code = generate_code()
+                expires_at = datetime.utcnow() + timedelta(minutes=10)
+
                 if not partner:
+                    # Новый пользователь — сохраняем chat_id, partner_id оставляем NULL
+                    cur.execute(
+                        f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, expires_at=%s WHERE session_token=%s",
+                        (user_id, code, expires_at, start_payload)
+                    )
+                    conn.commit()
                     max_send(max_bot_token, user_id,
-                        '⚠️ Ваш MAX не привязан к партнёрскому аккаунту.\n\nОбратитесь к администратору iHUNT для привязки.'
+                        f"👋 Добро пожаловать в партнёрскую программу iHUNT!\n\n"
+                        f"🔐 Ваш код для входа:\n\n{code}\n\n"
+                        f"Введите этот код на сайте. Код действует 10 минут."
                     )
                     return {'statusCode': 200, 'body': 'ok'}
 
-                code = generate_code()
-                expires_at = datetime.utcnow() + timedelta(minutes=10)
                 cur.execute(
                     f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
                     (user_id, code, partner['id'], expires_at, start_payload)
