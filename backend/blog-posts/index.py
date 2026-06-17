@@ -9,6 +9,7 @@ import json
 import os
 import re
 import urllib.request
+import urllib.error
 import psycopg2
 from datetime import datetime
 
@@ -271,6 +272,33 @@ def generate_article(existing_topics: list, existing_titles: list) -> dict:
     return json.loads(raw)
 
 
+def notify_indexnow(urls: list[str]) -> None:
+    """Отправляет список URL в IndexNow (Яндекс + Bing) для мгновенной индексации."""
+    key = os.environ.get('INDEXNOW_KEY', '')
+    if not key:
+        return
+    payload = json.dumps({
+        'host': 'i-hunt.ru',
+        'key': key,
+        'keyLocation': f'https://i-hunt.ru/{key}.txt',
+        'urlList': urls,
+    }).encode()
+    for endpoint in [
+        'https://yandex.com/indexnow',
+        'https://www.bing.com/indexnow',
+    ]:
+        try:
+            req = urllib.request.Request(
+                endpoint,
+                data=payload,
+                headers={'Content-Type': 'application/json; charset=utf-8'},
+                method='POST',
+            )
+            urllib.request.urlopen(req, timeout=5)
+        except Exception:
+            pass
+
+
 def handler(event: dict, context) -> dict:
     if event.get('httpMethod') == 'OPTIONS':
         return {'statusCode': 200, 'headers': CORS_HEADERS, 'body': ''}
@@ -396,6 +424,8 @@ def handler(event: dict, context) -> dict:
             )
             post_id = cur.fetchone()[0]
 
+        notify_indexnow([f'https://i-hunt.ru/blog/{slug}'])
+
         return {
             'statusCode': 200,
             'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
@@ -455,10 +485,24 @@ def handler(event: dict, context) -> dict:
             except Exception as e:
                 results.append({'ok': False, 'error': str(e)})
 
+        new_urls = [f"https://i-hunt.ru/blog/{r['slug']}" for r in results if r.get('ok')]
+        if new_urls:
+            notify_indexnow(new_urls)
+
         return {
             'statusCode': 200,
             'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
             'body': json.dumps({'success': True, 'generated': len([r for r in results if r.get('ok')]), 'results': results})
+        }
+
+    # GET: верификационный файл IndexNow — поисковики проверяют владение доменом
+    # URL: /{INDEXNOW_KEY}.txt — настраивается через Яндекс.Вебмастер → IndexNow
+    if method == 'GET' and action == 'indexnow-verify':
+        key = os.environ.get('INDEXNOW_KEY', '')
+        return {
+            'statusCode': 200,
+            'headers': {**CORS_HEADERS, 'Content-Type': 'text/plain; charset=utf-8'},
+            'body': key,
         }
 
     # GET: динамический sitemap всех опубликованных статей (XML)
