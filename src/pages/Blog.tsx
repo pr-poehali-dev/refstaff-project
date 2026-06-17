@@ -85,10 +85,39 @@ export default function Blog() {
       <Helmet>
         <title>Блог iHUNT — экспертные статьи о реферальном рекрутинге и HR</title>
         <meta name="description" content="Полезные статьи для HR-специалистов и рекрутеров: реферальный найм, снижение стоимости найма, геймификация, мотивация команды. Практические советы от iHUNT." />
+        <meta name="keywords" content="блог HR, реферальный рекрутинг статьи, HR советы, рекрутинг практики, подбор персонала статьи, HR менеджер блог, найм сотрудников советы" />
+        <meta name="robots" content="index, follow" />
         <link rel="canonical" href="https://i-hunt.ru/blog" />
+        <meta property="og:type" content="website" />
         <meta property="og:title" content="Блог iHUNT — о реферальном рекрутинге и HR" />
         <meta property="og:description" content="Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала." />
         <meta property="og:url" content="https://i-hunt.ru/blog" />
+        <meta property="og:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:locale" content="ru_RU" />
+        <meta property="og:site_name" content="iHUNT" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Блог iHUNT — о реферальном рекрутинге и HR" />
+        <meta name="twitter:description" content="Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала." />
+        <meta name="twitter:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg" />
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Blog',
+          'name': 'Блог iHUNT',
+          'description': 'Экспертные статьи о реферальном рекрутинге, HR-автоматизации и подборе персонала',
+          'url': 'https://i-hunt.ru/blog',
+          'publisher': { '@type': 'Organization', 'name': 'iHUNT', 'url': 'https://i-hunt.ru', 'logo': 'https://i-hunt.ru/favicon.svg' },
+          'inLanguage': 'ru',
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          'itemListElement': [
+            { '@type': 'ListItem', 'position': 1, 'name': 'Главная', 'item': 'https://i-hunt.ru/' },
+            { '@type': 'ListItem', 'position': 2, 'name': 'Блог', 'item': 'https://i-hunt.ru/blog' },
+          ],
+        })}</script>
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">

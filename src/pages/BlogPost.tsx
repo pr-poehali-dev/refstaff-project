@@ -158,8 +158,20 @@ export default function BlogPost() {
           'url': postUrl,
           'image': ogImageUrl,
           'datePublished': post.publishedAt,
-          'publisher': { '@type': 'Organization', 'name': 'iHUNT', 'url': 'https://i-hunt.ru' },
-          'author': { '@type': 'Organization', 'name': 'iHUNT' },
+          'dateModified': post.publishedAt,
+          'inLanguage': 'ru',
+          'publisher': { '@type': 'Organization', 'name': 'iHUNT', 'url': 'https://i-hunt.ru', 'logo': { '@type': 'ImageObject', 'url': 'https://i-hunt.ru/favicon.svg' } },
+          'author': { '@type': 'Organization', 'name': 'iHUNT', 'url': 'https://i-hunt.ru' },
+          'mainEntityOfPage': { '@type': 'WebPage', '@id': postUrl },
+        })}</script>
+        <script type="application/ld+json">{JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'BreadcrumbList',
+          'itemListElement': [
+            { '@type': 'ListItem', 'position': 1, 'name': 'Главная', 'item': 'https://i-hunt.ru/' },
+            { '@type': 'ListItem', 'position': 2, 'name': 'Блог', 'item': 'https://i-hunt.ru/blog' },
+            { '@type': 'ListItem', 'position': 3, 'name': post.title, 'item': postUrl },
+          ],
         })}</script>
       </Helmet>
 
