@@ -339,11 +339,24 @@ def handler(event: dict, context) -> dict:
 
             if not name:
                 return resp(400, {'error': 'Укажите имя'})
-            if not session_token or not chat_id_val:
+            if not session_token:
                 return resp(400, {'error': 'Неверные данные сессии'})
 
-            tg_id = int(chat_id_val) if messenger_type == 'telegram' else None
-            max_id = int(chat_id_val) if messenger_type == 'max' else None
+            # Читаем chat_id из БД — надёжнее чем из тела запроса
+            with conn.cursor() as cur:
+                cur.execute(
+                    f"SELECT chat_id, messenger FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status IN ('verified', 'code_sent')",
+                    (session_token,)
+                )
+                sess_row = cur.fetchone()
+            if not sess_row:
+                return resp(400, {'error': 'Сессия не найдена или истекла'})
+
+            db_chat_id = sess_row['chat_id'] or (int(chat_id_val) if chat_id_val else None)
+            db_messenger = sess_row['messenger'] or messenger_type
+
+            tg_id = int(db_chat_id) if db_chat_id and db_messenger == 'telegram' else None
+            max_id = int(db_chat_id) if db_chat_id and db_messenger == 'max' else None
 
             partner_code = generate_partner_code(name)
             partner = None
