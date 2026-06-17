@@ -1,11 +1,37 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Icon from '@/components/ui/icon';
+
+const SEO_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'HR вакансии — iHUNT',
+  description: 'Актуальные вакансии для HR-специалистов: рекрутеры, HR менеджеры, HRD, HRBP, кадровики. Поиск по всей России.',
+  url: 'https://i-hunt.ru/jobs',
+  numberOfItems: 'более 1000',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Вакансии HR менеджер' },
+    { '@type': 'ListItem', position: 2, name: 'Вакансии Рекрутер' },
+    { '@type': 'ListItem', position: 3, name: 'Вакансии HRD' },
+    { '@type': 'ListItem', position: 4, name: 'Вакансии HRBP' },
+    { '@type': 'ListItem', position: 5, name: 'Вакансии Кадровик' },
+  ],
+};
+
+const BREADCRUMB_JSON_LD = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Главная', item: 'https://i-hunt.ru/' },
+    { '@type': 'ListItem', position: 2, name: 'HR Вакансии', item: 'https://i-hunt.ru/jobs' },
+  ],
+};
 
 const API_URL = 'https://functions.poehali.dev/5ab7f550-e0f2-4f0e-8ce3-079e6069c1ac';
 
@@ -189,6 +215,26 @@ export default function Jobs() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <Helmet>
+        <title>HR Вакансии — рекрутер, HR менеджер, HRD, HRBP | iHUNT</title>
+        <meta name="description" content="Актуальные HR вакансии по всей России: рекрутер, HR менеджер, HRD, HRBP, кадровик, HRG. Поиск по городу, зарплате и опыту. Обновляется ежедневно." />
+        <meta name="keywords" content="HR вакансии, рекрутер вакансии, HR менеджер работа, HRD вакансии, HRBP работа, кадровик вакансии, менеджер по персоналу, подбор персонала работа, HR специалист вакансии, работа в HR" />
+        <meta name="robots" content="index, follow" />
+        <link rel="canonical" href="https://i-hunt.ru/jobs" />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://i-hunt.ru/jobs" />
+        <meta property="og:title" content="HR Вакансии — рекрутер, HR менеджер, HRD, HRBP | iHUNT" />
+        <meta property="og:description" content="Актуальные HR вакансии по всей России: рекрутер, HR менеджер, HRD, HRBP, кадровик. Поиск по городу, зарплате и опыту работы." />
+        <meta property="og:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg" />
+        <meta property="og:locale" content="ru_RU" />
+        <meta property="og:site_name" content="iHUNT" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="HR Вакансии — рекрутер, HR менеджер, HRD, HRBP | iHUNT" />
+        <meta name="twitter:description" content="Актуальные HR вакансии по всей России. Поиск по городу, зарплате и опыту работы." />
+        <meta name="twitter:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg" />
+        <script type="application/ld+json">{JSON.stringify(SEO_JSON_LD)}</script>
+        <script type="application/ld+json">{JSON.stringify(BREADCRUMB_JSON_LD)}</script>
+      </Helmet>
       <header className="bg-white border-b sticky top-0 z-10">
         <div className="container mx-auto px-4 py-3 flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/')}>

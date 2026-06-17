@@ -26,6 +26,14 @@
     </image:image>
   </url>
 
+  <!-- Страница HR вакансий -->
+  <url>
+    <loc>https://i-hunt.ru/jobs</loc>
+    <lastmod>2026-06-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
   <!-- Секции лендинга -->
   <url>
     <loc>https://i-hunt.ru/#how</loc>
