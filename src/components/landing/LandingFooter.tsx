@@ -27,7 +27,7 @@ export function LandingFooter({ onAbout, onPrivacy, onTerms, onPersonalData }: L
           <nav aria-label="Компания">
             <h4 className="font-semibold mb-2 text-xs">Компания</h4>
             <ul className="space-y-1 text-xs text-muted-foreground">
-              <li><a href="/jobs" className="hover:text-primary">Агрегатор вакансий</a></li>
+
               <li><a href="/blog" className="hover:text-primary">Блог</a></li>
               <li><a href="#contact" className="hover:text-primary">Контакты</a></li>
               <li><span onClick={onAbout} className="hover:text-primary cursor-pointer">О нас</span></li>
