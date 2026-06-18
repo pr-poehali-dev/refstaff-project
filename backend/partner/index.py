@@ -153,27 +153,37 @@ def handler(event: dict, context) -> dict:
                 return {'statusCode': 200, 'body': 'ok'}
 
             with conn.cursor() as cur:
+                # Принимаем pending и code_sent — на случай повторного нажатия /start
                 cur.execute(
-                    f"SELECT * FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > NOW()",
+                    f"SELECT * FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status IN ('pending','code_sent') AND expires_at > NOW() - INTERVAL '60 minutes'",
                     (session_token,)
                 )
                 session = cur.fetchone()
                 if not session:
+                    print(f"TG: session not found for token={session_token[:8]}...")
                     tg_send(tg_bot_token, chat_id, '❌ Ссылка недействительна или истекла. Вернитесь на сайт и попробуйте снова.')
                     return {'statusCode': 200, 'body': 'ok'}
 
                 cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE telegram_chat_id = %s AND status = 'active'", (chat_id,))
                 partner = cur.fetchone()
 
+                code = generate_code()
+                expires_at = datetime.utcnow() + timedelta(minutes=30)
+
                 if not partner:
+                    # Новый пользователь — сохраняем chat_id, ждём заполнения профиля
+                    cur.execute(
+                        f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, expires_at=%s WHERE session_token=%s",
+                        (chat_id, code, expires_at, session_token)
+                    )
+                    conn.commit()
                     tg_send(tg_bot_token, chat_id,
-                        '⚠️ Ваш Telegram не привязан к партнёрскому аккаунту.\n\n'
-                        'Обратитесь к администратору iHUNT для привязки вашего Telegram к партнёрскому аккаунту.'
+                        f"👋 Добро пожаловать в партнёрскую программу iHUNT!\n\n"
+                        f"🔐 Ваш код для входа:\n\n<b>{code}</b>\n\n"
+                        f"Введите этот код на сайте. Код действует <b>30 минут</b>."
                     )
                     return {'statusCode': 200, 'body': 'ok'}
 
-                code = generate_code()
-                expires_at = datetime.utcnow() + timedelta(minutes=30)
                 cur.execute(
                     f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
                     (chat_id, code, partner['id'], expires_at, session_token)
@@ -183,7 +193,7 @@ def handler(event: dict, context) -> dict:
             tg_send(tg_bot_token, chat_id,
                 f"👋 Привет, {partner['name']}!\n\n"
                 f"🔐 Ваш код для входа в партнёрский кабинет iHUNT:\n\n<b>{code}</b>\n\n"
-                f"Введите этот код на сайте. Код действует <b>10 минут</b>."
+                f"Введите этот код на сайте. Код действует <b>30 минут</b>."
             )
             return {'statusCode': 200, 'body': 'ok'}
 
@@ -258,7 +268,7 @@ def handler(event: dict, context) -> dict:
         if action == 'create_login_session' and method == 'POST':
             messenger = body.get('messenger', 'telegram')
             session_token = generate_token()
-            expires_at = datetime.utcnow() + timedelta(minutes=15)
+            expires_at = datetime.utcnow() + timedelta(minutes=60)
             with conn.cursor() as cur:
                 cur.execute(
                     f"INSERT INTO {SCHEMA}.partner_login_sessions (session_token, messenger, expires_at) VALUES (%s, %s, %s)",
