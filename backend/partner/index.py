@@ -154,9 +154,9 @@ def handler(event: dict, context) -> dict:
                 return {'statusCode': 200, 'body': 'ok'}
 
             with conn.cursor() as cur:
-                # Принимаем pending и code_sent — на случай повторного нажатия /start
+                # Ищем сессию по токену — любой статус кроме verified, без проверки времени
                 cur.execute(
-                    f"SELECT * FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status IN ('pending','code_sent') AND expires_at > NOW() - INTERVAL '60 minutes'",
+                    f"SELECT * FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status != 'verified'",
                     (session_token,)
                 )
                 session = cur.fetchone()
@@ -225,7 +225,7 @@ def handler(event: dict, context) -> dict:
 
             with conn.cursor() as cur:
                 cur.execute(
-                    f"SELECT * FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > NOW()",
+                    f"SELECT * FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status != 'verified'",
                     (start_payload,)
                 )
                 session = cur.fetchone()
@@ -301,7 +301,7 @@ def handler(event: dict, context) -> dict:
 
             with conn.cursor() as cur:
                 cur.execute(
-                    f"SELECT id, partner_id, messenger, chat_id, status, code, expires_at FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND code = %s AND (status IN ('code_sent', 'verified')) AND expires_at > NOW() - INTERVAL '60 minutes'",
+                    f"SELECT id, partner_id, messenger, chat_id, status, code, expires_at FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND code = %s AND status IN ('code_sent', 'verified')",
                     (session_token, code)
                 )
                 session = cur.fetchone()
