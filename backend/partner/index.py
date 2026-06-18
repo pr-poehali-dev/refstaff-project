@@ -173,7 +173,7 @@ def handler(event: dict, context) -> dict:
                     return {'statusCode': 200, 'body': 'ok'}
 
                 code = generate_code()
-                expires_at = datetime.utcnow() + timedelta(minutes=10)
+                expires_at = datetime.utcnow() + timedelta(minutes=30)
                 cur.execute(
                     f"UPDATE {SCHEMA}.partner_login_sessions SET status='code_sent', chat_id=%s, code=%s, partner_id=%s, expires_at=%s WHERE session_token=%s",
                     (chat_id, code, partner['id'], expires_at, session_token)
@@ -225,7 +225,7 @@ def handler(event: dict, context) -> dict:
                 partner = cur.fetchone()
 
                 code = generate_code()
-                expires_at = datetime.utcnow() + timedelta(minutes=10)
+                expires_at = datetime.utcnow() + timedelta(minutes=30)
 
                 if not partner:
                     # Новый пользователь — сохраняем chat_id, partner_id оставляем NULL
@@ -290,11 +290,18 @@ def handler(event: dict, context) -> dict:
 
             with conn.cursor() as cur:
                 cur.execute(
-                    f"SELECT id, partner_id, messenger, chat_id, status, code, expires_at FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND status = 'code_sent' AND code = %s AND expires_at > NOW()",
+                    f"SELECT id, partner_id, messenger, chat_id, status, code, expires_at FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s AND code = %s AND (status IN ('code_sent', 'verified')) AND expires_at > NOW() - INTERVAL '60 minutes'",
                     (session_token, code)
                 )
                 session = cur.fetchone()
                 if not session:
+                    # Дополнительная диагностика — ищем без фильтра по коду
+                    cur.execute(
+                        f"SELECT status, code, expires_at FROM {SCHEMA}.partner_login_sessions WHERE session_token = %s",
+                        (session_token,)
+                    )
+                    debug = cur.fetchone()
+                    print(f"verify_login_code FAIL: session_token={session_token[:8]}... input_code={code} db={dict(debug) if debug else 'NOT FOUND'}")
                     return resp(400, {'error': 'Неверный или истёкший код'})
 
                 session = dict(session)
