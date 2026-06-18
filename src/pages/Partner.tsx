@@ -166,6 +166,19 @@ export default function Partner() {
       loadPartnerData(savedCode);
     } else {
       setLoading(false);
+      // Восстанавливаем сессию входа если вернулись из бота
+      const savedSession = localStorage.getItem('partner_session_token');
+      const savedMessenger = localStorage.getItem('partner_session_messenger') as Messenger | null;
+      if (savedSession) {
+        setSessionToken(savedSession);
+        if (savedMessenger) setMessenger(savedMessenger);
+        // Проверяем статус сессии
+        apiCall('check_login_session', 'POST', { session_token: savedSession }).then(s => {
+          if (s.status === 'code_sent' || s.status === 'verified') {
+            setAuthStep('enter_otp');
+          }
+        });
+      }
     }
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, []);
@@ -178,7 +191,11 @@ export default function Partner() {
       if (data.error) {
         toast({ title: data.error, variant: 'destructive' });
       } else {
+        // Сохраняем в localStorage — не потеряется при возврате из бота
+        localStorage.setItem('partner_session_token', data.session_token);
+        localStorage.setItem('partner_session_messenger', selectedMessenger);
         setSessionToken(data.session_token);
+        setOtp('');
         setDeepLink(data.deep_link);
         setAuthStep('messenger_wait');
         window.open(data.deep_link, '_blank');
@@ -207,6 +224,8 @@ export default function Partner() {
         setAuthStep('fill_profile');
       } else if (data.partner_code) {
         localStorage.setItem('partner_code', data.partner_code);
+        localStorage.removeItem('partner_session_token');
+        localStorage.removeItem('partner_session_messenger');
         await loadPartnerData(data.partner_code);
         setAuthStep('choose');
       } else {
