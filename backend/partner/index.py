@@ -130,7 +130,8 @@ def handler(event: dict, context) -> dict:
     qs = event.get('queryStringParameters') or {}
     action = qs.get('action', 'profile')
     body = json.loads(event.get('body') or '{}')
-    partner_token = (event.get('headers') or {}).get('X-Partner-Token', '').strip()
+    # Токен берём из query (?pt=...) или из заголовка (обратная совместимость)
+    partner_token = (qs.get('pt') or (event.get('headers') or {}).get('X-Partner-Token', '')).strip()
 
     tg_bot_token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
     tg_bot_username = os.environ.get('TELEGRAM_BOT_USERNAME', '')

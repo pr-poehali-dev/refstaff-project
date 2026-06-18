@@ -121,8 +121,11 @@ export default function Partner() {
 
   const apiCall = async (action: string, method = 'GET', body?: object, token?: string) => {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
-    if (token) headers['X-Partner-Token'] = token;
-    const res = await fetch(`${PARTNER_URL}?action=${action}`, {
+    // Токен передаём в теле или query, не в заголовке — кириллица в заголовках ломает fetch
+    const url = token
+      ? `${PARTNER_URL}?action=${action}&pt=${encodeURIComponent(token)}`
+      : `${PARTNER_URL}?action=${action}`;
+    const res = await fetch(url, {
       method,
       headers,
       body: body ? JSON.stringify(body) : undefined,
@@ -214,9 +217,16 @@ export default function Partner() {
 
   const handleVerifyOtp = async () => {
     if (!otp.trim()) return;
+    // Берём токен из state, fallback — из localStorage
+    const token = sessionToken || localStorage.getItem('partner_session_token') || '';
+    if (!token) {
+      toast({ title: 'Сессия не найдена, начните вход заново', variant: 'destructive' });
+      setAuthStep('choose');
+      return;
+    }
     setSubmitting(true);
     try {
-      const data = await apiCall('verify_login_code', 'POST', { session_token: sessionToken, code: otp.trim() });
+      const data = await apiCall('verify_login_code', 'POST', { session_token: token, code: otp.trim() });
       if (data.error) {
         toast({ title: data.error, variant: 'destructive' });
       } else if (data.need_registration) {
