@@ -158,19 +158,17 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
 
             # Определяем: годовая оплата (365 дней) или месячная
             is_annual = (days >= 365)
-            # Лимит: месячные — не более 3 платежей; годовая — только 1 раз (считается как 3)
+            # Лимит: месячные — не более 3 платежей; годовая — 1 раз (засчитывается как 3)
             commission_limit_reached = paid_months >= 3
 
             if not commission_limit_reached:
                 price = SUBSCRIPTION_PRICES.get(days, days * 330)
-                # Для годовой оплаты считаем комиссию только за 3 месяца (3 × 9900 = 29700)
-                if is_annual:
-                    price_for_commission = SUBSCRIPTION_PRICES.get(30, 9900) * 3
-                else:
-                    price_for_commission = price
+                # Годовая: 50% от полной стоимости года (89900 * 0.5 = 44950)
+                # Месячная: 50% от стоимости месяца (9900 * 0.5 = 4950)
+                price_for_commission = price
                 commission = round(price_for_commission * COMMISSION_RATE, 2)
                 commission_available_at = datetime.utcnow() + timedelta(days=HOLD_DAYS)
-                # При годовой оплате засчитываем сразу 3 месяца (достигнут лимит)
+                # При годовой оплате засчитываем сразу 3 месяца (лимит исчерпан)
                 new_paid_months = 3 if is_annual else paid_months + 1
 
                 # Обновляем запись в partner_referrals
