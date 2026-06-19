@@ -247,14 +247,14 @@ def handler(event: dict, context) -> dict:
         if not employer_email or not job_title:
             return resp(400, {'error': 'employer_email и job_title обязательны'})
 
-        # Проверка лимита по IP
+        # Проверка лимита по email (IP ненадёжен — все запросы идут через один прокси)
         cur.execute(
             f"""INSERT INTO {SCHEMA}.public_test_ip_limits (ip_address, generation_date, count)
                 VALUES (%s, CURRENT_DATE, 1)
                 ON CONFLICT (ip_address, generation_date)
                 DO UPDATE SET count = public_test_ip_limits.count + 1
                 RETURNING count""",
-            (ip,)
+            (employer_email.lower(),)
         )
         row = cur.fetchone()
         if row and row['count'] > DAILY_LIMIT:
