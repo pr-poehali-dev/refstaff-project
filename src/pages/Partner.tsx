@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -355,136 +356,351 @@ export default function Partner() {
     );
   }
 
-  // ── СТРАНИЦА ВХОДА ──────────────────────────────────────────────────────────
+  // ── ЛЕНДИНГ + ФОРМА ВХОДА ───────────────────────────────────────────────────
   if (!partner) {
+    const scrollToLogin = () => document.getElementById('partner-login')?.scrollIntoView({ behavior: 'smooth' });
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50 flex items-center justify-center px-4 py-12">
-        <div className="max-w-md w-full">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
-              <div className="bg-primary/10 rounded-full p-4">
-                <Icon name="Handshake" size={40} className="text-primary" />
+      <div className="min-h-screen bg-white">
+        <Helmet>
+          <title>Партнёрская программа iHUNT — зарабатывайте на HR-технологиях</title>
+          <meta name="description" content="Партнёрская программа для HR-менеджеров, рекрутёров и кадровых агентств. Рекомендуйте iHUNT компаниям и получайте 50% с каждой оплаты подписки. До 101 490 ₽ с одного клиента." />
+          <meta name="keywords" content="партнёрская программа HR, реферальная программа для рекрутёров, заработок для HR-менеджеров, партнёрство iHUNT, кадровое агентство партнёр" />
+          <meta property="og:title" content="Партнёрская программа iHUNT — 50% с каждой подписки клиента" />
+          <meta property="og:description" content="Зарабатывайте до 101 490 ₽ с одного клиента. Программа для HR-специалистов, рекрутёров и кадровых агентств." />
+          <meta property="og:type" content="website" />
+          <link rel="canonical" href="https://i-hunt.ru/partner" />
+        </Helmet>
+
+        {/* ── HERO ── */}
+        <section className="relative bg-gradient-to-br from-primary/5 via-white to-secondary/5 pt-16 pb-20 px-4 overflow-hidden">
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-10 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
+          </div>
+          <div className="max-w-5xl mx-auto relative">
+            <div className="flex items-center gap-2 mb-6 justify-center">
+              <Icon name="Rocket" size={18} className="text-primary" />
+              <span className="text-sm font-semibold text-primary uppercase tracking-wide">iHUNT Partner Program</span>
+            </div>
+            <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-6 leading-tight text-gray-900">
+              Зарабатывайте до <span className="text-primary">101 490 ₽</span><br className="hidden sm:block" /> с одного клиента
+            </h1>
+            <p className="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-10">
+              Партнёрская программа для HR-специалистов, рекрутёров и кадровых агентств. Рекомендуйте iHUNT — получайте <strong>50% с каждой оплаты</strong> подписки ваших клиентов.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button size="lg" className="text-base px-8" onClick={scrollToLogin}>
+                <Icon name="Handshake" size={18} className="mr-2" />
+                Стать партнёром — бесплатно
+              </Button>
+              <Button size="lg" variant="outline" className="text-base px-8" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>
+                Узнать подробнее
+              </Button>
+            </div>
+            {/* Статистика */}
+            <div className="grid grid-cols-3 gap-6 mt-16 max-w-2xl mx-auto">
+              {[
+                { value: '50%', label: 'комиссия с каждой оплаты' },
+                { value: '3', label: 'платежа с одного клиента' },
+                { value: '30 дн', label: 'hold-период, затем — вывод' },
+              ].map(s => (
+                <div key={s.label} className="text-center">
+                  <div className="text-3xl font-extrabold text-primary">{s.value}</div>
+                  <div className="text-xs text-gray-500 mt-1">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── ДЛЯ КОГО ── */}
+        <section className="py-16 px-4 bg-gray-50">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3 text-gray-900">Кто становится партнёром iHUNT</h2>
+            <p className="text-gray-500 text-center mb-10 max-w-xl mx-auto">Программа создана для профессионалов рынка труда, которые работают с компаниями-работодателями</p>
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+              {[
+                { icon: 'Users', title: 'HR-менеджеры', desc: 'Специалисты по подбору персонала внутри компаний' },
+                { icon: 'Search', title: 'Рекрутёры', desc: 'Независимые и агентские рекрутёры' },
+                { icon: 'Building2', title: 'Кадровые агентства', desc: 'Агентства по подбору и аутстаффингу' },
+                { icon: 'GraduationCap', title: 'HR-консультанты', desc: 'Консультанты по управлению персоналом' },
+                { icon: 'Briefcase', title: 'Карьерные коучи', desc: 'Специалисты по развитию карьеры' },
+                { icon: 'Network', title: 'Бизнес-партнёры', desc: 'Все, кто работает с B2B-аудиторией' },
+              ].map(c => (
+                <div key={c.title} className="bg-white rounded-xl p-5 border border-gray-100 hover:border-primary/30 hover:shadow-sm transition-all">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
+                    <Icon name={c.icon} size={20} className="text-primary" />
+                  </div>
+                  <div className="font-semibold text-gray-900 text-sm">{c.title}</div>
+                  <div className="text-xs text-gray-500 mt-1">{c.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── КАК ЭТО РАБОТАЕТ ── */}
+        <section id="how-it-works" className="py-16 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3 text-gray-900">Как работает программа</h2>
+            <p className="text-gray-500 text-center mb-12 max-w-xl mx-auto">Четыре шага от регистрации до первых денег на счёте</p>
+            <div className="relative">
+              <div className="hidden sm:block absolute left-[39px] top-8 bottom-8 w-0.5 bg-gray-100" />
+              <div className="space-y-8">
+                {[
+                  { n: '1', icon: 'Link', title: 'Получите реферальную ссылку', desc: 'После регистрации в личном кабинете вы получаете уникальную ссылку. Делитесь ею с компаниями, которым нужен эффективный инструмент для найма через рекомендации сотрудников.' },
+                  { n: '2', icon: 'UserCheck', title: 'Клиент регистрируется в iHUNT', desc: 'Компания регистрируется по вашей ссылке и автоматически привязывается к вашему аккаунту навсегда. Клиент получает 14 дней бесплатного доступа.' },
+                  { n: '3', icon: 'CreditCard', title: 'Клиент оплачивает подписку', desc: 'Как только компания оплачивает подписку — вам начисляется 50% от суммы. Месячная подписка: 9 950 ₽, годовая: 101 490 ₽. Начисление происходит автоматически.' },
+                  { n: '4', icon: 'Wallet', title: 'Выводите деньги', desc: 'После 30-дневного hold-периода средства доступны для вывода на карту, СБП или расчётный счёт ИП/ООО. Минимальной суммы нет.' },
+                ].map(s => (
+                  <div key={s.n} className="flex gap-5">
+                    <div className="relative shrink-0">
+                      <div className="w-20 h-20 rounded-2xl bg-primary text-white flex flex-col items-center justify-center shadow-md">
+                        <Icon name={s.icon} size={24} />
+                        <span className="text-xs font-bold mt-1">Шаг {s.n}</span>
+                      </div>
+                    </div>
+                    <div className="pt-3">
+                      <div className="font-bold text-gray-900 mb-1">{s.title}</div>
+                      <div className="text-sm text-gray-500 leading-relaxed">{s.desc}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            <h1 className="text-2xl font-bold mb-1">Партнёрская программа</h1>
-            <p className="text-sm text-muted-foreground">Приглашайте компании в iHUNT и зарабатывайте 50% с каждой подписки</p>
           </div>
+        </section>
 
-          {authStep === 'choose' && (
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <p className="text-sm font-medium text-center">Войдите через мессенджер</p>
-                <p className="text-xs text-center text-muted-foreground">Нажмите кнопку — откроется бот, который пришлёт вам код</p>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => handleSendToMessenger('telegram')}
-                    disabled={submitting}
-                    className="flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-transparent hover:border-[#229ED9] hover:bg-blue-50 transition-all disabled:opacity-50"
-                  >
-                    <div className="w-14 h-14 rounded-full bg-[#229ED9] flex items-center justify-center">
-                      <Icon name="Send" size={26} className="text-white" />
-                    </div>
-                    <span className="text-sm font-semibold">Telegram</span>
-                  </button>
-                  <button
-                    onClick={() => handleSendToMessenger('max')}
-                    disabled={submitting}
-                    className="flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-transparent hover:border-[#0066CC] hover:bg-blue-50 transition-all disabled:opacity-50"
-                  >
-                    <div className="w-14 h-14 rounded-full bg-[#0066CC] flex items-center justify-center">
-                      <span className="text-white font-bold text-xl">M</span>
-                    </div>
-                    <span className="text-sm font-semibold">MAX</span>
-                  </button>
+        {/* ── СКОЛЬКО МОЖНО ЗАРАБОТАТЬ ── */}
+        <section className="py-16 px-4 bg-primary text-white">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Сколько можно заработать</h2>
+            <p className="text-center text-primary-foreground/80 mb-12 max-w-xl mx-auto">Ваш доход зависит от количества привлечённых клиентов и типа их подписки</p>
+            <div className="grid sm:grid-cols-2 gap-6 mb-10">
+              <div className="bg-white/10 rounded-2xl p-6">
+                <div className="text-sm font-semibold text-primary-foreground/70 mb-1 uppercase tracking-wide">Месячная подписка</div>
+                <div className="text-4xl font-extrabold mb-2">9 950 ₽</div>
+                <div className="text-sm text-primary-foreground/80">за каждый из первых 3 платежей клиента</div>
+                <div className="mt-4 pt-4 border-t border-white/20 text-sm">
+                  Итого с 1 клиента: <strong className="text-white">29 850 ₽</strong>
                 </div>
-                <p className="text-xs text-center text-muted-foreground">Впервые? Просто откройте бот — он создаст аккаунт автоматически</p>
-              </CardContent>
-            </Card>
-          )}
-
-          {authStep === 'messenger_wait' && (
-            <Card>
-              <CardContent className="pt-6 text-center space-y-4">
-                <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center ${messenger === 'telegram' ? 'bg-[#229ED9]' : 'bg-[#0066CC]'}`}>
-                  {messenger === 'telegram'
-                    ? <Icon name="Send" size={28} className="text-white" />
-                    : <span className="text-white font-bold text-2xl">M</span>}
+              </div>
+              <div className="bg-white/10 rounded-2xl p-6 ring-2 ring-white/40">
+                <div className="text-sm font-semibold text-primary-foreground/70 mb-1 uppercase tracking-wide">Годовая подписка</div>
+                <div className="text-4xl font-extrabold mb-2">101 490 ₽</div>
+                <div className="text-sm text-primary-foreground/80">разово при оплате клиентом года</div>
+                <div className="mt-4 pt-4 border-t border-white/20 text-sm">
+                  Лимит исчерпан после <strong className="text-white">1 платежа</strong>
                 </div>
-                <div>
-                  <p className="font-semibold">Откройте {messenger === 'telegram' ? 'Telegram' : 'MAX'}</p>
-                  <p className="text-sm text-muted-foreground mt-1">Нажмите «Старт» в боте — вам придёт код подтверждения</p>
-                </div>
-                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                  Ожидаю код...
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open(deepLink, '_blank')}>
-                    <Icon name="ExternalLink" size={14} className="mr-1" />Открыть снова
-                  </Button>
-                  <Button variant="ghost" size="sm" className="flex-1" onClick={() => setAuthStep('enter_otp')}>
-                    Ввести код
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {authStep === 'enter_otp' && (
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="text-center">
-                  <p className="font-semibold">Введите код из {messenger === 'telegram' ? 'Telegram' : 'MAX'}</p>
-                  <p className="text-sm text-muted-foreground mt-1">6-значный код был отправлен вам в мессенджер</p>
-                </div>
-                <Input
-                  placeholder="000000"
-                  value={otp}
-                  onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  className="text-center text-2xl font-mono tracking-[0.5em]"
-                  maxLength={6}
-                  autoFocus
-                  onKeyDown={e => e.key === 'Enter' && handleVerifyOtp()}
-                />
-                <Button className="w-full" onClick={handleVerifyOtp} disabled={submitting || otp.length < 6}>
-                  {submitting ? 'Проверка...' : 'Продолжить'}
-                </Button>
-                <button className="text-xs text-muted-foreground w-full text-center hover:text-foreground" onClick={() => { setOtp(''); setAuthStep('choose'); }}>
-                  ← Попробовать снова
-                </button>
-              </CardContent>
-            </Card>
-          )}
-
-          {authStep === 'fill_profile' && (
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                <div className="text-center">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <Icon name="CheckCircle" size={24} className="text-green-600" />
+              </div>
+            </div>
+            <div className="bg-white/10 rounded-2xl p-5">
+              <div className="font-semibold mb-3 text-center">Пример дохода за месяц</div>
+              <div className="grid grid-cols-3 gap-4 text-center text-sm">
+                {[
+                  { clients: '5 клиентов', type: 'месячные', earn: '49 750 ₽' },
+                  { clients: '10 клиентов', type: 'месячные', earn: '99 500 ₽' },
+                  { clients: '5 клиентов', type: 'годовые', earn: '507 450 ₽' },
+                ].map(e => (
+                  <div key={e.clients} className="bg-white/10 rounded-xl p-3">
+                    <div className="font-bold text-lg">{e.earn}</div>
+                    <div className="text-primary-foreground/70 text-xs mt-1">{e.clients}<br />{e.type}</div>
                   </div>
-                  <p className="font-semibold">Почти готово!</p>
-                  <p className="text-sm text-muted-foreground mt-1">Заполните данные для партнёрского аккаунта</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── ПРЕИМУЩЕСТВА ── */}
+        <section className="py-16 px-4 bg-gray-50">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-gray-900">Почему выбирают iHUNT Partner</h2>
+            <div className="grid sm:grid-cols-2 gap-5">
+              {[
+                { icon: 'Zap', title: 'Быстрый старт', desc: 'Регистрация за 2 минуты через Telegram. Никаких договоров и бумажной волокиты.' },
+                { icon: 'TrendingUp', title: 'Пассивный доход', desc: 'Привлекли клиента один раз — получаете комиссию с трёх платежей автоматически.' },
+                { icon: 'ShieldCheck', title: 'Прозрачная система', desc: 'Личный кабинет в реальном времени: каждый клиент, каждая выплата, каждый рубль.' },
+                { icon: 'Award', title: 'Востребованный продукт', desc: 'iHUNT — платформа реферального найма, которая реально экономит компаниям деньги на рекрутинге.' },
+                { icon: 'HeadphonesIcon', title: 'Поддержка партнёров', desc: 'Персональный менеджер, обучающие материалы и шаблоны для продвижения продукта.' },
+                { icon: 'Globe', title: 'Без территориальных ограничений', desc: 'Работайте с компаниями по всей России. Нет ограничений по географии или отрасли.' },
+              ].map(b => (
+                <div key={b.title} className="flex gap-4 bg-white p-5 rounded-xl border border-gray-100">
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
+                    <Icon name={b.icon} size={20} className="text-primary" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-gray-900 mb-1">{b.title}</div>
+                    <div className="text-sm text-gray-500">{b.desc}</div>
+                  </div>
                 </div>
-                <div>
-                  <Label>Имя и фамилия *</Label>
-                  <Input placeholder="Иванова Анна" value={profileForm.name} onChange={e => setProfileForm(p => ({ ...p, name: e.target.value }))} autoFocus />
-                </div>
-                <div>
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="anna@example.com" value={profileForm.email} onChange={e => setProfileForm(p => ({ ...p, email: e.target.value }))} />
-                </div>
-                <div>
-                  <Label>Телефон</Label>
-                  <Input placeholder="+7 900 000 00 00" value={profileForm.phone} onChange={e => setProfileForm(p => ({ ...p, phone: e.target.value }))} />
-                </div>
-                <Button className="w-full" onClick={handleCompleteRegistration} disabled={submitting || !profileForm.name}>
-                  {submitting ? 'Создаём аккаунт...' : 'Начать работу'}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── FAQ ── */}
+        <section className="py-16 px-4">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-gray-900">Частые вопросы</h2>
+            <div className="space-y-4">
+              {[
+                { q: 'Сколько стоит участие в программе?', a: 'Участие абсолютно бесплатное. Вы регистрируетесь, получаете ссылку и начинаете зарабатывать без каких-либо взносов.' },
+                { q: 'Как подтвердить, что клиент мой?', a: 'Клиент должен зарегистрироваться в iHUNT по вашей реферальной ссылке. После этого он автоматически и навсегда привязывается к вашему аккаунту.' },
+                { q: 'Когда деньги поступят на счёт?', a: 'После каждого платежа клиента начисляется комиссия. Через 30 дней (hold-период) средства становятся доступны для вывода.' },
+                { q: 'Есть ли лимит на количество клиентов?', a: 'Нет. Вы можете привлекать неограниченное количество клиентов. Лимит только на количество платежей с одного клиента — первые 3 ежемесячных или 1 годовой.' },
+                { q: 'Как выводить деньги?', a: 'Через личный кабинет. Доступные способы: СБП, банковская карта, расчётный счёт ИП или ООО. Перевод в течение 2 рабочих дней.' },
+                { q: 'Нужно ли оформлять ИП или самозанятость?', a: 'Для получения выплат вам понадобится статус самозанятого или ИП. Это стандартное требование при работе с юридическими лицами.' },
+              ].map((f, i) => (
+                <details key={i} className="group bg-gray-50 rounded-xl border border-gray-100">
+                  <summary className="flex items-center justify-between p-5 cursor-pointer font-semibold text-gray-900 list-none">
+                    {f.q}
+                    <Icon name="ChevronDown" size={18} className="text-gray-400 group-open:rotate-180 transition-transform shrink-0 ml-2" />
+                  </summary>
+                  <div className="px-5 pb-5 text-sm text-gray-600 leading-relaxed">{f.a}</div>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── ФОРМА ВХОДА / РЕГИСТРАЦИИ ── */}
+        <section id="partner-login" className="py-20 px-4 bg-gradient-to-br from-primary/5 to-secondary/5">
+          <div className="max-w-md mx-auto">
+            <div className="text-center mb-8">
+              <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Icon name="Handshake" size={28} className="text-white" />
+              </div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Войти в партнёрский кабинет</h2>
+              <p className="text-sm text-gray-500">Вход и регистрация — через мессенджер, без паролей</p>
+            </div>
+
+            {authStep === 'choose' && (
+              <Card className="shadow-lg">
+                <CardContent className="pt-6 space-y-4">
+                  <p className="text-sm font-medium text-center text-gray-700">Выберите мессенджер для входа</p>
+                  <p className="text-xs text-center text-gray-400">Нажмите — бот пришлёт код подтверждения</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <button
+                      onClick={() => handleSendToMessenger('telegram')}
+                      disabled={submitting}
+                      className="flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-transparent hover:border-[#229ED9] hover:bg-blue-50 transition-all disabled:opacity-50"
+                    >
+                      <div className="w-14 h-14 rounded-full bg-[#229ED9] flex items-center justify-center">
+                        <Icon name="Send" size={26} className="text-white" />
+                      </div>
+                      <span className="text-sm font-semibold">Telegram</span>
+                    </button>
+                    <button
+                      onClick={() => handleSendToMessenger('max')}
+                      disabled={submitting}
+                      className="flex flex-col items-center gap-2 p-5 rounded-xl border-2 border-transparent hover:border-[#0066CC] hover:bg-blue-50 transition-all disabled:opacity-50"
+                    >
+                      <div className="w-14 h-14 rounded-full bg-[#0066CC] flex items-center justify-center">
+                        <span className="text-white font-bold text-xl">M</span>
+                      </div>
+                      <span className="text-sm font-semibold">MAX</span>
+                    </button>
+                  </div>
+                  <p className="text-xs text-center text-gray-400">Впервые? Бот создаст аккаунт автоматически</p>
+                </CardContent>
+              </Card>
+            )}
+
+            {authStep === 'messenger_wait' && (
+              <Card className="shadow-lg">
+                <CardContent className="pt-6 text-center space-y-4">
+                  <div className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center ${messenger === 'telegram' ? 'bg-[#229ED9]' : 'bg-[#0066CC]'}`}>
+                    {messenger === 'telegram'
+                      ? <Icon name="Send" size={28} className="text-white" />
+                      : <span className="text-white font-bold text-2xl">M</span>}
+                  </div>
+                  <div>
+                    <p className="font-semibold">Откройте {messenger === 'telegram' ? 'Telegram' : 'MAX'}</p>
+                    <p className="text-sm text-gray-500 mt-1">Нажмите «Старт» в боте — вам придёт код подтверждения</p>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 text-sm text-gray-400">
+                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    Ожидаю код...
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" className="flex-1" onClick={() => window.open(deepLink, '_blank')}>
+                      <Icon name="ExternalLink" size={14} className="mr-1" />Открыть снова
+                    </Button>
+                    <Button variant="ghost" size="sm" className="flex-1" onClick={() => setAuthStep('enter_otp')}>
+                      Ввести код
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {authStep === 'enter_otp' && (
+              <Card className="shadow-lg">
+                <CardContent className="pt-6 space-y-4">
+                  <div className="text-center">
+                    <p className="font-semibold">Введите код из {messenger === 'telegram' ? 'Telegram' : 'MAX'}</p>
+                    <p className="text-sm text-gray-500 mt-1">6-значный код был отправлен в мессенджер</p>
+                  </div>
+                  <Input
+                    placeholder="000000"
+                    value={otp}
+                    onChange={e => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="text-center text-2xl font-mono tracking-[0.5em]"
+                    maxLength={6}
+                    autoFocus
+                    onKeyDown={e => e.key === 'Enter' && handleVerifyOtp()}
+                  />
+                  <Button className="w-full" onClick={handleVerifyOtp} disabled={submitting || otp.length < 6}>
+                    {submitting ? 'Проверка...' : 'Продолжить'}
+                  </Button>
+                  <button className="text-xs text-gray-400 w-full text-center hover:text-gray-700" onClick={() => { setOtp(''); setAuthStep('choose'); }}>
+                    ← Попробовать снова
+                  </button>
+                </CardContent>
+              </Card>
+            )}
+
+            {authStep === 'fill_profile' && (
+              <Card className="shadow-lg">
+                <CardContent className="pt-6 space-y-4">
+                  <div className="text-center">
+                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Icon name="CheckCircle" size={24} className="text-green-600" />
+                    </div>
+                    <p className="font-semibold">Почти готово!</p>
+                    <p className="text-sm text-gray-500 mt-1">Заполните данные для партнёрского аккаунта</p>
+                  </div>
+                  <div>
+                    <Label>Имя и фамилия *</Label>
+                    <Input placeholder="Иванова Анна" value={profileForm.name} onChange={e => setProfileForm(p => ({ ...p, name: e.target.value }))} autoFocus />
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <Input type="email" placeholder="anna@example.com" value={profileForm.email} onChange={e => setProfileForm(p => ({ ...p, email: e.target.value }))} />
+                  </div>
+                  <div>
+                    <Label>Телефон</Label>
+                    <Input placeholder="+7 900 000 00 00" value={profileForm.phone} onChange={e => setProfileForm(p => ({ ...p, phone: e.target.value }))} />
+                  </div>
+                  <Button className="w-full" onClick={handleCompleteRegistration} disabled={submitting || !profileForm.name}>
+                    {submitting ? 'Создаём аккаунт...' : 'Начать работу'}
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+          </div>
+        </section>
+
+        {/* ── ФУТЕР ── */}
+        <footer className="py-8 px-4 border-t bg-white text-center text-sm text-gray-400">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Icon name="Rocket" size={16} className="text-primary" />
+            <span className="font-bold text-gray-700">iHUNT</span>
+          </div>
+          <p>Платформа реферального найма для бизнеса · Партнёрская программа</p>
+          <p className="mt-1">© {new Date().getFullYear()} iHUNT. Все права защищены.</p>
+        </footer>
       </div>
     );
   }
