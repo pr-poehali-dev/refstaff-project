@@ -155,6 +155,18 @@ export default function Blog() {
               </p>
             </div>
 
+            {/* Партнёрская программа — баннер */}
+            <Link to="/partner" className="group flex items-center gap-3 sm:gap-4 mb-8 rounded-2xl border border-primary/20 bg-gradient-to-r from-primary/5 to-secondary/5 px-4 py-3 sm:px-5 sm:py-4 hover:shadow-md transition-shadow">
+              <div className="w-10 h-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center shrink-0">
+                <Icon name="Handshake" size={20} className="text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-xs font-semibold text-primary mb-0.5">Партнёрская программа iHUNT</div>
+                <div className="text-xs text-gray-500 leading-snug">Вы HR-специалист или рекрутёр? Рекомендуйте iHUNT и зарабатывайте <strong className="text-gray-700">до 101 490 ₽</strong> с одного клиента</div>
+              </div>
+              <Icon name="ChevronRight" size={16} className="text-primary shrink-0 group-hover:translate-x-1 transition-transform" />
+            </Link>
+
             {/* Список постов */}
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
