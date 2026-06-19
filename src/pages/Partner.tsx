@@ -490,7 +490,7 @@ export default function Partner() {
                 <div className="text-4xl font-extrabold mb-2">101 490 ₽</div>
                 <div className="text-sm text-primary-foreground/80">разово при оплате клиентом года</div>
                 <div className="mt-4 pt-4 border-t border-white/20 text-sm">
-                  Лимит исчерпан после <strong className="text-white">1 платежа</strong>
+                  Разовое начисление за <strong className="text-white">1 клиента</strong>
                 </div>
               </div>
             </div>
