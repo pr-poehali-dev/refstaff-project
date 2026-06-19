@@ -386,7 +386,7 @@ export default function Partner() {
               Зарабатывайте до <span className="text-primary">101 490 ₽</span><br className="hidden sm:block" /> с одного клиента
             </h1>
             <p className="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-10">
-              Партнёрская программа для HR-специалистов, рекрутёров и кадровых агентств. Рекомендуйте iHUNT — получайте <strong>50% с каждой оплаты</strong> подписки ваших клиентов.
+              Партнёрская программа для HR-специалистов, рекрутёров и кадровых агентств. Рекомендуйте <a href="https://i-hunt.ru/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">iHUNT</a> — получайте <strong>50% с каждой оплаты</strong> подписки ваших клиентов.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" className="text-base px-8" onClick={scrollToLogin}>
