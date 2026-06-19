@@ -139,45 +139,91 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         """, (tier, expires, company_id))
 
         # Начисляем комиссию партнёру, если компания пришла по реф-ссылке
+        # Правило: комиссия начисляется только за первые 3 ежемесячных платежа
+        # ИЛИ за разовую оплату года (365 дней) — но только 1 раз
         cur.execute(
-            f"SELECT referred_by_partner_id, name FROM {SCHEMA}.companies WHERE id = %s",
+            f"""SELECT c.referred_by_partner_id, c.name,
+                       pr.paid_months_count, pr.id as referral_id
+                FROM {SCHEMA}.companies c
+                LEFT JOIN {SCHEMA}.partner_referrals pr
+                    ON pr.company_id = c.id AND pr.partner_id = c.referred_by_partner_id
+                WHERE c.id = %s""",
             (company_id,)
         )
         company_row = cur.fetchone()
         partner_commission_info = None
         if company_row and company_row['referred_by_partner_id']:
             partner_id = company_row['referred_by_partner_id']
-            price = SUBSCRIPTION_PRICES.get(days, days * 330)  # fallback: 330₽/день
-            commission = round(price * COMMISSION_RATE, 2)
-            commission_available_at = datetime.utcnow() + timedelta(days=HOLD_DAYS)
+            paid_months = int(company_row['paid_months_count'] or 0)
 
-            # Обновляем запись в partner_referrals
-            cur.execute(f"""
-                UPDATE {SCHEMA}.partner_referrals
-                SET commission_amount = %s,
-                    commission_available_at = %s,
-                    subscription_tier = %s,
-                    subscription_expires_at = %s,
-                    subscription_set_at = NOW(),
-                    status = 'subscribed',
-                    updated_at = NOW()
-                WHERE partner_id = %s AND company_id = %s
-            """, (commission, commission_available_at, tier, expires, partner_id, company_id))
+            # Определяем: годовая оплата (365 дней) или месячная
+            is_annual = (days >= 365)
+            # Лимит: месячные — не более 3 платежей; годовая — только 1 раз (считается как 3)
+            commission_limit_reached = paid_months >= 3
 
-            # Начисляем на баланс партнёра (в pending — разблокируется после hold)
-            cur.execute(f"""
-                UPDATE {SCHEMA}.hr_partners
-                SET balance = balance + %s,
-                    total_earned = total_earned + %s,
-                    updated_at = NOW()
-                WHERE id = %s
-            """, (commission, commission, partner_id))
+            if not commission_limit_reached:
+                price = SUBSCRIPTION_PRICES.get(days, days * 330)
+                # Для годовой оплаты считаем комиссию только за 3 месяца (3 × 9900 = 29700)
+                if is_annual:
+                    price_for_commission = SUBSCRIPTION_PRICES.get(30, 9900) * 3
+                else:
+                    price_for_commission = price
+                commission = round(price_for_commission * COMMISSION_RATE, 2)
+                commission_available_at = datetime.utcnow() + timedelta(days=HOLD_DAYS)
+                # При годовой оплате засчитываем сразу 3 месяца (достигнут лимит)
+                new_paid_months = 3 if is_annual else paid_months + 1
 
-            partner_commission_info = {
-                'partner_id': partner_id,
-                'commission': commission,
-                'available_at': commission_available_at.isoformat(),
-            }
+                # Обновляем запись в partner_referrals
+                cur.execute(f"""
+                    UPDATE {SCHEMA}.partner_referrals
+                    SET commission_amount = commission_amount + %s,
+                        total_commission_earned = total_commission_earned + %s,
+                        commission_available_at = %s,
+                        subscription_tier = %s,
+                        subscription_expires_at = %s,
+                        subscription_set_at = NOW(),
+                        status = 'subscribed',
+                        paid_months_count = %s,
+                        updated_at = NOW()
+                    WHERE partner_id = %s AND company_id = %s
+                """, (commission, commission, commission_available_at, tier, expires,
+                      new_paid_months, partner_id, company_id))
+
+                # Начисляем на баланс партнёра
+                cur.execute(f"""
+                    UPDATE {SCHEMA}.hr_partners
+                    SET balance = balance + %s,
+                        total_earned = total_earned + %s,
+                        updated_at = NOW()
+                    WHERE id = %s
+                """, (commission, commission, partner_id))
+
+                partner_commission_info = {
+                    'partner_id': partner_id,
+                    'commission': commission,
+                    'available_at': commission_available_at.isoformat(),
+                    'paid_months_count': new_paid_months,
+                    'limit_reached': new_paid_months >= 3,
+                }
+                print(f"Partner commission: partner_id={partner_id} commission={commission} paid_months={new_paid_months} is_annual={is_annual}")
+            else:
+                # Лимит исчерпан — только обновляем данные подписки, без комиссии
+                cur.execute(f"""
+                    UPDATE {SCHEMA}.partner_referrals
+                    SET subscription_tier = %s,
+                        subscription_expires_at = %s,
+                        subscription_set_at = NOW(),
+                        status = 'subscribed',
+                        updated_at = NOW()
+                    WHERE partner_id = %s AND company_id = %s
+                """, (tier, expires, partner_id, company_id))
+                print(f"Partner commission: LIMIT REACHED for partner_id={partner_id}, paid_months={paid_months}")
+                partner_commission_info = {
+                    'partner_id': partner_id,
+                    'commission': 0,
+                    'limit_reached': True,
+                    'paid_months_count': paid_months,
+                }
 
         return ok({'success': True, 'expires_at': expires.isoformat(), 'partner_commission': partner_commission_info})
 
