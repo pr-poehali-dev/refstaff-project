@@ -486,7 +486,7 @@ export default function Partner() {
                 </div>
               </div>
               <div className="bg-white/10 rounded-2xl p-6 ring-2 ring-white/40">
-                <div className="text-sm font-semibold text-primary-foreground/70 mb-1 uppercase tracking-wide">Годовая подписка</div>
+                <div className="text-sm font-semibold text-primary-foreground/70 mb-1 uppercase tracking-wide">При оплате клиентом за 1 год</div>
                 <div className="text-4xl font-extrabold mb-2">101 490 ₽</div>
                 <div className="text-sm text-primary-foreground/80">разово при оплате клиентом года</div>
                 <div className="mt-4 pt-4 border-t border-white/20 text-sm">
