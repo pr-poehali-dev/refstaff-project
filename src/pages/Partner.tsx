@@ -478,7 +478,7 @@ export default function Partner() {
             <p className="text-center text-primary-foreground/80 mb-12 max-w-xl mx-auto">Ваш доход зависит от количества привлечённых клиентов и типа их подписки</p>
             <div className="grid sm:grid-cols-2 gap-6 mb-10">
               <div className="bg-white/10 rounded-2xl p-6">
-                <div className="text-sm font-semibold text-primary-foreground/70 mb-1 uppercase tracking-wide">Месячная подписка</div>
+                <div className="text-sm font-semibold text-primary-foreground/70 mb-1 uppercase tracking-wide">При оплате клиентом за 1 месяц</div>
                 <div className="text-4xl font-extrabold mb-2">9 950 ₽</div>
                 <div className="text-sm text-primary-foreground/80">Вознаграждение начисляется в течении 3х месяцев, если данный период продлевается клиентом</div>
                 <div className="mt-4 pt-4 border-t border-white/20 text-sm">
