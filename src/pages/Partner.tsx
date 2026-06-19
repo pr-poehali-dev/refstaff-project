@@ -539,6 +539,88 @@ export default function Partner() {
           </div>
         </section>
 
+        {/* ── О ПРОДУКТЕ iHUNT ── */}
+        <section className="py-16 px-4 bg-gray-50">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-1.5 mb-4">
+                <Icon name="Rocket" size={16} className="text-primary" />
+                <span className="text-sm font-semibold text-primary">Что такое iHUNT</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
+                Платформа реферального найма <a href="https://i-hunt.ru/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">iHUNT</a>
+              </h2>
+              <p className="text-gray-500 max-w-2xl mx-auto">
+                iHUNT помогает компаниям нанимать сотрудников через рекомендации — это быстрее, дешевле и эффективнее традиционного рекрутинга
+              </p>
+            </div>
+
+            {/* Как работает продукт */}
+            <div className="grid sm:grid-cols-3 gap-5 mb-12">
+              {[
+                { icon: 'Users', title: 'Сотрудники рекомендуют', desc: 'Компания подключает своих сотрудников как агентов по найму. Те рекомендуют знакомых на открытые вакансии.' },
+                { icon: 'UserCheck', title: 'Кандидаты приходят сами', desc: 'Рекомендованные кандидаты уже «тёплые» — их привели люди, которые знают и компанию, и соискателя.' },
+                { icon: 'Coins', title: 'Сотрудники получают бонусы', desc: 'За успешный наём рекомендатель получает денежное вознаграждение прямо в приложении.' },
+              ].map(f => (
+                <div key={f.title} className="bg-white rounded-xl p-6 border border-gray-100 text-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                    <Icon name={f.icon} size={24} className="text-primary" />
+                  </div>
+                  <div className="font-bold text-gray-900 mb-2">{f.title}</div>
+                  <div className="text-sm text-gray-500">{f.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Возможности платформы */}
+            <div className="bg-white rounded-2xl border border-gray-100 p-8">
+              <h3 className="text-lg font-bold text-gray-900 mb-6 text-center">Возможности платформы</h3>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  { icon: 'LayoutDashboard', text: 'Личный кабинет HR-менеджера с управлением вакансиями и кандидатами' },
+                  { icon: 'Share2', text: 'Реферальные ссылки для каждого сотрудника на каждую вакансию' },
+                  { icon: 'BarChart3', text: 'Аналитика: кто рекомендует, сколько нанято, сколько выплачено' },
+                  { icon: 'Bell', text: 'Уведомления сотрудникам о статусе их кандидатов в Telegram' },
+                  { icon: 'Wallet', text: 'Встроенный кошелёк для выплаты вознаграждений сотрудникам' },
+                  { icon: 'ClipboardList', text: 'AI-тесты для кандидатов — автоматическая проверка перед собеседованием' },
+                  { icon: 'Building2', text: 'Корпоративный профиль компании и страница вакансий' },
+                  { icon: 'Lock', text: 'Безопасность данных и соответствие требованиям 152-ФЗ' },
+                ].map(f => (
+                  <div key={f.text} className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
+                      <Icon name={f.icon} size={16} className="text-green-600" />
+                    </div>
+                    <span className="text-sm text-gray-600">{f.text}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Для кого продукт */}
+            <div className="mt-8 grid sm:grid-cols-3 gap-4 text-center text-sm">
+              {[
+                { label: 'Малый бизнес', desc: 'от 10 сотрудников' },
+                { label: 'Средний бизнес', desc: 'от 50 до 500 человек' },
+                { label: 'Крупные компании', desc: 'корпоративные решения' },
+              ].map(s => (
+                <div key={s.label} className="bg-white border border-gray-100 rounded-xl px-5 py-4">
+                  <div className="font-semibold text-gray-900">{s.label}</div>
+                  <div className="text-gray-400 text-xs mt-1">{s.desc}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-8">
+              <a href="https://i-hunt.ru/" target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="lg">
+                  <Icon name="ExternalLink" size={16} className="mr-2" />
+                  Узнать больше об iHUNT
+                </Button>
+              </a>
+            </div>
+          </div>
+        </section>
+
         {/* ── FAQ ── */}
         <section className="py-16 px-4">
           <div className="max-w-3xl mx-auto">
