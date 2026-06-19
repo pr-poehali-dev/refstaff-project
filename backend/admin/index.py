@@ -119,7 +119,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         from datetime import datetime, timedelta
 
         # Цены подписки для расчёта комиссии партнёру
-        SUBSCRIPTION_PRICES = {30: 9900, 365: 89900}
+        SUBSCRIPTION_PRICES = {30: 19900, 365: 202980}
         COMMISSION_RATE = 0.5
         HOLD_DAYS = 30
 
