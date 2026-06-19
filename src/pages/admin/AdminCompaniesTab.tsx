@@ -9,6 +9,22 @@ import { TabsContent } from '@/components/ui/tabs';
 import Icon from '@/components/ui/icon';
 import { Company, User, daysLeft } from './adminTypes';
 
+interface CompanyVacancy {
+  id: number;
+  title: string;
+  department?: string;
+  status: string;
+  recs_count?: number;
+}
+
+interface CompanyDetail extends Company {
+  users?: User[];
+  vacancies?: CompanyVacancy[];
+  description?: string;
+  website?: string;
+  industry?: string;
+}
+
 function SubBadge({ expiresAt, tier }: { expiresAt?: string; tier?: string }) {
   const days = daysLeft(expiresAt);
   if (days <= 0) return <Badge variant="destructive">Истекла</Badge>;
@@ -18,7 +34,7 @@ function SubBadge({ expiresAt, tier }: { expiresAt?: string; tier?: string }) {
 
 interface Props {
   companies: Company[];
-  selectedCompany: any;
+  selectedCompany: CompanyDetail | null;
   showCompanyDialog: boolean;
   setShowCompanyDialog: (v: boolean) => void;
   showSubDialog: boolean;
@@ -157,7 +173,7 @@ export default function AdminCompaniesTab({
                   <div>
                     <p className="text-gray-400 text-sm mb-2">Вакансии</p>
                     <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {selectedCompany.vacancies.map((v: any) => (
+                      {selectedCompany.vacancies.map((v) => (
                         <div key={v.id} className="bg-gray-800 rounded-lg p-2 flex items-center justify-between">
                           <div>
                             <p className="text-white text-sm">{v.title}</p>

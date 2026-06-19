@@ -5,11 +5,24 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 import type { PayoutRequest } from './PayoutRequests';
 
+interface EmployeeRec {
+  id: number;
+  status: string;
+  reward_amount?: number;
+  candidate_name: string;
+  candidate_email: string;
+  vacancy_title?: string;
+  vacancy_id?: number;
+  candidate_phone?: string;
+  comment?: string;
+  created_at: string;
+}
+
 interface EmployeeRecommendationsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedRequest: PayoutRequest | null;
-  recommendations: any[];
+  recommendations: EmployeeRec[];
   loading: boolean;
   getRecommendationStatusBadge: (status: string) => JSX.Element;
   onVacancyClick?: (vacancyId: number) => void;

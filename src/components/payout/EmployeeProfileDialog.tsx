@@ -4,11 +4,37 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { PayoutRequest } from '../PayoutRequests';
 
+interface EmployeeRec {
+  id: number;
+  status: string;
+  candidate_name: string;
+  vacancy_title?: string;
+  created_at: string;
+}
+
+interface EmployeeData {
+  first_name?: string;
+  last_name?: string;
+  position?: string;
+  department?: string;
+  avatar_url?: string;
+  level?: number;
+  experience_points?: number;
+  total_recommendations?: number;
+  successful_hires?: number;
+  total_earnings?: number;
+  email?: string;
+  phone?: string;
+  telegram?: string;
+  vk?: string;
+  recommendations?: EmployeeRec[];
+}
+
 interface EmployeeProfileDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   request: PayoutRequest | null;
-  employeeData: any;
+  employeeData: EmployeeData | null;
   loading: boolean;
 }
 
@@ -133,7 +159,7 @@ export function EmployeeProfileDialog({
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3 max-h-60 overflow-y-auto">
-                      {employeeData.recommendations.map((rec: any) => (
+                      {employeeData.recommendations.map((rec) => (
                         <div key={rec.id} className="border rounded-lg p-3">
                           <div className="flex items-start justify-between mb-2">
                             <div className="flex-1">

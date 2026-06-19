@@ -1,14 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 import type { Vacancy as ApiVacancy, Employee as ApiEmployee, Recommendation as ApiRecommendation, Company, WalletData, Chat } from '@/lib/api';
-import type { Vacancy, Employee, Recommendation, PayoutRequest, NewsPost } from '@/types';
+import type { CurrentUser, Vacancy, Employee, Recommendation, PayoutRequest, NewsPost } from '@/types';
 
 type Notification = { id: number; type: string; message: string; date: string; read: boolean };
+type ApiVacancyExtended = ApiVacancy & { motivation?: string; company_description?: string; company_name?: string };
 
 export function useDataLoader(params: {
   userRole: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  currentUser: any;
+  currentUser: CurrentUser | null;
   currentCompanyId: number;
   currentEmployeeId: number;
   showNotificationsDialog: boolean;
@@ -93,12 +93,9 @@ export function useDataLoader(params: {
         payoutDelayDays: v.payout_delay_days || 30,
         description: v.description || '',
         requirements: v.requirements || '',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        motivation: (v as any).motivation || '',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        companyDescription: (v as any).company_description || '',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        companyName: (v as any).company_name || '',
+        motivation: (v as ApiVacancyExtended).motivation || '',
+        companyDescription: (v as ApiVacancyExtended).company_description || '',
+        companyName: (v as ApiVacancyExtended).company_name || '',
         referralLink: v.referral_token && userRole === 'employee' ? `${window.location.origin}/r/${v.referral_token}?ref=${currentEmployeeId}` : ''
       }));
 

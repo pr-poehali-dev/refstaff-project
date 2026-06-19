@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import type { UserRole, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, PayoutRequest } from '@/types';
+import type { UserRole, CurrentUser, Vacancy, Employee, Recommendation, ChatMessage, NewsPost, PayoutRequest } from '@/types';
 import type { Company, WalletData, Chat } from '@/lib/api';
 import type { AiMessage } from '@/components/AiAssistantTab';
 
@@ -12,7 +12,7 @@ export function useIndexState() {
     }
     return 'guest';
   });
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [authToken, setAuthToken] = useState<string | null>(() => localStorage.getItem('authToken'));
   const [isVerifying, setIsVerifying] = useState<boolean>(() => !!localStorage.getItem('authToken'));
   const [activeVacancy, setActiveVacancy] = useState<Vacancy | null>(null);
@@ -127,7 +127,7 @@ export function useIndexState() {
     companyName: '', firstName: '', lastName: '', email: '', password: '', inn: '', employeeCount: '50'
   });
   const [innVerificationState, setInnVerificationState] = useState<{
-    isChecking: boolean; isVerified: boolean; error: string | null; companyData: any | null;
+    isChecking: boolean; isVerified: boolean; error: string | null; companyData: Record<string, unknown> | null;
   }>({ isChecking: false, isVerified: false, error: null, companyData: null });
   const [aiMessages, setAiMessages] = useState<AiMessage[]>(() => {
     try { return JSON.parse(localStorage.getItem('ai_chat_history') || '[]'); } catch { return []; }

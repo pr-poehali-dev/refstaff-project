@@ -46,7 +46,7 @@ export function PayoutReviewDialog({
         <div className="space-y-4">
           <div>
             <Label>Решение</Label>
-            <Select value={reviewStatus} onValueChange={(v) => setReviewStatus(v as any)}>
+            <Select value={reviewStatus} onValueChange={(v) => setReviewStatus(v as 'approved' | 'rejected' | 'paid')}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

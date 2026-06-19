@@ -1,5 +1,15 @@
 export type UserRole = 'guest' | 'employer' | 'employee';
 
+export interface CurrentUser {
+  id: number;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  role?: string;
+  company_id?: number;
+  [key: string]: unknown;
+}
+
 export interface Vacancy {
   id: number;
   title: string;

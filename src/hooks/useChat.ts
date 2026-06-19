@@ -1,12 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '@/lib/api';
 import type { Chat } from '@/lib/api';
-import type { ChatMessage, Employee } from '@/types';
+import type { ChatMessage, CurrentUser, Employee } from '@/types';
+
+interface MessageRaw {
+  id: number;
+  sender_id: number;
+  sender_name?: string;
+  message: string;
+  created_at: string;
+  attachment_url?: string;
+  attachment_type?: 'image' | 'file';
+  attachment_name?: string;
+  attachment_size?: number;
+}
 
 export function useChat(params: {
   userRole: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  currentUser: any;
+  currentUser: CurrentUser | null;
   currentEmployeeId: number;
   currentCompanyId: number;
   chats: Chat[];
@@ -79,7 +90,7 @@ export function useChat(params: {
   const loadChatMessages = async (chatId: number) => {
     try {
       const msgs = await api.getMessages(chatId, currentUser?.id);
-      const mapped: ChatMessage[] = msgs.map((m) => ({
+      const mapped: ChatMessage[] = (msgs as MessageRaw[]).map((m) => ({
         id: m.id,
         senderId: m.sender_id,
         senderName: m.sender_name || 'Сотрудник',
@@ -87,16 +98,11 @@ export function useChat(params: {
         timestamp: new Date(m.created_at).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }),
         createdAt: m.created_at,
         isOwn: m.sender_id === currentUser?.id,
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        attachments: (m as any).attachment_url ? [{
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          type: (m as any).attachment_type as 'image' | 'file',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          url: (m as any).attachment_url,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          name: (m as any).attachment_name || 'файл',
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          size: (m as any).attachment_size || 0,
+        attachments: m.attachment_url ? [{
+          type: m.attachment_type ?? 'file',
+          url: m.attachment_url,
+          name: m.attachment_name || 'файл',
+          size: m.attachment_size || 0,
         }] : undefined,
       }));
       setChatMessages(mapped);

@@ -4,11 +4,23 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import { PayoutRequest } from '../PayoutRequests';
 
+interface EmployeeRec {
+  id: number;
+  status: string;
+  reward_amount?: number;
+  candidate_name: string;
+  candidate_email?: string;
+  vacancy_title?: string;
+  candidate_phone?: string;
+  comment?: string;
+  created_at: string;
+}
+
 interface EmployeeRecommendationsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   request: PayoutRequest | null;
-  recommendations: any[];
+  recommendations: EmployeeRec[];
   loading: boolean;
 }
 

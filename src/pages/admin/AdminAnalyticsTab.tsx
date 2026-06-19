@@ -23,7 +23,7 @@ export default function AdminAnalyticsTab({ analytics }: Props) {
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-gray-400 text-sm">{s.label}</span>
-                    <Icon name={s.icon as any} size={18} className={s.color} />
+                    <Icon name={s.icon} size={18} className={s.color} />
                   </div>
                   <div className="text-2xl font-bold text-white">{s.value}</div>
                 </CardContent>

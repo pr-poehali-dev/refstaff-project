@@ -5,11 +5,29 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import type { PayoutRequest } from './PayoutRequests';
 
+interface EmployeeRec {
+  id: number;
+  status: string;
+  reward_amount?: number;
+  candidate_name: string;
+  candidate_email: string;
+  vacancy_title?: string;
+  created_at: string;
+}
+
+interface EmployeeProfileData {
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  position?: string;
+  recommendations?: EmployeeRec[];
+}
+
 interface EmployeeProfileDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   selectedRequest: PayoutRequest | null;
-  employeeData: any;
+  employeeData: EmployeeProfileData | null;
   loading: boolean;
   getRecommendationStatusBadge: (status: string) => JSX.Element;
 }
@@ -24,8 +42,8 @@ export function EmployeeProfileDialog({
 }: EmployeeProfileDialogProps) {
   if (!selectedRequest) return null;
 
-  const hiredCount = employeeData?.recommendations?.filter((r: any) => r.status === 'hired').length || 0;
-  const totalReward = employeeData?.recommendations?.reduce((sum: number, r: any) => 
+  const hiredCount = employeeData?.recommendations?.filter((r) => r.status === 'hired').length || 0;
+  const totalReward = employeeData?.recommendations?.reduce((sum: number, r) =>
     r.status === 'hired' ? sum + (r.reward_amount || 0) : sum, 0) || 0;
 
   return (
@@ -98,7 +116,7 @@ export function EmployeeProfileDialog({
               <div>
                 <h4 className="font-semibold mb-3">Последние рекомендации</h4>
                 <div className="space-y-2">
-                  {employeeData.recommendations.slice(0, 5).map((rec: any) => (
+                  {employeeData.recommendations.slice(0, 5).map((rec) => (
                     <Card key={rec.id}>
                       <CardContent className="py-4">
                         <div className="space-y-2">
