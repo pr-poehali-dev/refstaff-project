@@ -131,10 +131,16 @@ export default function Blog() {
               <span className="font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-xs">iHUNT - сервис реферального рекрутинга
 </span>
             </div>
-            <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
-              <Icon name="ArrowLeft" size={14} />
-              Главная
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link to="/partner" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
+                <Icon name="Handshake" size={14} />
+                Партнёрам
+              </Link>
+              <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
+                <Icon name="ArrowLeft" size={14} />
+                Главная
+              </Link>
+            </div>
           </div>
         </header>
 
