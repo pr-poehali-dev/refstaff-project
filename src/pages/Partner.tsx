@@ -47,6 +47,8 @@ interface Referral {
   hold_days_left: number | null;
   subscription_tier: string | null;
   subscription_expires_at: string | null;
+  paid_months_count: number;
+  total_commission_earned: number;
 }
 
 interface Payout {
@@ -635,6 +637,19 @@ export default function Partner() {
                             </div>
                           </div>
                         )}
+
+                        {/* Прогресс лимита выплат */}
+                        <div className="mt-2 pt-2 border-t flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">Платежей с комиссией:</span>
+                          <div className="flex items-center gap-1">
+                            {[1,2,3].map(n => (
+                              <div key={n} className={`w-4 h-4 rounded-full text-center leading-4 font-bold ${(r.paid_months_count ?? 0) >= n ? 'bg-green-500 text-white' : 'bg-gray-200 text-gray-400'}`}>{n}</div>
+                            ))}
+                            {(r.paid_months_count ?? 0) >= 3 && (
+                              <span className="text-gray-400 ml-1">лимит исчерпан</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>

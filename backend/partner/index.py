@@ -25,8 +25,8 @@ MAX_API = 'https://platform-api.max.ru'
 
 # Стоимость подписки для расчёта комиссии (50%)
 SUBSCRIPTION_PRICES = {
-    30: 9900,    # 1 месяц — 9 900 ₽
-    365: 89900,  # 1 год — 89 900 ₽
+    30: 19900,    # 1 месяц — 19 900 ₽
+    365: 202980,  # 1 год — 202 980 ₽
 }
 COMMISSION_RATE = 0.5  # 50%
 HOLD_DAYS = 30
@@ -467,7 +467,8 @@ def handler(event: dict, context) -> dict:
                     f"""SELECT id, company_name, contact_name, contact_email, contact_phone,
                                status, source, created_at,
                                commission_amount, commission_available_at,
-                               subscription_tier, subscription_expires_at, subscription_set_at
+                               subscription_tier, subscription_expires_at, subscription_set_at,
+                               paid_months_count, total_commission_earned
                         FROM {SCHEMA}.partner_referrals
                         WHERE partner_id = %s
                         ORDER BY created_at DESC""",
@@ -485,6 +486,8 @@ def handler(event: dict, context) -> dict:
                     d['contact_name'] = (cn[:2] + '***') if len(cn) > 2 else cn
                     # Числа
                     d['commission_amount'] = float(d['commission_amount'] or 0)
+                    d['total_commission_earned'] = float(d['total_commission_earned'] or 0)
+                    d['paid_months_count'] = int(d['paid_months_count'] or 0)
                     # Hold статус
                     avail = d.get('commission_available_at')
                     if avail:
@@ -555,6 +558,13 @@ def handler(event: dict, context) -> dict:
                 return resp(400, {'error': 'Укажите способ и реквизиты выплаты'})
 
             with conn.cursor() as cur:
+                # Уменьшаем баланс (с проверкой достаточности прямо в запросе)
+                cur.execute(
+                    f"UPDATE {SCHEMA}.hr_partners SET balance = balance - %s, updated_at = NOW() WHERE id = %s AND balance >= %s RETURNING id",
+                    (amount, partner_id, amount)
+                )
+                if not cur.fetchone():
+                    return resp(400, {'error': 'Недостаточно средств на балансе'})
                 cur.execute(
                     f"INSERT INTO {SCHEMA}.partner_payout_requests (partner_id, amount, payment_method, payment_details) VALUES (%s, %s, %s, %s) RETURNING id",
                     (partner_id, amount, payment_method, payment_details)
