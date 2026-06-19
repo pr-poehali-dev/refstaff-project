@@ -572,42 +572,102 @@ export default function Partner() {
               ))}
             </div>
 
-            {/* Возможности платформы */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-8">
-              <h3 className="text-lg font-bold text-gray-900 mb-6 text-center">Возможности платформы</h3>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  { icon: 'LayoutDashboard', text: 'Личный кабинет HR-менеджера с управлением вакансиями и кандидатами' },
-                  { icon: 'Share2', text: 'Реферальные ссылки для каждого сотрудника на каждую вакансию' },
-                  { icon: 'BarChart3', text: 'Аналитика: кто рекомендует, сколько нанято, сколько выплачено' },
-                  { icon: 'Bell', text: 'Уведомления сотрудникам о статусе их кандидатов в Telegram' },
-                  { icon: 'Wallet', text: 'Встроенный кошелёк для выплаты вознаграждений сотрудникам' },
-                  { icon: 'ClipboardList', text: 'AI-тесты для кандидатов — автоматическая проверка перед собеседованием' },
-                  { icon: 'Building2', text: 'Корпоративный профиль компании и страница вакансий' },
-                  { icon: 'Lock', text: 'Безопасность данных и соответствие требованиям 152-ФЗ' },
-                ].map(f => (
-                  <div key={f.text} className="flex items-start gap-3">
-                    <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center shrink-0 mt-0.5">
-                      <Icon name={f.icon} size={16} className="text-green-600" />
+            {/* Ключевые возможности — карточки */}
+            <div className="grid sm:grid-cols-2 gap-5 mb-8">
+              {[
+                {
+                  icon: 'Share2',
+                  title: 'Реферальный найм',
+                  desc: 'Сотрудники получают персональные реферальные ссылки на каждую вакансию и делятся ими с кандидатами. Рекомендованные люди уже знают о компании — конверсия в найм выше на 35%.',
+                  badge: 'Главная фича',
+                },
+                {
+                  icon: 'Trophy',
+                  title: 'Геймификация команды',
+                  desc: 'Рейтинги, бейджи и достижения превращают рекрутинг в соревнование. Ежемесячный рейтинг «Лучший рекрутёр» повышает активность сотрудников на 60%.',
+                  badge: null,
+                },
+                {
+                  icon: 'Wallet',
+                  title: 'Автоматические выплаты',
+                  desc: 'Встроенный кошелёк для бонусов: HR настраивает размер вознаграждения, а система автоматически начисляет его сотруднику после выхода кандидата на работу.',
+                  badge: null,
+                },
+                {
+                  icon: 'BrainCircuit',
+                  title: 'AI-тесты для кандидатов',
+                  desc: 'ИИ генерирует профессиональный тест по описанию вакансии за 15 секунд. Кандидат проходит тест без регистрации, HR получает результаты на почту сразу после прохождения.',
+                  badge: null,
+                },
+                {
+                  icon: 'BarChart3',
+                  title: 'Аналитика в реальном времени',
+                  desc: 'Полная воронка найма: кто рекомендовал → на каком этапе кандидат → когда выплатить бонус. Отчёт за квартал — в один клик.',
+                  badge: null,
+                },
+                {
+                  icon: 'MessageSquare',
+                  title: 'Встроенный чат',
+                  desc: 'HR общается с сотрудниками напрямую внутри платформы. Уведомления о статусе кандидатов приходят в Telegram — ничего не теряется.',
+                  badge: null,
+                },
+              ].map(f => (
+                <div key={f.title} className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-sm transition-shadow">
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                      <Icon name={f.icon} size={20} className="text-primary" />
                     </div>
-                    <span className="text-sm text-gray-600">{f.text}</span>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-bold text-gray-900 text-sm">{f.title}</span>
+                        {f.badge && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">{f.badge}</span>}
+                      </div>
+                      <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Результаты клиентов */}
+            <div className="bg-primary/5 rounded-2xl p-6 mb-8">
+              <div className="font-bold text-gray-900 text-center mb-5">Результаты компаний на iHUNT</div>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                {[
+                  { value: '+127%', label: 'рост числа рекомендаций' },
+                  { value: '-40%', label: 'сокращение времени найма' },
+                  { value: '92%', label: 'кандидатов проходят испытательный срок' },
+                ].map(s => (
+                  <div key={s.label}>
+                    <div className="text-2xl font-extrabold text-primary">{s.value}</div>
+                    <div className="text-xs text-gray-500 mt-1">{s.label}</div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Для кого продукт */}
-            <div className="mt-8 grid sm:grid-cols-3 gap-4 text-center text-sm">
-              {[
-                { label: 'Малый бизнес', desc: 'от 10 сотрудников' },
-                { label: 'Средний бизнес', desc: 'от 50 до 500 человек' },
-                { label: 'Крупные компании', desc: 'корпоративные решения' },
-              ].map(s => (
-                <div key={s.label} className="bg-white border border-gray-100 rounded-xl px-5 py-4">
-                  <div className="font-semibold text-gray-900">{s.label}</div>
-                  <div className="text-gray-400 text-xs mt-1">{s.desc}</div>
+            {/* Тарифы */}
+            <div className="grid sm:grid-cols-2 gap-4 mb-8">
+              <div className="bg-white border border-gray-200 rounded-xl p-5">
+                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Пробный период</div>
+                <div className="text-3xl font-extrabold text-gray-900 mb-1">0 ₽</div>
+                <div className="text-sm text-gray-500 mb-4">14 дней — все функции бесплатно</div>
+                <div className="space-y-1.5 text-xs text-gray-500">
+                  {['Все функции платформы', 'Без ограничений по сотрудникам', 'Поддержка 24/7'].map(t => (
+                    <div key={t} className="flex items-center gap-2"><Icon name="Check" size={14} className="text-green-500 shrink-0" />{t}</div>
+                  ))}
                 </div>
-              ))}
+              </div>
+              <div className="bg-primary rounded-xl p-5 text-white">
+                <div className="text-xs font-semibold text-primary-foreground/70 uppercase tracking-wide mb-2">Продвинутый</div>
+                <div className="text-3xl font-extrabold mb-1">19 900 ₽<span className="text-base font-normal">/мес</span></div>
+                <div className="text-sm text-primary-foreground/80 mb-4">или 16 915 ₽/мес при оплате года</div>
+                <div className="space-y-1.5 text-xs text-primary-foreground/90">
+                  {['Вакансии без ограничений', 'AI-тесты для кандидатов', 'Геймификация и рейтинги', 'Аналитика и отчёты', 'Встроенный чат'].map(t => (
+                    <div key={t} className="flex items-center gap-2"><Icon name="Check" size={14} className="text-white shrink-0" />{t}</div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div className="text-center mt-8">
