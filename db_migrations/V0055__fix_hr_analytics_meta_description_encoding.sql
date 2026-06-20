@@ -1,0 +1,1 @@
+UPDATE blog_posts SET meta_description = 'Узнайте, как HR-аналитика может улучшить процессы подбора и удержания персонала в вашей компании.' WHERE slug = 'hr-analitika-kak-ispolzovat-dannye-dlya-uluchsheniya-najma';
