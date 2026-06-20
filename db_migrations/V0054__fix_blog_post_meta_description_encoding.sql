@@ -1,0 +1,1 @@
+UPDATE blog_posts SET meta_description = 'Узнайте, как правильно отказывать кандидатам, сохраняя репутацию компании и поддержку для будущих взаимодействий.' WHERE slug = 'kak-pravilno-otkazyvat-kandidatam';
