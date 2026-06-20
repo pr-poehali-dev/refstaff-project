@@ -174,7 +174,7 @@ def call_gpt(prompt: str) -> str:
         'model': MODEL,
         'messages': [{'role': 'user', 'content': prompt}],
         'temperature': 0.8,
-        'max_tokens': 4096,
+        'max_tokens': 2500,
     }
     data = json.dumps(payload).encode('utf-8')
     req = urllib.request.Request(
