@@ -1,0 +1,1 @@
+UPDATE blog_posts SET meta_description = 'Узнайте, как ярмарки вакансий могут помочь в привлечении лучших кандидатов и улучшении имиджа компании.' WHERE slug = 'uchastie-v-yarmarkah-vakansij-i-karernyh-meropriyatiyah';
