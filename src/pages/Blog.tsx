@@ -132,10 +132,6 @@ export default function Blog() {
 </span>
             </div>
             <div className="flex items-center gap-3">
-              <Link to="/partner" className="text-sm text-primary font-medium hover:underline flex items-center gap-1">
-                <Icon name="Handshake" size={14} />
-                Партнёрам
-              </Link>
               <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
                 <Icon name="ArrowLeft" size={14} />
                 Главная
