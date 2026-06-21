@@ -307,4 +307,82 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         cur.execute(query, args)
         return ok(list(cur.fetchall()))
 
+    # --- PARTNERS LIST ---
+    if method == 'GET' and resource == 'partners':
+        cur.execute(f"""
+            SELECT p.id, p.name, p.email, p.phone, p.partner_code, p.status,
+                   p.balance, p.total_earned, p.clients_invited, p.clients_registered,
+                   p.payment_method, p.payment_details, p.inn, p.company_name, p.notes,
+                   p.created_at,
+                   p.telegram_chat_id, p.max_user_id,
+                   COUNT(DISTINCT pr.id) as referrals_count,
+                   COUNT(DISTINCT pr.id) FILTER (WHERE pr.status = 'subscribed') as paying_clients,
+                   COALESCE(SUM(pr.total_commission_earned), 0) as commission_total
+            FROM {SCHEMA}.hr_partners p
+            LEFT JOIN {SCHEMA}.partner_referrals pr ON pr.partner_id = p.id
+            GROUP BY p.id
+            ORDER BY p.created_at DESC
+        """)
+        partners = list(cur.fetchall())
+        return ok(partners)
+
+    # --- PARTNER DETAIL ---
+    if method == 'GET' and resource == 'partner':
+        partner_id = params.get('partner_id')
+        if not partner_id:
+            return err('partner_id required')
+        cur.execute(f"""
+            SELECT p.*, 
+                   COUNT(DISTINCT pr.id) as referrals_count,
+                   COUNT(DISTINCT pr.id) FILTER (WHERE pr.status = 'subscribed') as paying_clients,
+                   COALESCE(SUM(pr.total_commission_earned), 0) as commission_total
+            FROM {SCHEMA}.hr_partners p
+            LEFT JOIN {SCHEMA}.partner_referrals pr ON pr.partner_id = p.id
+            WHERE p.id = %s
+            GROUP BY p.id
+        """, (partner_id,))
+        partner = cur.fetchone()
+        if not partner:
+            return err('Partner not found', 404)
+
+        cur.execute(f"""
+            SELECT pr.id, pr.company_name, pr.contact_name, pr.contact_email, pr.contact_phone,
+                   pr.status, pr.source, pr.commission_amount, pr.total_commission_earned,
+                   pr.commission_available_at, pr.subscription_tier, pr.subscription_expires_at,
+                   pr.paid_months_count, pr.created_at,
+                   c.name as company_registered_name, c.subscription_tier as current_sub_tier
+            FROM {SCHEMA}.partner_referrals pr
+            LEFT JOIN {SCHEMA}.companies c ON c.id = pr.company_id
+            WHERE pr.partner_id = %s
+            ORDER BY pr.created_at DESC
+        """, (partner_id,))
+        referrals = list(cur.fetchall())
+
+        cur.execute(f"""
+            SELECT id, amount, status, created_at, payment_method, payment_details
+            FROM {SCHEMA}.partner_payout_requests
+            WHERE partner_id = %s
+            ORDER BY created_at DESC
+        """, (partner_id,))
+        payouts = list(cur.fetchall())
+
+        return ok({'partner': dict(partner), 'referrals': referrals, 'payouts': payouts})
+
+    # --- UPDATE PARTNER NOTES/STATUS ---
+    if method == 'PUT' and resource == 'partner':
+        partner_id = body.get('partner_id')
+        if not partner_id:
+            return err('partner_id required')
+        fields = []
+        values = []
+        for f in ['notes', 'status', 'balance']:
+            if f in body:
+                fields.append(f'{f} = %s')
+                values.append(body[f])
+        if not fields:
+            return err('No fields to update')
+        values.append(partner_id)
+        cur.execute(f"UPDATE {SCHEMA}.hr_partners SET {', '.join(fields)}, updated_at = CURRENT_TIMESTAMP WHERE id = %s", values)
+        return ok({'success': True})
+
     return err('Unknown resource', 404)

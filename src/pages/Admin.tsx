@@ -10,6 +10,7 @@ import AdminAnalyticsTab from './admin/AdminAnalyticsTab';
 import AdminCompaniesTab from './admin/AdminCompaniesTab';
 import AdminUsersTab from './admin/AdminUsersTab';
 import AdminBlogTab from './admin/AdminBlogTab';
+import AdminPartnersTab from './admin/AdminPartnersTab';
 
 export default function Admin() {
   const [secret, setSecret] = useState(() => localStorage.getItem('admin_secret') || '');
@@ -19,7 +20,7 @@ export default function Admin() {
   const [companies, setCompanies] = useState<Company[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState('');
-  const [selectedCompany, setSelectedCompany] = useState<any>(null);
+  const [selectedCompany, setSelectedCompany] = useState<Record<string, unknown> | null>(null);
   const [showCompanyDialog, setShowCompanyDialog] = useState(false);
   const [showSubDialog, setShowSubDialog] = useState(false);
   const [subForm, setSubForm] = useState({ company_id: 0, tier: 'advanced', days: '30' });
@@ -140,6 +141,7 @@ export default function Admin() {
             <TabsTrigger value="companies" className="data-[state=active]:bg-primary">🏢 Компании</TabsTrigger>
             <TabsTrigger value="users" className="data-[state=active]:bg-primary">👥 Сотрудники</TabsTrigger>
             <TabsTrigger value="blog" className="data-[state=active]:bg-primary">📝 Блог</TabsTrigger>
+            <TabsTrigger value="partners" className="data-[state=active]:bg-primary">🤝 Партнёры</TabsTrigger>
           </TabsList>
 
           <AdminAnalyticsTab analytics={analytics} />
@@ -178,6 +180,7 @@ export default function Admin() {
           />
 
           <AdminBlogTab secret={secret} />
+          <AdminPartnersTab secret={secret} />
         </Tabs>
       </div>
     </div>
