@@ -1939,6 +1939,7 @@ function Index() {
             </TabsList>
           </ScrollableTabs>
 
+          <Suspense fallback={<LazyFallback />}>
           <TabsContent value="vacancies" className="space-y-4">
             <VacanciesTab
               isSubscriptionExpired={isSubscriptionExpired}
@@ -2080,6 +2081,7 @@ function Index() {
               setMessages={setAiMessages}
             />
           </TabsContent>
+          </Suspense>
 
         </Tabs>
         )}
@@ -3179,6 +3181,7 @@ function Index() {
             </TabsList>
           </ScrollableTabs>
 
+          <Suspense fallback={<LazyFallback />}>
           <TabsContent value="news" className="space-y-4">
             <EmployeeNewsTab
               newsPosts={newsPosts}
@@ -3256,6 +3259,7 @@ function Index() {
               <HrRecommendationsTab recommendations={recommendations} />
             </TabsContent>
           )}
+          </Suspense>
         </Tabs>
       </div>
 
