@@ -183,7 +183,7 @@ export default function BlogPost() {
               <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
                 <Icon name="Rocket" className="text-white" size={18} />
               </div>
-              <span className="sm:text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-lg">iHUNT - сервис реферального рекрутинга</span>
+              <span className="sm:text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent font-bold text-xs">iHUNT - реферальный рекрутинг</span>
             </div>
             <Link to="/blog" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
               <Icon name="ArrowLeft" size={14} />
