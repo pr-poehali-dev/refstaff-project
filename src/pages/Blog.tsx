@@ -128,8 +128,7 @@ export default function Blog() {
               <div className="bg-gradient-to-r from-primary to-secondary p-1.5 rounded-lg">
                 <Icon name="Rocket" className="text-white" size={18} />
               </div>
-              <span className="font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-xs">iHUNT - сервис реферального рекрутинга
-</span>
+              <span className="font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent text-xs">iHUNT - реферальный рекрутинг</span>
             </div>
             <div className="flex items-center gap-3">
               <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors flex items-center gap-1">
