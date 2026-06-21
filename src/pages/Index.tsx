@@ -35,46 +35,50 @@ const BlogCarousel = lazy(() => import('@/components/BlogCarousel'));
 const Onboarding = lazy(() => import('@/components/Onboarding'));
 const GamesTab = lazy(() => import('@/components/GamesTab'));
 const VacancyTestManager = lazy(() => import('@/components/VacancyTestManager').then(m => ({ default: m.VacancyTestManager })));
-import { AboutDialog } from '@/components/dialogs/AboutDialog';
-import { PrivacyDialog } from '@/components/dialogs/PrivacyDialog';
-import { TermsDialog } from '@/components/dialogs/TermsDialog';
-import { PersonalDataDialog } from '@/components/dialogs/PersonalDataDialog';
-import { ForgotPasswordDialog } from '@/components/dialogs/ForgotPasswordDialog';
-import { ResetPasswordDialog } from '@/components/dialogs/ResetPasswordDialog';
-import { DemoDialog } from '@/components/dialogs/DemoDialog';
-import { ReferralLinkDialog } from '@/components/dialogs/ReferralLinkDialog';
-import { RecommendDialog } from '@/components/dialogs/RecommendDialog';
-import { WithdrawDialog } from '@/components/dialogs/WithdrawDialog';
-import { CompanySettingsDialog } from '@/components/dialogs/CompanySettingsDialog';
-import { ChatDialog } from '@/components/dialogs/ChatDialog';
-import { InviteEmployeeDialog } from '@/components/dialogs/InviteEmployeeDialog';
-import { LandingHeader } from '@/components/landing/LandingHeader';
-import { HeroSection } from '@/components/landing/HeroSection';
-import { HowItWorksSection } from '@/components/landing/HowItWorksSection';
-import { BenefitsSection } from '@/components/landing/BenefitsSection';
-import { PricingSection } from '@/components/landing/PricingSection';
-import { ContactSection } from '@/components/landing/ContactSection';
-import { LandingFooter } from '@/components/landing/LandingFooter';
-import { VacanciesTab } from '@/components/employer/VacanciesTab';
-import { EmployeesTab } from '@/components/employer/EmployeesTab';
-import { RecommendationsTab } from '@/components/employer/RecommendationsTab';
-import { PayoutsTab } from '@/components/employer/PayoutsTab';
-import { NewsTab } from '@/components/employer/NewsTab';
-import { ChatsTab } from '@/components/employer/ChatsTab';
-import { StatsTab } from '@/components/employer/StatsTab';
-import { SubscriptionTab } from '@/components/employer/SubscriptionTab';
-import { HelpTab } from '@/components/employer/HelpTab';
-import { AiAssistantTabWrapper } from '@/components/employer/AiAssistantTabWrapper';
-import { EmployeeNewsTab } from '@/components/employee/EmployeeNewsTab';
-import { EmployeeVacanciesTab } from '@/components/employee/EmployeeVacanciesTab';
-import { MyRecommendationsTab } from '@/components/employee/MyRecommendationsTab';
-import { AchievementsTab } from '@/components/employee/AchievementsTab';
-import { WalletHistoryTab } from '@/components/employee/WalletHistoryTab';
-import { NotificationsTab } from '@/components/employee/NotificationsTab';
-import { EmployeeHelpTab } from '@/components/employee/EmployeeHelpTab';
-import { GamesTabWrapper } from '@/components/employee/GamesTabWrapper';
-import { HrVacanciesTab } from '@/components/employee/HrVacanciesTab';
-import { HrRecommendationsTab } from '@/components/employee/HrRecommendationsTab';
+// Диалоги — lazy, грузятся только при открытии
+const AboutDialog = lazy(() => import('@/components/dialogs/AboutDialog').then(m => ({ default: m.AboutDialog })));
+const PrivacyDialog = lazy(() => import('@/components/dialogs/PrivacyDialog').then(m => ({ default: m.PrivacyDialog })));
+const TermsDialog = lazy(() => import('@/components/dialogs/TermsDialog').then(m => ({ default: m.TermsDialog })));
+const PersonalDataDialog = lazy(() => import('@/components/dialogs/PersonalDataDialog').then(m => ({ default: m.PersonalDataDialog })));
+const ForgotPasswordDialog = lazy(() => import('@/components/dialogs/ForgotPasswordDialog').then(m => ({ default: m.ForgotPasswordDialog })));
+const ResetPasswordDialog = lazy(() => import('@/components/dialogs/ResetPasswordDialog').then(m => ({ default: m.ResetPasswordDialog })));
+const DemoDialog = lazy(() => import('@/components/dialogs/DemoDialog').then(m => ({ default: m.DemoDialog })));
+const ReferralLinkDialog = lazy(() => import('@/components/dialogs/ReferralLinkDialog').then(m => ({ default: m.ReferralLinkDialog })));
+const RecommendDialog = lazy(() => import('@/components/dialogs/RecommendDialog').then(m => ({ default: m.RecommendDialog })));
+const WithdrawDialog = lazy(() => import('@/components/dialogs/WithdrawDialog').then(m => ({ default: m.WithdrawDialog })));
+const CompanySettingsDialog = lazy(() => import('@/components/dialogs/CompanySettingsDialog').then(m => ({ default: m.CompanySettingsDialog })));
+const ChatDialog = lazy(() => import('@/components/dialogs/ChatDialog').then(m => ({ default: m.ChatDialog })));
+const InviteEmployeeDialog = lazy(() => import('@/components/dialogs/InviteEmployeeDialog').then(m => ({ default: m.InviteEmployeeDialog })));
+// Лендинг — lazy, не нужен авторизованным пользователям
+const LandingHeader = lazy(() => import('@/components/landing/LandingHeader').then(m => ({ default: m.LandingHeader })));
+const HeroSection = lazy(() => import('@/components/landing/HeroSection').then(m => ({ default: m.HeroSection })));
+const HowItWorksSection = lazy(() => import('@/components/landing/HowItWorksSection').then(m => ({ default: m.HowItWorksSection })));
+const BenefitsSection = lazy(() => import('@/components/landing/BenefitsSection').then(m => ({ default: m.BenefitsSection })));
+const PricingSection = lazy(() => import('@/components/landing/PricingSection').then(m => ({ default: m.PricingSection })));
+const ContactSection = lazy(() => import('@/components/landing/ContactSection').then(m => ({ default: m.ContactSection })));
+const LandingFooter = lazy(() => import('@/components/landing/LandingFooter').then(m => ({ default: m.LandingFooter })));
+// Вкладки работодателя — lazy, не нужны на лендинге
+const VacanciesTab = lazy(() => import('@/components/employer/VacanciesTab').then(m => ({ default: m.VacanciesTab })));
+const EmployeesTab = lazy(() => import('@/components/employer/EmployeesTab').then(m => ({ default: m.EmployeesTab })));
+const RecommendationsTab = lazy(() => import('@/components/employer/RecommendationsTab').then(m => ({ default: m.RecommendationsTab })));
+const PayoutsTab = lazy(() => import('@/components/employer/PayoutsTab').then(m => ({ default: m.PayoutsTab })));
+const NewsTab = lazy(() => import('@/components/employer/NewsTab').then(m => ({ default: m.NewsTab })));
+const ChatsTab = lazy(() => import('@/components/employer/ChatsTab').then(m => ({ default: m.ChatsTab })));
+const StatsTab = lazy(() => import('@/components/employer/StatsTab').then(m => ({ default: m.StatsTab })));
+const SubscriptionTab = lazy(() => import('@/components/employer/SubscriptionTab').then(m => ({ default: m.SubscriptionTab })));
+const HelpTab = lazy(() => import('@/components/employer/HelpTab').then(m => ({ default: m.HelpTab })));
+const AiAssistantTabWrapper = lazy(() => import('@/components/employer/AiAssistantTabWrapper').then(m => ({ default: m.AiAssistantTabWrapper })));
+// Вкладки сотрудника — lazy, не нужны на лендинге
+const EmployeeNewsTab = lazy(() => import('@/components/employee/EmployeeNewsTab').then(m => ({ default: m.EmployeeNewsTab })));
+const EmployeeVacanciesTab = lazy(() => import('@/components/employee/EmployeeVacanciesTab').then(m => ({ default: m.EmployeeVacanciesTab })));
+const MyRecommendationsTab = lazy(() => import('@/components/employee/MyRecommendationsTab').then(m => ({ default: m.MyRecommendationsTab })));
+const AchievementsTab = lazy(() => import('@/components/employee/AchievementsTab').then(m => ({ default: m.AchievementsTab })));
+const WalletHistoryTab = lazy(() => import('@/components/employee/WalletHistoryTab').then(m => ({ default: m.WalletHistoryTab })));
+const NotificationsTab = lazy(() => import('@/components/employee/NotificationsTab').then(m => ({ default: m.NotificationsTab })));
+const EmployeeHelpTab = lazy(() => import('@/components/employee/EmployeeHelpTab').then(m => ({ default: m.EmployeeHelpTab })));
+const GamesTabWrapper = lazy(() => import('@/components/employee/GamesTabWrapper').then(m => ({ default: m.GamesTabWrapper })));
+const HrVacanciesTab = lazy(() => import('@/components/employee/HrVacanciesTab').then(m => ({ default: m.HrVacanciesTab })));
+const HrRecommendationsTab = lazy(() => import('@/components/employee/HrRecommendationsTab').then(m => ({ default: m.HrRecommendationsTab })));
 
 const LazyFallback = () => <div className="flex items-center justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
 
@@ -1368,6 +1372,7 @@ function Index() {
     handleLogin: () => void,
     isAuthLoading: boolean
   ) => (
+    <Suspense fallback={<LazyFallback />}>
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
       <LandingHeader
         onLogin={() => setShowLoginDialog(true)}
@@ -1820,6 +1825,7 @@ function Index() {
 
       <PersonalDataDialog open={showPersonalDataDialog} onOpenChange={setShowPersonalDataDialog} />
     </div>
+    </Suspense>
   );
 
   const renderEmployerDashboard = () => {
@@ -2079,39 +2085,43 @@ function Index() {
         )}
       </div>
 
-      <InviteEmployeeDialog
-        open={showInviteDialog}
-        onOpenChange={setShowInviteDialog}
-        form={inviteForm}
-        onFormChange={setInviteForm}
-        onSubmit={handleInviteEmployee}
-        isLoading={isAuthLoading}
-      />
+      <Suspense fallback={null}>
+        <InviteEmployeeDialog
+          open={showInviteDialog}
+          onOpenChange={setShowInviteDialog}
+          form={inviteForm}
+          onFormChange={setInviteForm}
+          onSubmit={handleInviteEmployee}
+          isLoading={isAuthLoading}
+        />
+      </Suspense>
 
-      <CompanySettingsDialog
-        open={showCompanySettingsDialog}
-        onOpenChange={setShowCompanySettingsDialog}
-        company={company}
-        form={companyEditForm}
-        onFormChange={setCompanyEditForm}
-        logoPreview={companyLogoPreview}
-        onLogoFileChange={(file) => {
-          setCompanyLogoFile(file);
-          const reader = new FileReader();
-          reader.onload = (ev) => setCompanyLogoPreview(ev.target?.result as string);
-          reader.readAsDataURL(file);
-        }}
-        onLogoRemove={() => {
-          setCompanyLogoPreview(null);
-          setCompanyLogoFile(null);
-          if (company?.logo_url) {
-            api.updateCompany(currentCompanyId, { logo_url: '' });
-            setCompany(prev => prev ? { ...prev, logo_url: undefined } : null);
-          }
-        }}
-        onSave={handleSaveCompany}
-        isSaving={isSavingCompany}
-      />
+      <Suspense fallback={null}>
+        <CompanySettingsDialog
+          open={showCompanySettingsDialog}
+          onOpenChange={setShowCompanySettingsDialog}
+          company={company}
+          form={companyEditForm}
+          onFormChange={setCompanyEditForm}
+          logoPreview={companyLogoPreview}
+          onLogoFileChange={(file) => {
+            setCompanyLogoFile(file);
+            const reader = new FileReader();
+            reader.onload = (ev) => setCompanyLogoPreview(ev.target?.result as string);
+            reader.readAsDataURL(file);
+          }}
+          onLogoRemove={() => {
+            setCompanyLogoPreview(null);
+            setCompanyLogoFile(null);
+            if (company?.logo_url) {
+              api.updateCompany(currentCompanyId, { logo_url: '' });
+              setCompany(prev => prev ? { ...prev, logo_url: undefined } : null);
+            }
+          }}
+          onSave={handleSaveCompany}
+          isSaving={isSavingCompany}
+        />
+      </Suspense>
 
       <Dialog open={showChatDialog} onOpenChange={setShowChatDialog}>
         <DialogContent hideClose className="max-w-4xl h-[100dvh] sm:h-[600px] w-[100vw] sm:w-full rounded-none sm:rounded-lg flex flex-col p-0 overflow-hidden">
@@ -3806,34 +3816,38 @@ function Index() {
         />
       </Suspense>
 
-      <RecommendDialog
-        open={showRecommendDialog}
-        onOpenChange={setShowRecommendDialog}
-        vacancyTitle={selectedVacancyDetail?.title}
-        form={recommendationForm}
-        onFormChange={setRecommendationForm}
-        onSubmit={async () => {
-          if (!selectedVacancyDetail) return;
-          await handleCreateRecommendation({
-            vacancyId: selectedVacancyDetail.id,
-            name: recommendationForm.name,
-            email: recommendationForm.email,
-            phone: recommendationForm.phone,
-            comment: recommendationForm.comment,
-          });
-          setShowRecommendDialog(false);
-          setShowVacancyDetail(false);
-        }}
-      />
+      <Suspense fallback={null}>
+        <RecommendDialog
+          open={showRecommendDialog}
+          onOpenChange={setShowRecommendDialog}
+          vacancyTitle={selectedVacancyDetail?.title}
+          form={recommendationForm}
+          onFormChange={setRecommendationForm}
+          onSubmit={async () => {
+            if (!selectedVacancyDetail) return;
+            await handleCreateRecommendation({
+              vacancyId: selectedVacancyDetail.id,
+              name: recommendationForm.name,
+              email: recommendationForm.email,
+              phone: recommendationForm.phone,
+              comment: recommendationForm.comment,
+            });
+            setShowRecommendDialog(false);
+            setShowVacancyDetail(false);
+          }}
+        />
+      </Suspense>
 
-      <CandidateDetail
-        recommendation={selectedCandidate}
-        open={showCandidateDetail}
-        onOpenChange={setShowCandidateDetail}
-        userRole={userRole}
-      />
+      <Suspense fallback={null}>
+        <CandidateDetail
+          recommendation={selectedCandidate}
+          open={showCandidateDetail}
+          onOpenChange={setShowCandidateDetail}
+          userRole={userRole}
+        />
+      </Suspense>
 
-      <WithdrawDialog
+      <Suspense fallback={null}><WithdrawDialog
         open={showWithdrawDialog}
         onOpenChange={setShowWithdrawDialog}
         form={withdrawForm}
@@ -3880,7 +3894,7 @@ function Index() {
             alert('Не удалось отправить запрос');
           }
         }}
-      />
+      /></Suspense>
 
 
     </>
@@ -3953,41 +3967,47 @@ function Index() {
       )}
 
       {/* Диалог реферальной ссылки с QR-кодом */}
-      <ReferralLinkDialog
-        open={showReferralLinkDialog}
-        onOpenChange={setShowReferralLinkDialog}
-        referralLink={referralLink}
-        onCopyLink={handleCopyLink}
-      />
+      <Suspense fallback={null}>
+        <ReferralLinkDialog
+          open={showReferralLinkDialog}
+          onOpenChange={setShowReferralLinkDialog}
+          referralLink={referralLink}
+          onCopyLink={handleCopyLink}
+        />
+      </Suspense>
 
       {/* Диалог запроса восстановления пароля */}
-      <ForgotPasswordDialog
-        open={showForgotPasswordDialog}
-        onOpenChange={setShowForgotPasswordDialog}
-        email={forgotPasswordEmail}
-        onEmailChange={setForgotPasswordEmail}
-        message={passwordResetMessage}
-        onMessageChange={setPasswordResetMessage}
-        onSubmit={handleRequestPasswordReset}
-        onBackToLogin={() => {
-          setShowForgotPasswordDialog(false);
-          setForgotPasswordEmail('');
-          setPasswordResetMessage('');
-          setShowLoginDialog(true);
-        }}
-        isLoading={isAuthLoading}
-      />
+      <Suspense fallback={null}>
+        <ForgotPasswordDialog
+          open={showForgotPasswordDialog}
+          onOpenChange={setShowForgotPasswordDialog}
+          email={forgotPasswordEmail}
+          onEmailChange={setForgotPasswordEmail}
+          message={passwordResetMessage}
+          onMessageChange={setPasswordResetMessage}
+          onSubmit={handleRequestPasswordReset}
+          onBackToLogin={() => {
+            setShowForgotPasswordDialog(false);
+            setForgotPasswordEmail('');
+            setPasswordResetMessage('');
+            setShowLoginDialog(true);
+          }}
+          isLoading={isAuthLoading}
+        />
+      </Suspense>
 
       {/* Диалог сброса пароля */}
-      <ResetPasswordDialog
-        open={showResetPasswordDialog}
-        onOpenChange={setShowResetPasswordDialog}
-        form={resetPasswordForm}
-        onFormChange={setResetPasswordForm}
-        message={passwordResetMessage}
-        onSubmit={handleResetPassword}
-        isLoading={isAuthLoading}
-      />
+      <Suspense fallback={null}>
+        <ResetPasswordDialog
+          open={showResetPasswordDialog}
+          onOpenChange={setShowResetPasswordDialog}
+          form={resetPasswordForm}
+          onFormChange={setResetPasswordForm}
+          message={passwordResetMessage}
+          onSubmit={handleResetPassword}
+          isLoading={isAuthLoading}
+        />
+      </Suspense>
 
       {lightboxImage && (
         <div
