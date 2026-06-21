@@ -332,7 +332,7 @@ export function VacanciesTab({
                             className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                           >
                             <span className="mr-1">✅</span>
-                            <span></span>
+                            <span className="hidden sm:inline">Актив.</span>
                           </Button>
                           <Button
                             variant="destructive"
