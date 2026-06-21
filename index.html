@@ -13,6 +13,48 @@
     <link rel="apple-touch-icon" href="/favicon.svg">
     <link rel="canonical" href="https://i-hunt.ru/" />
 
+    <!-- SEO: подставляем мета-теги вакансий синхронно для Telegram и соцсетей -->
+    <script>
+    (function() {
+      var path = window.location.pathname;
+      var ogImage = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/0e9e50fa-3793-4c04-9957-ca24ea4d1579.jpg';
+      var vacancyMatch = path.match(/^\/vacancy\/(\d+)/);
+      var referralMatch = path.match(/^\/r\/([^\/]+)$/);
+      var setMeta = function(sel, attr, val) {
+        var el = document.querySelector(sel);
+        if (el) { el.setAttribute(attr, val); }
+        else { var m = document.createElement('meta'); var parts = sel.replace('[','').replace(']','').split('='); m.setAttribute(parts[0].trim(), parts[1].replace(/"/g,'')); m.setAttribute(attr, val); document.head.appendChild(m); }
+      };
+      if (vacancyMatch || referralMatch) {
+        var type = vacancyMatch ? 'vacancy' : 'referral';
+        var id = vacancyMatch ? vacancyMatch[1] : referralMatch[1];
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', 'https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a?resource=vacancies' + (vacancyMatch ? '&vacancy_id=' + id : '&referral_token=' + id), false);
+          xhr.send();
+          if (xhr.status === 200) {
+            var v = JSON.parse(xhr.responseText);
+            if (v && v.title) {
+              var title = v.title + ' | iHUNT';
+              var desc = (v.requirements || '').substring(0, 160) || ('Вакансия ' + v.title + '. Зарплата: ' + (v.salary_display || ''));
+              var url = 'https://i-hunt.ru' + path;
+              document.title = title;
+              setMeta('meta[property="og:title"]', 'content', title);
+              setMeta('meta[property="og:description"]', 'content', desc);
+              setMeta('meta[property="og:image"]', 'content', ogImage);
+              setMeta('meta[property="og:url"]', 'content', url);
+              setMeta('meta[name="twitter:title"]', 'content', title);
+              setMeta('meta[name="twitter:description"]', 'content', desc);
+              setMeta('meta[name="twitter:image"]', 'content', ogImage);
+              var canonical = document.querySelector('link[rel="canonical"]');
+              if (canonical) canonical.setAttribute('href', url);
+            }
+          }
+        } catch(e) {}
+      }
+    })();
+    </script>
+
     <!-- SEO: подставляем мета-теги статьи блога синхронно для поисковых ботов -->
     <script>
     (function() {

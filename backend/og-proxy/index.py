@@ -9,10 +9,10 @@ import os
 import urllib.request
 
 API_URL = 'https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a'
-APP_URL = 'https://refstaff.poehali.dev'
+APP_URL = 'https://i-hunt.ru'
 
-VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/527161af-5ca6-4a19-a62f-86e2a76c97b8.jpg'
-REFERRAL_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/032a8a8d-15a3-4c23-85e1-3c02c8f864c7.jpg'
+VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/0e9e50fa-3793-4c04-9957-ca24ea4d1579.jpg'
+REFERRAL_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/0e9e50fa-3793-4c04-9957-ca24ea4d1579.jpg'
 EMPLOYEE_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/1a4f08a4-f047-444f-aab6-82e0357b0c94.jpg'
 
 BOT_AGENTS = [
