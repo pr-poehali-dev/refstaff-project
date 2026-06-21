@@ -1,4 +1,3 @@
-import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -10,7 +9,7 @@ import { Textarea } from '@/components/ui/textarea';
 import Icon from '@/components/ui/icon';
 import { STATUS_LABELS, TIER_LABELS, PAYOUT_STATUS } from './partner/partnerTypes';
 import { usePartner } from './partner/usePartner';
-import PartnerAuth from './partner/PartnerAuth';
+import PartnerLanding from './partner/PartnerLanding';
 
 export default function Partner() {
   const {
@@ -38,379 +37,21 @@ export default function Partner() {
 
   // ── ЛЕНДИНГ + ФОРМА ВХОДА ───────────────────────────────────────────────────
   if (!partner) {
-    const scrollToLogin = () => document.getElementById('partner-login')?.scrollIntoView({ behavior: 'smooth' });
     return (
-      <div className="min-h-screen bg-white">
-        <Helmet>
-          <title>Партнёрская программа iHUNT — зарабатывайте на HR-технологиях</title>
-          <meta name="description" content="Партнёрская программа для HR-менеджеров, рекрутёров и кадровых агентств. Рекомендуйте iHUNT компаниям и получайте 50% с каждой оплаты подписки. До 101 490 ₽ с одного клиента." />
-          <meta name="keywords" content="партнёрская программа HR, реферальная программа для рекрутёров, заработок для HR-менеджеров, партнёрство iHUNT, кадровое агентство партнёр" />
-          <meta property="og:title" content="Партнёрская программа iHUNT — 50% с каждой подписки клиента" />
-          <meta property="og:description" content="Зарабатывайте до 101 490 ₽ с одного клиента. Программа для HR-специалистов, рекрутёров и кадровых агентств." />
-          <meta property="og:type" content="website" />
-          <link rel="canonical" href="https://i-hunt.ru/partner" />
-        </Helmet>
-
-        {/* ── HERO ── */}
-        <section className="relative bg-gradient-to-br from-primary/5 via-white to-secondary/5 pt-16 pb-20 px-4 overflow-hidden">
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute top-10 right-10 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
-          </div>
-          <div className="max-w-5xl mx-auto relative">
-            <div className="flex items-center gap-2 mb-6 justify-center">
-              <Icon name="Rocket" size={18} className="text-primary" />
-              <span className="text-sm font-semibold text-primary uppercase tracking-wide">iHUNT Partner Program</span>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-center mb-6 leading-tight text-gray-900">
-              Зарабатывайте до <span className="text-primary">101 490 ₽</span><br className="hidden sm:block" /> с одного клиента
-            </h1>
-            <p className="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-10">
-              Партнёрская программа для HR-специалистов, рекрутёров и кадровых агентств. Рекомендуйте <a href="https://i-hunt.ru/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">iHUNT</a> — получайте <strong>50% с каждой оплаты</strong> подписки ваших клиентов.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="text-base px-8" onClick={scrollToLogin}>
-                <Icon name="Handshake" size={18} className="mr-2" />
-                Стать партнёром — бесплатно
-              </Button>
-              <Button size="lg" variant="outline" className="text-base px-8" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>
-                Узнать подробнее
-              </Button>
-            </div>
-            {/* Статистика */}
-            <div className="grid grid-cols-3 gap-6 mt-16 max-w-2xl mx-auto">
-              {[
-                { value: '50%', label: 'комиссия с каждой оплаты' },
-                { value: '3', label: 'платежа с одного клиента' },
-                { value: '30 дн', label: 'hold-период, затем — вывод' },
-              ].map(s => (
-                <div key={s.label} className="text-center">
-                  <div className="text-3xl font-extrabold text-primary">{s.value}</div>
-                  <div className="text-xs text-gray-500 mt-1">{s.label}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── ДЛЯ КОГО ── */}
-        <section className="py-16 px-4 bg-gray-50">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3 text-gray-900">Кто становится партнёром iHUNT</h2>
-            <p className="text-gray-500 text-center mb-10 max-w-xl mx-auto">Программа создана для профессионалов рынка труда, которые работают с компаниями-работодателями</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              {[
-                { icon: 'Users', title: 'HR-менеджеры', desc: 'Специалисты по подбору персонала внутри компаний' },
-                { icon: 'Search', title: 'Рекрутёры', desc: 'Независимые и агентские рекрутёры' },
-                { icon: 'Building2', title: 'Кадровые агентства', desc: 'Агентства по подбору и аутстаффингу' },
-                { icon: 'GraduationCap', title: 'HR-консультанты', desc: 'Консультанты по управлению персоналом' },
-                { icon: 'Briefcase', title: 'Карьерные коучи', desc: 'Специалисты по развитию карьеры' },
-                { icon: 'Network', title: 'Бизнес-партнёры', desc: 'Все, кто работает с B2B-аудиторией' },
-              ].map(c => (
-                <div key={c.title} className="bg-white rounded-xl p-5 border border-gray-100 hover:border-primary/30 hover:shadow-sm transition-all">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center mb-3">
-                    <Icon name={c.icon} size={20} className="text-primary" />
-                  </div>
-                  <div className="font-semibold text-gray-900 text-sm">{c.title}</div>
-                  <div className="text-xs text-gray-500 mt-1">{c.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── КАК ЭТО РАБОТАЕТ ── */}
-        <section id="how-it-works" className="py-16 px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3 text-gray-900">Как работает программа</h2>
-            <p className="text-gray-500 text-center mb-12 max-w-xl mx-auto">Четыре шага от регистрации до первых денег на счёте</p>
-            <div className="relative">
-              <div className="hidden sm:block absolute left-[39px] top-8 bottom-8 w-0.5 bg-gray-100" />
-              <div className="space-y-8">
-                {[
-                  { n: '1', icon: 'Link', title: 'Получите реферальную ссылку', desc: 'После регистрации в личном кабинете вы получаете уникальную ссылку. Делитесь ею с компаниями, которым нужен эффективный инструмент для найма через рекомендации сотрудников.' },
-                  { n: '2', icon: 'UserCheck', title: 'Клиент регистрируется в iHUNT', desc: 'Компания регистрируется по вашей ссылке и автоматически привязывается к вашему аккаунту навсегда. Клиент получает 14 дней бесплатного доступа.' },
-                  { n: '3', icon: 'CreditCard', title: 'Клиент оплачивает подписку', desc: 'Как только компания оплачивает подписку — вам начисляется ваше партнёрское вознаграждение: 50% от суммы оплаты. За месячную подписку вы получаете 9 950 ₽, за годовую — 101 490 ₽. Начисление происходит автоматически.' },
-                  { n: '4', icon: 'Wallet', title: 'Выводите деньги', desc: 'После 30-дневного hold-периода средства доступны для вывода на карту, СБП или расчётный счёт ИП/ООО. Минимальной суммы нет.' },
-                ].map(s => (
-                  <div key={s.n} className="flex gap-5">
-                    <div className="relative shrink-0">
-                      <div className="w-20 h-20 rounded-2xl bg-primary text-white flex flex-col items-center justify-center shadow-md">
-                        <Icon name={s.icon} size={24} />
-                        <span className="text-xs font-bold mt-1">Шаг {s.n}</span>
-                      </div>
-                    </div>
-                    <div className="pt-3">
-                      <div className="font-bold text-gray-900 mb-1">{s.title}</div>
-                      <div className="text-sm text-gray-500 leading-relaxed">{s.desc}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── СКОЛЬКО МОЖНО ЗАРАБОТАТЬ ── */}
-        <section className="py-16 px-4 bg-primary text-white">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-3">Сколько можно заработать</h2>
-            <p className="text-center text-primary-foreground/80 mb-12 max-w-xl mx-auto">Ваш доход зависит от количества привлечённых клиентов и типа их подписки</p>
-            <div className="grid sm:grid-cols-2 gap-6 mb-10">
-              <div className="bg-white/10 rounded-2xl p-6">
-                <div className="text-sm font-semibold text-primary-foreground/70 mb-1 uppercase tracking-wide">При оплате клиентом за 1 месяц</div>
-                <div className="text-4xl font-extrabold mb-2">9 950 ₽</div>
-                <div className="text-sm text-primary-foreground/80">Вознаграждение начисляется в течении 3х месяцев, если данный период продлевается клиентом</div>
-                <div className="mt-4 pt-4 border-t border-white/20 text-sm">
-                  Итого с 1 клиента: <strong className="text-white">29 850 ₽</strong>
-                </div>
-              </div>
-              <div className="bg-white/10 rounded-2xl p-6 ring-2 ring-white/40">
-                <div className="text-sm font-semibold text-primary-foreground/70 mb-1 uppercase tracking-wide">При оплате клиентом за 1 год</div>
-                <div className="text-4xl font-extrabold mb-2">101 490 ₽</div>
-                <div className="text-sm text-primary-foreground/80">разово при оплате клиентом года</div>
-                <div className="mt-4 pt-4 border-t border-white/20 text-sm">
-                  Разовое начисление за <strong className="text-white">1 клиента</strong>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white/10 rounded-2xl p-5">
-              <div className="font-semibold mb-3 text-center">Пример дохода за месяц</div>
-              <div className="grid grid-cols-3 gap-4 text-center text-sm">
-                {[
-                  { clients: '5 клиентов', type: 'месячные', earn: '49 750 ₽' },
-                  { clients: '10 клиентов', type: 'месячные', earn: '99 500 ₽' },
-                  { clients: '5 клиентов', type: 'годовые', earn: '507 450 ₽' },
-                ].map(e => (
-                  <div key={e.clients} className="bg-white/10 rounded-xl p-3">
-                    <div className="font-bold text-lg">{e.earn}</div>
-                    <div className="text-primary-foreground/70 text-xs mt-1">{e.clients}<br />{e.type}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ── ПРЕИМУЩЕСТВА ── */}
-        <section className="py-16 px-4 bg-gray-50">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-gray-900">Почему выбирают iHUNT Partner</h2>
-            <div className="grid sm:grid-cols-2 gap-5">
-              {[
-                { icon: 'Zap', title: 'Быстрый старт', desc: 'Регистрация за 2 минуты через Telegram. Никаких договоров и бумажной волокиты.' },
-                { icon: 'TrendingUp', title: 'Пассивный доход', desc: 'Привлекли клиента один раз — получаете комиссию с трёх платежей автоматически.' },
-                { icon: 'ShieldCheck', title: 'Прозрачная система', desc: 'Личный кабинет в реальном времени: каждый клиент, каждая выплата, каждый рубль.' },
-                { icon: 'Award', title: 'Востребованный продукт', desc: 'iHUNT — платформа реферального найма, которая реально экономит компаниям деньги на рекрутинге.' },
-                { icon: 'HeadphonesIcon', title: 'Поддержка партнёров', desc: 'Персональный менеджер, обучающие материалы и шаблоны для продвижения продукта.' },
-                { icon: 'Globe', title: 'Без территориальных ограничений', desc: 'Работайте с компаниями по всей России. Нет ограничений по географии или отрасли.' },
-              ].map(b => (
-                <div key={b.title} className="flex gap-4 bg-white p-5 rounded-xl border border-gray-100">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center shrink-0">
-                    <Icon name={b.icon} size={20} className="text-primary" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-gray-900 mb-1">{b.title}</div>
-                    <div className="text-sm text-gray-500">{b.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ── О ПРОДУКТЕ iHUNT ── */}
-        <section className="py-16 px-4 bg-gray-50">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 bg-primary/10 rounded-full px-4 py-1.5 mb-4">
-                <Icon name="Rocket" size={16} className="text-primary" />
-                <span className="text-sm font-semibold text-primary">Что такое iHUNT</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">
-                Платформа реферального найма <a href="https://i-hunt.ru/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">iHUNT</a>
-              </h2>
-              <p className="text-gray-500 max-w-2xl mx-auto">
-                iHUNT помогает компаниям нанимать сотрудников через рекомендации — это быстрее, дешевле и эффективнее традиционного рекрутинга
-              </p>
-            </div>
-
-            {/* Как работает продукт */}
-            <div className="grid sm:grid-cols-3 gap-5 mb-12">
-              {[
-                { icon: 'Users', title: 'Сотрудники рекомендуют', desc: 'Компания подключает своих сотрудников как агентов по найму. Те рекомендуют знакомых на открытые вакансии.' },
-                { icon: 'UserCheck', title: 'Кандидаты приходят сами', desc: 'Рекомендованные кандидаты уже «тёплые» — их привели люди, которые знают и компанию, и соискателя.' },
-                { icon: 'Coins', title: 'Сотрудники получают бонусы', desc: 'За успешный наём рекомендатель получает денежное вознаграждение прямо в приложении.' },
-              ].map(f => (
-                <div key={f.title} className="bg-white rounded-xl p-6 border border-gray-100 text-center">
-                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
-                    <Icon name={f.icon} size={24} className="text-primary" />
-                  </div>
-                  <div className="font-bold text-gray-900 mb-2">{f.title}</div>
-                  <div className="text-sm text-gray-500">{f.desc}</div>
-                </div>
-              ))}
-            </div>
-
-            {/* Ключевые возможности — карточки */}
-            <div className="grid sm:grid-cols-2 gap-5 mb-8">
-              {[
-                {
-                  icon: 'Share2',
-                  title: 'Реферальный найм',
-                  desc: 'Сотрудники получают персональные реферальные ссылки на каждую вакансию и делятся ими с кандидатами. Рекомендованные люди уже знают о компании — конверсия в найм выше на 35%.',
-                  badge: 'Главная фича',
-                },
-                {
-                  icon: 'Trophy',
-                  title: 'Геймификация команды',
-                  desc: 'Рейтинги, бейджи и достижения превращают рекрутинг в соревнование. Ежемесячный рейтинг «Лучший рекрутёр» повышает активность сотрудников на 60%.',
-                  badge: null,
-                },
-                {
-                  icon: 'Wallet',
-                  title: 'Автоматические выплаты',
-                  desc: 'Встроенный кошелёк для бонусов: HR настраивает размер вознаграждения, а система автоматически начисляет его сотруднику после выхода кандидата на работу.',
-                  badge: null,
-                },
-                {
-                  icon: 'BrainCircuit',
-                  title: 'AI-тесты для кандидатов',
-                  desc: 'ИИ генерирует профессиональный тест по описанию вакансии за 15 секунд. Кандидат проходит тест без регистрации, HR получает результаты на почту сразу после прохождения.',
-                  badge: null,
-                },
-                {
-                  icon: 'BarChart3',
-                  title: 'Аналитика в реальном времени',
-                  desc: 'Полная воронка найма: кто рекомендовал → на каком этапе кандидат → когда выплатить бонус. Отчёт за квартал — в один клик.',
-                  badge: null,
-                },
-                {
-                  icon: 'MessageSquare',
-                  title: 'Встроенный чат',
-                  desc: 'HR общается с сотрудниками напрямую внутри платформы. Уведомления о статусе кандидатов приходят в Telegram — ничего не теряется.',
-                  badge: null,
-                },
-              ].map(f => (
-                <div key={f.title} className="bg-white rounded-xl p-5 border border-gray-100 hover:shadow-sm transition-shadow">
-                  <div className="flex items-start gap-4">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
-                      <Icon name={f.icon} size={20} className="text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-bold text-gray-900 text-sm">{f.title}</span>
-                        {f.badge && <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">{f.badge}</span>}
-                      </div>
-                      <p className="text-xs text-gray-500 leading-relaxed">{f.desc}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Результаты клиентов */}
-            <div className="bg-primary/5 rounded-2xl p-6 mb-8">
-              <div className="font-bold text-gray-900 text-center mb-5">Результаты компаний на iHUNT</div>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                {[
-                  { value: '+127%', label: 'рост числа рекомендаций' },
-                  { value: '-40%', label: 'сокращение времени найма' },
-                  { value: '92%', label: 'кандидатов проходят испытательный срок' },
-                ].map(s => (
-                  <div key={s.label}>
-                    <div className="text-2xl font-extrabold text-primary">{s.value}</div>
-                    <div className="text-xs text-gray-500 mt-1">{s.label}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Тарифы */}
-            <div className="grid sm:grid-cols-2 gap-4 mb-8">
-              <div className="bg-white border border-gray-200 rounded-xl p-5">
-                <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Пробный период</div>
-                <div className="text-3xl font-extrabold text-gray-900 mb-1">0 ₽</div>
-                <div className="text-sm text-gray-500 mb-4">14 дней — все функции бесплатно</div>
-                <div className="space-y-1.5 text-xs text-gray-500">
-                  {['Все функции платформы', 'Без ограничений по сотрудникам', 'Поддержка 24/7'].map(t => (
-                    <div key={t} className="flex items-center gap-2"><Icon name="Check" size={14} className="text-green-500 shrink-0" />{t}</div>
-                  ))}
-                </div>
-              </div>
-              <div className="bg-primary rounded-xl p-5 text-white">
-                <div className="text-xs font-semibold text-primary-foreground/70 uppercase tracking-wide mb-2">Продвинутый</div>
-                <div className="text-3xl font-extrabold mb-1">19 900 ₽<span className="text-base font-normal">/мес</span></div>
-                <div className="text-sm text-primary-foreground/80 mb-4">или 16 915 ₽/мес при оплате года</div>
-                <div className="space-y-1.5 text-xs text-primary-foreground/90">
-                  {['Вакансии без ограничений', 'AI-тесты для кандидатов', 'Геймификация и рейтинги', 'Аналитика и отчёты', 'Встроенный чат'].map(t => (
-                    <div key={t} className="flex items-center gap-2"><Icon name="Check" size={14} className="text-white shrink-0" />{t}</div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="text-center mt-8">
-              <a href="https://i-hunt.ru/" target="_blank" rel="noopener noreferrer">
-                <Button variant="outline" size="lg">
-                  <Icon name="ExternalLink" size={16} className="mr-2" />
-                  Узнать больше об iHUNT
-                </Button>
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ── FAQ ── */}
-        <section className="py-16 px-4">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12 text-gray-900">Частые вопросы</h2>
-            <div className="space-y-4">
-              {[
-                { q: 'Сколько стоит участие в программе?', a: 'Участие абсолютно бесплатное. Вы регистрируетесь, получаете ссылку и начинаете зарабатывать без каких-либо взносов.' },
-                { q: 'Как подтвердить, что клиент мой?', a: 'Клиент должен зарегистрироваться в iHUNT по вашей реферальной ссылке. После этого он автоматически и навсегда привязывается к вашему аккаунту.' },
-                { q: 'Когда деньги поступят на счёт?', a: 'После каждого платежа клиента начисляется комиссия. Через 30 дней (hold-период) средства становятся доступны для вывода.' },
-                { q: 'Есть ли лимит на количество клиентов?', a: 'Нет. Вы можете привлекать неограниченное количество клиентов. Лимит только на количество платежей с одного клиента — первые 3 ежемесячных или 1 годовой.' },
-                { q: 'Как выводить деньги?', a: 'Через личный кабинет. Доступные способы: СБП, банковская карта, расчётный счёт ИП или ООО. Перевод в течение 2 рабочих дней.' },
-                { q: 'Нужно ли оформлять ИП или самозанятость?', a: 'Для получения выплат вам понадобится статус самозанятого или ИП. Это стандартное требование при работе с юридическими лицами.' },
-              ].map((f, i) => (
-                <details key={i} className="group bg-gray-50 rounded-xl border border-gray-100">
-                  <summary className="flex items-center justify-between p-5 cursor-pointer font-semibold text-gray-900 list-none">
-                    {f.q}
-                    <Icon name="ChevronDown" size={18} className="text-gray-400 group-open:rotate-180 transition-transform shrink-0 ml-2" />
-                  </summary>
-                  <div className="px-5 pb-5 text-sm text-gray-600 leading-relaxed">{f.a}</div>
-                </details>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <PartnerAuth
-          authStep={authStep}
-          setAuthStep={setAuthStep}
-          messenger={messenger}
-          deepLink={deepLink}
-          otp={otp}
-          setOtp={setOtp}
-          submitting={submitting}
-          profileForm={profileForm}
-          setProfileForm={setProfileForm}
-          handleSendToMessenger={handleSendToMessenger}
-          handleVerifyOtp={handleVerifyOtp}
-          handleCompleteRegistration={handleCompleteRegistration}
-        />
-
-        {/* ── ФУТЕР ── */}
-        <footer className="py-8 px-4 border-t bg-white text-center text-sm text-gray-400">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Icon name="Rocket" size={16} className="text-primary" />
-            <span className="font-bold text-gray-700">iHUNT</span>
-          </div>
-          <p>Платформа реферального найма для бизнеса · Партнёрская программа</p>
-          <p className="mt-1">© {new Date().getFullYear()} iHUNT. Все права защищены.</p>
-        </footer>
-      </div>
+      <PartnerLanding
+        authStep={authStep}
+        setAuthStep={setAuthStep}
+        messenger={messenger}
+        deepLink={deepLink}
+        otp={otp}
+        setOtp={setOtp}
+        submitting={submitting}
+        profileForm={profileForm}
+        setProfileForm={setProfileForm}
+        handleSendToMessenger={handleSendToMessenger}
+        handleVerifyOtp={handleVerifyOtp}
+        handleCompleteRegistration={handleCompleteRegistration}
+      />
     );
   }
 
@@ -534,7 +175,6 @@ export default function Partner() {
                           </div>
                         </div>
 
-                        {/* Подписка */}
                         {r.subscription_tier && (
                           <div className="mt-2 pt-2 border-t flex items-center justify-between text-xs">
                             <span className="text-muted-foreground">
@@ -546,7 +186,6 @@ export default function Partner() {
                           </div>
                         )}
 
-                        {/* Комиссия */}
                         {r.commission_amount > 0 && (
                           <div className="mt-2 pt-2 border-t flex items-center justify-between text-xs">
                             <span className="text-muted-foreground">Комиссия 50%:</span>
@@ -563,7 +202,6 @@ export default function Partner() {
                           </div>
                         )}
 
-                        {/* Прогресс лимита выплат */}
                         <div className="mt-2 pt-2 border-t flex items-center justify-between text-xs">
                           <span className="text-muted-foreground">Платежей с комиссией:</span>
                           <div className="flex items-center gap-1">
@@ -610,7 +248,7 @@ export default function Partner() {
 
                 {payouts.length === 0 ? (
                   <div className="text-center py-6 text-muted-foreground">
-                    <Icon name="Wallet" size={32} className="mx-auto mb-2 opacity-30" />
+                    <Icon name="Wallet" size={28} className="mx-auto mb-2 opacity-30" />
                     <p className="text-sm">Выплат пока не было</p>
                   </div>
                 ) : (
@@ -618,16 +256,13 @@ export default function Partner() {
                     {payouts.map(p => (
                       <div key={p.id} className="flex items-center justify-between p-3 rounded-lg border bg-white">
                         <div>
-                          <p className="font-medium text-sm">{p.amount.toLocaleString('ru')} ₽</p>
-                          <p className="text-xs text-muted-foreground">{p.payment_method} · {p.payment_details}</p>
-                          {p.admin_comment && <p className="text-xs text-muted-foreground mt-1">{p.admin_comment}</p>}
+                          <p className="font-semibold text-sm">{p.amount.toLocaleString('ru')} ₽</p>
+                          <p className="text-xs text-muted-foreground">{p.payment_method} · {new Date(p.created_at).toLocaleDateString('ru')}</p>
+                          {p.admin_comment && <p className="text-xs text-muted-foreground mt-0.5">{p.admin_comment}</p>}
                         </div>
-                        <div className="text-right">
-                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${PAYOUT_STATUS[p.status]?.color || ''}`}>
-                            {PAYOUT_STATUS[p.status]?.label || p.status}
-                          </span>
-                          <p className="text-xs text-muted-foreground mt-1">{new Date(p.created_at).toLocaleDateString('ru')}</p>
-                        </div>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${PAYOUT_STATUS[p.status]?.color || 'bg-gray-100 text-gray-700'}`}>
+                          {PAYOUT_STATUS[p.status]?.label || p.status}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -701,8 +336,6 @@ export default function Partner() {
 
           {/* ── Помощь ── */}
           <TabsContent value="help" className="mt-3 space-y-4">
-
-            {/* Как работает программа */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -718,7 +351,7 @@ export default function Partner() {
                   { step: '4', title: 'Получаете выплату', desc: 'После 30-дневного hold-периода деньги становятся доступны к выводу на карту или расчётный счёт.' },
                 ].map(s => (
                   <div key={s.step} className="flex gap-3">
-                    <div className="w-7 h-7 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center shrink-0 mt-0.5">{s.step}</div>
+                    <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold shrink-0">{s.step}</div>
                     <div>
                       <p className="font-medium text-sm">{s.title}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">{s.desc}</p>
@@ -728,7 +361,6 @@ export default function Partner() {
               </CardContent>
             </Card>
 
-            {/* Советы по привлечению */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -752,7 +384,6 @@ export default function Partner() {
               </CardContent>
             </Card>
 
-            {/* FAQ */}
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
@@ -776,7 +407,6 @@ export default function Partner() {
               </CardContent>
             </Card>
 
-            {/* Контакт */}
             <Card className="bg-primary/5 border-primary/20">
               <CardContent className="pt-4 pb-4 flex items-center gap-3">
                 <Icon name="HeadphonesIcon" size={24} className="text-primary shrink-0" />
@@ -789,7 +419,6 @@ export default function Partner() {
                 </Button>
               </CardContent>
             </Card>
-
           </TabsContent>
         </Tabs>
       </div>
