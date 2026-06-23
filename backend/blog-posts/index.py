@@ -192,11 +192,8 @@ def call_gpt(prompt: str) -> str:
 def fix_encoding(text: str) -> str:
     """Убирает символы-заменители (U+FFFD и похожие) которые появляются
     при обрезке UTF-8 на границе многобайтового символа."""
-    # Убираем Unicode replacement character
-    text = text.replace('\ufffd', '')
-    # Убираем последовательности вида ??, которые бывают при двойной
-    # ошибке кодировки — только если они окружены буквами (внутри слова)
-    text = re.sub(r'(?<=[а-яёa-z])\?{1,2}(?=[а-яёa-z])', '', text, flags=re.IGNORECASE)
+    # Убираем все Unicode replacement characters (одиночные и в группах)
+    text = re.sub(r'\ufffd+', '', text)
     return text
 
 
@@ -367,7 +364,7 @@ def handler(event: dict, context) -> dict:
         if not row:
             return {'statusCode': 404, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'not found'})}
         post = {
-            'id': row[0], 'slug': row[1], 'title': row[2], 'metaDescription': row[3],
+            'id': row[0], 'slug': row[1], 'title': fix_encoding(row[2] or ''), 'metaDescription': fix_encoding(row[3] or ''),
             'content': fix_encoding(row[4] or ''), 'topic': row[5], 'publishedAt': row[6].isoformat() if row[6] else None
         }
         return {
