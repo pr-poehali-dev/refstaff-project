@@ -3,6 +3,7 @@ import os
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.header import Header
 import psycopg2
 import psycopg2.extras
 
@@ -83,7 +84,7 @@ def handler(event, context):
     sent = 0
     for admin in admins:
         msg = MIMEMultipart('alternative')
-        msg['Subject'] = subject
+        msg['Subject'] = Header(subject, 'utf-8')
         msg['From'] = smtp_user
         msg['To'] = admin['email']
         msg.attach(MIMEText(html, 'html', 'utf-8'))

@@ -368,7 +368,7 @@ def handler(event: dict, context) -> dict:
             return {'statusCode': 404, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'not found'})}
         post = {
             'id': row[0], 'slug': row[1], 'title': row[2], 'metaDescription': row[3],
-            'content': row[4], 'topic': row[5], 'publishedAt': row[6].isoformat() if row[6] else None
+            'content': fix_encoding(row[4] or ''), 'topic': row[5], 'publishedAt': row[6].isoformat() if row[6] else None
         }
         return {
             'statusCode': 200,
