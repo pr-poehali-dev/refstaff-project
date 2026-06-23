@@ -149,17 +149,18 @@ def slugify(text: str) -> str:
 def get_existing_articles(conn) -> tuple:
     """Возвращает (topics, titles) — для передачи GPT и проверки дублей."""
     with conn.cursor() as cur:
-        cur.execute(f'SELECT topic, title FROM {SCHEMA}.blog_posts ORDER BY created_at DESC LIMIT 50')
+        cur.execute(f'SELECT topic, title FROM {SCHEMA}.blog_posts ORDER BY created_at DESC LIMIT 200')
         rows = cur.fetchall()
     topics = [r[0] for r in rows]
     titles = [r[1] for r in rows]
     return topics, titles
 
 
-def titles_are_similar(title_a: str, title_b: str, threshold: float = 0.6) -> bool:
+def titles_are_similar(title_a: str, title_b: str, threshold: float = 0.4) -> bool:
     """Простая проверка на схожесть через общие слова (без внешних библиотек)."""
+    STOP_WORDS = {'в', 'и', 'на', 'с', 'по', 'для', 'как', 'что', 'от', 'к', 'о', 'из', 'не', 'или', 'а', 'но'}
     def words(t):
-        return set(re.sub(r'[^а-яёa-z0-9\s]', '', t.lower()).split())
+        return set(re.sub(r'[^а-яёa-z0-9\s]', '', t.lower()).split()) - STOP_WORDS
     wa, wb = words(title_a), words(title_b)
     if not wa or not wb:
         return False
@@ -222,19 +223,21 @@ def generate_article(existing_topics: list, existing_titles: list) -> dict:
     if not available:
         available = TOPIC_POOLS
     topic_hint = random.choice(available)
-    existing_topics_str = '\n'.join(f'- {t}' for t in existing_topics[:20]) if existing_topics else 'нет'
-    existing_titles_str = '\n'.join(f'- {t}' for t in existing_titles[:20]) if existing_titles else 'нет'
+    existing_topics_str = '\n'.join(f'- {t}' for t in existing_topics) if existing_topics else 'нет'
+    existing_titles_str = '\n'.join(f'- {t}' for t in existing_titles) if existing_titles else 'нет'
 
     prompt = f"""Ты SEO-копирайтер для блога реферальной HR-платформы. Блог охватывает широкую HR-тематику: подбор персонала, адаптация, удержание, HR-аналитика, тренды рынка труда.
 
-УЖЕ НАПИСАННЫЕ СТАТЬИ — ТЕМЫ (не повторяй):
+УЖЕ НАПИСАННЫЕ СТАТЬИ — ТЕМЫ (не повторяй эти темы даже в другой формулировке или синонимами):
 {existing_topics_str}
 
-УЖЕ НАПИСАННЫЕ СТАТЬИ — ЗАГОЛОВКИ (твой заголовок должен быть ПОЛНОСТЬЮ другим):
+УЖЕ НАПИСАННЫЕ СТАТЬИ — ЗАГОЛОВКИ (твой заголовок должен быть ПОЛНОСТЬЮ другим, не перефразируй эти заголовки):
 {existing_titles_str}
 
+КРИТИЧЕСКИ ВАЖНО: Если подсказка ниже похожа по смыслу на одну из уже написанных тем — игнорируй её и выбери совершенно другую тему. "Agile в HR" и "гибкие методологии в HR" — это одна и та же тема. Нельзя писать про одно и то же разными словами.
+
 ПОДСКАЗКА ДЛЯ НОВОЙ ТЕМЫ: {topic_hint}
-Выбери эту тему или любую смежную HR-тему — главное, чтобы она была уникальной.
+Выбери эту тему ТОЛЬКО если она не пересекается по смыслу ни с одной из уже написанных. Иначе выбери совершенно другую HR-тему.
 
 ЗАДАЧА: напиши одну полную SEO-статью для HR-блога.
 
