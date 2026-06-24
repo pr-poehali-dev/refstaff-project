@@ -156,7 +156,7 @@ def get_existing_articles(conn) -> tuple:
     return topics, titles
 
 
-def titles_are_similar(title_a: str, title_b: str, threshold: float = 0.4) -> bool:
+def titles_are_similar(title_a: str, title_b: str, threshold: float = 0.55) -> bool:
     """Простая проверка на схожесть через общие слова (без внешних библиотек)."""
     STOP_WORDS = {'в', 'и', 'на', 'с', 'по', 'для', 'как', 'что', 'от', 'к', 'о', 'из', 'не', 'или', 'а', 'но'}
     def words(t):
@@ -380,20 +380,27 @@ def handler(event: dict, context) -> dict:
             return {'statusCode': 403, 'headers': CORS_HEADERS, 'body': json.dumps({'error': 'forbidden'})}
 
         existing_topics, existing_titles = get_existing_articles(conn)
-        article = generate_article(existing_topics, existing_titles)
 
-        # Проверяем схожесть заголовка с уже существующими
-        for existing_title in existing_titles:
-            if titles_are_similar(article['title'], existing_title):
-                return {
-                    'statusCode': 409,
-                    'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
-                    'body': json.dumps({
-                        'error': 'duplicate_title',
-                        'message': f'Сгенерированный заголовок слишком похож на существующий: "{existing_title}"',
-                        'generated_title': article['title']
-                    })
-                }
+        # До 3 попыток генерации, если GPT вернул похожий заголовок
+        article = None
+        last_duplicate = None
+        for _attempt in range(3):
+            candidate = generate_article(existing_topics, existing_titles)
+            duplicate_of = next((t for t in existing_titles if titles_are_similar(candidate['title'], t)), None)
+            if not duplicate_of:
+                article = candidate
+                break
+            last_duplicate = duplicate_of
+
+        if article is None:
+            return {
+                'statusCode': 409,
+                'headers': {**CORS_HEADERS, 'Content-Type': 'application/json'},
+                'body': json.dumps({
+                    'error': 'duplicate_title',
+                    'message': f'После 3 попыток не удалось сгенерировать уникальный заголовок. Последний дубль: "{last_duplicate}"',
+                })
+            }
 
         content_with_links = inject_links(article['content'])
         slug_base = slugify(article['topic'])
@@ -446,16 +453,19 @@ def handler(event: dict, context) -> dict:
 
         for _ in range(count):
             try:
-                article = generate_article(existing_topics, existing_titles)
-
-                # Проверка на схожесть заголовка
-                duplicate_found = False
-                for existing_title in existing_titles:
-                    if titles_are_similar(article['title'], existing_title):
-                        results.append({'ok': False, 'error': f'duplicate_title: похож на "{existing_title}"'})
-                        duplicate_found = True
+                # До 3 попыток генерации при дубле
+                article = None
+                last_dup = None
+                for _attempt in range(3):
+                    candidate = generate_article(existing_topics, existing_titles)
+                    dup = next((t for t in existing_titles if titles_are_similar(candidate['title'], t)), None)
+                    if not dup:
+                        article = candidate
                         break
-                if duplicate_found:
+                    last_dup = dup
+
+                if article is None:
+                    results.append({'ok': False, 'error': f'duplicate_title после 3 попыток: "{last_dup}"'})
                     continue
 
                 content_with_links = inject_links(article['content'])
