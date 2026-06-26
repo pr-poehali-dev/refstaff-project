@@ -78,7 +78,7 @@ TOPIC_POOLS = [
     # Удержание и вовлечённость
     'почему сотрудники уходят: топ причин текучки',
     'как удержать ключевых сотрудников',
-    'нематериальная мотивация: что работает в 2025 году',
+    'нематериальная мотивация: что работает в {year} году',
     'системы грейдов и карьерных треков',
     'корпоративная культура как конкурентное преимущество',
     'wellbeing-программы: влияние на удержание',
@@ -216,9 +216,10 @@ def inject_links(content: str) -> str:
 
 def generate_article(existing_topics: list, existing_titles: list) -> dict:
     import random
-    available = [t for t in TOPIC_POOLS if t not in existing_topics]
+    current_year = datetime.utcnow().year
+    available = [t.format(year=current_year) for t in TOPIC_POOLS if t.format(year=current_year) not in existing_topics]
     if not available:
-        available = TOPIC_POOLS
+        available = [t.format(year=current_year) for t in TOPIC_POOLS]
     topic_hint = random.choice(available)
     existing_topics_str = '\n'.join(f'- {t}' for t in existing_topics) if existing_topics else 'нет'
     existing_titles_str = '\n'.join(f'- {t}' for t in existing_titles) if existing_titles else 'нет'
@@ -235,6 +236,8 @@ def generate_article(existing_topics: list, existing_titles: list) -> dict:
 
 ПОДСКАЗКА ДЛЯ НОВОЙ ТЕМЫ: {topic_hint}
 Выбери эту тему ТОЛЬКО если она не пересекается по смыслу ни с одной из уже написанных. Иначе выбери совершенно другую HR-тему.
+
+ТЕКУЩИЙ ГОД: {current_year}. Используй его везде где упоминается год (в заголовке, тексте, метаописании).
 
 ЗАДАЧА: напиши одну полную SEO-статью для HR-блога.
 
