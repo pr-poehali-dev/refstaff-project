@@ -8,6 +8,9 @@ Disallow: /api
 # Sitemap
 Sitemap: https://i-hunt.ru/sitemap.xml
 
+# RSS
+# https://i-hunt.ru/blog/rss.xml
+
 # Googlebot
 User-agent: Googlebot
 Allow: /

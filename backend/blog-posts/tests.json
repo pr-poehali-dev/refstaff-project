@@ -15,6 +15,13 @@
       "bodyMatcher": "partial"
     },
     {
+      "name": "Blog RSS feed",
+      "method": "GET",
+      "path": "/?action=rss",
+      "expectedStatus": 200,
+      "bodyMatcher": "partial"
+    },
+    {
       "name": "Blog sitemap XML",
       "method": "GET",
       "path": "/?action=sitemap",

@@ -515,6 +515,49 @@ def handler(event: dict, context) -> dict:
             'body': key,
         }
 
+    # GET: RSS-лента для Яндекс.Дзен и других агрегаторов
+    if method == 'GET' and action == 'rss':
+        with conn.cursor() as cur:
+            cur.execute(
+                f'SELECT slug, title, meta_description, content, published_at FROM {SCHEMA}.blog_posts '
+                f'WHERE is_published=TRUE ORDER BY published_at DESC LIMIT 50'
+            )
+            rows = cur.fetchall()
+
+        def xml_escape(s):
+            return (s or '').replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;')
+
+        now_rfc = datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S +0000')
+        lines = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom">',
+            '  <channel>',
+            f'    <title>{BRAND} — блог об HR и рекрутинге</title>',
+            f'    <link>{SITE_URL}/blog</link>',
+            f'    <description>Статьи о реферальном рекрутинге, HR-аналитике и подборе персонала</description>',
+            '    <language>ru</language>',
+            f'    <lastBuildDate>{now_rfc}</lastBuildDate>',
+            f'    <atom:link href="{SITE_URL}/blog/rss.xml" rel="self" type="application/rss+xml"/>',
+        ]
+        for slug, title, meta_description, content, published_at in rows:
+            pub_date = published_at.strftime('%a, %d %b %Y %H:%M:%S +0000') if published_at else now_rfc
+            lines += [
+                '    <item>',
+                f'      <title>{xml_escape(title)}</title>',
+                f'      <link>{SITE_URL}/blog/{slug}</link>',
+                f'      <guid isPermaLink="true">{SITE_URL}/blog/{slug}</guid>',
+                f'      <pubDate>{pub_date}</pubDate>',
+                f'      <description>{xml_escape(meta_description or "")}</description>',
+                f'      <content:encoded><![CDATA[{content or ""}]]></content:encoded>',
+                '    </item>',
+            ]
+        lines += ['  </channel>', '</rss>']
+        return {
+            'statusCode': 200,
+            'headers': {**CORS_HEADERS, 'Content-Type': 'application/rss+xml; charset=utf-8'},
+            'body': '\n'.join(lines)
+        }
+
     # GET: динамический sitemap всех опубликованных статей (XML)
     if method == 'GET' and action == 'sitemap':
         with conn.cursor() as cur:
