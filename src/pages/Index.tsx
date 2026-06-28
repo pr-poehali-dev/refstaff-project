@@ -56,6 +56,7 @@ const HowItWorksSection = lazy(() => import('@/components/landing/HowItWorksSect
 const BenefitsSection = lazy(() => import('@/components/landing/BenefitsSection').then(m => ({ default: m.BenefitsSection })));
 const PricingSection = lazy(() => import('@/components/landing/PricingSection').then(m => ({ default: m.PricingSection })));
 const ContactSection = lazy(() => import('@/components/landing/ContactSection').then(m => ({ default: m.ContactSection })));
+const FaqSection = lazy(() => import('@/components/landing/FaqSection').then(m => ({ default: m.FaqSection })));
 const LandingFooter = lazy(() => import('@/components/landing/LandingFooter').then(m => ({ default: m.LandingFooter })));
 // Вкладки работодателя — lazy, не нужны на лендинге
 const VacanciesTab = lazy(() => import('@/components/employer/VacanciesTab').then(m => ({ default: m.VacanciesTab })));
@@ -1399,6 +1400,8 @@ function Index() {
           onRegister={() => setShowRegisterDialog(true)}
           onDemo={() => setShowDemoDialog(true)}
         />
+
+        <FaqSection />
 
         <ContactSection
           form={contactForm}
