@@ -38,9 +38,7 @@ export function FaqSection() {
       <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-white to-purple-50/40 pointer-events-none" />
       <div className="container mx-auto max-w-3xl relative z-10">
         <div className="text-center mb-10 sm:mb-12">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-3 uppercase tracking-wide">
-            Частые вопросы
-          </span>
+          <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 mb-3 uppercase tracking-wide">FAQ</span>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
             Остались{' '}
             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
