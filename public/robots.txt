@@ -7,6 +7,7 @@ Disallow: /api
 
 # Sitemap
 Sitemap: https://i-hunt.ru/sitemap.xml
+Sitemap: https://functions.poehali.dev/24adc9a7-714f-4df9-a6b0-3874d99d1577?action=sitemap
 
 # RSS
 # https://i-hunt.ru/blog/rss.xml
