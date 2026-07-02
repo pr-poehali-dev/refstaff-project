@@ -9,6 +9,7 @@ import os
 import urllib.request
 
 API_URL = 'https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a'
+BLOG_API_URL = 'https://functions.poehali.dev/24adc9a7-714f-4df9-a6b0-3874d99d1577'
 APP_URL = 'https://i-hunt.ru'
 
 VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/0e9e50fa-3793-4c04-9957-ca24ea4d1579.jpg'
@@ -31,6 +32,14 @@ CORS_HEADERS = {
 def is_bot(user_agent: str) -> bool:
     ua = user_agent.lower()
     return any(b in ua for b in BOT_AGENTS)
+
+
+def fetch_blog_post(slug: str) -> dict:
+    url = f'{BLOG_API_URL}?action=get&slug={slug}'
+    req = urllib.request.Request(url)
+    with urllib.request.urlopen(req, timeout=5) as resp:
+        data = json.loads(resp.read().decode('utf-8'))
+    return data.get('post', {}) if isinstance(data, dict) else {}
 
 
 def fetch_vacancy_by_id(vacancy_id: str) -> dict:
@@ -98,6 +107,24 @@ def handler(event: dict, context) -> dict:
         }
 
     try:
+        if page_type == 'blog':
+            slug = query.get('id', '')
+            redirect_url = f'{APP_URL}/blog/{slug}'
+            post = fetch_blog_post(slug) if slug else {}
+            if post:
+                title = f'{post.get("title", "Статья")} | Блог iHUNT'
+                description = post.get('metaDescription', 'Экспертные статьи о реферальном рекрутинге и HR от iHUNT')
+            else:
+                title = 'Блог iHUNT — статьи о реферальном рекрутинге и HR'
+                description = 'Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала.'
+            image = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg'
+            html = build_html(title, description, image, redirect_url, redirect_url)
+            return {
+                'statusCode': 200,
+                'headers': {**CORS_HEADERS, 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600'},
+                'body': html
+            }
+
         if page_type == 'employee':
             token = query.get('id', '')
             redirect_url = f'{APP_URL}/employee-register' + (f'?token={token}' if token else '')

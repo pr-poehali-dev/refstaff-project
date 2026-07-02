@@ -6,6 +6,7 @@ import Icon from '@/components/ui/icon';
 
 const BLOG_API = 'https://functions.poehali.dev/24adc9a7-714f-4df9-a6b0-3874d99d1577';
 const OG_IMAGE_API = 'https://functions.poehali.dev/c6e24176-0014-4fee-8ecd-b597171ff766';
+const OG_PROXY_URL = 'https://functions.poehali.dev/a7ef69a9-2736-4504-ac24-54132c34d646';
 
 const REACTIONS = [
   { emoji: '👍', label: 'Полезно' },
@@ -115,12 +116,13 @@ export default function BlogPost() {
   );
 
   const postUrl = `https://i-hunt.ru/blog/${post.slug}`;
+  const proxyUrl = `${OG_PROXY_URL}?type=blog&id=${encodeURIComponent(post.slug)}`;
   const ogImageUrl = `${OG_IMAGE_API}?title=${encodeURIComponent(post.title)}&department=${encodeURIComponent('HR & Рекрутинг')}&salary=${encodeURIComponent('iHUNT Блог')}`;
   const totalReactions = Object.values(stats.reactions).reduce((a, b) => a + b, 0);
 
   const shareLinks = {
-    vk: `https://vk.com/share.php?url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(post.metaDescription)}`,
-    telegram: `https://t.me/share/url?url=${encodeURIComponent(postUrl)}&text=${encodeURIComponent(post.title + '\n\n' + post.metaDescription)}`,
+    vk: `https://vk.com/share.php?url=${encodeURIComponent(proxyUrl)}&title=${encodeURIComponent(post.title)}&description=${encodeURIComponent(post.metaDescription)}`,
+    telegram: `https://t.me/share/url?url=${encodeURIComponent(proxyUrl)}&text=${encodeURIComponent(post.title)}`,
     whatsapp: `https://wa.me/?text=${encodeURIComponent(post.title + '\n\n' + post.metaDescription + '\n\n' + postUrl)}`,
   };
 
