@@ -4,6 +4,7 @@ User-agent: *
 Allow: /
 Disallow: /admin
 Disallow: /api
+Disallow: /)
 
 # Sitemap
 Sitemap: https://i-hunt.ru/sitemap.xml
