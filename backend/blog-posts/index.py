@@ -115,6 +115,56 @@ TOPIC_POOLS = [
     'навыки рекрутера будущего',
     'people analytics: от данных к решениям',
     'agile в HR: гибкие методологии в управлении персоналом',
+
+    # Специфика отраслей и сегментов найма
+    'подбор персонала в общепите и HoReCa',
+    'найм линейного персонала в логистике и складах',
+    'рекрутинг в медицинских учреждениях: особенности',
+    'подбор персонала в строительной отрасли',
+    'найм в сфере услуг: клиентский сервис и продажи',
+    'рекрутинг топ-менеджеров: executive search изнутри',
+    'подбор персонала для сезонного бизнеса',
+    'найм сотрудников для филиальной сети',
+    'рекрутинг в госсекторе: особенности и ограничения',
+    'подбор персонала в образовательных учреждениях',
+
+    # Компенсации и льготы
+    'компенсационная политика: как выстроить систему оплаты',
+    'бенефиты для сотрудников: что предложить кроме зарплаты',
+    'ДМС и страхование сотрудников: как выбрать программу',
+    'бонусы и премии: как привязать к результатам работы',
+    'прозрачность зарплат в компании: плюсы и риски',
+
+    # Правовые и организационные аспекты
+    'трудовой договор и оформление сотрудников: частые ошибки HR',
+    'испытательный срок с точки зрения трудового права',
+    'увольнение сотрудников: как провести грамотно и законно',
+    'внутренние регламенты и HR-политики компании',
+    'аутстаффинг и аутсорсинг персонала: когда это выгодно',
+
+    # Обучение и развитие
+    'корпоративное обучение: как выстроить систему',
+    'индивидуальные планы развития сотрудников',
+    'кадровый резерв: как выявлять и растить таланты',
+    'менторство руководителей: развитие управленческих навыков',
+    'оценка персонала по методу 360 градусов',
+    'ассессмент-центр: как оценивать потенциал сотрудников',
+
+    # HR-функция и управление
+    'роль HRBP в современной компании',
+    'как выстроить HR-стратегию на год',
+    'бюджетирование HR-отдела: на чём не стоит экономить',
+    'HR-метрики для совета директоров: что показывать',
+    'аутсорсинг HR-функций: за и против',
+    'кросс-функциональное взаимодействие HR с другими отделами',
+
+    # Психология и коммуникации
+    'эмоциональный интеллект рекрутера',
+    'сложные переговоры о зарплате с кандидатом',
+    'обратная связь кандидатам после отказа: как делать правильно',
+    'синдром самозванца у сотрудников: роль HR',
+    'конфликты в команде: роль HR в их разрешении',
+    'психологическая безопасность в команде',
 ]
 
 KEY_PHRASES = [
@@ -217,9 +267,16 @@ def inject_links(content: str) -> str:
 def generate_article(existing_topics: list, existing_titles: list) -> dict:
     import random
     current_year = datetime.utcnow().year
-    available = [t.format(year=current_year) for t in TOPIC_POOLS if t.format(year=current_year) not in existing_topics]
+    all_topics = [t.format(year=current_year) for t in TOPIC_POOLS]
+    # Нечёткое сравнение: тема из пула считается "занятой", если она похожа
+    # на любую уже написанную тему или заголовок (GPT переформулирует темы своими словами)
+    available = [
+        t for t in all_topics
+        if not any(titles_are_similar(t, existing, threshold=0.45) for existing in existing_topics)
+        and not any(titles_are_similar(t, existing, threshold=0.45) for existing in existing_titles)
+    ]
     if not available:
-        available = [t.format(year=current_year) for t in TOPIC_POOLS]
+        available = all_topics
     topic_hint = random.choice(available)
     existing_topics_str = '\n'.join(f'- {t}' for t in existing_topics) if existing_topics else 'нет'
     existing_titles_str = '\n'.join(f'- {t}' for t in existing_titles) if existing_titles else 'нет'
@@ -384,12 +441,15 @@ def handler(event: dict, context) -> dict:
 
         existing_topics, existing_titles = get_existing_articles(conn)
 
-        # До 3 попыток генерации, если GPT вернул похожий заголовок
+        # До 5 попыток генерации, если GPT вернул похожую тему или заголовок
         article = None
         last_duplicate = None
-        for _attempt in range(3):
+        for _attempt in range(5):
             candidate = generate_article(existing_topics, existing_titles)
-            duplicate_of = next((t for t in existing_titles if titles_are_similar(candidate['title'], t)), None)
+            duplicate_of = (
+                next((t for t in existing_titles if titles_are_similar(candidate['title'], t)), None)
+                or next((t for t in existing_topics if titles_are_similar(candidate['topic'], t, threshold=0.45)), None)
+            )
             if not duplicate_of:
                 article = candidate
                 break
