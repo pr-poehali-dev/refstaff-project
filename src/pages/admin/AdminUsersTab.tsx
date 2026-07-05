@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { TabsContent } from '@/components/ui/tabs';
+import Icon from '@/components/ui/icon';
 import { User } from './adminTypes';
 
 interface Props {
@@ -58,11 +59,11 @@ export default function AdminUsersTab({
                     <div>
                       <p className="font-semibold text-white">{u.first_name} {u.last_name}</p>
                       <p className="text-gray-400 text-xs">{u.email}</p>
-                      {u.company_name && <p className="text-gray-500 text-xs mt-0.5">🏢 {u.company_name}</p>}
+                      {u.company_name && <p className="text-gray-500 text-xs mt-0.5 flex items-center gap-1"><Icon name="Building2" size={12} />{u.company_name}</p>}
                       <div className="flex gap-3 mt-2 text-xs text-gray-400">
-                        <span>🎯 {u.total_recommendations} рек.</span>
-                        <span>✅ {u.successful_hires} найм.</span>
-                        <span>💰 {Number(u.wallet_balance).toLocaleString()} ₽</span>
+                        <span className="flex items-center gap-1"><Icon name="Target" size={12} />{u.total_recommendations} рек.</span>
+                        <span className="flex items-center gap-1"><Icon name="CheckCircle2" size={12} />{u.successful_hires} найм.</span>
+                        <span className="flex items-center gap-1"><Icon name="Wallet" size={12} />{Number(u.wallet_balance).toLocaleString()} ₽</span>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-1">

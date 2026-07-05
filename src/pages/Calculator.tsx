@@ -98,8 +98,9 @@ export default function Calculator() {
         <main className="container mx-auto max-w-6xl px-4 py-10 sm:py-16">
           {/* Заголовок */}
           <div className="text-center mb-10 sm:mb-14">
-            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-              🧮 Бесплатный инструмент
+            <Badge className="mb-4 bg-primary/10 text-primary border-primary/20 gap-1">
+              <Icon name="BarChart3" size={14} />
+              Бесплатный инструмент
             </Badge>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
               Калькулятор стоимости найма

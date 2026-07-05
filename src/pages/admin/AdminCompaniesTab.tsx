@@ -88,9 +88,9 @@ export default function AdminCompaniesTab({
                       <p className="font-semibold text-white">{c.name}</p>
                       {c.inn && <p className="text-gray-400 text-xs mt-0.5">ИНН: {c.inn}</p>}
                       <div className="flex gap-3 mt-2 text-xs text-gray-400">
-                        <span>👥 {c.users_count} польз.</span>
-                        <span>💼 {c.vacancies_count} вакансий</span>
-                        <span>🎯 {c.recommendations_count} рек.</span>
+                        <span className="flex items-center gap-1"><Icon name="Users" size={12} />{c.users_count} польз.</span>
+                        <span className="flex items-center gap-1"><Icon name="Briefcase" size={12} />{c.vacancies_count} вакансий</span>
+                        <span className="flex items-center gap-1"><Icon name="Target" size={12} />{c.recommendations_count} рек.</span>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
@@ -180,7 +180,7 @@ export default function AdminCompaniesTab({
                             <p className="text-gray-400 text-xs">{v.department}</p>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className="text-gray-400 text-xs">🎯 {v.recs_count}</span>
+                            <span className="text-gray-400 text-xs flex items-center gap-1"><Icon name="Target" size={12} />{v.recs_count}</span>
                             <Badge variant={v.status === 'active' ? 'default' : 'secondary'} className="text-xs">
                               {v.status === 'active' ? 'Активна' : 'Архив'}
                             </Badge>

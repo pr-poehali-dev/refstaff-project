@@ -22,14 +22,14 @@ export function MyRecommendationsTab({
   return (
     <div className="space-y-4">
       <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-        <span>⭐ Мои рекомендации</span>
-        <span className="hidden sm:inline"></span>
+        <Icon name="Star" size={20} />
+        <span>Мои рекомендации</span>
       </h2>
       <div className="grid gap-4">
         {myRecs.length === 0 && (
           <Card className="border-dashed">
             <CardContent className="flex flex-col items-center justify-center py-12 text-center gap-4">
-              <span className="text-5xl">👥</span>
+              <Icon name="Users" size={48} className="text-muted-foreground" />
               <div>
                 <p className="font-semibold text-lg mb-1">Рекомендаций пока нет</p>
                 <p className="text-sm text-muted-foreground">Порекомендуйте знакомых на открытые вакансии и получайте вознаграждение</p>
@@ -88,7 +88,7 @@ export function MyRecommendationsTab({
                       <span>
                         {daysRemaining > 0
                           ? `Выплата через ${daysRemaining} ${daysRemaining === 1 ? 'день' : daysRemaining < 5 ? 'дня' : 'дней'}`
-                          : '✓ Выплата доступна'
+                          : <span className="inline-flex items-center gap-1"><Icon name="CheckCircle2" size={14} />Выплата доступна</span>
                         }
                       </span>
                     </div>

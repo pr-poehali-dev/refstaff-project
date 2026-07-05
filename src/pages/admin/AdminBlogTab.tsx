@@ -67,7 +67,7 @@ export default function AdminBlogTab({ secret }: Props) {
     setGenerating(true);
     setGenLog([]);
     for (let i = 0; i < count; i++) {
-      setGenLog(prev => [...prev, `⏳ Генерирую статью ${i + 1} из ${count}...`]);
+      setGenLog(prev => [...prev, `Генерирую статью ${i + 1} из ${count}...`]);
       try {
         const r = await fetch(`${BLOG_API}?action=generate`, {
           method: 'POST',
@@ -76,12 +76,12 @@ export default function AdminBlogTab({ secret }: Props) {
         });
         const d = await r.json();
         if (d.success) {
-          setGenLog(prev => [...prev.slice(0, -1), `✅ ${i + 1}. ${d.title}`]);
+          setGenLog(prev => [...prev.slice(0, -1), `${i + 1}. ${d.title}`]);
         } else {
-          setGenLog(prev => [...prev.slice(0, -1), `❌ Ошибка при генерации статьи ${i + 1}`]);
+          setGenLog(prev => [...prev.slice(0, -1), `Ошибка при генерации статьи ${i + 1}`]);
         }
       } catch {
-        setGenLog(prev => [...prev.slice(0, -1), `❌ Ошибка сети при статье ${i + 1}`]);
+        setGenLog(prev => [...prev.slice(0, -1), `Ошибка сети при статье ${i + 1}`]);
       }
       if (i < count - 1) await new Promise(res => setTimeout(res, 2000));
     }
@@ -182,13 +182,13 @@ export default function AdminBlogTab({ secret }: Props) {
                         onClick={() => {
                           const url = `${BLOG_API}?action=generate&admin_secret=${secret}`;
                           navigator.clipboard.writeText(url);
-                          alert('✅ URL скопирован в буфер обмена');
+                          alert('URL скопирован в буфер обмена');
                         }}
                       >
                         <Icon name="Copy" size={13} />
                       </Button>
                     </div>
-                    <p className="text-gray-500 mt-2">👆 Нажми иконку копирования — секрет подставится автоматически</p>
+                    <p className="text-gray-500 mt-2 flex items-center gap-1"><Icon name="Hand" size={12} />Нажми иконку копирования — секрет подставится автоматически</p>
                   </div>
                   <div className="bg-gray-800 rounded p-3 space-y-1">
                     <p className="text-gray-300 font-medium mb-2">Настройки в cron-job.org:</p>

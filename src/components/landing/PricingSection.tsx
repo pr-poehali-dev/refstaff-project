@@ -15,7 +15,7 @@ export function PricingSection({ period, onPeriodChange, onRegister, onDemo }: P
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="container mx-auto max-w-6xl relative z-10">
         <div className="text-center mb-10 sm:mb-12 md:mb-16">
-          <Badge className="mb-4 bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs sm:text-sm">💎 Прозрачное ценообразование</Badge>
+          <Badge className="mb-4 bg-blue-500/10 text-blue-600 border-blue-500/20 text-xs sm:text-sm"><Icon name="Gem" size={14} className="inline-block mr-1" />Прозрачное ценообразование</Badge>
           <h2 id="pricing-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-blue-600 to-green-600 bg-clip-text text-transparent">Тарифы</h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto px-4">14 дней бесплатно для всех новых клиентов</p>
         </div>

@@ -50,7 +50,7 @@ export function PayoutsTab({
         <>
           <div className="mb-4 sm:mb-6">
             <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2 mb-2">
-              <span>💰</span>
+              <Icon name="Wallet" size={22} />
               <span className="hidden sm:inline">Запросы на выплаты</span>
               <span className="sm:hidden">Выплаты</span>
             </h2>
@@ -65,7 +65,7 @@ export function PayoutsTab({
             >
               <CardTitle className="text-sm sm:text-base flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
-                  <span>⚙️</span> Доступные методы выплат
+                  <Icon name="Settings" size={16} /> Доступные методы выплат
                 </div>
                 <Icon name={payoutMethodsCollapsed ? 'ChevronDown' : 'ChevronUp'} size={16} className="text-muted-foreground" />
               </CardTitle>
@@ -76,17 +76,17 @@ export function PayoutsTab({
             {!payoutMethodsCollapsed && (
               <CardContent className="space-y-2">
                 {[
-                  { key: 'cash', label: 'Наличными', emoji: '💵' },
-                  { key: 'card', label: 'На карту', emoji: '💳' },
-                  { key: 'sbp', label: 'По СБП', emoji: '📱' },
-                  { key: 'bank', label: 'По реквизитам на счёт', emoji: '🏦' },
-                ].map(({ key, label, emoji }) => {
+                  { key: 'cash', label: 'Наличными', icon: 'Banknote' },
+                  { key: 'card', label: 'На карту', icon: 'CreditCard' },
+                  { key: 'sbp', label: 'По СБП', icon: 'Smartphone' },
+                  { key: 'bank', label: 'По реквизитам на счёт', icon: 'Landmark' },
+                ].map(({ key, label, icon }) => {
                   const methods: string[] = company?.payout_methods ?? ['card', 'sbp', 'cash', 'bank'];
                   const enabled = methods.includes(key);
                   return (
                     <div key={key} className="flex items-center justify-between py-1" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center gap-2 text-sm">
-                        <span>{emoji}</span>
+                        <Icon name={icon} size={16} className="text-muted-foreground" />
                         <span>{label}</span>
                       </div>
                       <Checkbox

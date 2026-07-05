@@ -71,7 +71,7 @@ export default function AiAssistantTab({ companyId, messages, setMessages }: Pro
     <div className="flex flex-col h-[70vh] max-h-[700px]">
       <div className="mb-4">
         <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-          <span>🤖</span> ИИ-помощник
+          <Icon name="Bot" size={22} /> ИИ-помощник
         </h2>
         <p className="text-xs sm:text-sm text-muted-foreground mt-1">
           Знает данные вашей компании и платформу iHUNT. Спросите что угодно.
@@ -103,7 +103,7 @@ export default function AiAssistantTab({ companyId, messages, setMessages }: Pro
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
               <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-sm">
-                🤖
+                <Icon name="Bot" size={16} />
               </div>
             )}
             <Card className={`max-w-[80%] ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
@@ -117,7 +117,7 @@ export default function AiAssistantTab({ companyId, messages, setMessages }: Pro
         {loading && (
           <div className="flex justify-start">
             <div className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center mr-2 mt-0.5 flex-shrink-0 text-sm">
-              🤖
+              <Icon name="Bot" size={16} />
             </div>
             <Card className="bg-muted">
               <CardContent className="p-3 flex items-center gap-1">

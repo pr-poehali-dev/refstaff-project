@@ -72,7 +72,7 @@ export function EmployeesTab({
           <div className="flex flex-col gap-4 mb-6">
             <div>
               <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-                <span>👥</span>
+                <Icon name="Users" size={22} />
                 <span className="hidden sm:inline">Сотрудники компании</span>
                 <span className="sm:hidden">Сотрудники</span>
               </h2>
@@ -157,7 +157,7 @@ export function EmployeesTab({
                         }}
                         className="flex-1 sm:flex-none text-xs sm:text-sm"
                       >
-                        <span className="sm:mr-1">💬</span>
+                        <Icon name="MessageCircle" size={16} className="sm:mr-1" />
                         <span className="hidden sm:inline">Написать</span>
                       </Button>
                       <Button
@@ -169,7 +169,7 @@ export function EmployeesTab({
                         }}
                         className="flex-1 sm:flex-none text-xs sm:text-sm"
                       >
-                        <span>✏️</span>
+                        <Icon name="Pencil" size={16} />
                       </Button>
                       <Dialog open={showEditRolesDialog && employeeToEditRoles?.id === employee.id} onOpenChange={(open) => {
                         if (!open) {
@@ -184,7 +184,7 @@ export function EmployeesTab({
                             onRolesFormChange({ isAdmin: employee.isAdmin || false });
                             onEditRolesDialogChange(true);
                           }} className="flex-1 sm:flex-none text-xs sm:text-sm">
-                            <span>🛡️</span>
+                            <Icon name="Shield" size={16} />
                           </Button>
                         </DialogTrigger>
                         <DialogContent>

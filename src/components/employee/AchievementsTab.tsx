@@ -10,12 +10,28 @@ interface AchievementsTabProps {
   currentEmployeeId: number;
 }
 
+function getRankIcon(hired: number): string {
+  if (hired >= 10) return 'Crown';
+  if (hired >= 5) return 'Star';
+  if (hired >= 3) return 'Target';
+  if (hired >= 1) return 'Sparkles';
+  return 'Flag';
+}
+
+function getRankLabel(hired: number): string {
+  if (hired >= 10) return 'Легенда';
+  if (hired >= 5) return 'Мастер';
+  if (hired >= 3) return 'Профи';
+  if (hired >= 1) return 'Новичок';
+  return 'Старт';
+}
+
 export function AchievementsTab({ employees, recommendations, currentEmployeeId }: AchievementsTabProps) {
   return (
     <div className="space-y-4">
       <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-        <span>🏆 Достижения и рейтинг</span>
-        <span className="hidden sm:inline"></span>
+        <Icon name="Trophy" size={20} className="text-primary" />
+        <span>Достижения и рейтинг</span>
       </h2>
 
       <Card className="bg-gradient-to-r from-primary/10 to-secondary/10">
@@ -54,11 +70,9 @@ export function AchievementsTab({ employees, recommendations, currentEmployeeId 
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-primary text-xs sm:text-sm">
-                      {emp.hired >= 10 ? '👑 Легенда' :
-                       emp.hired >= 5 ? '⭐ Мастер' :
-                       emp.hired >= 3 ? '🎯 Профи' :
-                       emp.hired >= 1 ? '🌟 Новичок' : '🔰 Старт'}
+                    <div className="font-bold text-primary text-xs sm:text-sm flex items-center justify-end gap-1">
+                      <Icon name={getRankIcon(emp.hired)} size={14} />
+                      {getRankLabel(emp.hired)}
                     </div>
                   </div>
                 </div>
@@ -106,7 +120,7 @@ export function AchievementsTab({ employees, recommendations, currentEmployeeId 
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-sm sm:text-lg truncate">Меткий глаз</div>
                     {hasSharpEye
-                      ? <div className="text-xs sm:text-sm text-muted-foreground">3 успешных найма выполнено ✓</div>
+                      ? <div className="text-xs sm:text-sm text-muted-foreground flex items-center gap-1">3 успешных найма выполнено <Icon name="CheckCircle2" size={14} className="text-green-600" /></div>
                       : <div className="text-xs sm:text-sm text-muted-foreground">{myHires}/3 успешных найма<Progress value={Math.round((myHires / 3) * 100)} className="h-1 mt-2" /></div>
                     }
                   </div>

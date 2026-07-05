@@ -35,7 +35,7 @@ export default function EmployeeDashboard({ currentUser, onLogout }: EmployeeDas
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-xl sm:text-3xl font-bold mb-2 flex items-center gap-2 sm:gap-3">
-            <span className="text-2xl sm:text-4xl">💬</span>
+            <Icon name="MessageCircle" size={32} className="sm:w-9 sm:h-9" />
             <span className="hidden sm:inline">Чат с коллегами</span>
             <span className="sm:hidden text-base">Чат</span>
           </h1>

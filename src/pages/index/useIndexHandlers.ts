@@ -341,7 +341,7 @@ export function useIndexHandlers(s: ReturnType<typeof import('./useIndexState').
         if (s.subscriptionDaysLeft !== null && s.subscriptionDaysLeft <= 3 && s.subscriptionDaysLeft > 0) {
           s.setNotifications(prev => {
             if (prev.some(n => n.type === 'subscription' && n.message.includes('подписка'))) return prev;
-            return [{ id: Date.now() + 50, type: 'subscription', message: `⚠️ Через ${s.subscriptionDaysLeft} дн. истекает подписка на сервис. Продлите, чтобы не потерять доступ.`, date: new Date().toISOString(), read: false }, ...prev];
+            return [{ id: Date.now() + 50, type: 'subscription', message: `Через ${s.subscriptionDaysLeft} дн. истекает подписка на сервис. Продлите, чтобы не потерять доступ.`, date: new Date().toISOString(), read: false }, ...prev];
           });
         }
       }
@@ -577,9 +577,9 @@ export function useIndexHandlers(s: ReturnType<typeof import('./useIndexState').
       if (response.ok) {
         s.setShowDemoDialog(false);
         s.setDemoForm({ companyName: '', name: '', phone: '', email: '', employeeCount: '' });
-        alert('✅ Заявка на демонстрацию отправлена! Мы свяжемся с вами в ближайшее время.');
-      } else { alert('❌ Ошибка при отправке. Попробуйте позже.'); }
-    } catch { alert('❌ Не удалось отправить заявку. Проверьте подключение к интернету.'); }
+        alert('Заявка на демонстрацию отправлена! Мы свяжемся с вами в ближайшее время.');
+      } else { alert('Ошибка при отправке. Попробуйте позже.'); }
+    } catch { alert('Не удалось отправить заявку. Проверьте подключение к интернету.'); }
     finally { s.setDemoFormSubmitting(false); }
   };
 
@@ -597,9 +597,9 @@ export function useIndexHandlers(s: ReturnType<typeof import('./useIndexState').
       if (response.ok) {
         s.setContactFormSuccess(true);
         s.setContactForm({ name: '', email: '', phone: '', message: '' });
-        alert('✅ Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.');
-      } else { alert('❌ Ошибка при отправке: ' + (data.error || 'Попробуйте позже')); }
-    } catch { alert('❌ Не удалось отправить сообщение. Проверьте подключение к интернету.'); }
+        alert('Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.');
+      } else { alert('Ошибка при отправке: ' + (data.error || 'Попробуйте позже')); }
+    } catch { alert('Не удалось отправить сообщение. Проверьте подключение к интернету.'); }
     finally { s.setContactFormSubmitting(false); }
   };
 
@@ -619,7 +619,7 @@ export function useIndexHandlers(s: ReturnType<typeof import('./useIndexState').
         s.setRegisterForm({ companyName: '', firstName: '', lastName: '', email: '', password: '', inn: '', employeeCount: '50' });
         localStorage.setItem('showOnboarding', 'true');
         if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'registration');
-        alert(`✅ Регистрация успешна!\n\nМы отправили письмо с подтверждением на ${s.registerForm.email}.\nПожалуйста, проверьте вашу почту и перейдите по ссылке в письме для активации аккаунта.`);
+        alert(`Регистрация успешна!\n\nМы отправили письмо с подтверждением на ${s.registerForm.email}.\nПожалуйста, проверьте вашу почту и перейдите по ссылке в письме для активации аккаунта.`);
       } else { alert(data.error || 'Ошибка регистрации'); }
     } catch { alert('Не удалось зарегистрироваться'); }
     finally { s.setIsAuthLoading(false); }
@@ -728,7 +728,7 @@ export function useIndexHandlers(s: ReturnType<typeof import('./useIndexState').
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (response.status === 403) {
         s.setResendVerificationEmail(s.loginForm.email);
-        alert('❌ Email не подтверждён!\n\nМы отправили письмо с подтверждением на вашу почту при регистрации.\nПожалуйста, проверьте почту (в том числе папку "Спам") и перейдите по ссылке в письме для активации аккаунта.');
+        alert('Email не подтверждён!\n\nМы отправили письмо с подтверждением на вашу почту при регистрации.\nПожалуйста, проверьте почту (в том числе папку "Спам") и перейдите по ссылке в письме для активации аккаунта.');
       } else if (response.status === 401) {
         alert('Неверный email или пароль. Проверьте данные и попробуйте снова.');
       } else { alert(data.error || 'Не удалось войти. Попробуйте ещё раз.'); }
@@ -748,7 +748,7 @@ export function useIndexHandlers(s: ReturnType<typeof import('./useIndexState').
       const data = await response.json();
       if (response.ok) {
         s.setResendVerificationTimer(30);
-        alert('✅ Письмо с подтверждением отправлено повторно!\n\nПроверьте вашу почту (в том числе папку "Спам").');
+        alert('Письмо с подтверждением отправлено повторно!\n\nПроверьте вашу почту (в том числе папку "Спам").');
       } else { alert(data.error || 'Не удалось отправить письмо'); }
     } catch { alert('Не удалось отправить письмо с подтверждением'); }
     finally { s.setIsResendingVerification(false); }

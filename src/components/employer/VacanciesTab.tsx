@@ -63,8 +63,8 @@ export function VacanciesTab({
         <>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-              <span>💼 Вакансии</span>
-              <span className="hidden sm:inline"></span>
+              <Icon name="Briefcase" size={22} />
+              <span>Вакансии</span>
             </h2>
             <Dialog>
               <DialogTrigger asChild>
@@ -286,7 +286,7 @@ export function VacanciesTab({
                         onClick={() => onTestManager({ id: vacancy.id, title: vacancy.title })}
                         className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                       >
-                        <span className="mr-1">📋</span>
+                        <Icon name="ClipboardList" size={14} className="mr-1" />
                         <span className="hidden sm:inline">Тест</span>
                       </Button>
                       <Button
@@ -309,7 +309,7 @@ export function VacanciesTab({
                         }}
                         className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                       >
-                        <span className="mr-1">✏️</span>
+                        <Icon name="Pencil" size={14} className="mr-1" />
                         <span className="hidden sm:inline">Ред.</span>
                       </Button>
                       {vacancy.status === 'active' && (
@@ -319,7 +319,7 @@ export function VacanciesTab({
                           onClick={() => onArchiveVacancy(vacancy.id)}
                           className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                         >
-                          <span className="mr-1">📦</span>
+                          <Icon name="Archive" size={14} className="mr-1" />
                           <span className="hidden sm:inline">В архив</span>
                         </Button>
                       )}
@@ -331,7 +331,7 @@ export function VacanciesTab({
                             onClick={() => onRestoreVacancy(vacancy.id)}
                             className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                           >
-                            <span className="mr-1">✅</span>
+                            <Icon name="CheckCircle2" size={14} className="mr-1" />
                             <span className="hidden sm:inline">Актив.</span>
                           </Button>
                           <Button
@@ -344,7 +344,7 @@ export function VacanciesTab({
                             }}
                             className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                           >
-                            <span className="mr-1">🗑️</span>
+                            <Icon name="Trash2" size={14} className="mr-1" />
                             <span className="hidden sm:inline">Удалить</span>
                           </Button>
                         </>

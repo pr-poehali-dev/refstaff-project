@@ -770,12 +770,12 @@ function Index() {
       if (response.ok) {
         setShowDemoDialog(false);
         setDemoForm({ companyName: '', name: '', phone: '', email: '', employeeCount: '' });
-        alert('✅ Заявка на демонстрацию отправлена! Мы свяжемся с вами в ближайшее время.');
+        alert('Заявка на демонстрацию отправлена! Мы свяжемся с вами в ближайшее время.');
       } else {
-        alert('❌ Ошибка при отправке. Попробуйте позже.');
+        alert('Ошибка при отправке. Попробуйте позже.');
       }
     } catch {
-      alert('❌ Не удалось отправить заявку. Проверьте подключение к интернету.');
+      alert('Не удалось отправить заявку. Проверьте подключение к интернету.');
     } finally {
       setDemoFormSubmitting(false);
     }
@@ -810,13 +810,13 @@ function Index() {
       if (response.ok) {
         setContactFormSuccess(true);
         setContactForm({ name: '', email: '', phone: '', message: '' });
-        alert('✅ Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.');
+        alert('Сообщение успешно отправлено! Мы свяжемся с вами в ближайшее время.');
       } else {
-        alert('❌ Ошибка при отправке: ' + (data.error || 'Попробуйте позже'));
+        alert('Ошибка при отправке: ' + (data.error || 'Попробуйте позже'));
       }
     } catch (error) {
       console.error('Ошибка отправки формы:', error);
-      alert('❌ Не удалось отправить сообщение. Проверьте подключение к интернету.');
+      alert('Не удалось отправить сообщение. Проверьте подключение к интернету.');
     } finally {
       setContactFormSubmitting(false);
     }
@@ -863,7 +863,7 @@ function Index() {
         setShowRegisterDialog(false);
         setRegisterForm({ companyName: '', firstName: '', lastName: '', email: '', password: '', inn: '', employeeCount: '50' });
         if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'registration');
-        alert(`✅ Регистрация успешна!\n\nМы отправили письмо с подтверждением на ${registerForm.email}.\nПожалуйста, проверьте вашу почту и перейдите по ссылке в письме для активации аккаунта.`);
+        alert(`Регистрация успешна!\n\nМы отправили письмо с подтверждением на ${registerForm.email}.\nПожалуйста, проверьте вашу почту и перейдите по ссылке в письме для активации аккаунта.`);
       } else {
         alert(data.error || 'Ошибка регистрации');
       }
@@ -1029,7 +1029,7 @@ function Index() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } else if (response.status === 403) {
         setResendVerificationEmail(loginForm.email);
-        alert('❌ Email не подтверждён!\n\nМы отправили письмо с подтверждением на вашу почту при регистрации.\nПожалуйста, проверьте почту (в том числе папку "Спам") и перейдите по ссылке в письме для активации аккаунта.');
+        alert('Email не подтверждён!\n\nМы отправили письмо с подтверждением на вашу почту при регистрации.\nПожалуйста, проверьте почту (в том числе папку "Спам") и перейдите по ссылке в письме для активации аккаунта.');
       } else if (response.status === 401) {
         alert('Неверный email или пароль. Проверьте данные и попробуйте снова.');
       } else {
@@ -1070,7 +1070,7 @@ function Index() {
 
       if (response.ok) {
         setResendVerificationTimer(30);
-        alert('✅ Письмо с подтверждением отправлено повторно!\n\nПроверьте вашу почту (в том числе папку "Спам").');
+        alert('Письмо с подтверждением отправлено повторно!\n\nПроверьте вашу почту (в том числе папку "Спам").');
       } else {
         alert(data.error || 'Не удалось отправить письмо');
       }
@@ -1645,7 +1645,7 @@ function Index() {
                           <Icon name="Loader2" size={14} className="animate-spin" />Ожидаем подтверждения...
                         </div>
                         <Button variant="outline" size="sm" className="w-full" onClick={() => window.open(tgLoginDeepLink, '_blank')}>Открыть бота снова</Button>
-                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setTgLoginStep('input'); setTgLoginError(''); }}>← Назад</Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setTgLoginStep('input'); setTgLoginError(''); }}><Icon name="ArrowLeft" size={14} className="mr-1" />Назад</Button>
                       </div>
                     ) : (
                       <>
@@ -1660,7 +1660,7 @@ function Index() {
                         <Button className="w-full" onClick={handleTgVerifyLoginCode} disabled={isTgLoginLoading || tgLoginCode.length !== 6}>
                           {isTgLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</> : 'Войти'}
                         </Button>
-                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setTgLoginStep('wait'); setTgLoginCode(''); setTgLoginError(''); }}>← Назад</Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setTgLoginStep('wait'); setTgLoginCode(''); setTgLoginError(''); }}><Icon name="ArrowLeft" size={14} className="mr-1" />Назад</Button>
                       </>
                     )}
                   </div>
@@ -1692,7 +1692,7 @@ function Index() {
                         <Button variant="outline" size="sm" className="w-full" onClick={() => window.open(maxLoginDeepLink, '_blank')}>
                           Открыть бота снова
                         </Button>
-                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setMaxLoginStep('input'); setMaxLoginError(''); }}>← Назад</Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setMaxLoginStep('input'); setMaxLoginError(''); }}><Icon name="ArrowLeft" size={14} className="mr-1" />Назад</Button>
                       </div>
                     ) : (
                       <>
@@ -1707,7 +1707,7 @@ function Index() {
                         <Button className="w-full" onClick={handleMaxVerifyLoginCode} disabled={isMaxLoginLoading || maxLoginCode.length !== 6}>
                           {isMaxLoginLoading ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</> : 'Войти'}
                         </Button>
-                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setMaxLoginStep('wait'); setMaxLoginCode(''); setMaxLoginError(''); }}>← Назад</Button>
+                        <Button variant="ghost" className="w-full text-sm" onClick={() => { setMaxLoginStep('wait'); setMaxLoginCode(''); setMaxLoginError(''); }}><Icon name="ArrowLeft" size={14} className="mr-1" />Назад</Button>
                       </>
                     )}
                   </div>
@@ -1880,7 +1880,7 @@ function Index() {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-6 sm:mb-8">
           <h1 className="text-xl sm:text-3xl font-bold mb-2 flex items-center gap-2 sm:gap-3">
-            <span className="text-2xl sm:text-4xl">📈</span>
+            <Icon name="TrendingUp" size={28} className="sm:w-9 sm:h-9" />
             <span className="hidden sm:inline">Личный кабинет работодателя</span>
             <span className="sm:hidden text-base">Кабинет</span>
           </h1>
@@ -1928,16 +1928,16 @@ function Index() {
         }}>
           <ScrollableTabs>
             <TabsList className="w-max sm:w-full">
-              <TabsTrigger value="vacancies">💼 Вакансии</TabsTrigger>
-              <TabsTrigger value="employees">👥 Сотрудники{newEmployeesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-blue-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newEmployeesCount}</span>}</TabsTrigger>
-              <TabsTrigger value="recommendations">🎯 Рекомендации{newRecommendationsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-green-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newRecommendationsCount}</span>}</TabsTrigger>
-              <TabsTrigger value="payouts">💰 Выплаты{newPayoutsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newPayoutsCount}</span>}</TabsTrigger>
-              <TabsTrigger value="news">📢 Новости</TabsTrigger>
-              <TabsTrigger value="chats">💬 Чаты{unreadMessagesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">{unreadMessagesCount}</span>}</TabsTrigger>
-              <TabsTrigger value="stats">📊 Статистика</TabsTrigger>
-              <TabsTrigger value="subscription" className="sm:hidden">💳 Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
-              <TabsTrigger value="help">❓ Помощь</TabsTrigger>
-              <TabsTrigger value="ai-assistant">🤖 ИИ-чат</TabsTrigger>
+              <TabsTrigger value="vacancies" className="flex items-center gap-1.5"><Icon name="Briefcase" size={14} />Вакансии</TabsTrigger>
+              <TabsTrigger value="employees" className="flex items-center gap-1.5"><Icon name="Users" size={14} />Сотрудники{newEmployeesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-blue-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newEmployeesCount}</span>}</TabsTrigger>
+              <TabsTrigger value="recommendations" className="flex items-center gap-1.5"><Icon name="Target" size={14} />Рекомендации{newRecommendationsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-green-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newRecommendationsCount}</span>}</TabsTrigger>
+              <TabsTrigger value="payouts" className="flex items-center gap-1.5"><Icon name="Wallet" size={14} />Выплаты{newPayoutsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newPayoutsCount}</span>}</TabsTrigger>
+              <TabsTrigger value="news" className="flex items-center gap-1.5"><Icon name="Megaphone" size={14} />Новости</TabsTrigger>
+              <TabsTrigger value="chats" className="flex items-center gap-1.5"><Icon name="MessageCircle" size={14} />Чаты{unreadMessagesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">{unreadMessagesCount}</span>}</TabsTrigger>
+              <TabsTrigger value="stats" className="flex items-center gap-1.5"><Icon name="BarChart3" size={14} />Статистика</TabsTrigger>
+              <TabsTrigger value="subscription" className="sm:hidden flex items-center gap-1.5"><Icon name="CreditCard" size={14} />Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
+              <TabsTrigger value="help" className="flex items-center gap-1.5"><Icon name="HelpCircle" size={14} />Помощь</TabsTrigger>
+              <TabsTrigger value="ai-assistant" className="flex items-center gap-1.5"><Icon name="Bot" size={14} />ИИ-чат</TabsTrigger>
 
             </TabsList>
           </ScrollableTabs>
@@ -2573,10 +2573,10 @@ function Index() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="news">📰 Новость</SelectItem>
-                  <SelectItem value="achievement">🏆 Достижение</SelectItem>
-                  <SelectItem value="announcement">📢 Объявление</SelectItem>
-                  <SelectItem value="blog">✍️ Блог</SelectItem>
+                  <SelectItem value="news"><span className="inline-flex items-center gap-1.5"><Icon name="FileText" size={14} />Новость</span></SelectItem>
+                  <SelectItem value="achievement"><span className="inline-flex items-center gap-1.5"><Icon name="Trophy" size={14} />Достижение</span></SelectItem>
+                  <SelectItem value="announcement"><span className="inline-flex items-center gap-1.5"><Icon name="Megaphone" size={14} />Объявление</span></SelectItem>
+                  <SelectItem value="blog"><span className="inline-flex items-center gap-1.5"><Icon name="FileEdit" size={14} />Блог</span></SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -2643,10 +2643,10 @@ function Index() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="news">📰 Новость</SelectItem>
-                  <SelectItem value="achievement">🏆 Достижение</SelectItem>
-                  <SelectItem value="announcement">📢 Объявление</SelectItem>
-                  <SelectItem value="blog">✍️ Блог</SelectItem>
+                  <SelectItem value="news"><span className="inline-flex items-center gap-1.5"><Icon name="FileText" size={14} />Новость</span></SelectItem>
+                  <SelectItem value="achievement"><span className="inline-flex items-center gap-1.5"><Icon name="Trophy" size={14} />Достижение</span></SelectItem>
+                  <SelectItem value="announcement"><span className="inline-flex items-center gap-1.5"><Icon name="Megaphone" size={14} />Объявление</span></SelectItem>
+                  <SelectItem value="blog"><span className="inline-flex items-center gap-1.5"><Icon name="FileEdit" size={14} />Блог</span></SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -2785,7 +2785,7 @@ function Index() {
                     });
                     setShowSubscriptionDialog(false);
                     setDemoForm({ companyName: '', name: '', phone: '', email: '', employeeCount: '' });
-                    alert('✅ Заявка отправлена! Мы свяжемся с вами в ближайшее время.');
+                    alert('Заявка отправлена! Мы свяжемся с вами в ближайшее время.');
                   } catch {
                     alert('Ошибка отправки. Попробуйте позже.');
                   } finally {
@@ -3017,8 +3017,8 @@ function Index() {
                 <div className="flex-1 w-full">
                   <CardTitle className="text-lg sm:text-2xl flex flex-col sm:flex-row items-start sm:items-center gap-2">
                     <span>{currentUser?.first_name} {currentUser?.last_name}</span>
-                    <Badge variant="secondary" className="text-[10px] sm:text-xs">
-                      🏆 #{calculateEmployeeRank(employees.find(e => e.id === currentEmployeeId) || employees[0])} в рейтинге
+                    <Badge variant="secondary" className="text-[10px] sm:text-xs flex items-center gap-1">
+                      <Icon name="Trophy" size={11} />#{calculateEmployeeRank(employees.find(e => e.id === currentEmployeeId) || employees[0])} в рейтинге
                     </Badge>
                   </CardTitle>
                   <CardDescription className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
@@ -3075,21 +3075,21 @@ function Index() {
                 })()}
                 <div className="grid grid-cols-3 gap-3 sm:gap-4 pt-3 sm:pt-4 border-t">
                   <div className="text-center">
-                    <div className="text-2xl sm:text-3xl mb-1">🎯</div>
+                    <div className="flex justify-center mb-1"><Icon name="Target" size={28} className="sm:w-8 sm:h-8" /></div>
                     <div className="text-xl sm:text-2xl font-bold text-primary">
                       {employees.find(e => e.id === currentEmployeeId)?.recommendations || 0}
                     </div>
                     <div className="text-[10px] sm:text-xs text-muted-foreground">Рекомендаций</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl sm:text-3xl mb-1">✅</div>
+                    <div className="flex justify-center mb-1"><Icon name="CheckCircle2" size={28} className="sm:w-8 sm:h-8 text-green-600" /></div>
                     <div className="text-xl sm:text-2xl font-bold text-green-600">
                       {employees.find(e => e.id === currentEmployeeId)?.hired || 0}
                     </div>
                     <div className="text-[10px] sm:text-xs text-muted-foreground">Нанято</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl sm:text-3xl mb-1">💸</div>
+                    <div className="flex justify-center mb-1"><Icon name="Wallet" size={28} className="sm:w-8 sm:h-8 text-secondary" /></div>
                     <div className="text-xl sm:text-2xl font-bold text-secondary">
                       {(employees.find(e => e.id === currentEmployeeId)?.earnings || 0).toLocaleString()} ₽
                     </div>
@@ -3103,7 +3103,7 @@ function Index() {
           <Card>
             <CardHeader className="p-4 sm:p-6">
               <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
-                <span className="text-xl sm:text-2xl">💰</span>
+                <Icon name="Wallet" size={24} />
                 Кошелек
               </CardTitle>
             </CardHeader>
@@ -3153,33 +3153,33 @@ function Index() {
         }}>
           <ScrollableTabs>
             <TabsList className="inline-flex w-max gap-1">
-              <TabsTrigger value="news" className="text-xs whitespace-nowrap px-2 py-1.5 relative">
-                <span>📢</span><span className="tab-label ml-1">Новости</span>
+              <TabsTrigger value="news" className="text-xs whitespace-nowrap px-2 py-1.5 relative flex items-center gap-1">
+                <Icon name="Megaphone" size={14} /><span className="tab-label ml-1">Новости</span>
                 {newNewsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-purple-500 text-white border-0 leading-4">+{newNewsCount}</Badge>}
               </TabsTrigger>
-              <TabsTrigger value="vacancies" className="text-xs whitespace-nowrap px-2 py-1.5 relative">
-                <span>💼</span><span className="tab-label ml-1">Вакансии</span>
+              <TabsTrigger value="vacancies" className="text-xs whitespace-nowrap px-2 py-1.5 relative flex items-center gap-1">
+                <Icon name="Briefcase" size={14} /><span className="tab-label ml-1">Вакансии</span>
                 {newVacanciesCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-green-500 text-white border-0 leading-4">+{newVacanciesCount}</Badge>}
               </TabsTrigger>
-              <TabsTrigger value="my-recommendations" className="text-xs whitespace-nowrap px-2 py-1.5 relative">
-                <span>⭐</span><span className="tab-label ml-1">Рекомендации</span>
+              <TabsTrigger value="my-recommendations" className="text-xs whitespace-nowrap px-2 py-1.5 relative flex items-center gap-1">
+                <Icon name="Star" size={14} /><span className="tab-label ml-1">Рекомендации</span>
                 {newRecommendationsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-orange-500 text-white border-0 leading-4">+{newRecommendationsCount}</Badge>}
               </TabsTrigger>
-              <TabsTrigger value="achievements" className="text-xs whitespace-nowrap px-2 py-1.5">
-                <span>🏆</span><span className="tab-label ml-1">Рейтинг</span>
+              <TabsTrigger value="achievements" className="text-xs whitespace-nowrap px-2 py-1.5 flex items-center gap-1">
+                <Icon name="Trophy" size={14} /><span className="tab-label ml-1">Рейтинг</span>
               </TabsTrigger>
-              <TabsTrigger value="notifications" className="text-xs whitespace-nowrap px-2 py-1.5 relative">
-                <span>🔔</span><span className="tab-label ml-1">Уведомления</span>
+              <TabsTrigger value="notifications" className="text-xs whitespace-nowrap px-2 py-1.5 relative flex items-center gap-1">
+                <Icon name="Bell" size={14} /><span className="tab-label ml-1">Уведомления</span>
                 {newNotificationsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-red-500 text-white border-0 leading-4">+{newNotificationsCount}</Badge>}
               </TabsTrigger>
-              <TabsTrigger value="wallet-history" className="text-xs whitespace-nowrap px-2 py-1.5">
-                <span>💳</span><span className="tab-label ml-1">История</span>
+              <TabsTrigger value="wallet-history" className="text-xs whitespace-nowrap px-2 py-1.5 flex items-center gap-1">
+                <Icon name="CreditCard" size={14} /><span className="tab-label ml-1">История</span>
               </TabsTrigger>
-              <TabsTrigger value="help" className="text-xs whitespace-nowrap px-2 py-1.5">
-                <span>❓</span><span className="tab-label ml-1">Помощь</span>
+              <TabsTrigger value="help" className="text-xs whitespace-nowrap px-2 py-1.5 flex items-center gap-1">
+                <Icon name="HelpCircle" size={14} /><span className="tab-label ml-1">Помощь</span>
               </TabsTrigger>
-              <TabsTrigger value="games" className="text-xs whitespace-nowrap px-2 py-1.5">
-                <span>🎮</span><span className="tab-label ml-1">Игры</span>
+              <TabsTrigger value="games" className="text-xs whitespace-nowrap px-2 py-1.5 flex items-center gap-1">
+                <Icon name="Gamepad2" size={14} /><span className="tab-label ml-1">Игры</span>
               </TabsTrigger>
             </TabsList>
           </ScrollableTabs>
@@ -3668,7 +3668,7 @@ function Index() {
                       className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-red-700"
                       onClick={() => setProfileForm(f => ({...f, avatar: ''}))}
                       title="Удалить фото"
-                    >✕</button>
+                    ><Icon name="X" size={10} /></button>
                   </div>
                 ) : (
                   <Avatar className="h-12 w-12 shrink-0">
@@ -3889,7 +3889,7 @@ function Index() {
               })
             });
             if (response.ok) {
-              alert('✅ Запрос на выплату отправлен!');
+              alert('Запрос на выплату отправлен!');
               setShowWithdrawDialog(false);
               setWithdrawForm({ amount: '', paymentMethod: 'card', paymentDetails: '', accountFullName: '', accountBank: '', accountNumber: '', accountBik: '', bankName: '' });
               await loadData();

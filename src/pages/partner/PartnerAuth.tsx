@@ -116,8 +116,8 @@ export default function PartnerAuth({
               <Button className="w-full" onClick={handleVerifyOtp} disabled={submitting || otp.length < 6}>
                 {submitting ? 'Проверка...' : 'Продолжить'}
               </Button>
-              <button className="text-xs text-gray-400 w-full text-center hover:text-gray-700" onClick={() => { setOtp(''); setAuthStep('choose'); }}>
-                ← Попробовать снова
+              <button className="text-xs text-gray-400 w-full text-center hover:text-gray-700 inline-flex items-center justify-center gap-1" onClick={() => { setOtp(''); setAuthStep('choose'); }}>
+                <Icon name="ArrowLeft" size={12} />Попробовать снова
               </button>
             </CardContent>
           </Card>

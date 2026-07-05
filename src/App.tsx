@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { lazy, Suspense, useEffect, Component, type ReactNode } from "react";
+import Icon from "@/components/ui/icon";
 
 // Все lazy-компоненты объявляем ДО использования
 const Index = lazy(() => import("./pages/Index"));
@@ -37,7 +38,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, ErrorBoundaryStat
     if (this.state.hasError) {
       return (
         <div style={{ minHeight: '100dvh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16, padding: 24, textAlign: 'center' }}>
-          <div style={{ fontSize: 48 }}>⚠️</div>
+          <Icon name="AlertTriangle" size={48} />
           <p style={{ fontSize: 18, fontWeight: 600 }}>Что-то пошло не так</p>
           <p style={{ color: '#6b7280', fontSize: 14 }}>Попробуйте перезагрузить страницу</p>
           <button

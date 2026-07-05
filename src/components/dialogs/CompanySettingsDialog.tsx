@@ -76,7 +76,7 @@ export function CompanySettingsDialog({
                     className="absolute -top-1.5 -right-1.5 bg-destructive text-white rounded-full w-4 h-4 flex items-center justify-center text-[10px] leading-none hover:bg-red-700"
                     onClick={onLogoRemove}
                     title="Удалить логотип"
-                  >✕</button>
+                  ><Icon name="X" size={10} /></button>
                 </div>
               )}
               <div className="flex-1 min-w-0">

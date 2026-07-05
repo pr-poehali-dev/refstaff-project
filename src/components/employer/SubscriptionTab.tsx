@@ -16,7 +16,7 @@ export function SubscriptionTab({ subscriptionDaysLeft, company, onRenew }: Subs
   return (
     <>
       <h2 className="text-lg font-semibold flex items-center gap-2">
-        <span>💳</span> Подписка
+        <Icon name="CreditCard" size={20} /> Подписка
       </h2>
       <Card className={subscriptionDaysLeft !== null && subscriptionDaysLeft <= 0 ? 'border-destructive' : subscriptionDaysLeft !== null && subscriptionDaysLeft < 7 ? 'border-orange-400' : 'border-primary'}>
         <CardHeader className="pb-3">

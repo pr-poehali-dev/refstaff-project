@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { BENEFITS_DATA } from '@/data/benefitsData';
+import Icon from '@/components/ui/icon';
 
 interface BenefitsSectionProps {
   activeBenefit: number | null;
@@ -15,7 +16,7 @@ export function BenefitsSection({ activeBenefit, onBenefitClick, onBenefitClose 
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="container mx-auto max-w-7xl relative z-10">
         <div className="text-center mb-10 sm:mb-14 md:mb-20">
-          <Badge className="mb-4 bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs sm:text-sm">✨ Почему iHUNT</Badge>
+          <Badge className="mb-4 bg-purple-500/10 text-purple-600 border-purple-500/20 text-xs sm:text-sm gap-1"><Icon name="Sparkles" size={14} /> Почему iHUNT</Badge>
           <h2 id="benefits-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
             Преимущества платформы
           </h2>
@@ -32,7 +33,7 @@ export function BenefitsSection({ activeBenefit, onBenefitClick, onBenefitClose 
                 <div className="p-4 sm:p-6 pt-5 sm:pt-8">
                   <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                     <div className={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
-                      <span className="text-xl sm:text-2xl">{benefit.emoji}</span>
+                      <Icon name={benefit.icon} size={24} className="text-white" />
                     </div>
                   </div>
                   <h3 className="text-base sm:text-xl font-bold mb-2 sm:mb-3 text-gray-900">{benefit.title}</h3>
@@ -51,7 +52,7 @@ export function BenefitsSection({ activeBenefit, onBenefitClick, onBenefitClose 
               <>
                 <DialogHeader>
                   <DialogTitle className="flex items-center gap-3 text-xl">
-                    <span className="text-3xl">{BENEFITS_DATA[activeBenefit].emoji}</span>
+                    <Icon name={BENEFITS_DATA[activeBenefit].icon} size={32} className="text-primary" />
                     {BENEFITS_DATA[activeBenefit].title}
                   </DialogTitle>
                   <DialogDescription className="text-base text-gray-700 mt-2 leading-relaxed">
@@ -63,7 +64,7 @@ export function BenefitsSection({ activeBenefit, onBenefitClick, onBenefitClose 
                   <ul className="space-y-3">
                     {BENEFITS_DATA[activeBenefit].examples.map((ex, j) => (
                       <li key={j} className="flex gap-2 text-sm text-muted-foreground">
-                        <span className="mt-0.5 shrink-0 text-primary">✓</span>
+                        <Icon name="CheckCircle2" size={16} className="mt-0.5 shrink-0 text-primary" />
                         <span>{ex}</span>
                       </li>
                     ))}
@@ -79,11 +80,11 @@ export function BenefitsSection({ activeBenefit, onBenefitClick, onBenefitClose 
             <CardContent className="p-4 sm:p-6 md:p-8">
               <div className="grid md:grid-cols-2 gap-6 sm:gap-8 items-center">
                 <div>
-                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4">🎯 Результаты наших клиентов</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold mb-3 sm:mb-4 flex items-center gap-2"><Icon name="Target" size={24} /> Результаты наших клиентов</h3>
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                        <span className="text-2xl">📈</span>
+                        <Icon name="TrendingUp" size={24} className="text-green-600" />
                       </div>
                       <div>
                         <div className="font-bold text-xl">+127%</div>
@@ -92,7 +93,7 @@ export function BenefitsSection({ activeBenefit, onBenefitClick, onBenefitClose 
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                        <span className="text-2xl">⏱️</span>
+                        <Icon name="Timer" size={24} className="text-blue-600" />
                       </div>
                       <div>
                         <div className="font-bold text-xl">-40%</div>
@@ -101,7 +102,7 @@ export function BenefitsSection({ activeBenefit, onBenefitClick, onBenefitClose 
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                        <span className="text-2xl">💎</span>
+                        <Icon name="Gem" size={24} className="text-purple-600" />
                       </div>
                       <div>
                         <div className="font-bold text-xl">92%</div>

@@ -19,46 +19,46 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
 }
 
-const EMOJI_MAP: Array<{ keywords: string[]; emojis: string[] }> = [
-  { keywords: ['реферальн', 'рекоменд'], emojis: ['🤝', '👥', '🔗', '💬', '🎯'] },
-  { keywords: ['рекрутинг', 'рекрутер', 'подбор'], emojis: ['🔍', '🎯', '📋', '🧩', '🕵️'] },
-  { keywords: ['найм', 'нанима', 'вакансии', 'вакансия'], emojis: ['📌', '💼', '📝', '🗂️', '📂'] },
-  { keywords: ['собеседован', 'интервью'], emojis: ['🎤', '💬', '🤔', '📊', '🗣️'] },
-  { keywords: ['онбординг', 'адаптац', 'новичк'], emojis: ['🚀', '🌱', '👋', '🗺️', '🎒'] },
-  { keywords: ['удержан', 'текучк', 'лояльност'], emojis: ['🏆', '💎', '⚓', '🛡️', '❤️'] },
-  { keywords: ['мотивац', 'вовлечённ', 'вовлечен'], emojis: ['🔥', '⚡', '💪', '🌟', '🎮'] },
-  { keywords: ['аналитик', 'метрик', 'kpi', 'данн'], emojis: ['📊', '📈', '🔢', '📉', '🧮'] },
-  { keywords: ['бренд', 'evp', 'репутац'], emojis: ['✨', '💫', '🏅', '🎖️', '🌐'] },
-  { keywords: ['автоматизац', 'технолог', 'цифров', 'ии', 'искусственн'], emojis: ['🤖', '⚙️', '💡', '🖥️', '🔧'] },
-  { keywords: ['выплат', 'бонус', 'зарплат', 'деньг'], emojis: ['💰', '💵', '🤑', '💳', '🏦'] },
-  { keywords: ['геймификац', 'игр', 'рейтинг'], emojis: ['🎮', '🏆', '🎲', '⭐', '🥇'] },
-  { keywords: ['стартап', 'малый бизнес', 'бизнес'], emojis: ['🚀', '💡', '🌱', '⚡', '🎯'] },
-  { keywords: ['it', 'разработчик', 'программист', 'технич'], emojis: ['💻', '👨‍💻', '⌨️', '🖥️', '🔬'] },
-  { keywords: ['ритейл', 'торговл', 'магазин'], emojis: ['🛒', '🏪', '🛍️', '📦', '💳'] },
-  { keywords: ['производств', 'завод', 'фабрик'], emojis: ['🏭', '⚙️', '🔩', '🛠️', '👷'] },
-  { keywords: ['обучен', 'развити', 'карьер', 'навык'], emojis: ['📚', '🎓', '📖', '🧠', '✏️'] },
-  { keywords: ['команд', 'коллектив', 'корпоратив'], emojis: ['👫', '🤜', '🏃', '💼', '🌍'] },
-  { keywords: ['ошибк', 'проблем', 'сложност'], emojis: ['⚠️', '🚧', '🔍', '💡', '🛠️'] },
-  { keywords: ['совет', 'лайфхак', 'практик'], emojis: ['💡', '✅', '📌', '🎯', '🔑'] },
+const ICON_MAP: Array<{ keywords: string[]; icons: string[] }> = [
+  { keywords: ['реферальн', 'рекоменд'], icons: ['Handshake', 'Users', 'Link2', 'MessageSquare', 'Target'] },
+  { keywords: ['рекрутинг', 'рекрутер', 'подбор'], icons: ['Search', 'Target', 'ClipboardList', 'Puzzle', 'UserSearch'] },
+  { keywords: ['найм', 'нанима', 'вакансии', 'вакансия'], icons: ['Pin', 'Briefcase', 'FileEdit', 'FolderOpen', 'Folder'] },
+  { keywords: ['собеседован', 'интервью'], icons: ['Mic', 'MessageSquare', 'HelpCircle', 'BarChart3', 'MessagesSquare'] },
+  { keywords: ['онбординг', 'адаптац', 'новичк'], icons: ['Rocket', 'Sprout', 'Hand', 'Map', 'Backpack'] },
+  { keywords: ['удержан', 'текучк', 'лояльност'], icons: ['Trophy', 'Gem', 'Anchor', 'Shield', 'Heart'] },
+  { keywords: ['мотивац', 'вовлечённ', 'вовлечен'], icons: ['Flame', 'Zap', 'Dumbbell', 'Star', 'Gamepad2'] },
+  { keywords: ['аналитик', 'метрик', 'kpi', 'данн'], icons: ['BarChart3', 'TrendingUp', 'Hash', 'LineChart', 'Calculator'] },
+  { keywords: ['бренд', 'evp', 'репутац'], icons: ['Sparkles', 'Star', 'Award', 'Medal', 'Globe'] },
+  { keywords: ['автоматизац', 'технолог', 'цифров', 'ии', 'искусственн'], icons: ['Bot', 'Settings', 'Lightbulb', 'Monitor', 'Wrench'] },
+  { keywords: ['выплат', 'бонус', 'зарплат', 'деньг'], icons: ['DollarSign', 'Wallet', 'Coins', 'CreditCard', 'Landmark'] },
+  { keywords: ['геймификац', 'игр', 'рейтинг'], icons: ['Gamepad2', 'Trophy', 'Dices', 'Star', 'Medal'] },
+  { keywords: ['стартап', 'малый бизнес', 'бизнес'], icons: ['Rocket', 'Lightbulb', 'Sprout', 'Zap', 'Target'] },
+  { keywords: ['it', 'разработчик', 'программист', 'технич'], icons: ['Laptop', 'Code2', 'Keyboard', 'Monitor', 'Microscope'] },
+  { keywords: ['ритейл', 'торговл', 'магазин'], icons: ['ShoppingCart', 'Store', 'ShoppingBag', 'Package', 'CreditCard'] },
+  { keywords: ['производств', 'завод', 'фабрик'], icons: ['Factory', 'Settings', 'Wrench', 'HardHat', 'Cog'] },
+  { keywords: ['обучен', 'развити', 'карьер', 'навык'], icons: ['BookOpen', 'GraduationCap', 'Book', 'Brain', 'PenLine'] },
+  { keywords: ['команд', 'коллектив', 'корпоратив'], icons: ['Users', 'UsersRound', 'Building2', 'Briefcase', 'Globe'] },
+  { keywords: ['ошибк', 'проблем', 'сложност'], icons: ['AlertTriangle', 'Construction', 'Search', 'Lightbulb', 'Wrench'] },
+  { keywords: ['совет', 'лайфхак', 'практик'], icons: ['Lightbulb', 'CheckCircle2', 'Pin', 'Target', 'Key'] },
 ];
 
-const emojiCache = new Map<string, string>();
+const iconCache = new Map<string, string>();
 
-function getPostEmoji(title: string, topic: string, id: number): string {
+function getPostIcon(title: string, topic: string, id: number): string {
   const key = String(id);
-  if (emojiCache.has(key)) return emojiCache.get(key)!;
+  if (iconCache.has(key)) return iconCache.get(key)!;
   const text = (title + ' ' + topic).toLowerCase();
-  for (const { keywords, emojis } of EMOJI_MAP) {
+  for (const { keywords, icons } of ICON_MAP) {
     if (keywords.some(kw => text.includes(kw))) {
-      const emoji = emojis[id % emojis.length];
-      emojiCache.set(key, emoji);
-      return emoji;
+      const icon = icons[id % icons.length];
+      iconCache.set(key, icon);
+      return icon;
     }
   }
-  const fallback = ['📝', '💼', '🎯', '🔍', '📋', '✨', '🚀', '💡', '📊', '🤝'];
-  const emoji = fallback[id % fallback.length];
-  emojiCache.set(key, emoji);
-  return emoji;
+  const fallback = ['FileEdit', 'Briefcase', 'Target', 'Search', 'ClipboardList', 'Sparkles', 'Rocket', 'Lightbulb', 'BarChart3', 'Handshake'];
+  const icon = fallback[id % fallback.length];
+  iconCache.set(key, icon);
+  return icon;
 }
 
 export default function BlogCarousel() {
@@ -158,7 +158,7 @@ export default function BlogCarousel() {
         <div className="flex items-end justify-between mb-8 sm:mb-10">
           <div>
             <Badge className="mb-3 bg-primary/10 text-primary border-primary/20 text-xs sm:text-sm">
-              📝 Блог
+              <Icon name="FileText" size={12} className="inline-block mr-1" />Блог
             </Badge>
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900">
               Полезные статьи
@@ -222,7 +222,7 @@ export default function BlogCarousel() {
                       {post.publishedAt ? formatDate(post.publishedAt) : ''}
                     </span>
                     <h3 className="text-sm sm:text-base font-bold text-gray-900 mb-3 leading-snug group-hover:text-primary transition-colors line-clamp-3 flex-1">
-                      <span className="mr-1.5">{getPostEmoji(post.title, post.topic, post.id)}</span>{post.title}
+                      <Icon name={getPostIcon(post.title, post.topic, post.id)} size={16} className="inline-block mr-1.5 text-primary align-text-bottom" />{post.title}
                     </h3>
                     <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2 mb-4">
                       {post.metaDescription}

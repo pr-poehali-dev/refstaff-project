@@ -32,7 +32,7 @@ const WaitScreen = ({ deepLink, onBack, onReopen, messenger }: { deepLink: strin
       <Icon name="Loader2" size={16} className="animate-spin" />Ожидаем подтверждения...
     </div>
     <Button variant="outline" className="w-full" onClick={onReopen}><Icon name="Send" size={16} className="mr-2 text-blue-500" />Открыть бота снова</Button>
-    <Button variant="ghost" className="w-full text-sm" onClick={onBack}>← Назад</Button>
+    <Button variant="ghost" className="w-full text-sm" onClick={onBack}><Icon name="ArrowLeft" size={14} className="mr-1" />Назад</Button>
   </div>
 );
 
@@ -52,7 +52,7 @@ const CodeScreen = ({ code, onChange, onSubmit, onBack, isSubmitting }: { code: 
     <Button type="submit" className="w-full h-12" disabled={isSubmitting || code.length !== 6}>
       {isSubmitting ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Проверяем...</> : 'Подтвердить и создать аккаунт'}
     </Button>
-    <Button type="button" variant="ghost" className="w-full text-sm" onClick={onBack}>← Назад</Button>
+    <Button type="button" variant="ghost" className="w-full text-sm" onClick={onBack}><Icon name="ArrowLeft" size={14} className="mr-1" />Назад</Button>
   </form>
 );
 
@@ -73,7 +73,7 @@ const NameForm = ({ form, onChange, onSubmit, messenger, color, isSubmitting, on
     <Button type="submit" className="w-full h-12 text-base" disabled={isSubmitting}>
       {isSubmitting ? <><Icon name="Loader2" size={18} className="animate-spin mr-2" />Подготавливаем...</> : <><Icon name="Send" size={18} className={`mr-2 ${color}`} />Открыть {messenger} и получить код</>}
     </Button>
-    <Button type="button" variant="ghost" className="w-full" onClick={onBack}>← Назад</Button>
+    <Button type="button" variant="ghost" className="w-full" onClick={onBack}><Icon name="ArrowLeft" size={14} className="mr-1" />Назад</Button>
   </form>
 );
 
@@ -292,7 +292,7 @@ function EmployeeRegister() {
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? <><Icon name="Loader2" size={16} className="animate-spin mr-2" />Регистрация...</> : 'Зарегистрироваться'}
               </Button>
-              <Button type="button" variant="ghost" className="w-full" onClick={() => goBack('method')}>← Назад</Button>
+              <Button type="button" variant="ghost" className="w-full" onClick={() => goBack('method')}><Icon name="ArrowLeft" size={14} className="mr-1" />Назад</Button>
             </form>
           )}
 

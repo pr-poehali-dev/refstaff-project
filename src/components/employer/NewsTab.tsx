@@ -63,7 +63,7 @@ export function NewsTab({
         <>
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-              <span>📢</span>
+              <Icon name="Megaphone" size={22} />
               <span className="hidden sm:inline">Новости компании</span>
               <span className="sm:hidden">Новости</span>
             </h2>
@@ -85,11 +85,20 @@ export function NewsTab({
                           post.category === 'achievement' ? 'secondary' :
                           post.category === 'announcement' ? 'outline' :
                           'default'
-                        } className="text-xs">
-                          {post.category === 'news' ? '📰 Новость' :
-                           post.category === 'achievement' ? '🏆 Достижение' :
-                           post.category === 'announcement' ? '📢 Объявление' :
-                           '✍️ Блог'}
+                        } className="text-xs flex items-center gap-1">
+                          <Icon
+                            name={
+                              post.category === 'news' ? 'FileText' :
+                              post.category === 'achievement' ? 'Trophy' :
+                              post.category === 'announcement' ? 'Megaphone' :
+                              'FileEdit'
+                            }
+                            size={12}
+                          />
+                          {post.category === 'news' ? 'Новость' :
+                           post.category === 'achievement' ? 'Достижение' :
+                           post.category === 'announcement' ? 'Объявление' :
+                           'Блог'}
                         </Badge>
                         <span className="text-xs text-muted-foreground whitespace-nowrap">
                           {new Date(post.date).toLocaleDateString('ru-RU')}
@@ -179,10 +188,10 @@ export function NewsTab({
                       <SelectValue placeholder="Выберите категорию" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="news">📰 Новость</SelectItem>
-                      <SelectItem value="achievement">🏆 Достижение</SelectItem>
-                      <SelectItem value="announcement">📢 Объявление</SelectItem>
-                      <SelectItem value="blog">✍️ Блог</SelectItem>
+                      <SelectItem value="news"><span className="inline-flex items-center gap-1.5"><Icon name="FileText" size={14} />Новость</span></SelectItem>
+                      <SelectItem value="achievement"><span className="inline-flex items-center gap-1.5"><Icon name="Trophy" size={14} />Достижение</span></SelectItem>
+                      <SelectItem value="announcement"><span className="inline-flex items-center gap-1.5"><Icon name="Megaphone" size={14} />Объявление</span></SelectItem>
+                      <SelectItem value="blog"><span className="inline-flex items-center gap-1.5"><Icon name="FileEdit" size={14} />Блог</span></SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -226,10 +235,10 @@ export function NewsTab({
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="news">📰 Новость</SelectItem>
-                      <SelectItem value="achievement">🏆 Достижение</SelectItem>
-                      <SelectItem value="announcement">📢 Объявление</SelectItem>
-                      <SelectItem value="blog">✍️ Блог</SelectItem>
+                      <SelectItem value="news"><span className="inline-flex items-center gap-1.5"><Icon name="FileText" size={14} />Новость</span></SelectItem>
+                      <SelectItem value="achievement"><span className="inline-flex items-center gap-1.5"><Icon name="Trophy" size={14} />Достижение</span></SelectItem>
+                      <SelectItem value="announcement"><span className="inline-flex items-center gap-1.5"><Icon name="Megaphone" size={14} />Объявление</span></SelectItem>
+                      <SelectItem value="blog"><span className="inline-flex items-center gap-1.5"><Icon name="FileEdit" size={14} />Блог</span></SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

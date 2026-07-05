@@ -194,7 +194,7 @@ export default function CompanyStats({ recommendations, employees, vacancies, co
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-          <span>📊</span> Статистика по компании
+          <Icon name="BarChart3" size={22} /> Статистика по компании
         </h2>
         <div className="flex items-center gap-2 flex-wrap">
           <Select value={period} onValueChange={v => setPeriod(v as Period)}>

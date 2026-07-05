@@ -9,11 +9,11 @@ const OG_IMAGE_API = 'https://functions.poehali.dev/c6e24176-0014-4fee-8ecd-b597
 const OG_PROXY_URL = 'https://functions.poehali.dev/a7ef69a9-2736-4504-ac24-54132c34d646';
 
 const REACTIONS = [
-  { emoji: '👍', label: 'Полезно' },
-  { emoji: '🔥', label: 'Огонь' },
-  { emoji: '💡', label: 'Интересно' },
-  { emoji: '❤️', label: 'Нравится' },
-  { emoji: '😮', label: 'Удивительно' },
+  { icon: 'ThumbsUp', label: 'Полезно' },
+  { icon: 'Flame', label: 'Огонь' },
+  { icon: 'Lightbulb', label: 'Интересно' },
+  { icon: 'Heart', label: 'Нравится' },
+  { icon: 'Sparkles', label: 'Удивительно' },
 ];
 
 interface Post {
@@ -84,14 +84,14 @@ export default function BlogPost() {
     }).then(() => loadStats(post.id));
   }, [post, loadStats]);
 
-  const handleReact = async (emoji: string) => {
+  const handleReact = async (icon: string) => {
     if (!post || reacting) return;
     setReacting(true);
     const sid = getSessionId();
     const r = await fetch(`${BLOG_API}?action=react`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ post_id: post.id, session_id: sid, emoji }),
+      body: JSON.stringify({ post_id: post.id, session_id: sid, emoji: icon }),
     });
     const d = await r.json();
     setStats(prev => ({ ...prev, reactions: d.reactions || {}, my_reaction: d.my_reaction || null }));
@@ -275,13 +275,13 @@ export default function BlogPost() {
                 Как вам статья?
               </p>
               <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-                {REACTIONS.map(({ emoji, label }) => {
-                  const count = stats.reactions[emoji] || 0;
-                  const isActive = stats.my_reaction === emoji;
+                {REACTIONS.map(({ icon, label }) => {
+                  const count = stats.reactions[icon] || 0;
+                  const isActive = stats.my_reaction === icon;
                   return (
                     <button
-                      key={emoji}
-                      onClick={() => handleReact(emoji)}
+                      key={icon}
+                      onClick={() => handleReact(icon)}
                       disabled={reacting}
                       title={label}
                       className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm transition-all duration-200 select-none
@@ -290,7 +290,7 @@ export default function BlogPost() {
                           : 'border-gray-200 bg-white hover:border-primary/40 hover:bg-primary/5 text-gray-600'
                         }`}
                     >
-                      <span className="text-base leading-none">{emoji}</span>
+                      <Icon name={icon} size={18} />
                       {count > 0 && <span className="text-xs font-medium">{count}</span>}
                     </button>
                   );

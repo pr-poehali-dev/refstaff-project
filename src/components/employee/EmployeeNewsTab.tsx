@@ -14,8 +14,8 @@ export function EmployeeNewsTab({ newsPosts, onLike, onComments }: EmployeeNewsT
   return (
     <div className="space-y-4">
       <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-        <span>📢 Новости компании</span>
-        <span className="hidden sm:inline"></span>
+        <Icon name="Megaphone" size={20} />
+        <span>Новости компании</span>
       </h2>
 
       {newsPosts.length === 0 ? (
@@ -36,11 +36,20 @@ export function EmployeeNewsTab({ newsPosts, onLike, onComments }: EmployeeNewsT
                     post.category === 'achievement' ? 'secondary' :
                     post.category === 'announcement' ? 'outline' :
                     'default'
-                  } className="text-[10px] sm:text-xs">
-                    {post.category === 'news' ? '📰 Новость' :
-                     post.category === 'achievement' ? '🏆 Достижение' :
-                     post.category === 'announcement' ? '📢 Объявление' :
-                     '✍️ Блог'}
+                  } className="text-[10px] sm:text-xs flex items-center gap-1">
+                    <Icon
+                      name={
+                        post.category === 'news' ? 'FileText' :
+                        post.category === 'achievement' ? 'Trophy' :
+                        post.category === 'announcement' ? 'Megaphone' :
+                        'FileEdit'
+                      }
+                      size={12}
+                    />
+                    {post.category === 'news' ? 'Новость' :
+                     post.category === 'achievement' ? 'Достижение' :
+                     post.category === 'announcement' ? 'Объявление' :
+                     'Блог'}
                   </Badge>
                   <span className="text-[10px] sm:text-xs text-muted-foreground">
                     {new Date(post.date).toLocaleDateString('ru-RU')}

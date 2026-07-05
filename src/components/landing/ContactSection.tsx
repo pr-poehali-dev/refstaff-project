@@ -25,7 +25,7 @@ export function ContactSection({ form, onFormChange, onSubmit, isSubmitting }: C
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="container mx-auto max-w-3xl relative z-10">
         <div className="text-center mb-8 sm:mb-10 md:mb-12">
-          <Badge className="mb-4 bg-green-500/10 text-green-600 border-green-500/20 text-xs sm:text-sm">💬 Контакты</Badge>
+          <Badge className="mb-4 bg-green-500/10 text-green-600 border-green-500/20 text-xs sm:text-sm"><Icon name="MessageCircle" size={14} className="inline-block mr-1" />Контакты</Badge>
           <h2 id="contact-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">Обратная связь</h2>
           <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground px-4">
             Свяжитесь с нами, и мы с радостью ответим на все ваши вопросы

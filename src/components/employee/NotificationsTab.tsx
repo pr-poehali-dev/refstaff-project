@@ -27,8 +27,8 @@ export function NotificationsTab({ notifications, userRole, onMarkRead }: Notifi
   return (
     <div className="space-y-4">
       <h2 className="text-lg sm:text-2xl font-semibold mb-3 sm:mb-4 flex items-center gap-2">
-        <span>🔔 Уведомления</span>
-        <span className="hidden sm:inline"></span>
+        <Icon name="Bell" size={20} />
+        <span>Уведомления</span>
       </h2>
       <div className="space-y-2 sm:space-y-3">
         {filtered.map((notif) => (

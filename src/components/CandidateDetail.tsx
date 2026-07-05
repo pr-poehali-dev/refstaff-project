@@ -124,11 +124,11 @@ export function CandidateDetail({ recommendation, open, onOpenChange, userRole }
               Статус обработки
             </h3>
             <div className="flex items-center gap-3 p-4 bg-muted/50 rounded-lg">
-              <div className={`text-3xl ${statusInfo.color}`}>
-                {recommendation.status === 'pending' && '⏳'}
-                {recommendation.status === 'interview' && '💼'}
-                {recommendation.status === 'hired' && '✅'}
-                {recommendation.status === 'rejected' && '❌'}
+              <div className={statusInfo.color}>
+                {recommendation.status === 'pending' && <Icon name="Clock" size={32} />}
+                {recommendation.status === 'interview' && <Icon name="MessageSquare" size={32} />}
+                {(recommendation.status === 'hired' || recommendation.status === 'accepted') && <Icon name="CheckCircle2" size={32} />}
+                {recommendation.status === 'rejected' && <Icon name="XCircle" size={32} />}
               </div>
               <div className="flex-1">
                 <p className="font-medium">{statusInfo.label}</p>

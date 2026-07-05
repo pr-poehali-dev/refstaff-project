@@ -6,7 +6,8 @@ export function EmployeeHelpTab() {
     <div className="space-y-6">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold flex items-center gap-2 mb-2">
-          <span>❓ Помощь</span>
+          <Icon name="HelpCircle" size={24} />
+          <span>Помощь</span>
         </h2>
         <p className="text-muted-foreground">Краткий гид по разделам платформы</p>
       </div>
@@ -17,7 +18,7 @@ export function EmployeeHelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Newspaper" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg">📢 Новости</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Megaphone" size={18} />Новости</CardTitle>
                 <CardDescription className="mt-1">Лента событий компании</CardDescription>
               </div>
             </div>
@@ -33,7 +34,7 @@ export function EmployeeHelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Briefcase" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg">💼 Вакансии</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Briefcase" size={18} />Вакансии</CardTitle>
                 <CardDescription className="mt-1">Открытые позиции для рекомендаций</CardDescription>
               </div>
             </div>
@@ -50,7 +51,7 @@ export function EmployeeHelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Star" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg">⭐ Рекомендации</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Star" size={18} />Рекомендации</CardTitle>
                 <CardDescription className="mt-1">История ваших кандидатов</CardDescription>
               </div>
             </div>
@@ -66,7 +67,7 @@ export function EmployeeHelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Trophy" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg">🏆 Рейтинг</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Trophy" size={18} />Рейтинг</CardTitle>
                 <CardDescription className="mt-1">Ваш профиль, кошелёк и достижения</CardDescription>
               </div>
             </div>
@@ -83,7 +84,7 @@ export function EmployeeHelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Bell" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg">🔔 Уведомления</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Bell" size={18} />Уведомления</CardTitle>
                 <CardDescription className="mt-1">Все важные события в одном месте</CardDescription>
               </div>
             </div>
@@ -99,7 +100,7 @@ export function EmployeeHelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="CreditCard" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg">💳 История</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="CreditCard" size={18} />История</CardTitle>
                 <CardDescription className="mt-1">Все транзакции по вашему кошельку</CardDescription>
               </div>
             </div>

@@ -71,7 +71,8 @@ export function MessengerDialog({ open, onOpenChange, employees, currentUserId, 
     if (messages.length === 0) return null;
     const lastMsg = messages[messages.length - 1];
     return {
-      text: lastMsg.message || (lastMsg.attachments ? '📎 Вложение' : ''),
+      text: lastMsg.message || (lastMsg.attachments ? 'Вложение' : ''),
+      isAttachment: !lastMsg.message && !!lastMsg.attachments,
       timestamp: lastMsg.timestamp
     };
   };
@@ -170,7 +171,10 @@ export function MessengerDialog({ open, onOpenChange, employees, currentUserId, 
                         <div className="text-xs text-muted-foreground mb-1">{emp.position}</div>
                         {lastMsg && (
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-muted-foreground truncate">{lastMsg.text}</span>
+                            <span className="text-sm text-muted-foreground truncate inline-flex items-center gap-1">
+                              {lastMsg.isAttachment && <Icon name="Paperclip" size={12} />}
+                              {lastMsg.text}
+                            </span>
                             {unreadCount > 0 && (
                               <Badge variant="default" className="ml-2 h-5 min-w-[20px] flex items-center justify-center px-1.5">
                                 {unreadCount}

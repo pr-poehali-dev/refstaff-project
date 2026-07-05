@@ -358,8 +358,8 @@ export default function EmployeeChat({ currentUserId, companyId }: EmployeeChatP
                           }`}>
                             {formatTime(msg.created_at)}
                             {isOwn && (
-                              <span className="ml-1">
-                                {msg.is_read ? '✓✓' : '✓'}
+                              <span className="ml-1 inline-flex items-center">
+                                <Icon name={msg.is_read ? 'CheckCheck' : 'Check'} size={12} />
                               </span>
                             )}
                           </div>

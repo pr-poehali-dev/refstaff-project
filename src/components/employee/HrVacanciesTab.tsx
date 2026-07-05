@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import Icon from '@/components/ui/icon';
 import type { Vacancy } from '@/types';
 
 interface HrVacanciesTabProps {
@@ -12,7 +13,7 @@ export function HrVacanciesTab({ vacancies }: HrVacanciesTabProps) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-            <span>👔</span> Управление вакансиями
+            <Icon name="Briefcase" size={20} /> Управление вакансиями
           </h2>
           <p className="text-xs sm:text-sm text-muted-foreground">Доступ HR Manager</p>
         </div>
@@ -35,9 +36,9 @@ export function HrVacanciesTab({ vacancies }: HrVacanciesTabProps) {
                 </Badge>
               </div>
               <div className="flex flex-wrap gap-2 mt-2 text-sm text-muted-foreground">
-                <span>💰 {vacancy.salary}</span>
-                <span>🎁 {vacancy.reward.toLocaleString()} ₽</span>
-                <span>👥 {vacancy.recommendations} кандидатов</span>
+                <span className="inline-flex items-center gap-1"><Icon name="Wallet" size={14} />{vacancy.salary}</span>
+                <span className="inline-flex items-center gap-1"><Icon name="Gift" size={14} />{vacancy.reward.toLocaleString()} ₽</span>
+                <span className="inline-flex items-center gap-1"><Icon name="Users" size={14} />{vacancy.recommendations} кандидатов</span>
               </div>
             </CardHeader>
           </Card>

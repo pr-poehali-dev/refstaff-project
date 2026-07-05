@@ -15,8 +15,8 @@ export function WalletHistoryTab({ recommendations, currentEmployeeId }: WalletH
   return (
     <div className="space-y-4">
       <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-        <span>💳 История кошелька</span>
-        <span className="hidden sm:inline"></span>
+        <Icon name="CreditCard" size={20} />
+        <span>История кошелька</span>
       </h2>
       <div className="space-y-2 sm:space-y-3">
         {walletRecs.length === 0 ? (

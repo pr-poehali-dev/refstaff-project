@@ -64,7 +64,7 @@ export default function Admin() {
     setShowSubDialog(false);
     loadCompanies();
     if (selectedCompany) loadCompanyDetail(subForm.company_id);
-    alert('✅ Подписка обновлена');
+    alert('Подписка обновлена');
   };
 
   const handleCancelSub = async () => {
@@ -73,7 +73,7 @@ export default function Admin() {
     await adminFetch(secret, '?resource=company_subscription', 'PUT', { company_id: selectedCompany.company.id, tier: 'none', days: '0' });
     loadCompanies();
     loadCompanyDetail(selectedCompany.company.id);
-    alert('✅ Подписка отменена');
+    alert('Подписка отменена');
   };
 
   const handleUpdateUser = async () => {
@@ -82,7 +82,7 @@ export default function Admin() {
     setShowUserDialog(false);
     if (selectedCompany?.company?.id) loadCompanyDetail(selectedCompany.company.id);
     else loadUsers(search);
-    alert('✅ Данные сотрудника обновлены');
+    alert('Данные сотрудника обновлены');
   };
 
   useEffect(() => {
@@ -137,11 +137,11 @@ export default function Admin() {
       <div className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="bg-gray-800 border border-gray-700 mb-6">
-            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary">📊 Аналитика</TabsTrigger>
-            <TabsTrigger value="companies" className="data-[state=active]:bg-primary">🏢 Компании</TabsTrigger>
-            <TabsTrigger value="users" className="data-[state=active]:bg-primary">👥 Сотрудники</TabsTrigger>
-            <TabsTrigger value="blog" className="data-[state=active]:bg-primary">📝 Блог</TabsTrigger>
-            <TabsTrigger value="partners" className="data-[state=active]:bg-primary">🤝 Партнёры</TabsTrigger>
+            <TabsTrigger value="analytics" className="data-[state=active]:bg-primary flex items-center gap-1.5"><Icon name="BarChart3" size={14} />Аналитика</TabsTrigger>
+            <TabsTrigger value="companies" className="data-[state=active]:bg-primary flex items-center gap-1.5"><Icon name="Building2" size={14} />Компании</TabsTrigger>
+            <TabsTrigger value="users" className="data-[state=active]:bg-primary flex items-center gap-1.5"><Icon name="Users" size={14} />Сотрудники</TabsTrigger>
+            <TabsTrigger value="blog" className="data-[state=active]:bg-primary flex items-center gap-1.5"><Icon name="FileEdit" size={14} />Блог</TabsTrigger>
+            <TabsTrigger value="partners" className="data-[state=active]:bg-primary flex items-center gap-1.5"><Icon name="Handshake" size={14} />Партнёры</TabsTrigger>
           </TabsList>
 
           <AdminAnalyticsTab analytics={analytics} />

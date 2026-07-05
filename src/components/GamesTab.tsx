@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import Icon from '@/components/ui/icon';
 
 const GAME_SCORES_URL = 'https://functions.poehali.dev/3d0d6f47-623a-421f-b26b-742ea13a85da';
 
@@ -46,13 +47,15 @@ function Leaderboard({ game, refresh }: { game: string; refresh: number }) {
   if (loading) return <p className="text-xs text-muted-foreground text-center py-2">Загрузка...</p>;
   if (leaders.length === 0) return <p className="text-xs text-muted-foreground text-center py-2">Пока нет рекордов. Будь первым!</p>;
 
-  const medals = ['🥇', '🥈', '🥉'];
+  const medalColors = ['text-yellow-500', 'text-gray-400', 'text-amber-600'];
 
   return (
     <div className="space-y-1.5">
       {leaders.map((l, i) => (
         <div key={i} className="flex items-center gap-2 text-sm">
-          <span className="w-5 text-center text-base">{medals[i] || `${i + 1}`}</span>
+          <span className="w-5 flex items-center justify-center">
+            {i < 3 ? <Icon name="Medal" size={16} className={medalColors[i]} /> : `${i + 1}`}
+          </span>
           <Avatar className="h-6 w-6">
             <AvatarImage src={l.avatar_url || ''} />
             <AvatarFallback className="text-[10px]">{l.name[0]}</AvatarFallback>
@@ -67,10 +70,10 @@ function Leaderboard({ game, refresh }: { game: string; refresh: number }) {
 
 // ─── Memory Game ────────────────────────────────────────────────────────────
 
-const EMOJIS = ['🚀', '⭐', '💎', '🎯', '🔥', '🏆', '💡', '🎁'];
+const CARD_ICONS = ['Rocket', 'Star', 'Gem', 'Target', 'Flame', 'Trophy', 'Lightbulb', 'Gift'];
 
 function MemoryGame() {
-  const [cards, setCards] = useState<{ id: number; emoji: string; flipped: boolean; matched: boolean }[]>([]);
+  const [cards, setCards] = useState<{ id: number; icon: string; flipped: boolean; matched: boolean }[]>([]);
   const [selected, setSelected] = useState<number[]>([]);
   const [moves, setMoves] = useState(0);
   const [won, setWon] = useState(false);
@@ -81,9 +84,9 @@ function MemoryGame() {
   const [lbRefresh, setLbRefresh] = useState(0);
 
   const init = useCallback(() => {
-    const pairs = [...EMOJIS, ...EMOJIS]
+    const pairs = [...CARD_ICONS, ...CARD_ICONS]
       .sort(() => Math.random() - 0.5)
-      .map((emoji, i) => ({ id: i, emoji, flipped: false, matched: false }));
+      .map((icon, i) => ({ id: i, icon, flipped: false, matched: false }));
     setCards(pairs);
     setSelected([]);
     setMoves(0);
@@ -95,7 +98,7 @@ function MemoryGame() {
   useEffect(() => {
     if (selected.length === 2) {
       const [a, b] = selected;
-      if (cards[a].emoji === cards[b].emoji) {
+      if (cards[a].icon === cards[b].icon) {
         setCards(prev => prev.map((c, i) => i === a || i === b ? { ...c, matched: true } : c));
         setSelected([]);
       } else {
@@ -131,18 +134,18 @@ function MemoryGame() {
     <Card className="md:col-span-2">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-base">🃏 Memory</CardTitle>
+          <CardTitle className="text-base flex items-center gap-1.5"><Icon name="Gamepad2" size={18} />Memory</CardTitle>
           <div className="flex items-center gap-2 text-sm">
             <Badge variant="outline">Ходов: {moves}</Badge>
             {bestScore !== null && <Badge variant="secondary">Мой рекорд: {bestScore}</Badge>}
-            <Button size="sm" variant="ghost" onClick={init}>↺ Заново</Button>
+            <Button size="sm" variant="ghost" onClick={init}><Icon name="RotateCcw" size={14} className="mr-1" />Заново</Button>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {won ? (
           <div className="text-center py-4 space-y-3">
-            <p className="text-4xl">🎉</p>
+            <Icon name="PartyPopper" size={40} className="mx-auto text-primary" />
             <p className="font-semibold text-lg">Победа за {moves} ходов!</p>
             {bestScore === moves && <Badge className="bg-yellow-500 text-white">Новый рекорд!</Badge>}
             <Button onClick={init}>Играть ещё</Button>
@@ -158,13 +161,13 @@ function MemoryGame() {
                   ${card.matched ? 'opacity-50' : ''}
                 `}
               >
-                {card.flipped || card.matched ? card.emoji : '❓'}
+                {card.flipped || card.matched ? <Icon name={card.icon} size={22} /> : <Icon name="HelpCircle" size={22} className="text-muted-foreground/40" />}
               </button>
             ))}
           </div>
         )}
         <div className="border-t pt-3">
-          <p className="text-xs font-semibold text-muted-foreground mb-2">🏆 Таблица лидеров</p>
+          <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1"><Icon name="Trophy" size={12} />Таблица лидеров</p>
           <Leaderboard game="memory" refresh={lbRefresh} />
         </div>
       </CardContent>
@@ -226,7 +229,7 @@ function ReactionGame() {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-base">⚡ Реакция</CardTitle>
+          <CardTitle className="text-base flex items-center gap-1.5"><Icon name="Zap" size={18} />Реакция</CardTitle>
           {best !== null && <Badge variant="secondary">Мой рекорд: {best} мс</Badge>}
         </div>
       </CardHeader>
@@ -235,19 +238,19 @@ function ReactionGame() {
           onClick={state === 'idle' || state === 'done' || state === 'early' ? start : click}
           className={`w-full h-32 rounded-xl text-center transition-all duration-200 font-medium text-lg select-none ${bgMap[state]}`}
         >
-          {state === 'idle' && '👆 Нажми, чтобы начать'}
-          {state === 'waiting' && '⏳ Жди зелёного...'}
-          {state === 'ready' && '🟢 ЖМИ!'}
-          {state === 'early' && <span>😅 Слишком рано!<br /><span className="text-sm text-muted-foreground">Нажми для повтора</span></span>}
+          {state === 'idle' && <span className="inline-flex items-center gap-1.5"><Icon name="Hand" size={18} />Нажми, чтобы начать</span>}
+          {state === 'waiting' && <span className="inline-flex items-center gap-1.5"><Icon name="Clock" size={18} />Жди зелёного...</span>}
+          {state === 'ready' && 'ЖМИ!'}
+          {state === 'early' && <span className="inline-flex items-center gap-1.5"><Icon name="AlertTriangle" size={18} />Слишком рано!<br /><span className="text-sm text-muted-foreground">Нажми для повтора</span></span>}
           {state === 'done' && time !== null && (
-            <span>{time} мс {best === time && '🏆'}<br /><span className="text-sm text-muted-foreground">Нажми для повтора</span></span>
+            <span className="inline-flex items-center gap-1.5">{time} мс {best === time && <Icon name="Trophy" size={18} />}<br /><span className="text-sm text-muted-foreground">Нажми для повтора</span></span>
           )}
         </button>
         {(state === 'done' || state === 'early') && (
-          <Button size="sm" variant="ghost" onClick={reset}>↺ Сброс</Button>
+          <Button size="sm" variant="ghost" onClick={reset}><Icon name="RotateCcw" size={14} className="mr-1" />Сброс</Button>
         )}
         <div className="border-t pt-3">
-          <p className="text-xs font-semibold text-muted-foreground mb-2">🏆 Таблица лидеров</p>
+          <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1"><Icon name="Trophy" size={12} />Таблица лидеров</p>
           <Leaderboard game="reaction" refresh={lbRefresh} />
         </div>
       </CardContent>
@@ -283,12 +286,12 @@ function GuessGame() {
     let h = '';
     if (n === secret) {
       setWon(true);
-      h = '🎯 Угадал!';
+      h = 'Угадал!';
       submitScore('guess', newAttempts).then(() => setLbRefresh(r => r + 1));
     } else if (n < secret) {
-      h = n < secret - 20 ? '🔼 Намного больше' : '🔼 Больше';
+      h = n < secret - 20 ? 'Намного больше' : 'Больше';
     } else {
-      h = n > secret + 20 ? '🔽 Намного меньше' : '🔽 Меньше';
+      h = n > secret + 20 ? 'Намного меньше' : 'Меньше';
     }
     setHint(h);
     setHistory(prev => [{ n, hint: h }, ...prev]);
@@ -299,17 +302,17 @@ function GuessGame() {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-base">🔢 Угадай число</CardTitle>
+          <CardTitle className="text-base flex items-center gap-1.5"><Icon name="Hash" size={18} />Угадай число</CardTitle>
           <div className="flex items-center gap-2">
             <Badge variant="outline">Попыток: {attempts}</Badge>
-            <Button size="sm" variant="ghost" onClick={reset}>↺ Заново</Button>
+            <Button size="sm" variant="ghost" onClick={reset}><Icon name="RotateCcw" size={14} className="mr-1" />Заново</Button>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {won ? (
           <div className="text-center py-4 space-y-3">
-            <p className="text-4xl">🎯</p>
+            <Icon name="Target" size={40} className="mx-auto text-primary" />
             <p className="font-semibold">Угадал за {attempts} {attempts === 1 ? 'попытку' : attempts < 5 ? 'попытки' : 'попыток'}!</p>
             <Button onClick={reset}>Играть ещё</Button>
           </div>
@@ -340,7 +343,7 @@ function GuessGame() {
           </>
         )}
         <div className="border-t pt-3">
-          <p className="text-xs font-semibold text-muted-foreground mb-2">🏆 Таблица лидеров</p>
+          <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1"><Icon name="Trophy" size={12} />Таблица лидеров</p>
           <Leaderboard game="guess" refresh={lbRefresh} />
         </div>
       </CardContent>
@@ -430,7 +433,7 @@ function TicTacToe() {
     <Card>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between flex-wrap gap-2">
-          <CardTitle className="text-base">❌ Крестики-нолики</CardTitle>
+          <CardTitle className="text-base flex items-center gap-1.5"><Icon name="Gamepad2" size={18} />Крестики-нолики</CardTitle>
           <div className="flex gap-2 text-xs">
             <Badge className="bg-blue-500 text-white">Вы: {scores.you}</Badge>
             <Badge variant="outline">Ничья: {scores.draw}</Badge>
@@ -441,12 +444,14 @@ function TicTacToe() {
       <CardContent className="space-y-3">
         {(result || isDraw) ? (
           <div className="text-center py-3 space-y-2">
-            <p className="text-3xl">{result?.winner === 'X' ? '🎉' : isDraw ? '🤝' : '🤖'}</p>
+            <Icon name={result?.winner === 'X' ? 'PartyPopper' : isDraw ? 'Handshake' : 'Bot'} size={32} className="mx-auto text-primary" />
             <p className="font-semibold">{result?.winner === 'X' ? 'Вы победили!' : isDraw ? 'Ничья!' : 'Бот победил!'}</p>
             <Button size="sm" onClick={reset}>Ещё раз</Button>
           </div>
         ) : (
-          <p className="text-sm text-center text-muted-foreground">{isX ? '👆 Ваш ход (X)' : '🤖 Бот думает...'}</p>
+          <p className="text-sm text-center text-muted-foreground flex items-center justify-center gap-1.5">
+            {isX ? <><Icon name="Hand" size={14} />Ваш ход (X)</> : <><Icon name="Bot" size={14} />Бот думает...</>}
+          </p>
         )}
         <div className="grid grid-cols-3 gap-2 max-w-[240px] mx-auto">
           {board.map((cell, i) => (
@@ -463,7 +468,7 @@ function TicTacToe() {
           ))}
         </div>
         <div className="border-t pt-3">
-          <p className="text-xs font-semibold text-muted-foreground mb-2">🏆 Таблица лидеров</p>
+          <p className="text-xs font-semibold text-muted-foreground mb-2 flex items-center gap-1"><Icon name="Trophy" size={12} />Таблица лидеров</p>
           <Leaderboard game="tictactoe" refresh={lbRefresh} />
         </div>
       </CardContent>

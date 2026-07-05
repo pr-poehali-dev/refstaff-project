@@ -45,7 +45,7 @@ export function RecommendationsTab({
         <>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
             <h2 className="text-xl sm:text-2xl font-semibold flex items-center gap-2">
-              <span>🎯</span>
+              <Icon name="Target" size={22} />
               <span className="hidden sm:inline">Рекомендации кандидатов</span>
               <span className="sm:hidden">Рекомендации</span>
             </h2>

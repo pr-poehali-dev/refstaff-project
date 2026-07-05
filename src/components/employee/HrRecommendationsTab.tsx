@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import Icon from '@/components/ui/icon';
 import type { Recommendation } from '@/types';
 
 interface HrRecommendationsTabProps {
@@ -11,7 +12,7 @@ export function HrRecommendationsTab({ recommendations }: HrRecommendationsTabPr
     <div className="space-y-4">
       <div className="mb-4">
         <h2 className="text-lg sm:text-2xl font-semibold flex items-center gap-2">
-          <span>👔</span> Все рекомендации
+          <Icon name="Briefcase" size={20} /> Все рекомендации
         </h2>
         <p className="text-xs sm:text-sm text-muted-foreground">Доступ HR Manager</p>
       </div>
@@ -35,8 +36,8 @@ export function HrRecommendationsTab({ recommendations }: HrRecommendationsTabPr
                 </Badge>
               </div>
               <div className="text-sm text-muted-foreground mt-1">
-                {rec.candidatePhone && <span>📞 {rec.candidatePhone}</span>}
-                {rec.candidateEmail && <span className="ml-3">✉️ {rec.candidateEmail}</span>}
+                {rec.candidatePhone && <span className="inline-flex items-center gap-1"><Icon name="Phone" size={14} />{rec.candidatePhone}</span>}
+                {rec.candidateEmail && <span className="ml-3 inline-flex items-center gap-1"><Icon name="Mail" size={14} />{rec.candidateEmail}</span>}
               </div>
             </CardHeader>
           </Card>

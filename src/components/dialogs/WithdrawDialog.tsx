@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import Icon from '@/components/ui/icon';
 import type { WalletData } from '@/lib/api';
 import type { Company } from '@/lib/api';
 
@@ -88,13 +89,21 @@ export function WithdrawDialog({
               </SelectTrigger>
               <SelectContent>
                 {(company?.payout_methods ?? ['card', 'sbp', 'bank', 'cash']).map((m) => {
-                  const labels: Record<string, string> = {
-                    card: '💳 Банковская карта',
-                    sbp: '📱 СБП',
-                    bank: '🏦 По реквизитам на счёт',
-                    cash: '💵 Наличными',
+                  const labels: Record<string, { icon: string; text: string }> = {
+                    card: { icon: 'CreditCard', text: 'Банковская карта' },
+                    sbp: { icon: 'Smartphone', text: 'СБП' },
+                    bank: { icon: 'Landmark', text: 'По реквизитам на счёт' },
+                    cash: { icon: 'Banknote', text: 'Наличными' },
                   };
-                  return <SelectItem key={m} value={m}>{labels[m] ?? m}</SelectItem>;
+                  const info = labels[m] ?? { icon: 'Wallet', text: m };
+                  return (
+                    <SelectItem key={m} value={m}>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Icon name={info.icon} size={14} />
+                        {info.text}
+                      </span>
+                    </SelectItem>
+                  );
                 })}
               </SelectContent>
             </Select>
@@ -138,8 +147,9 @@ export function WithdrawDialog({
               </div>
             </>
           ) : form.paymentMethod === 'cash' ? (
-            <p className="text-sm text-muted-foreground bg-muted rounded-lg p-3">
-              💵 Выплата будет произведена наличными. Уточните детали у вашего работодателя.
+            <p className="text-sm text-muted-foreground bg-muted rounded-lg p-3 flex items-center gap-2">
+              <Icon name="Banknote" size={16} className="shrink-0" />
+              Выплата будет произведена наличными. Уточните детали у вашего работодателя.
             </p>
           ) : (
             <>

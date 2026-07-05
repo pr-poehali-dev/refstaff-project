@@ -314,7 +314,7 @@ export function useDataLoader(params: {
             return [{
               id: Date.now() + 50,
               type: 'subscription',
-              message: `⚠️ Через ${subscriptionDaysLeft} дн. истекает подписка на сервис. Продлите, чтобы не потерять доступ.`,
+              message: `Через ${subscriptionDaysLeft} дн. истекает подписка на сервис. Продлите, чтобы не потерять доступ.`,
               date: new Date().toISOString(),
               read: false
             }, ...prev];

@@ -2,10 +2,10 @@ import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 
 const STEPS = [
-  { emoji: '🏢', title: 'Регистрация', desc: 'Создайте аккаунт компании и разместите открытые вакансии', color: 'from-blue-500 to-blue-600' },
-  { emoji: '👥', title: 'Приглашение', desc: 'Добавьте своих сотрудников в систему одним кликом', color: 'from-green-500 to-green-600' },
-  { emoji: '🎯', title: 'Рекомендации', desc: 'Получайте качественные кандидатуры от вашей команды', color: 'from-purple-500 to-purple-600' },
-  { emoji: '💰', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за найм', color: 'from-orange-500 to-orange-600' },
+  { icon: 'Building2', title: 'Регистрация', desc: 'Создайте аккаунт компании и разместите открытые вакансии', color: 'from-blue-500 to-blue-600' },
+  { icon: 'Users', title: 'Приглашение', desc: 'Добавьте своих сотрудников в систему одним кликом', color: 'from-green-500 to-green-600' },
+  { icon: 'Target', title: 'Рекомендации', desc: 'Получайте качественные кандидатуры от вашей команды', color: 'from-purple-500 to-purple-600' },
+  { icon: 'Wallet', title: 'Вознаграждение', desc: 'Выплачивайте бонусы за найм', color: 'from-orange-500 to-orange-600' },
 ];
 
 export function HowItWorksSection() {
@@ -14,7 +14,7 @@ export function HowItWorksSection() {
       <div className="absolute inset-0 bg-grid-pattern opacity-5"></div>
       <div className="container mx-auto max-w-7xl relative z-10">
         <div className="text-center mb-8 sm:mb-12 md:mb-20">
-          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">⚡ Простой процесс</Badge>
+          <Badge className="mb-4 bg-primary/10 text-primary border-primary/20"><Icon name="Zap" size={14} className="inline-block mr-1" />Простой процесс</Badge>
           <h2 id="how-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
             Как это работает
           </h2>
@@ -33,7 +33,7 @@ export function HowItWorksSection() {
                   <div className="p-4 sm:p-6 pt-6 sm:pt-8">
                     <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
                       <div className={`flex-shrink-0 w-10 h-10 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br ${step.color} flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform duration-300`}>
-                        <span className="text-xl sm:text-2xl">{step.emoji}</span>
+                        <Icon name={step.icon} size={24} className="text-white" />
                       </div>
                       <div className={`flex-shrink-0 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br ${step.color} text-white flex items-center justify-center font-bold text-base sm:text-lg shadow-md`}>
                         {i + 1}

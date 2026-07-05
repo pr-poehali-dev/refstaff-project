@@ -15,7 +15,7 @@ export function HeroSection({ onRegister, onLogin }: HeroSectionProps) {
       <div className="container mx-auto max-w-7xl">
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 items-center">
           <div className="text-center lg:text-left">
-            <Badge className="mb-4 sm:mb-6 animate-fade-in text-xs sm:text-sm">🚀 Реферальный рекрутинг</Badge>
+            <Badge className="mb-4 sm:mb-6 animate-fade-in text-xs sm:text-sm"><Icon name="Rocket" size={14} className="inline-block mr-1" />Реферальный рекрутинг</Badge>
             <h1 id="hero-title" className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 animate-slide-up bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent leading-tight">
               Нанимайте лучших кандидатов через своих сотрудников
             </h1>

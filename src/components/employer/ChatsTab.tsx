@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import Icon from '@/components/ui/icon';
 import { type Chat } from '@/lib/api';
 import type { Employee } from '@/types';
 
@@ -33,7 +34,7 @@ export function ChatsTab({
       ) : (
         <>
           <h2 className="text-xl sm:text-2xl font-semibold mb-4 flex items-center gap-2">
-            <span>💬</span>
+            <Icon name="MessageCircle" size={22} />
             <span className="hidden sm:inline">Чаты с сотрудниками</span>
             <span className="sm:hidden">Чаты</span>
           </h2>
