@@ -102,7 +102,7 @@ export function HelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="MessageSquare" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="MessageCircle" size={18} />Чаты</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5">Чаты</CardTitle>
                 <CardDescription className="mt-1">Личная переписка с сотрудниками</CardDescription>
               </div>
             </div>
