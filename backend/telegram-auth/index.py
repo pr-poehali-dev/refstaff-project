@@ -30,8 +30,12 @@ def tg_send(token: str, chat_id: int, text: str, reply_markup: dict = None):
         payload['reply_markup'] = reply_markup
     data = json.dumps(payload).encode()
     req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
-    with urllib.request.urlopen(req, timeout=10) as resp:
-        return json.loads(resp.read())
+    try:
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            return json.loads(resp.read())
+    except Exception as e:
+        print(f'tg_send failed: {e}')
+        return None
 
 
 def generate_code() -> str:
@@ -114,6 +118,19 @@ def handler(event: dict, context) -> dict:
             conn = get_db()
             cursor = conn.cursor()
             try:
+                # Telegram может продублировать webhook — если код уже отправлен этому chat_id, шлём его повторно
+                cursor.execute(
+                    f"SELECT code FROM {DB_SCHEMA}.tg_login_sessions WHERE session_token = %s AND status = 'code_sent' AND telegram_chat_id = %s AND expires_at > CURRENT_TIMESTAMP",
+                    (session_token, chat_id)
+                )
+                resent_login = cursor.fetchone()
+                if resent_login:
+                    tg_send(bot_token, chat_id,
+                        f"🔐 Ваш код для входа в iHUNT:\n\n<b>{resent_login['code']}</b>\n\n"
+                        f"Введите этот код на странице входа. Код действует <b>10 минут</b>."
+                    )
+                    return {'statusCode': 200, 'body': 'ok'}
+
                 # Проверяем login-сессию
                 cursor.execute(
                     f"SELECT * FROM {DB_SCHEMA}.tg_login_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
@@ -192,7 +209,20 @@ def handler(event: dict, context) -> dict:
                     )
                     return {'statusCode': 200, 'body': 'ok'}
 
-                # Проверяем регистрационную сессию сотрудника
+                # Проверяем регистрационную сессию сотрудника (Telegram может продублировать webhook —
+                # если код уже был отправлен этому же chat_id, просто повторно шлём тот же код)
+                cursor.execute(
+                    f"SELECT * FROM {DB_SCHEMA}.tg_sessions WHERE session_token = %s AND status = 'code_sent' AND telegram_chat_id = %s AND code_used = FALSE AND expires_at > CURRENT_TIMESTAMP",
+                    (session_token, chat_id)
+                )
+                resent_session = cursor.fetchone()
+                if resent_session:
+                    tg_send(bot_token, chat_id,
+                        f"🔐 Ваш код подтверждения:\n\n<b>{resent_session['code']}</b>\n\n"
+                        f"Введите этот код на странице регистрации. Код действует <b>10 минут</b>."
+                    )
+                    return {'statusCode': 200, 'body': 'ok'}
+
                 cursor.execute(
                     f"SELECT * FROM {DB_SCHEMA}.tg_sessions WHERE session_token = %s AND status = 'pending' AND expires_at > CURRENT_TIMESTAMP",
                     (session_token,)
