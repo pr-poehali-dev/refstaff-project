@@ -86,7 +86,7 @@ export function HelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Newspaper" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Megaphone" size={18} />Новости</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5">Новости</CardTitle>
                 <CardDescription className="mt-1">Корпоративные коммуникации</CardDescription>
               </div>
             </div>
