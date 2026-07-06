@@ -3154,32 +3154,32 @@ function Index() {
           <ScrollableTabs>
             <TabsList className="inline-flex w-max gap-1">
               <TabsTrigger value="news" className="text-xs whitespace-nowrap px-2 py-1.5 relative flex items-center gap-1">
-                <Icon name="Megaphone" size={14} /><span className="tab-label ml-1">Новости</span>
+                <Icon name="Megaphone" size={14} className="text-purple-500" /><span className="tab-label ml-1">Новости</span>
                 {newNewsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-purple-500 text-white border-0 leading-4">+{newNewsCount}</Badge>}
               </TabsTrigger>
               <TabsTrigger value="vacancies" className="text-xs whitespace-nowrap px-2 py-1.5 relative flex items-center gap-1">
-                <Icon name="Briefcase" size={14} /><span className="tab-label ml-1">Вакансии</span>
+                <Icon name="Briefcase" size={14} className="text-blue-600" /><span className="tab-label ml-1">Вакансии</span>
                 {newVacanciesCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-green-500 text-white border-0 leading-4">+{newVacanciesCount}</Badge>}
               </TabsTrigger>
               <TabsTrigger value="my-recommendations" className="text-xs whitespace-nowrap px-2 py-1.5 relative flex items-center gap-1">
-                <Icon name="Star" size={14} /><span className="tab-label ml-1">Рекомендации</span>
+                <Icon name="Star" size={14} className="text-orange-500" /><span className="tab-label ml-1">Рекомендации</span>
                 {newRecommendationsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-orange-500 text-white border-0 leading-4">+{newRecommendationsCount}</Badge>}
               </TabsTrigger>
               <TabsTrigger value="achievements" className="text-xs whitespace-nowrap px-2 py-1.5 flex items-center gap-1">
-                <Icon name="Trophy" size={14} /><span className="tab-label ml-1">Рейтинг</span>
+                <Icon name="Trophy" size={14} className="text-yellow-500" /><span className="tab-label ml-1">Рейтинг</span>
               </TabsTrigger>
               <TabsTrigger value="notifications" className="text-xs whitespace-nowrap px-2 py-1.5 relative flex items-center gap-1">
-                <Icon name="Bell" size={14} /><span className="tab-label ml-1">Уведомления</span>
+                <Icon name="Bell" size={14} className="text-red-500" /><span className="tab-label ml-1">Уведомления</span>
                 {newNotificationsCount > 0 && <Badge className="ml-1 px-1 py-0 text-[10px] bg-red-500 text-white border-0 leading-4">+{newNotificationsCount}</Badge>}
               </TabsTrigger>
               <TabsTrigger value="wallet-history" className="text-xs whitespace-nowrap px-2 py-1.5 flex items-center gap-1">
-                <Icon name="CreditCard" size={14} /><span className="tab-label ml-1">История</span>
+                <Icon name="CreditCard" size={14} className="text-teal-500" /><span className="tab-label ml-1">История</span>
               </TabsTrigger>
               <TabsTrigger value="help" className="text-xs whitespace-nowrap px-2 py-1.5 flex items-center gap-1">
-                <Icon name="HelpCircle" size={14} /><span className="tab-label ml-1">Помощь</span>
+                <Icon name="HelpCircle" size={14} className="text-cyan-500" /><span className="tab-label ml-1">Помощь</span>
               </TabsTrigger>
               <TabsTrigger value="games" className="text-xs whitespace-nowrap px-2 py-1.5 flex items-center gap-1">
-                <Icon name="Gamepad2" size={14} /><span className="tab-label ml-1">Игры</span>
+                <Icon name="Gamepad2" size={14} className="text-fuchsia-500" /><span className="tab-label ml-1">Игры</span>
               </TabsTrigger>
             </TabsList>
           </ScrollableTabs>
