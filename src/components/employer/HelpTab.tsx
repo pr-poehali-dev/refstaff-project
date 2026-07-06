@@ -19,7 +19,7 @@ export function HelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Briefcase" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Briefcase" size={18} />Вакансии</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5"> Вакансии</CardTitle>
                 <CardDescription className="mt-1">Управление открытыми позициями</CardDescription>
               </div>
             </div>
