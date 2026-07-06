@@ -70,7 +70,7 @@ export function HelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Wallet" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Wallet" size={18} />Выплаты</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5">Выплаты</CardTitle>
                 <CardDescription className="mt-1">Управление вознаграждениями</CardDescription>
               </div>
             </div>
