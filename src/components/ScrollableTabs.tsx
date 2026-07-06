@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, type ReactNode } from 'react';
+import { useRef, useState, useEffect, type ReactNode, type TouchEvent, type MouseEvent } from 'react';
 import Icon from '@/components/ui/icon';
 
 interface ScrollableTabsProps {
@@ -9,6 +9,8 @@ export default function ScrollableTabs({ children }: ScrollableTabsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
+  const touchStart = useRef({ x: 0, y: 0 });
+  const suppressClick = useRef(false);
 
   const checkScroll = () => {
     const el = scrollRef.current;
@@ -35,6 +37,26 @@ export default function ScrollableTabs({ children }: ScrollableTabsProps) {
     el.scrollBy({ left: direction === 'left' ? -120 : 120, behavior: 'smooth' });
   };
 
+  const handleTouchStart = (e: TouchEvent<HTMLDivElement>) => {
+    touchStart.current = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  };
+
+  const handleTouchMove = (e: TouchEvent<HTMLDivElement>) => {
+    const dx = Math.abs(e.touches[0].clientX - touchStart.current.x);
+    const dy = Math.abs(e.touches[0].clientY - touchStart.current.y);
+    if (dx > 6 || dy > 6) {
+      suppressClick.current = true;
+    }
+  };
+
+  const handleClickCapture = (e: MouseEvent<HTMLDivElement>) => {
+    if (suppressClick.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      suppressClick.current = false;
+    }
+  };
+
   return (
     <div className="relative sm:static">
       {canScrollLeft && (
@@ -47,7 +69,10 @@ export default function ScrollableTabs({ children }: ScrollableTabsProps) {
       )}
       <div
         ref={scrollRef}
-        className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none"
+        className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0 scrollbar-none touch-pan-x"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onClickCapture={handleClickCapture}
       >
         {children}
       </div>
