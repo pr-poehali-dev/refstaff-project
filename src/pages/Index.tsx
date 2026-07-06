@@ -1928,16 +1928,16 @@ function Index() {
         }}>
           <ScrollableTabs>
             <TabsList className="w-max sm:w-full">
-              <TabsTrigger value="vacancies" className="flex items-center gap-1.5"><Icon name="Briefcase" size={14} />Вакансии</TabsTrigger>
-              <TabsTrigger value="employees" className="flex items-center gap-1.5"><Icon name="Users" size={14} />Сотрудники{newEmployeesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-blue-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newEmployeesCount}</span>}</TabsTrigger>
-              <TabsTrigger value="recommendations" className="flex items-center gap-1.5"><Icon name="Target" size={14} />Рекомендации{newRecommendationsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-green-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newRecommendationsCount}</span>}</TabsTrigger>
-              <TabsTrigger value="payouts" className="flex items-center gap-1.5"><Icon name="Wallet" size={14} />Выплаты{newPayoutsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newPayoutsCount}</span>}</TabsTrigger>
-              <TabsTrigger value="news" className="flex items-center gap-1.5"><Icon name="Megaphone" size={14} />Новости</TabsTrigger>
-              <TabsTrigger value="chats" className="flex items-center gap-1.5"><Icon name="MessageCircle" size={14} />Чаты{unreadMessagesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">{unreadMessagesCount}</span>}</TabsTrigger>
-              <TabsTrigger value="stats" className="flex items-center gap-1.5"><Icon name="BarChart3" size={14} />Статистика</TabsTrigger>
-              <TabsTrigger value="subscription" className="sm:hidden flex items-center gap-1.5"><Icon name="CreditCard" size={14} />Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
-              <TabsTrigger value="help" className="flex items-center gap-1.5"><Icon name="HelpCircle" size={14} />Помощь</TabsTrigger>
-              <TabsTrigger value="ai-assistant" className="flex items-center gap-1.5"><Icon name="Bot" size={14} />ИИ-чат</TabsTrigger>
+              <TabsTrigger value="vacancies" className="flex items-center gap-1.5"><Icon name="Briefcase" size={14} className="text-blue-600" />Вакансии</TabsTrigger>
+              <TabsTrigger value="employees" className="flex items-center gap-1.5"><Icon name="Users" size={14} className="text-sky-500" />Сотрудники{newEmployeesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-blue-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newEmployeesCount}</span>}</TabsTrigger>
+              <TabsTrigger value="recommendations" className="flex items-center gap-1.5"><Icon name="Target" size={14} className="text-green-600" />Рекомендации{newRecommendationsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-green-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newRecommendationsCount}</span>}</TabsTrigger>
+              <TabsTrigger value="payouts" className="flex items-center gap-1.5"><Icon name="Wallet" size={14} className="text-orange-500" />Выплаты{newPayoutsCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-orange-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">+{newPayoutsCount}</span>}</TabsTrigger>
+              <TabsTrigger value="news" className="flex items-center gap-1.5"><Icon name="Megaphone" size={14} className="text-purple-500" />Новости</TabsTrigger>
+              <TabsTrigger value="chats" className="flex items-center gap-1.5"><Icon name="MessageCircle" size={14} className="text-red-500" />Чаты{unreadMessagesCount > 0 && <span className="ml-1.5 inline-flex items-center justify-center bg-red-500 text-white text-[10px] font-bold rounded-full px-1.5 min-w-[18px] h-[18px]">{unreadMessagesCount}</span>}</TabsTrigger>
+              <TabsTrigger value="stats" className="flex items-center gap-1.5"><Icon name="BarChart3" size={14} className="text-indigo-500" />Статистика</TabsTrigger>
+              <TabsTrigger value="subscription" className="sm:hidden flex items-center gap-1.5"><Icon name="CreditCard" size={14} className="text-teal-500" />Подписка{subscriptionDaysLeft !== null && subscriptionDaysLeft < 14 ? ` (${subscriptionDaysLeft})` : ''}</TabsTrigger>
+              <TabsTrigger value="help" className="flex items-center gap-1.5"><Icon name="HelpCircle" size={14} className="text-cyan-500" />Помощь</TabsTrigger>
+              <TabsTrigger value="ai-assistant" className="flex items-center gap-1.5"><Icon name="Bot" size={14} className="text-fuchsia-500" />ИИ-чат</TabsTrigger>
 
             </TabsList>
           </ScrollableTabs>
