@@ -34,7 +34,7 @@ export default function PartnerPayoutsTab({ partner, payouts, pendingCommission,
               )}
             </div>
             <Button size="sm" onClick={onRequestPayout} disabled={partner.balance <= 0}>
-              <Icon name="ArrowUpRight" size={14} className="mr-1" />Вывести
+              <Icon name="Send" size={14} className="mr-1" />Запросить вывод
             </Button>
           </div>
 

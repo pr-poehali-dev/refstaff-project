@@ -11,6 +11,7 @@ import PartnerClientsTab from './partner/PartnerClientsTab';
 import PartnerPayoutsTab from './partner/PartnerPayoutsTab';
 import PartnerProfileTab from './partner/PartnerProfileTab';
 import PartnerHelpTab from './partner/PartnerHelpTab';
+import PartnerRulesTab from './partner/PartnerRulesTab';
 
 export default function Partner() {
   const {
@@ -20,11 +21,9 @@ export default function Partner() {
     profileForm, setProfileForm,
     editProfile, setEditProfile, savingProfile,
     showAddReferral, setShowAddReferral,
-    showPayout, setShowPayout,
     referralForm, setReferralForm,
-    payoutForm, setPayoutForm,
     handleSendToMessenger, handleVerifyOtp, handleCompleteRegistration,
-    handleAddReferral, handleRequestPayout, handleSaveProfile,
+    handleAddReferral, handleSaveProfile,
     copyToClipboard, logout,
   } = usePartner();
 
@@ -129,6 +128,9 @@ export default function Partner() {
             <TabsTrigger value="help" className="flex-1">
               <Icon name="CircleHelp" size={14} className="mr-1" />Помощь
             </TabsTrigger>
+            <TabsTrigger value="rules" className="flex-1">
+              <Icon name="FileText" size={14} className="mr-1" />Правила
+            </TabsTrigger>
           </TabsList>
 
           <PartnerClientsTab referrals={referrals} />
@@ -138,7 +140,7 @@ export default function Partner() {
             payouts={payouts}
             pendingCommission={pendingCommission}
             availableCommission={availableCommission}
-            onRequestPayout={() => setShowPayout(true)}
+            onRequestPayout={() => window.open('https://t.me/ihunt_support', '_blank')}
           />
 
           <PartnerProfileTab
@@ -149,6 +151,8 @@ export default function Partner() {
           />
 
           <PartnerHelpTab />
+
+          <PartnerRulesTab />
         </Tabs>
       </div>
 
@@ -168,35 +172,6 @@ export default function Partner() {
         </DialogContent>
       </Dialog>
 
-      {/* Диалог выплаты */}
-      <Dialog open={showPayout} onOpenChange={setShowPayout}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Запрос на выплату</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Доступно: <span className="font-bold text-foreground">{partner.balance.toLocaleString('ru')} ₽</span></p>
-            {partner.payment_method && (
-              <div className="p-3 rounded-lg bg-blue-50 border border-blue-200 text-xs">
-                <p className="font-medium text-blue-800 mb-1">Сохранённые реквизиты:</p>
-                <p className="text-blue-700">{partner.payment_method}: {partner.payment_details}</p>
-                <button
-                  className="text-blue-600 underline mt-1"
-                  onClick={() => setPayoutForm(p => ({
-                    ...p,
-                    payment_method: partner.payment_method || '',
-                    payment_details: partner.payment_details || '',
-                  }))}
-                >
-                  Использовать
-                </button>
-              </div>
-            )}
-            <div><Label>Сумма *</Label><Input type="number" placeholder="1000" value={payoutForm.amount} onChange={e => setPayoutForm(p => ({ ...p, amount: e.target.value }))} /></div>
-            <div><Label>Способ выплаты *</Label><Input placeholder="СБП / Карта / Расчётный счёт" value={payoutForm.payment_method} onChange={e => setPayoutForm(p => ({ ...p, payment_method: e.target.value }))} /></div>
-            <div><Label>Реквизиты *</Label><Input placeholder="Номер карты, телефон СБП или р/с" value={payoutForm.payment_details} onChange={e => setPayoutForm(p => ({ ...p, payment_details: e.target.value }))} /></div>
-            <Button className="w-full" onClick={handleRequestPayout} disabled={submitting}>{submitting ? 'Отправка...' : 'Отправить запрос'}</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
