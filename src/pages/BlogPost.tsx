@@ -9,11 +9,11 @@ const OG_IMAGE_API = 'https://functions.poehali.dev/c6e24176-0014-4fee-8ecd-b597
 const OG_PROXY_URL = 'https://functions.poehali.dev/a7ef69a9-2736-4504-ac24-54132c34d646';
 
 const REACTIONS = [
-  { icon: 'ThumbsUp', label: 'Полезно' },
-  { icon: 'Flame', label: 'Огонь' },
-  { icon: 'Lightbulb', label: 'Интересно' },
-  { icon: 'Heart', label: 'Нравится' },
-  { icon: 'Sparkles', label: 'Удивительно' },
+  { icon: 'ThumbsUp', emoji: '👍', label: 'Полезно', color: 'text-blue-500', activeBg: 'bg-blue-50 border-blue-400' },
+  { icon: 'Flame', emoji: '🔥', label: 'Огонь', color: 'text-orange-500', activeBg: 'bg-orange-50 border-orange-400' },
+  { icon: 'Lightbulb', emoji: '💡', label: 'Интересно', color: 'text-yellow-500', activeBg: 'bg-yellow-50 border-yellow-400' },
+  { icon: 'Heart', emoji: '❤️', label: 'Нравится', color: 'text-red-500', activeBg: 'bg-red-50 border-red-400' },
+  { icon: 'Sparkles', emoji: '😮', label: 'Удивительно', color: 'text-purple-500', activeBg: 'bg-purple-50 border-purple-400' },
 ];
 
 interface Post {
@@ -84,14 +84,14 @@ export default function BlogPost() {
     }).then(() => loadStats(post.id));
   }, [post, loadStats]);
 
-  const handleReact = async (icon: string) => {
+  const handleReact = async (emoji: string) => {
     if (!post || reacting) return;
     setReacting(true);
     const sid = getSessionId();
     const r = await fetch(`${BLOG_API}?action=react`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ post_id: post.id, session_id: sid, emoji: icon }),
+      body: JSON.stringify({ post_id: post.id, session_id: sid, emoji }),
     });
     const d = await r.json();
     setStats(prev => ({ ...prev, reactions: d.reactions || {}, my_reaction: d.my_reaction || null }));
@@ -275,19 +275,19 @@ export default function BlogPost() {
                 Как вам статья?
               </p>
               <div className="flex items-center justify-center gap-2 sm:gap-3 flex-wrap">
-                {REACTIONS.map(({ icon, label }) => {
-                  const count = stats.reactions[icon] || 0;
-                  const isActive = stats.my_reaction === icon;
+                {REACTIONS.map(({ icon, emoji, label, color, activeBg }) => {
+                  const count = stats.reactions[emoji] || 0;
+                  const isActive = stats.my_reaction === emoji;
                   return (
                     <button
                       key={icon}
-                      onClick={() => handleReact(icon)}
+                      onClick={() => handleReact(emoji)}
                       disabled={reacting}
                       title={label}
                       className={`flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm transition-all duration-200 select-none
                         ${isActive
-                          ? 'border-primary bg-primary/10 text-primary font-semibold scale-105'
-                          : 'border-gray-200 bg-white hover:border-primary/40 hover:bg-primary/5 text-gray-600'
+                          ? `${activeBg} ${color} font-semibold scale-105`
+                          : `border-gray-200 bg-white hover:bg-gray-50 ${color}`
                         }`}
                     >
                       <Icon name={icon} size={18} />
