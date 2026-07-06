@@ -286,7 +286,7 @@ export function VacanciesTab({
                         onClick={() => onTestManager({ id: vacancy.id, title: vacancy.title })}
                         className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                       >
-                        <Icon name="ClipboardList" size={14} className="mr-1" />
+                        <Icon name="ClipboardList" size={14} className="mr-1 text-blue-600" />
                         <span className="hidden sm:inline">Тест</span>
                       </Button>
                       <Button
@@ -309,7 +309,7 @@ export function VacanciesTab({
                         }}
                         className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                       >
-                        <Icon name="Pencil" size={14} className="mr-1" />
+                        <Icon name="Pencil" size={14} className="mr-1 text-amber-500" />
                         <span className="hidden sm:inline">Ред.</span>
                       </Button>
                       {vacancy.status === 'active' && (
@@ -319,7 +319,7 @@ export function VacanciesTab({
                           onClick={() => onArchiveVacancy(vacancy.id)}
                           className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                         >
-                          <Icon name="Archive" size={14} className="mr-1" />
+                          <Icon name="Archive" size={14} className="mr-1 text-slate-500" />
                           <span className="hidden sm:inline">В архив</span>
                         </Button>
                       )}
@@ -331,7 +331,7 @@ export function VacanciesTab({
                             onClick={() => onRestoreVacancy(vacancy.id)}
                             className="flex-1 sm:flex-none text-[10px] sm:text-sm h-7 sm:h-9 px-2 sm:px-3"
                           >
-                            <Icon name="CheckCircle2" size={14} className="mr-1" />
+                            <Icon name="CheckCircle2" size={14} className="mr-1 text-green-600" />
                             <span className="hidden sm:inline">Актив.</span>
                           </Button>
                           <Button
