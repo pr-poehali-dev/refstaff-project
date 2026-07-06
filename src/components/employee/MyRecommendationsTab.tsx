@@ -47,17 +47,17 @@ export function MyRecommendationsTab({
             onClick={() => onViewCandidate(rec)}
           >
             <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-lg">{rec.candidateName}</CardTitle>
-                  <CardDescription>{rec.vacancyTitle || rec.vacancy}</CardDescription>
+              <div className="flex flex-wrap justify-between items-start gap-2">
+                <div className="min-w-0">
+                  <CardTitle className="text-lg break-words">{rec.candidateName}</CardTitle>
+                  <CardDescription className="break-words">{rec.vacancyTitle || rec.vacancy}</CardDescription>
                 </div>
                 <Badge variant={
                   rec.status === 'hired' || rec.status === 'accepted' ? 'default' :
                   rec.status === 'rejected' ? 'destructive' :
                   rec.status === 'interview' ? 'outline' :
                   'secondary'
-                } className={rec.status === 'accepted' ? 'bg-green-600 hover:bg-green-600' : ''}>
+                } className={`shrink-0 whitespace-nowrap ${rec.status === 'accepted' ? 'bg-green-600 hover:bg-green-600' : ''}`}>
                   {rec.status === 'hired' || rec.status === 'accepted' ? 'Принят' :
                    rec.status === 'rejected' ? 'Отклонён' :
                    rec.status === 'interview' ? 'На интервью' :
