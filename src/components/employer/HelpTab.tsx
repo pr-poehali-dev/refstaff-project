@@ -53,7 +53,7 @@ export function HelpTab() {
             <div className="flex items-start gap-3">
               <div className="p-2 bg-primary/10 rounded-lg"><Icon name="Target" className="w-6 h-6 text-primary" /></div>
               <div>
-                <CardTitle className="text-lg flex items-center gap-1.5"><Icon name="Target" size={18} />Рекомендации</CardTitle>
+                <CardTitle className="text-lg flex items-center gap-1.5">Рекомендации</CardTitle>
                 <CardDescription className="mt-1">Отслеживание кандидатов</CardDescription>
               </div>
             </div>
