@@ -24,7 +24,7 @@ export function LandingHeader({ onLogin, onRegister }: LandingHeaderProps) {
           <a href="/create-test" target="_blank" className="text-xs lg:text-sm hover:text-primary transition-colors font-medium inline-flex items-center gap-1"><Icon name="Sparkles" size={14} className="text-amber-400" />AI тесты</a>
         </nav>
         <div className="flex items-center gap-2">
-          <a href="/create-test" target="_blank" className="md:hidden inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg border border-primary/40 text-primary bg-primary/5 active:bg-primary/10 transition-colors whitespace-nowrap leading-none"><Icon name="Sparkles" size={12} />AI</a>
+          <a href="/create-test" target="_blank" className="md:hidden inline-flex items-center gap-1 text-[11px] font-medium px-2.5 py-1.5 rounded-lg border border-primary/40 text-primary bg-primary/5 active:bg-primary/10 transition-colors whitespace-nowrap leading-none"><Icon name="Sparkles" size={12} className="text-amber-400" />AI</a>
           <Button variant="ghost" onClick={onLogin} aria-label="Войти в систему" size="sm" className="text-xs sm:text-sm">Вход</Button>
           <Button onClick={onRegister} aria-label="Зарегистрировать компанию" size="sm" className="text-xs">
             <span className="hidden sm:inline">Зарегистрировать</span>
