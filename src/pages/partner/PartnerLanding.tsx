@@ -53,10 +53,7 @@ export default function PartnerLanding(props: Props) {
             Партнёрская программа для HR-специалистов, рекрутёров и кадровых агентств. Рекомендуйте <a href="https://i-hunt.ru/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-semibold">iHUNT</a> — получайте <strong>50% с каждой оплаты</strong> подписки ваших клиентов.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="text-base px-8" onClick={scrollToLogin}>
-              <Icon name="Handshake" size={18} className="mr-2" />
-              Стать партнёром — бесплатно
-            </Button>
+            <Button size="lg" className="text-base px-8" onClick={scrollToLogin}>Стать партнёром </Button>
             <Button size="lg" variant="outline" className="text-base px-8" onClick={() => document.getElementById('how-it-works')?.scrollIntoView({ behavior: 'smooth' })}>
               Узнать подробнее
             </Button>
