@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Icon from '@/components/ui/icon';
 import { AuthStep, Messenger } from './partnerTypes';
+import { PrivacyDialog } from '@/components/dialogs/PrivacyDialog';
+import { PersonalDataDialog } from '@/components/dialogs/PersonalDataDialog';
 
 interface Props {
   authStep: AuthStep;
@@ -26,6 +29,9 @@ export default function PartnerAuth({
   profileForm, setProfileForm,
   handleSendToMessenger, handleVerifyOtp, handleCompleteRegistration,
 }: Props) {
+  const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
+  const [showPersonalDataDialog, setShowPersonalDataDialog] = useState(false);
+
   return (
     <section id="partner-login" className="py-20 px-4 bg-gradient-to-br from-primary/5 to-secondary/5">
       <div className="max-w-md mx-auto">
@@ -65,6 +71,12 @@ export default function PartnerAuth({
                 </button>
               </div>
               <p className="text-xs text-center text-gray-400">Впервые? Бот создаст аккаунт автоматически</p>
+              <p className="text-xs text-center text-gray-400">
+                Продолжая, вы соглашаетесь с{' '}
+                <span onClick={() => setShowPrivacyDialog(true)} className="underline hover:text-primary cursor-pointer">политикой конфиденциальности</span>
+                {' '}и{' '}
+                <span onClick={() => setShowPersonalDataDialog(true)} className="underline hover:text-primary cursor-pointer">обработкой персональных данных</span>
+              </p>
             </CardContent>
           </Card>
         )}
@@ -152,6 +164,9 @@ export default function PartnerAuth({
           </Card>
         )}
       </div>
+
+      <PrivacyDialog open={showPrivacyDialog} onOpenChange={setShowPrivacyDialog} />
+      <PersonalDataDialog open={showPersonalDataDialog} onOpenChange={setShowPersonalDataDialog} />
     </section>
   );
 }

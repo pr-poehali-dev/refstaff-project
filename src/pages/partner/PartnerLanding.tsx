@@ -1,9 +1,12 @@
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Icon from '@/components/ui/icon';
 import PartnerAuth from './PartnerAuth';
 import { AuthStep, Messenger } from './partnerTypes';
+import { PrivacyDialog } from '@/components/dialogs/PrivacyDialog';
+import { PersonalDataDialog } from '@/components/dialogs/PersonalDataDialog';
 
 interface Props {
   authStep: AuthStep;
@@ -22,6 +25,8 @@ interface Props {
 
 export default function PartnerLanding(props: Props) {
   const scrollToLogin = () => document.getElementById('partner-login')?.scrollIntoView({ behavior: 'smooth' });
+  const [showPrivacyDialog, setShowPrivacyDialog] = useState(false);
+  const [showPersonalDataDialog, setShowPersonalDataDialog] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
@@ -297,8 +302,16 @@ export default function PartnerLanding(props: Props) {
           <span className="font-bold text-gray-700">iHUNT</span>
         </div>
         <p>Платформа реферального найма для бизнеса · Партнёрская программа</p>
+        <div className="flex items-center justify-center gap-3 mt-2 text-xs">
+          <span onClick={() => setShowPrivacyDialog(true)} className="hover:text-primary cursor-pointer">Политика конфиденциальности</span>
+          <span>·</span>
+          <span onClick={() => setShowPersonalDataDialog(true)} className="hover:text-primary cursor-pointer">Обработка персональных данных</span>
+        </div>
         <p className="mt-1">© {new Date().getFullYear()} iHUNT. Все права защищены.</p>
       </footer>
+
+      <PrivacyDialog open={showPrivacyDialog} onOpenChange={setShowPrivacyDialog} />
+      <PersonalDataDialog open={showPersonalDataDialog} onOpenChange={setShowPersonalDataDialog} />
     </div>
   );
 }
