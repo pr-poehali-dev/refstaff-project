@@ -225,13 +225,13 @@ export default function Jobs() {
         <meta property="og:url" content="https://i-hunt.ru/jobs" />
         <meta property="og:title" content="HR Вакансии — рекрутер, HR менеджер, HRD, HRBP | iHUNT" />
         <meta property="og:description" content="Актуальные HR вакансии по всей России: рекрутер, HR менеджер, HRD, HRBP, кадровик. Поиск по городу, зарплате и опыту работы." />
-        <meta property="og:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg" />
+        <meta property="og:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/d707b1fc-06f6-4d41-9c38-4fbcfe1e3dbd.jpg" />
         <meta property="og:locale" content="ru_RU" />
         <meta property="og:site_name" content="iHUNT" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="HR Вакансии — рекрутер, HR менеджер, HRD, HRBP | iHUNT" />
         <meta name="twitter:description" content="Актуальные HR вакансии по всей России. Поиск по городу, зарплате и опыту работы." />
-        <meta name="twitter:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg" />
+        <meta name="twitter:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/d707b1fc-06f6-4d41-9c38-4fbcfe1e3dbd.jpg" />
         <script type="application/ld+json">{JSON.stringify(SEO_JSON_LD)}</script>
         <script type="application/ld+json">{JSON.stringify(BREADCRUMB_JSON_LD)}</script>
       </Helmet>

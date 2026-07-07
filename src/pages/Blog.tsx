@@ -92,7 +92,7 @@ export default function Blog() {
         <meta property="og:title" content="Блог iHUNT — о реферальном рекрутинге и HR" />
         <meta property="og:description" content="Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала." />
         <meta property="og:url" content="https://i-hunt.ru/blog" />
-        <meta property="og:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg" />
+        <meta property="og:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/d707b1fc-06f6-4d41-9c38-4fbcfe1e3dbd.jpg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:locale" content="ru_RU" />
@@ -100,7 +100,7 @@ export default function Blog() {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="Блог iHUNT — о реферальном рекрутинге и HR" />
         <meta name="twitter:description" content="Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала." />
-        <meta name="twitter:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/og-image-1779707875070.jpg" />
+        <meta name="twitter:image" content="https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/d707b1fc-06f6-4d41-9c38-4fbcfe1e3dbd.jpg" />
         <script type="application/ld+json">{JSON.stringify({
           '@context': 'https://schema.org',
           '@type': 'Blog',
