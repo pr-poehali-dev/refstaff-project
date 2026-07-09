@@ -12,8 +12,8 @@ API_URL = 'https://functions.poehali.dev/fad87b35-32bf-4090-9a18-d8ecce13f24a'
 BLOG_API_URL = 'https://functions.poehali.dev/24adc9a7-714f-4df9-a6b0-3874d99d1577'
 APP_URL = 'https://i-hunt.ru'
 
-VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/0e9e50fa-3793-4c04-9957-ca24ea4d1579.jpg'
-REFERRAL_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/0e9e50fa-3793-4c04-9957-ca24ea4d1579.jpg'
+VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/32e0fd66-0c26-41b8-8b3f-7dad116ef6f2.png'
+REFERRAL_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/32e0fd66-0c26-41b8-8b3f-7dad116ef6f2.png'
 EMPLOYEE_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/1a4f08a4-f047-444f-aab6-82e0357b0c94.jpg'
 
 BOT_AGENTS = [
