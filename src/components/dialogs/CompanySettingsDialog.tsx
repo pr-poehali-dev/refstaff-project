@@ -12,6 +12,7 @@ export interface CompanyEditForm {
   description: string;
   website: string;
   industry: string;
+  phone: string;
   telegram: string;
   vk: string;
 }
@@ -161,6 +162,19 @@ export function CompanySettingsDialog({
                 disabled
               />
             </div>
+          </div>
+          <div>
+            <Label htmlFor="company-phone" className="text-xs flex items-center gap-1">
+              <Icon name="Phone" size={12} /> Номер телефона
+            </Label>
+            <Input
+              id="company-phone"
+              className="mt-1 h-9 text-sm"
+              type="tel"
+              placeholder="+7 (999) 123-45-67"
+              value={form.phone}
+              onChange={(e) => onFormChange({ ...form, phone: e.target.value })}
+            />
           </div>
           <Separator />
           <div>

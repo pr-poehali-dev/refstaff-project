@@ -107,7 +107,7 @@ function Index() {
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [showCompanySettingsDialog, setShowCompanySettingsDialog] = useState(false);
-  const [companyEditForm, setCompanyEditForm] = useState({ description: '', website: '', industry: '', telegram: '', vk: '' });
+  const [companyEditForm, setCompanyEditForm] = useState({ description: '', website: '', industry: '', phone: '', telegram: '', vk: '' });
   const [isSavingCompany, setIsSavingCompany] = useState(false);
   const [companyLogoFile, setCompanyLogoFile] = useState<File | null>(null);
   const [companyLogoPreview, setCompanyLogoPreview] = useState<string | null>(null);
@@ -422,6 +422,7 @@ function Index() {
         description: companyEditForm.description,
         website: companyEditForm.website,
         industry: companyEditForm.industry,
+        phone: companyEditForm.phone,
         telegram: companyEditForm.telegram,
         vk: companyEditForm.vk,
         ...(logoUrl ? { logo_url: logoUrl } : {})
@@ -1490,6 +1491,17 @@ function Index() {
                   onChange={(e) => setRegisterForm({...registerForm, password: e.target.value})}
                 />
               </div>
+              <div className="col-span-2">
+                <Label htmlFor="admin-phone" className="text-xs">Номер телефона</Label>
+                <Input 
+                  id="admin-phone" 
+                  className="mt-1 h-8 text-sm"
+                  type="tel"
+                  placeholder="+7 (999) 123-45-67" 
+                  value={registerForm.phone}
+                  onChange={(e) => setRegisterForm({...registerForm, phone: e.target.value})}
+                />
+              </div>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="col-span-2 space-y-1">
@@ -1865,10 +1877,10 @@ function Index() {
                 <Badge variant="destructive" className="ml-2 text-xs">{subscriptionDaysLeft} дн.</Badge>
               )}
             </Button>
-            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '', telegram: company?.telegram || '', vk: company?.vk || '' }); setShowCompanySettingsDialog(true); }} size="icon" className="sm:hidden">
+            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '', phone: company?.phone || '', telegram: company?.telegram || '', vk: company?.vk || '' }); setShowCompanySettingsDialog(true); }} size="icon" className="sm:hidden">
               <Icon name="Settings" size={18} />
             </Button>
-            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '', telegram: company?.telegram || '', vk: company?.vk || '' }); setShowCompanySettingsDialog(true); }} size="sm" className="hidden sm:flex">
+            <Button variant="ghost" onClick={() => { setCompanyEditForm({ description: company?.description || '', website: company?.website || '', industry: company?.industry || '', phone: company?.phone || '', telegram: company?.telegram || '', vk: company?.vk || '' }); setShowCompanySettingsDialog(true); }} size="sm" className="hidden sm:flex">
               <Icon name="Settings" className="mr-2" size={18} />
               <span className="hidden lg:inline">Настройки</span>
             </Button>

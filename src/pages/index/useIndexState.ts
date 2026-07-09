@@ -124,7 +124,7 @@ export function useIndexState() {
   });
   const [recommendationForm, setRecommendationForm] = useState({ name: '', email: '', phone: '', comment: '' });
   const [registerForm, setRegisterForm] = useState({
-    companyName: '', firstName: '', lastName: '', email: '', password: '', inn: '', employeeCount: '50'
+    companyName: '', firstName: '', lastName: '', email: '', password: '', phone: '', inn: '', employeeCount: '50'
   });
   const [innVerificationState, setInnVerificationState] = useState<{
     isChecking: boolean; isVerified: boolean; error: string | null; companyData: Record<string, unknown> | null;

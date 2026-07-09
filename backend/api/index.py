@@ -588,7 +588,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             
             query = """
                 SELECT id, name, employee_count, invite_token, logo_url, 
-                       description, website, industry, inn, telegram, vk, created_at,
+                       description, website, industry, inn, phone, telegram, vk, created_at,
                        subscription_tier, subscription_expires_at, payout_methods
                 FROM t_p65890965_refstaff_project.companies
                 WHERE id = %s
@@ -629,6 +629,9 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             if 'industry' in body_data:
                 update_fields.append('industry = %s')
                 params.append(body_data['industry'])
+            if 'phone' in body_data:
+                update_fields.append('phone = %s')
+                params.append(body_data['phone'])
             if 'telegram' in body_data:
                 update_fields.append('telegram = %s')
                 params.append(body_data['telegram'])

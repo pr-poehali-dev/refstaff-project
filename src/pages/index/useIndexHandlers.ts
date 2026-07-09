@@ -611,12 +611,12 @@ export function useIndexHandlers(s: ReturnType<typeof import('./useIndexState').
     try {
       const response = await fetch('https://functions.poehali.dev/c6b69066-22c2-4545-bd88-10571ecd9140', {
         method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'register', email: s.registerForm.email, password: s.registerForm.password, first_name: s.registerForm.firstName, last_name: s.registerForm.lastName, company_name: s.registerForm.companyName, company_inn: s.registerForm.inn || undefined, employee_count: parseInt(s.registerForm.employeeCount) })
+        body: JSON.stringify({ action: 'register', email: s.registerForm.email, password: s.registerForm.password, first_name: s.registerForm.firstName, last_name: s.registerForm.lastName, company_name: s.registerForm.companyName, company_inn: s.registerForm.inn || undefined, employee_count: parseInt(s.registerForm.employeeCount), phone: s.registerForm.phone || undefined })
       });
       const data = await response.json();
       if (response.ok) {
         s.setShowRegisterDialog(false);
-        s.setRegisterForm({ companyName: '', firstName: '', lastName: '', email: '', password: '', inn: '', employeeCount: '50' });
+        s.setRegisterForm({ companyName: '', firstName: '', lastName: '', email: '', password: '', phone: '', inn: '', employeeCount: '50' });
         localStorage.setItem('showOnboarding', 'true');
         if (typeof window.ym === 'function') window.ym(106919720, 'reachGoal', 'registration');
         alert(`Регистрация успешна!\n\nМы отправили письмо с подтверждением на ${s.registerForm.email}.\nПожалуйста, проверьте вашу почту и перейдите по ссылке в письме для активации аккаунта.`);

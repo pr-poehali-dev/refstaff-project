@@ -140,6 +140,7 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 company_inn = body_data.get('company_inn')
                 employee_count = body_data.get('employee_count', 50)
                 ref_code = body_data.get('ref_code', '').strip()
+                phone = body_data.get('phone', '').strip() or None
                 
                 if not email or not password or not first_name or not last_name:
                     return {
@@ -198,10 +199,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                     invite_token = os.urandom(16).hex()
                     cursor.execute("""
                         INSERT INTO t_p65890965_refstaff_project.companies 
-                        (name, employee_count, invite_token, subscription_tier, subscription_expires_at, inn, referred_by_partner_id, created_at, updated_at)
-                        VALUES (%s, %s, %s, 'trial', %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+                        (name, employee_count, invite_token, subscription_tier, subscription_expires_at, inn, phone, referred_by_partner_id, created_at, updated_at)
+                        VALUES (%s, %s, %s, 'trial', %s, %s, %s, %s, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                         RETURNING id
-                    """, (company_name, employee_count, invite_token, datetime.utcnow() + timedelta(days=14), company_inn, referred_by_partner_id))
+                    """, (company_name, employee_count, invite_token, datetime.utcnow() + timedelta(days=14), company_inn, phone, referred_by_partner_id))
                     company_id = cursor.fetchone()['id']
                     role = 'admin'
 
