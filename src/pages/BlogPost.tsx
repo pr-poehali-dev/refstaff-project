@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import Icon from '@/components/ui/icon';
 
 const BLOG_API = 'https://functions.poehali.dev/24adc9a7-714f-4df9-a6b0-3874d99d1577';
-const OG_IMAGE_API = 'https://functions.poehali.dev/c6e24176-0014-4fee-8ecd-b597171ff766';
 const OG_PROXY_URL = 'https://functions.poehali.dev/a7ef69a9-2736-4504-ac24-54132c34d646';
 
 const REACTIONS = [
@@ -117,7 +116,7 @@ export default function BlogPost() {
 
   const postUrl = `https://i-hunt.ru/blog/${post.slug}`;
   const proxyUrl = `${OG_PROXY_URL}?type=blog&id=${encodeURIComponent(post.slug)}`;
-  const ogImageUrl = `${OG_IMAGE_API}?title=${encodeURIComponent(post.title)}&department=${encodeURIComponent('HR & Рекрутинг')}&salary=${encodeURIComponent('iHUNT Блог')}`;
+  const ogImageUrl = 'https://i-hunt.ru/blog-og-image.png';
   const totalReactions = Object.values(stats.reactions).reduce((a, b) => a + b, 0);
 
   const shareLinks = {

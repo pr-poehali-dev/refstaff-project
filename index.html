@@ -56,45 +56,67 @@
     })();
     </script>
 
-    <!-- SEO: подставляем мета-теги статьи блога синхронно для поисковых ботов -->
+    <!-- SEO: подставляем мета-теги блога синхронно для поисковых ботов и соцсетей -->
     <script>
     (function() {
       var path = window.location.pathname;
+      var blogImage = 'https://i-hunt.ru/blog-og-image.png';
+      var setMeta = function(sel, attr, val) {
+        var el = document.querySelector(sel);
+        if (el) el.setAttribute(attr, val);
+        else { var m = document.createElement('meta'); var parts = sel.replace('[','').replace(']','').split('='); m.setAttribute(parts[0].trim(), parts[1].replace(/"/g,'')); m.setAttribute(attr, val); document.head.appendChild(m); }
+      };
+      var setLink = function(rel, val) {
+        var el = document.querySelector('link[rel="' + rel + '"]');
+        if (el) el.setAttribute('href', val);
+      };
+
       var blogMatch = path.match(/^\/blog\/([^\/]+)$/);
-      if (!blogMatch) return;
-      var slug = blogMatch[1];
-      try {
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'https://functions.poehali.dev/24adc9a7-714f-4df9-a6b0-3874d99d1577?action=get&slug=' + encodeURIComponent(slug), false);
-        xhr.send();
-        if (xhr.status === 200) {
-          var data = JSON.parse(xhr.responseText);
-          var post = data && data.post;
-          if (post && post.title) {
-            var title = post.title + ' | Блог iHUNT';
-            var desc = post.metaDescription || post.meta_description || '';
-            var url = 'https://i-hunt.ru/blog/' + slug;
-            document.title = title;
-            var setMeta = function(sel, attr, val) {
-              var el = document.querySelector(sel);
-              if (el) el.setAttribute(attr, val);
-              else { var m = document.createElement('meta'); var parts = sel.replace('[','').replace(']','').split('='); m.setAttribute(parts[0].trim(), parts[1].replace(/"/g,'')); m.setAttribute(attr, val); document.head.appendChild(m); }
-            };
-            var setLink = function(rel, val) {
-              var el = document.querySelector('link[rel="' + rel + '"]');
-              if (el) el.setAttribute('href', val);
-            };
-            setMeta('meta[name="description"]', 'content', desc);
-            setMeta('meta[property="og:title"]', 'content', title);
-            setMeta('meta[property="og:description"]', 'content', desc);
-            setMeta('meta[property="og:url"]', 'content', url);
-            setMeta('meta[property="og:type"]', 'content', 'article');
-            setMeta('meta[name="twitter:title"]', 'content', title);
-            setMeta('meta[name="twitter:description"]', 'content', desc);
-            setLink('canonical', url);
+      if (blogMatch) {
+        var slug = blogMatch[1];
+        try {
+          var xhr = new XMLHttpRequest();
+          xhr.open('GET', 'https://functions.poehali.dev/24adc9a7-714f-4df9-a6b0-3874d99d1577?action=get&slug=' + encodeURIComponent(slug), false);
+          xhr.send();
+          if (xhr.status === 200) {
+            var data = JSON.parse(xhr.responseText);
+            var post = data && data.post;
+            if (post && post.title) {
+              var title = post.title + ' | Блог iHUNT';
+              var desc = post.metaDescription || post.meta_description || '';
+              var url = 'https://i-hunt.ru/blog/' + slug;
+              document.title = title;
+              setMeta('meta[name="description"]', 'content', desc);
+              setMeta('meta[property="og:title"]', 'content', title);
+              setMeta('meta[property="og:description"]', 'content', desc);
+              setMeta('meta[property="og:url"]', 'content', url);
+              setMeta('meta[property="og:type"]', 'content', 'article');
+              setMeta('meta[property="og:image"]', 'content', blogImage);
+              setMeta('meta[name="twitter:title"]', 'content', title);
+              setMeta('meta[name="twitter:description"]', 'content', desc);
+              setMeta('meta[name="twitter:image"]', 'content', blogImage);
+              setLink('canonical', url);
+            }
           }
-        }
-      } catch(e) {}
+        } catch(e) {}
+        return;
+      }
+
+      if (path === '/blog' || path === '/blog/') {
+        var listTitle = 'Блог iHUNT — экспертные статьи о реферальном рекрутинге и HR';
+        var listDesc = 'Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала.';
+        var listUrl = 'https://i-hunt.ru/blog';
+        document.title = listTitle;
+        setMeta('meta[name="description"]', 'content', listDesc);
+        setMeta('meta[property="og:title"]', 'content', listTitle);
+        setMeta('meta[property="og:description"]', 'content', listDesc);
+        setMeta('meta[property="og:url"]', 'content', listUrl);
+        setMeta('meta[property="og:image"]', 'content', blogImage);
+        setMeta('meta[name="twitter:title"]', 'content', listTitle);
+        setMeta('meta[name="twitter:description"]', 'content', listDesc);
+        setMeta('meta[name="twitter:image"]', 'content', blogImage);
+        setLink('canonical', listUrl);
+      }
     })();
     </script>
 

@@ -15,6 +15,7 @@ APP_URL = 'https://i-hunt.ru'
 VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/32e0fd66-0c26-41b8-8b3f-7dad116ef6f2.png'
 REFERRAL_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/32e0fd66-0c26-41b8-8b3f-7dad116ef6f2.png'
 EMPLOYEE_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/1a4f08a4-f047-444f-aab6-82e0357b0c94.jpg'
+BLOG_IMAGE = 'https://i-hunt.ru/blog-og-image.png'
 
 BOT_AGENTS = [
     'vkshare', 'facebookexternalhit', 'twitterbot', 'telegrambot',
@@ -117,7 +118,7 @@ def handler(event: dict, context) -> dict:
             else:
                 title = 'Блог iHUNT — статьи о реферальном рекрутинге и HR'
                 description = 'Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала.'
-            image = 'https://i-hunt.ru/og-image.jpg'
+            image = BLOG_IMAGE
             html = build_html(title, description, image, redirect_url, redirect_url)
             return {
                 'statusCode': 200,
