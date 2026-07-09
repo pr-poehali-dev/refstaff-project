@@ -117,7 +117,7 @@ def handler(event: dict, context) -> dict:
             else:
                 title = 'Блог iHUNT — статьи о реферальном рекрутинге и HR'
                 description = 'Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала.'
-            image = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/3821f5d7-e370-4b9f-a459-21a64bec2650.jpg'
+            image = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/files/4384328c-47b1-47b0-b98e-fbaba0cdf21b.jpg'
             html = build_html(title, description, image, redirect_url, redirect_url)
             return {
                 'statusCode': 200,
