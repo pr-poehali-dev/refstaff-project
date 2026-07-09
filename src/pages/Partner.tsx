@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -12,6 +13,35 @@ import PartnerPayoutsTab from './partner/PartnerPayoutsTab';
 import PartnerProfileTab from './partner/PartnerProfileTab';
 import PartnerHelpTab from './partner/PartnerHelpTab';
 import PartnerRulesTab from './partner/PartnerRulesTab';
+
+const PARTNER_TITLE = 'Партнёрская программа iHUNT — зарабатывайте до 101 490 ₽ с клиента';
+const PARTNER_DESC = 'Партнёрская программа для HR-специалистов, рекрутёров и кадровых агентств. Рекомендуйте iHUNT — получайте 50% с каждой оплаты подписки ваших клиентов.';
+const PARTNER_IMAGE = 'https://i-hunt.ru/partner-og-image.jpg';
+const PARTNER_URL = 'https://i-hunt.ru/partner';
+
+function PartnerSeo() {
+  return (
+    <Helmet>
+      <title>{PARTNER_TITLE}</title>
+      <meta name="description" content={PARTNER_DESC} />
+      <meta name="robots" content="index, follow" />
+      <link rel="canonical" href={PARTNER_URL} />
+      <meta property="og:type" content="website" />
+      <meta property="og:title" content={PARTNER_TITLE} />
+      <meta property="og:description" content={PARTNER_DESC} />
+      <meta property="og:url" content={PARTNER_URL} />
+      <meta property="og:image" content={PARTNER_IMAGE} />
+      <meta property="og:image:width" content="1149" />
+      <meta property="og:image:height" content="617" />
+      <meta property="og:locale" content="ru_RU" />
+      <meta property="og:site_name" content="iHUNT" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={PARTNER_TITLE} />
+      <meta name="twitter:description" content={PARTNER_DESC} />
+      <meta name="twitter:image" content={PARTNER_IMAGE} />
+    </Helmet>
+  );
+}
 
 export default function Partner() {
   const {
@@ -37,20 +67,23 @@ export default function Partner() {
 
   if (!partner) {
     return (
-      <PartnerLanding
-        authStep={authStep}
-        setAuthStep={setAuthStep}
-        messenger={messenger}
-        deepLink={deepLink}
-        otp={otp}
-        setOtp={setOtp}
-        submitting={submitting}
-        profileForm={profileForm}
-        setProfileForm={setProfileForm}
-        handleSendToMessenger={handleSendToMessenger}
-        handleVerifyOtp={handleVerifyOtp}
-        handleCompleteRegistration={handleCompleteRegistration}
-      />
+      <>
+        <PartnerSeo />
+        <PartnerLanding
+          authStep={authStep}
+          setAuthStep={setAuthStep}
+          messenger={messenger}
+          deepLink={deepLink}
+          otp={otp}
+          setOtp={setOtp}
+          submitting={submitting}
+          profileForm={profileForm}
+          setProfileForm={setProfileForm}
+          handleSendToMessenger={handleSendToMessenger}
+          handleVerifyOtp={handleVerifyOtp}
+          handleCompleteRegistration={handleCompleteRegistration}
+        />
+      </>
     );
   }
 
@@ -59,6 +92,7 @@ export default function Partner() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <PartnerSeo />
       <div className="bg-white border-b px-4 py-3">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2">

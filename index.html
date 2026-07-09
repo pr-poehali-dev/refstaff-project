@@ -116,6 +116,24 @@
         setMeta('meta[name="twitter:description"]', 'content', listDesc);
         setMeta('meta[name="twitter:image"]', 'content', blogImage);
         setLink('canonical', listUrl);
+        return;
+      }
+
+      if (path === '/partner' || path === '/partner/') {
+        var partnerTitle = 'Партнёрская программа iHUNT — зарабатывайте до 101 490 ₽ с клиента';
+        var partnerDesc = 'Партнёрская программа для HR-специалистов, рекрутёров и кадровых агентств. Рекомендуйте iHUNT — получайте 50% с каждой оплаты подписки ваших клиентов.';
+        var partnerUrl = 'https://i-hunt.ru/partner';
+        var partnerImage = 'https://i-hunt.ru/partner-og-image.jpg';
+        document.title = partnerTitle;
+        setMeta('meta[name="description"]', 'content', partnerDesc);
+        setMeta('meta[property="og:title"]', 'content', partnerTitle);
+        setMeta('meta[property="og:description"]', 'content', partnerDesc);
+        setMeta('meta[property="og:url"]', 'content', partnerUrl);
+        setMeta('meta[property="og:image"]', 'content', partnerImage);
+        setMeta('meta[name="twitter:title"]', 'content', partnerTitle);
+        setMeta('meta[name="twitter:description"]', 'content', partnerDesc);
+        setMeta('meta[name="twitter:image"]', 'content', partnerImage);
+        setLink('canonical', partnerUrl);
       }
     })();
     </script>
