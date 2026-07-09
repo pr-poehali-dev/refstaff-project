@@ -16,6 +16,8 @@ from psycopg2.extras import RealDictCursor
 import urllib.request
 
 NOTIFY_URL = 'https://functions.poehali.dev/3c081b85-b149-4f98-a70a-f773cb440d06'
+SEND_EMAIL_URL = 'https://functions.poehali.dev/268341d7-c5b3-4c4f-a5fb-50277c318250'
+ADMIN_RECIPIENTS = ['info@i-hunt.ru', 'sales@i-hunt.ru']
 
 def send_notification(payload):
     try:
@@ -24,6 +26,24 @@ def send_notification(payload):
         urllib.request.urlopen(req, timeout=5)
     except Exception:
         pass
+
+def notify_admins_new_company(company_name: str, contact_name: str, contact_email: str, company_inn: str):
+    html = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px;">
+        <h2 style="color: #667eea;">🏢 Новая регистрация компании на iHUNT</h2>
+        <p><strong>Компания:</strong> {company_name}</p>
+        <p><strong>ИНН:</strong> {company_inn or '—'}</p>
+        <p><strong>Контакт:</strong> {contact_name}</p>
+        <p><strong>Email:</strong> {contact_email}</p>
+    </div>
+    """
+    for admin_email in ADMIN_RECIPIENTS:
+        try:
+            payload = {'to_email': admin_email, 'action': 'custom', 'subject': f'Новая компания: {company_name}', 'html_content': html}
+            req = urllib.request.Request(SEND_EMAIL_URL, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')
+            urllib.request.urlopen(req, timeout=5)
+        except Exception:
+            pass
 
 def get_db_connection():
     dsn = os.environ.get('DATABASE_URL')
@@ -223,6 +243,10 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
                 """, (user_id, verification_token, expires_at))
                 
                 conn.commit()
+
+                # Уведомляем администраторов о регистрации новой компании
+                if company_name:
+                    notify_admins_new_company(company_name, f"{first_name} {last_name}", email, company_inn)
 
                 # Уведомляем партнёра о новой регистрации по его ссылке
                 if referred_by_partner_id and partner_row and company_name:

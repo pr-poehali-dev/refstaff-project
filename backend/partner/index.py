@@ -22,6 +22,27 @@ CORS_HEADERS = {
 
 SCHEMA = 't_p65890965_refstaff_project'
 MAX_API = 'https://platform-api.max.ru'
+SEND_EMAIL_URL = 'https://functions.poehali.dev/268341d7-c5b3-4c4f-a5fb-50277c318250'
+ADMIN_RECIPIENTS = ['info@i-hunt.ru', 'sales@i-hunt.ru']
+
+
+def notify_admins_new_partner(name: str, email: str, phone: str, partner_code: str):
+    html = f"""
+    <div style="font-family: Arial, sans-serif; max-width: 600px;">
+        <h2 style="color: #667eea;">🤝 Новая регистрация партнёра в партнёрской программе iHUNT</h2>
+        <p><strong>Имя:</strong> {name}</p>
+        <p><strong>Email:</strong> {email or '—'}</p>
+        <p><strong>Телефон:</strong> {phone or '—'}</p>
+        <p><strong>Код партнёра:</strong> {partner_code}</p>
+    </div>
+    """
+    for admin_email in ADMIN_RECIPIENTS:
+        try:
+            payload = {'to_email': admin_email, 'action': 'custom', 'subject': f'Новый партнёр: {name}', 'html_content': html}
+            req = urllib.request.Request(SEND_EMAIL_URL, data=json.dumps(payload).encode('utf-8'), headers={'Content-Type': 'application/json'}, method='POST')
+            urllib.request.urlopen(req, timeout=5)
+        except Exception:
+            pass
 
 # Стоимость подписки для расчёта комиссии (50%)
 SUBSCRIPTION_PRICES = {
@@ -407,6 +428,7 @@ def handler(event: dict, context) -> dict:
                         conn.commit()
                         cur.execute(f"SELECT * FROM {SCHEMA}.hr_partners WHERE id = %s", (new_id,))
                         partner = dict(cur.fetchone())
+                        notify_admins_new_partner(name, email, phone, partner_code)
                     except Exception as e:
                         conn.rollback()
                         if 'unique' in str(e).lower():

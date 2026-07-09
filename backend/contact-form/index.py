@@ -146,8 +146,11 @@ def handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
         }
 
 
+ADMIN_RECIPIENTS = ['info@i-hunt.ru', 'sales@i-hunt.ru']
+
+
 def send_contact_notification(user_name: str, user_email: str, user_message: str):
-    """Отправляет уведомление о новом сообщении с формы контактов на email администратора"""
+    """Отправляет уведомление о новом сообщении с формы контактов на почту администраторов"""
     smtp_host = os.environ.get('EMAIL_SMTP_HOST')
     smtp_port = int(os.environ.get('EMAIL_SMTP_PORT', '587'))
     smtp_user = os.environ.get('EMAIL_FROM')
@@ -232,7 +235,7 @@ def send_contact_notification(user_name: str, user_email: str, user_message: str
     msg = MIMEMultipart('alternative')
     msg['Subject'] = f'Новое сообщение от {user_name}'
     msg['From'] = smtp_user
-    msg['To'] = smtp_user  # Отправляем самому себе (на почту администратора)
+    msg['To'] = ', '.join(ADMIN_RECIPIENTS)
     msg['Reply-To'] = user_email  # Чтобы можно было быстро ответить клиенту
     
     html_part = MIMEText(html_content, 'html', 'utf-8')
@@ -241,4 +244,4 @@ def send_contact_notification(user_name: str, user_email: str, user_message: str
     with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as server:
         server.starttls()
         server.login(smtp_user, smtp_password)
-        server.send_message(msg)
+        server.send_message(msg, to_addrs=ADMIN_RECIPIENTS)
