@@ -16,6 +16,35 @@ VACANCY_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a83330
 REFERRAL_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/32e0fd66-0c26-41b8-8b3f-7dad116ef6f2.png'
 EMPLOYEE_IMAGE = 'https://cdn.poehali.dev/projects/8d04a195-3369-41af-824b-a8333098d2fe/bucket/1a4f08a4-f047-444f-aab6-82e0357b0c94.jpg'
 BLOG_IMAGE = 'https://i-hunt.ru/blog-og-image.png'
+DEFAULT_IMAGE = 'https://i-hunt.ru/og-image.jpg'
+PARTNER_IMAGE = 'https://i-hunt.ru/partner-og-image.jpg'
+
+STATIC_PAGES = {
+    'create-test': {
+        'title': 'AI Тест для кандидатов — создать тест по вакансии бесплатно | iHUNT',
+        'description': 'Создайте профессиональный тест для отбора кандидатов за 1 минуту с помощью ИИ. Введите описание вакансии — ИИ сгенерирует вопросы. Бесплатно для HR и рекрутеров.',
+        'path': '/create-test',
+        'image': DEFAULT_IMAGE,
+    },
+    'jobs': {
+        'title': 'HR Вакансии — рекрутер, HR менеджер, HRD, HRBP | iHUNT',
+        'description': 'Актуальные HR вакансии по всей России: рекрутер, HR менеджер, HRD, HRBP, кадровик, HRG. Поиск по городу, зарплате и опыту. Обновляется ежедневно.',
+        'path': '/jobs',
+        'image': DEFAULT_IMAGE,
+    },
+    'partner': {
+        'title': 'Партнёрская программа iHUNT — зарабатывайте до 101 490 ₽ с клиента',
+        'description': 'Партнёрская программа для HR-специалистов, рекрутёров и кадровых агентств. Рекомендуйте iHUNT — получайте 50% с каждой оплаты подписки ваших клиентов.',
+        'path': '/partner',
+        'image': PARTNER_IMAGE,
+    },
+    'blog': {
+        'title': 'Блог iHUNT — экспертные статьи о реферальном рекрутинге и HR',
+        'description': 'Экспертные статьи о реферальном найме, HR-автоматизации и снижении стоимости подбора персонала.',
+        'path': '/blog',
+        'image': BLOG_IMAGE,
+    },
+}
 
 BOT_AGENTS = [
     'vkshare', 'facebookexternalhit', 'twitterbot', 'telegrambot',
